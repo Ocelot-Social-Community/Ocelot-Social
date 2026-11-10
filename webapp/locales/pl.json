@@ -329,6 +329,7 @@
       "deleteError": "Nie można usunąć roli: {message}",
       "deleteSuccess": "Rola usunięta.",
       "description": "Kto co może w całej sieci. Twórz role i przypisuj uprawnienia — zmiany działają natychmiast.",
+      "discard": "Odrzuć",
       "members": "{count} członków",
       "name": "Role i uprawnienia",
       "nameLabel": "Nazwa",
@@ -470,6 +471,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Co najmniej jeden z tematów nie istnieje.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Opis musi mieć co najmniej {min} znaków.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Grupa, której osoby z zewnątrz nie mogą znaleźć, nie może też pokazać im swoich członków.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Nazwa grupy może mieć co najwyżej {max} znaków.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Nazwa grupy musi mieć co najmniej {min} znaków.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ta unikalna nazwa grupy jest już zajęta.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Wybrano za mało tematów (co najmniej {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Wybrano za dużo tematów (najwyżej {max}).",
@@ -1126,6 +1129,13 @@
         "group_videoCall_join": "Dołączenie do trwającej rozmowy wideo w grupie."
       },
       "resultingType": "Z tymi uprawnieniami grupa jest:",
+      "roleManageWarning": {
+        "both": "Rola <strong>{roles}</strong> będzie mogła edytować role grupy: kto ją ma, może kształtować każdą rolę oprócz roli właściciela, odbierać prawa innym rolom i zmieniać to, co widzą osoby spoza grupy. Przydzielaj tę rolę tylko członkom, którym powierzyłbyś zarządzanie grupą. <strong>{own}</strong>, Twoja własna rola, nie będzie już mogła edytować ról grupy. Cofnąć to może tylko właściciel.",
+        "confirm": "Zapisz mimo to",
+        "grant": "Rola <strong>{roles}</strong> będzie mogła edytować role grupy: kto ją ma, może kształtować każdą rolę oprócz roli właściciela, odbierać prawa innym rolom i zmieniać to, co widzą osoby spoza grupy. Przydzielaj tę rolę tylko członkom, którym powierzyłbyś zarządzanie grupą.",
+        "lockout": "<strong>{own}</strong>, Twoja własna rola, nie będzie już mogła edytować ról grupy. Cofnąć to może tylko właściciel.",
+        "title": "Zmienić, kto zarządza rolami?"
+      },
       "saved": "Uprawnienia zapisane",
       "saveFirst": "Najpierw zapisz lub odrzuć — są niezapisane zmiany.",
       "simple": {

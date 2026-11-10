@@ -11,7 +11,7 @@
       :roles="orderedRoles"
       :active-name="activeRoleName"
       :label-for="(role) => networkRoleLabel(role.name)"
-      :badge-for="(role) => !canRename(role)"
+      :badge-for="isFixedRole"
       :badge-title="$t('admin.roles.protected')"
       :label="$t('admin.roles.title')"
       @select="setActive"
@@ -192,6 +192,18 @@
               @click="saveRole(activeRole)"
             >
               {{ $t('admin.roles.save') }}
+            </os-button>
+          </span>
+          <!-- Back to the saved rights: the draft is rebuilt from the server set, as the conflict
+               banner's "load" does. Only when there is something to discard. -->
+          <span class="role__action">
+            <os-button
+              appearance="ghost"
+              :disabled="!isDirty(activeRole) || saving"
+              :data-test="`role-${activeRole.name}-discard`"
+              @click="discardChanges(activeRole)"
+            >
+              {{ $t('admin.roles.discard') }}
             </os-button>
           </span>
           <span class="role__action" :title="deleteHint(activeRole)">
@@ -501,6 +513,10 @@ export default {
       this.$set(this.forms, name, { permissions, baseline: [...keys] })
       this.$set(this.conflicts, name, false)
     },
+    // Throw the draft away: the form shows the role's saved rights again.
+    discardChanges(role) {
+      this.loadServerVersion(role.name)
+    },
     // Keep editing (keep mine): hide the banner but preserve the draft. Advance the draft's
     // baseline to the acknowledged server set so a plain rebuild does not re-pop the banner;
     // only a genuinely NEW remote move raises it again. The eventual save overwrites theirs.
@@ -548,13 +564,16 @@ export default {
       this.cancelCreate()
       this.cancelRename()
     },
-    // Mandatory roles are load-bearing by name (owner ⇒ full catalog, user ⇒ the
-    // baseline fallback) and cannot be renamed — mirrors the backend guard.
-    // Fixed roles: `owner` (protected) and `user` (the baseline everybody holds) cannot be renamed
-    // or deleted — the backend refuses both (MANDATORY_ROLE_NAMES). The lock on their tabs reads
-    // this, so the two cannot disagree again; it used to follow `protected` and left `user` bare.
+    // Fixed roles: `owner` (protected) and `user` (the baseline everybody holds) are load-bearing
+    // by name (owner ⇒ full catalog, user ⇒ the baseline fallback) and cannot be renamed or
+    // deleted by anybody — the backend refuses both (MANDATORY_ROLE_NAMES). Only they carry the
+    // lock on their tab. A role this viewer may not change is a different matter: its form says
+    // so, and a lock there would claim the role is fixed for everybody.
+    isFixedRole(role) {
+      return Boolean(role.protected) || role.name === 'user'
+    },
     canRename(role) {
-      return !role.protected && role.name !== 'user' && this.mayChange(role)
+      return !this.isFixedRole(role) && this.mayChange(role)
     },
     // Whether the viewer may change this role at all (#10485): their own, or one their role
     // outranks — the backend's answer, so the page offers exactly what it would accept. A

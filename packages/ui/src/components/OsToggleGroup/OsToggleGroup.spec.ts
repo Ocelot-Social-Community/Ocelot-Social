@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
-import { h } from 'vue'
+import { Comment, Text, h } from 'vue'
 
 import OsToggleGroup from './OsToggleGroup.vue'
 
@@ -147,6 +147,30 @@ describe('osToggleGroup', () => {
         'closed:false',
         'hidden:false',
       ])
+    })
+
+    it('puts what the option slot renders into the button suffix, apart from the label', () => {
+      wrapper = mount(OsToggleGroup, {
+        props: { options: OPTIONS, value: 'public' },
+        slots: { option: () => h('em', { class: 'extra' }, 'x') },
+      })
+
+      expect(at(wrapper, 'option-public').find('.os-button__suffix .extra').exists()).toBe(true)
+    })
+
+    it('leaves the suffix out where the option slot renders nothing to show', () => {
+      wrapper = mount(OsToggleGroup, {
+        props: { options: OPTIONS, value: 'public' },
+        slots: {
+          option: ({ option }: { option: ToggleGroupOption }) =>
+            option.value === 'closed'
+              ? h('em', { class: 'extra' }, 'x')
+              : [h(Comment, 'v-if'), h(Text, '\n  '), h(Comment, 'v-if')],
+        },
+      })
+
+      expect(at(wrapper, 'option-public').find('.os-button__suffix').exists()).toBe(false)
+      expect(at(wrapper, 'option-closed').find('.os-button__suffix').exists()).toBe(true)
     })
 
     it('passes a class through to the group', () => {

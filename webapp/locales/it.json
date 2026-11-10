@@ -329,6 +329,7 @@
       "deleteError": "Impossibile eliminare il ruolo: {message}",
       "deleteSuccess": "Ruolo eliminato.",
       "description": "Chi può fare cosa in tutta la rete. Crea ruoli e assegna permessi: le modifiche hanno effetto subito.",
+      "discard": "Scarta",
       "members": "{count} membri",
       "name": "Ruoli e permessi",
       "nameLabel": "Nome",
@@ -470,6 +471,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Almeno uno degli argomenti non esiste.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La descrizione deve contenere almeno {min} caratteri.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un gruppo che gli esterni non possono trovare non può nemmeno mostrare loro i suoi membri.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Il nome del gruppo può contenere al massimo {max} caratteri.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Il nome del gruppo deve contenere almeno {min} caratteri.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Questo nome unico del gruppo è già in uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Sono stati selezionati troppo pochi argomenti (almeno {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Sono stati selezionati troppi argomenti (al massimo {max}).",
@@ -1126,6 +1129,13 @@
         "group_videoCall_join": "Partecipare a una videochiamata in corso nel gruppo."
       },
       "resultingType": "Con questi permessi il gruppo è:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> potrà poi modificare i ruoli del gruppo: chi ha questo ruolo può modellare ogni ruolo tranne quello del proprietario, togliere diritti agli altri ruoli e cambiare ciò che vedono i non membri. Assegna il ruolo solo a membri a cui affideresti la gestione del gruppo. <strong>{own}</strong>, il tuo stesso ruolo, non potrà più modificare i ruoli del gruppo. Solo un proprietario potrà annullarlo.",
+        "confirm": "Salva comunque",
+        "grant": "<strong>{roles}</strong> potrà poi modificare i ruoli del gruppo: chi ha questo ruolo può modellare ogni ruolo tranne quello del proprietario, togliere diritti agli altri ruoli e cambiare ciò che vedono i non membri. Assegna il ruolo solo a membri a cui affideresti la gestione del gruppo.",
+        "lockout": "<strong>{own}</strong>, il tuo stesso ruolo, non potrà più modificare i ruoli del gruppo. Solo un proprietario potrà annullarlo.",
+        "title": "Cambiare chi gestisce i ruoli?"
+      },
       "saved": "Permessi salvati",
       "saveFirst": "Prima salva o annulla: ci sono modifiche non salvate.",
       "simple": {

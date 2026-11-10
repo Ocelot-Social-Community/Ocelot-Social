@@ -329,6 +329,7 @@
       "deleteError": "No se pudo eliminar el rol: {message}",
       "deleteSuccess": "Rol eliminado.",
       "description": "Quién puede hacer qué en toda la red. Crea roles y asigna permisos: los cambios se aplican de inmediato.",
+      "discard": "Descartar",
       "members": "{count} miembros",
       "name": "Roles y permisos",
       "nameLabel": "Nombre",
@@ -470,6 +471,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Al menos uno de los temas no existe.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La descripción debe tener al menos {min} caracteres.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un grupo que los demás no pueden encontrar tampoco puede mostrarles sus miembros.",
+    "GROUP_SAVE_NAME_TOO_LONG": "El nombre del grupo puede tener como máximo {max} caracteres.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "El nombre del grupo debe tener al menos {min} caracteres.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Este nombre único del grupo ya está en uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Hay muy pocos temas seleccionados (al menos {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Hay demasiados temas seleccionados (como máximo {max}).",
@@ -1126,6 +1129,13 @@
         "group_videoCall_join": "Unirse a una videollamada en curso del grupo."
       },
       "resultingType": "Con estos permisos el grupo es:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> podrá editar los roles del grupo: quien tenga este rol puede configurar cualquier rol excepto el del propietario, quitar derechos a otros roles y cambiar lo que ven quienes no son miembros. Da el rol solo a miembros a los que confiarías la gestión del grupo. <strong>{own}</strong>, tu propio rol, ya no podrá editar los roles del grupo. Solo un propietario puede deshacerlo.",
+        "confirm": "Guardar de todos modos",
+        "grant": "<strong>{roles}</strong> podrá editar los roles del grupo: quien tenga este rol puede configurar cualquier rol excepto el del propietario, quitar derechos a otros roles y cambiar lo que ven quienes no son miembros. Da el rol solo a miembros a los que confiarías la gestión del grupo.",
+        "lockout": "<strong>{own}</strong>, tu propio rol, ya no podrá editar los roles del grupo. Solo un propietario puede deshacerlo.",
+        "title": "¿Cambiar quién gestiona los roles?"
+      },
       "saved": "Permisos guardados",
       "saveFirst": "Guarda o descarta primero: hay cambios sin guardar.",
       "simple": {

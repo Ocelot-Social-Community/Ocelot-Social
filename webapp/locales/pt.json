@@ -329,6 +329,7 @@
       "deleteError": "Não foi possível excluir a função: {message}",
       "deleteSuccess": "Função excluída.",
       "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações são aplicadas de imediato.",
+      "discard": "Descartar",
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",
@@ -470,6 +471,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Pelo menos um dos tópicos não existe.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "A descrição deve ter pelo menos {min} caracteres.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Um grupo que pessoas de fora não conseguem encontrar também não pode mostrar seus membros a elas.",
+    "GROUP_SAVE_NAME_TOO_LONG": "O nome do grupo deve ter no máximo {max} caracteres.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "O nome do grupo deve ter pelo menos {min} caracteres.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Este nome único de grupo já está em uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Poucos tópicos selecionados (pelo menos {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Tópicos demais selecionados (no máximo {max}).",
@@ -1126,6 +1129,13 @@
         "group_videoCall_join": "Participar de uma videochamada em andamento no grupo."
       },
       "resultingType": "Com estas permissões o grupo é:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> poderá então editar as funções do grupo: quem tem esta função pode moldar qualquer função, exceto a do proprietário, tirar direitos de outras funções e mudar o que não membros veem. Dê a função apenas a membros a quem você confiaria a gestão do grupo. <strong>{own}</strong>, a sua própria função, não poderá mais editar as funções do grupo. Só um proprietário pode desfazer isso.",
+        "confirm": "Salvar mesmo assim",
+        "grant": "<strong>{roles}</strong> poderá então editar as funções do grupo: quem tem esta função pode moldar qualquer função, exceto a do proprietário, tirar direitos de outras funções e mudar o que não membros veem. Dê a função apenas a membros a quem você confiaria a gestão do grupo.",
+        "lockout": "<strong>{own}</strong>, a sua própria função, não poderá mais editar as funções do grupo. Só um proprietário pode desfazer isso.",
+        "title": "Mudar quem gerencia as funções?"
+      },
       "saved": "Permissões guardadas",
       "saveFirst": "Guarde ou descarte primeiro: há alterações não guardadas.",
       "simple": {

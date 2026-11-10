@@ -329,6 +329,7 @@
       "deleteError": "Could not delete role: {message}",
       "deleteSuccess": "Role deleted.",
       "description": "Who may do what across the network. Create roles and assign permissions — changes apply immediately.",
+      "discard": "Discard",
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
@@ -470,6 +471,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "At least one of the categories does not exist.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "The description must be at least {min} characters long.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "A group that outsiders cannot find cannot show them its members either.",
+    "GROUP_SAVE_NAME_TOO_LONG": "The group name must be at most {max} characters long.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "The group name must be at least {min} characters long.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "This unique group name is already taken.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",
@@ -1126,6 +1129,13 @@
         "group_videoCall_join": "Join a video call running in the group."
       },
       "resultingType": "With these rights the group is:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> may then edit the group's roles: its holders can shape every role but the owner's, take rights away from other roles and change what non-members see. Give the role only to members you would trust with running the group. <strong>{own}</strong>, your own role, may then no longer edit the group's roles. Only an owner can undo that.",
+        "confirm": "Save anyway",
+        "grant": "<strong>{roles}</strong> may then edit the group's roles: its holders can shape every role but the owner's, take rights away from other roles and change what non-members see. Give the role only to members you would trust with running the group.",
+        "lockout": "<strong>{own}</strong>, your own role, may then no longer edit the group's roles. Only an owner can undo that.",
+        "title": "Change who manages roles?"
+      },
       "saved": "Rights saved",
       "saveFirst": "Save or discard first — there are unsaved changes.",
       "simple": {

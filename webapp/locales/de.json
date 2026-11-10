@@ -329,6 +329,7 @@
       "deleteError": "Rolle konnte nicht gelöscht werden: {message}",
       "deleteSuccess": "Rolle gelöscht.",
       "description": "Wer im Netzwerk was darf. Rollen anlegen und Rechte zuweisen — Änderungen gelten sofort.",
+      "discard": "Verwerfen",
       "members": "{count} Mitglieder",
       "name": "Rollen & Rechte",
       "nameLabel": "Name",
@@ -470,6 +471,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Mindestens ein Thema gibt es nicht.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Eine Gruppe, die Außenstehende nicht finden können, kann ihnen auch ihre Mitglieder nicht zeigen.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Der Gruppenname darf höchstens {max} Zeichen lang sein.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Der Gruppenname muss mindestens {min} Zeichen lang sein.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Dieser eindeutige Gruppenname ist bereits vergeben.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Es sind zu wenige Themen ausgewählt (mindestens {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Es sind zu viele Themen ausgewählt (höchstens {max}).",
@@ -1126,6 +1129,13 @@
         "group_videoCall_join": "An einem laufenden Videoanruf der Gruppe teilnehmen."
       },
       "resultingType": "Mit diesen Rechten ist die Gruppe:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> darf danach die Rollen der Gruppe bearbeiten: Wer diese Rolle hat, kann jede Rolle außer der des Inhabers gestalten, anderen Rollen Rechte entziehen und ändern, was Nicht-Mitglieder sehen. Gib die Rolle nur Mitgliedern, denen du die Verwaltung der Gruppe anvertraust. <strong>{own}</strong>, deine eigene Rolle, darf danach die Rollen der Gruppe nicht mehr bearbeiten. Rückgängig machen kann das dann nur ein Inhaber.",
+        "confirm": "Trotzdem speichern",
+        "grant": "<strong>{roles}</strong> darf danach die Rollen der Gruppe bearbeiten: Wer diese Rolle hat, kann jede Rolle außer der des Inhabers gestalten, anderen Rollen Rechte entziehen und ändern, was Nicht-Mitglieder sehen. Gib die Rolle nur Mitgliedern, denen du die Verwaltung der Gruppe anvertraust.",
+        "lockout": "<strong>{own}</strong>, deine eigene Rolle, darf danach die Rollen der Gruppe nicht mehr bearbeiten. Rückgängig machen kann das dann nur ein Inhaber.",
+        "title": "Rollenverwaltung ändern?"
+      },
       "saved": "Rechte gespeichert",
       "saveFirst": "Erst speichern oder verwerfen — es gibt ungesicherte Änderungen.",
       "simple": {

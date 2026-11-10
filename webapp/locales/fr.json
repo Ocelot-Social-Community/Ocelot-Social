@@ -329,6 +329,7 @@
       "deleteError": "Impossible de supprimer le rôle : {message}",
       "deleteSuccess": "Rôle supprimé.",
       "description": "Qui peut faire quoi sur l'ensemble du réseau. Créez des rôles et attribuez des droits — les modifications s'appliquent immédiatement.",
+      "discard": "Abandonner",
       "members": "{count} membres",
       "name": "Rôles et droits",
       "nameLabel": "Nom",
@@ -470,6 +471,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Au moins un des sujets n'existe pas.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La description doit comporter au moins {min} caractères.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un groupe que les personnes extérieures ne peuvent pas trouver ne peut pas non plus leur montrer ses membres.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Le nom du groupe ne doit pas dépasser {max} caractères.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Le nom du groupe doit comporter au moins {min} caractères.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ce nom unique de groupe est déjà pris.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Trop peu de sujets sélectionnés (au moins {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Trop de sujets sélectionnés (au plus {max}).",
@@ -1126,6 +1129,13 @@
         "group_videoCall_join": "Rejoindre un appel vidéo en cours dans le groupe."
       },
       "resultingType": "Avec ces permissions, le groupe est :",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> pourra ensuite modifier les rôles du groupe : ses détenteurs peuvent façonner tous les rôles sauf celui du propriétaire, retirer des droits aux autres rôles et changer ce que voient les non-membres. Ne donnez ce rôle qu’à des membres à qui vous confieriez la gestion du groupe. <strong>{own}</strong>, votre propre rôle, ne pourra plus modifier les rôles du groupe. Seul un propriétaire pourra revenir en arrière.",
+        "confirm": "Enregistrer quand même",
+        "grant": "<strong>{roles}</strong> pourra ensuite modifier les rôles du groupe : ses détenteurs peuvent façonner tous les rôles sauf celui du propriétaire, retirer des droits aux autres rôles et changer ce que voient les non-membres. Ne donnez ce rôle qu’à des membres à qui vous confieriez la gestion du groupe.",
+        "lockout": "<strong>{own}</strong>, votre propre rôle, ne pourra plus modifier les rôles du groupe. Seul un propriétaire pourra revenir en arrière.",
+        "title": "Changer qui gère les rôles ?"
+      },
       "saved": "Permissions enregistrées",
       "saveFirst": "Enregistrez ou annulez d'abord : il y a des modifications non enregistrées.",
       "simple": {

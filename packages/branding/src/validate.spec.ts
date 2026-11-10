@@ -107,6 +107,15 @@ test('defineBranding THROWS on a user name minimum of 0', () => {
   )
 })
 
+test('defineBranding THROWS on a group name minimum of 0', () => {
+  // The backend's DB schema holds Group.name to at least GROUP_NAME_LENGTH_FLOOR characters, so a
+  // brand allowing an empty name would let groups store what the audit then reports.
+  assert.throws(
+    () => defineBranding({ group: { nameLengthMin: 0 } }),
+    /invalid branding config[\s\S]*group\.nameLengthMin must be ≥ 1 \(got 0\)/,
+  )
+})
+
 test('defineBranding accepts valid overrides and the vanilla (empty) config', () => {
   assert.doesNotThrow(() => defineBranding({}))
   assert.doesNotThrow(() => defineBranding({ group: { nameLengthMax: 80 } }))
