@@ -628,8 +628,8 @@ export default {
         this.showDeleteModal = false
         this.$router.replace('/')
       } catch (err) {
+        // The dialog stays for another try; cancel closes it.
         this.$toastBackendError(err)
-        this.showDeleteModal = false
       } finally {
         this.deleteLoading = false
       }

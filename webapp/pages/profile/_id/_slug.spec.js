@@ -248,11 +248,12 @@ describe('ProfileSlug', () => {
           expect(isOpen()).toBe(false)
         })
 
-        it('reports a failed mutation and closes without leaving the profile', async () => {
+        it('reports a failed mutation and stays open for another try', async () => {
           const mutate = jest.fn().mockRejectedValue(new Error('boom'))
           const { button, isOpen, replace } = dialog(mutate)
           await fireEvent.click(button('confirm'))
-          await waitFor(() => expect(isOpen()).toBe(false))
+          await waitFor(() => expect(button('confirm').disabled).toBe(false))
+          expect(isOpen()).toBe(true)
           expect(replace).not.toHaveBeenCalled()
         })
 
