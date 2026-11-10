@@ -137,14 +137,17 @@ export default {
       type: Boolean,
       default: false,
     },
-    // The video quality the user asked for (see devicePreferences).
+    // The video quality the user asked for, one of the choices on offer (see devicePreferences):
+    // another value would select no option, and the call would take it for auto.
     sendQuality: {
       type: String,
       default: 'auto',
+      validator: (value) => SEND_QUALITIES.includes(value),
     },
     receiveQuality: {
       type: String,
       default: 'auto',
+      validator: (value) => RECEIVE_QUALITIES.includes(value),
     },
     // Our camera is being started anew: a new send quality has to wait for it.
     cameraRenewing: {
