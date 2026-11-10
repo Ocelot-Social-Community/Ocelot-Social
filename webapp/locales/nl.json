@@ -1968,6 +1968,15 @@
       "dtx": "Spreekpauzes niet verzenden",
       "dtxFailed": "De instelling voor spreekpauzes kon niet worden gewijzigd – je microfoon werkt verder zoals voorheen.",
       "dtxHint": "Bespaart gegevens zolang je zwijgt. Horen anderen je soms niet, zet het dan uit.",
+      "quality": {
+        "audio": "Geen camera's (schermdelingen blijven)",
+        "auto": "Automatisch",
+        "high": "Hoog",
+        "low": "Laag",
+        "medium": "Gemiddeld"
+      },
+      "receiveQuality": "Kwaliteit van ontvangen video's",
+      "sendQuality": "Kwaliteit van mijn video",
       "speakerError": "De luidspreker kon niet worden gewisseld.",
       "title": "Apparaatinstellingen"
     },

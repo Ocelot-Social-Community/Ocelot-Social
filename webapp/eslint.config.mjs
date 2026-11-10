@@ -146,7 +146,7 @@ export default [
             '/^permissions\\.sections\\./',
             '/^profile\\.(groups|network)\\./',
             '/^map\\.legend\\.(event|group|theUser|user)$/',
-            '/^videoCall\\.(errors|prejoin\\.permission)\\./',
+            '/^videoCall\\.(errors|prejoin\\.permission|deviceSettings\\.quality)\\./',
             // one key per resource type (ContentMenu, ReportModal, ReportList)
             '/^(report|disable|release)\\.[^.]+\\.(title|message)$/',
             '/^(disable|release)\\.(submit|success|cancel)$/',

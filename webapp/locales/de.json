@@ -1968,6 +1968,15 @@
       "dtx": "Sprechpausen nicht übertragen",
       "dtxFailed": "Die Sprechpausen ließen sich nicht umstellen – dein Mikrofon läuft weiter wie zuvor.",
       "dtxHint": "Spart Daten, solange du schweigst. Hören dich andere manchmal nicht, schalte es aus.",
+      "quality": {
+        "audio": "Keine Kameras (Bildschirmfreigaben bleiben)",
+        "auto": "Automatisch",
+        "high": "Hoch",
+        "low": "Niedrig",
+        "medium": "Mittel"
+      },
+      "receiveQuality": "Qualität der empfangenen Videos",
+      "sendQuality": "Qualität meines Videos",
       "speakerError": "Der Lautsprecher konnte nicht gewechselt werden.",
       "title": "Geräte-Einstellungen"
     },

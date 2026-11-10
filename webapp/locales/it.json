@@ -1968,6 +1968,15 @@
       "dtx": "Non trasmettere le pause nel parlato",
       "dtxFailed": "Non è stato possibile cambiare l’impostazione delle pause nel parlato: il tuo microfono continua come prima.",
       "dtxHint": "Risparmia dati mentre taci. Se a volte gli altri non ti sentono, disattivalo.",
+      "quality": {
+        "audio": "Nessuna videocamera (le condivisioni dello schermo restano)",
+        "auto": "Automatica",
+        "high": "Alta",
+        "low": "Bassa",
+        "medium": "Media"
+      },
+      "receiveQuality": "Qualità dei video ricevuti",
+      "sendQuality": "Qualità del mio video",
       "speakerError": "Impossibile cambiare l'altoparlante.",
       "title": "Impostazioni dei dispositivi"
     },
