@@ -116,7 +116,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-danger-hover': 'var(--color-danger-dark)',
   'color-danger-inverse': 'rgb(253, 243, 242)',
   'color-danger-light': 'rgb(242, 97, 65)',
-  'color-default': 'light-dark(var(--background-color-softer), var(--background-color-softer))',
+  'color-default': 'var(--background-color-softer)',
   'color-default-active': 'light-dark(var(--color-neutral-60), rgb(75, 71, 83))',
   'color-default-contrast': 'var(--text-color-base)',
   'color-default-contrast-inverse': 'var(--color-neutral-100)',
