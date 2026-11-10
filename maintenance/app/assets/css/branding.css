@@ -117,7 +117,7 @@ body {
   --color-disabled-contrast: rgb(255, 255, 255);
 
   /* Text */
-  --color-text-base: rgb(75, 69, 84);
+  --text-color-base: rgb(75, 69, 84);
   --color-text-soft: rgb(112, 103, 126);
-  --color-background-soft: rgb(250, 249, 250);
+  --background-color-soft: rgb(250, 249, 250);
 }
