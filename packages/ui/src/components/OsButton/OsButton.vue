@@ -148,6 +148,9 @@
           )
         }
 
+        // Filtered only to ask whether there is text; rendered as given. Unlike the icon and suffix,
+        // whose wrappers hold nothing else, the label's comments and spaces are part of how the
+        // caller wrote it — dropping the blank text between two words' elements would join them.
         if (defaultContent && hasText) {
           innerChildren.push(...(defaultContent as ReturnType<typeof h>[]))
         }
