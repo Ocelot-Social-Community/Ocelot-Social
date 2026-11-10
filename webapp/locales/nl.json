@@ -2064,11 +2064,14 @@
       "unsupportedBrowser": "Je browser ondersteunt geen audio/video."
     },
     "qualityLimit": {
+      "cameraHidden": "Camera verborgen",
       "ownBandwidth": "Je video wordt in lagere kwaliteit verzonden: je verbinding laat niet meer toe.",
       "ownChoice": "Je video wordt in lagere kwaliteit verzonden, zoals gekozen in de apparaatinstellingen.",
       "ownCpu": "Je video wordt in lagere kwaliteit verzonden: je apparaat is overbelast.",
       "remoteChoice": "De video van {name} komt in lagere kwaliteit binnen, zoals gekozen in de apparaatinstellingen.",
-      "remoteCpu": "De video van {name} komt in lagere kwaliteit binnen: je apparaat is overbelast."
+      "remoteCpu": "De video van {name} komt in lagere kwaliteit binnen: je apparaat is overbelast.",
+      "remoteHiddenBandwidth": "De camera van {name} is verborgen: je verbinding is te zwak.",
+      "remoteHiddenChoice": "De camera van {name} is verborgen, zoals gekozen in de apparaatinstellingen."
     },
     "reconnecting": "Verbinding verbroken — opnieuw verbinden…",
     "reloadPending": "Het platform heeft een nieuw ontwerp. Het wordt toegepast zodra je het gesprek verlaat.",

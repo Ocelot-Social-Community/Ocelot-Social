@@ -2064,11 +2064,14 @@
       "unsupportedBrowser": "Dein Browser unterstützt Audio/Video nicht."
     },
     "qualityLimit": {
+      "cameraHidden": "Kamera ausgeblendet",
       "ownBandwidth": "Dein Video wird in geringerer Qualität gesendet: Deine Verbindung reicht nicht für mehr.",
       "ownChoice": "Dein Video wird in geringerer Qualität gesendet, wie in den Geräte-Einstellungen gewählt.",
       "ownCpu": "Dein Video wird in geringerer Qualität gesendet: Dein Gerät ist ausgelastet.",
       "remoteChoice": "Das Video von {name} kommt in geringerer Qualität an, wie in den Geräte-Einstellungen gewählt.",
-      "remoteCpu": "Das Video von {name} kommt in geringerer Qualität an: Dein Gerät ist ausgelastet."
+      "remoteCpu": "Das Video von {name} kommt in geringerer Qualität an: Dein Gerät ist ausgelastet.",
+      "remoteHiddenBandwidth": "Die Kamera von {name} ist ausgeblendet: Deine Verbindung ist zu schwach.",
+      "remoteHiddenChoice": "Die Kamera von {name} ist ausgeblendet, wie in den Geräte-Einstellungen gewählt."
     },
     "reconnecting": "Verbindung unterbrochen – verbinde neu…",
     "reloadPending": "Die Plattform hat ein neues Design. Es wird übernommen, sobald du den Anruf verlässt.",

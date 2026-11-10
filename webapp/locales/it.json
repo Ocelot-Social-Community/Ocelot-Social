@@ -2064,11 +2064,14 @@
       "unsupportedBrowser": "Il tuo browser non supporta audio/video."
     },
     "qualityLimit": {
+      "cameraHidden": "Videocamera nascosta",
       "ownBandwidth": "Il tuo video viene inviato in qualità ridotta: la tua connessione non permette di più.",
       "ownChoice": "Il tuo video viene inviato in qualità ridotta, come scelto nelle impostazioni dei dispositivi.",
       "ownCpu": "Il tuo video viene inviato in qualità ridotta: il tuo dispositivo è sovraccarico.",
       "remoteChoice": "Il video di {name} arriva in qualità ridotta, come scelto nelle impostazioni dei dispositivi.",
-      "remoteCpu": "Il video di {name} arriva in qualità ridotta: il tuo dispositivo è sovraccarico."
+      "remoteCpu": "Il video di {name} arriva in qualità ridotta: il tuo dispositivo è sovraccarico.",
+      "remoteHiddenBandwidth": "La videocamera di {name} è nascosta: la tua connessione è troppo debole.",
+      "remoteHiddenChoice": "La videocamera di {name} è nascosta, come scelto nelle impostazioni dei dispositivi."
     },
     "reconnecting": "Connessione persa — riconnessione…",
     "reloadPending": "La piattaforma ha un nuovo design. Verrà applicato non appena lascerai la chiamata.",

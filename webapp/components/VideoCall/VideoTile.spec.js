@@ -226,6 +226,8 @@ describe('VideoTile', () => {
         qualityLimit: { reason: 'cpu', height: 360, fps: 15 },
       })
       expect(badge(wrapper).text()).toBe('360p · 15 fps')
+      // The sign beside the numbers: held back, not all the camera can.
+      expect(badge(wrapper).find('.osicon').exists()).toBe(true)
       expect(badge(wrapper).attributes()).toMatchObject({
         role: 'img',
         'aria-label': '360p · 15 fps: videoCall.qualityLimit.ownCpu',
@@ -263,6 +265,37 @@ describe('VideoTile', () => {
       expect(badge(wrapper).find('.osicon').exists()).toBe(true)
       expect(badge(wrapper).text()).toBe('')
       expect(badge(wrapper).attributes('aria-label')).toBe(label)
+    })
+
+    describe('for a camera we do not receive at all', () => {
+      const HINT = '[data-test="video-tile-camera-hidden"]'
+      const hidden = (reason, props = {}) =>
+        factory({ tile: buildTile(), qualityLimit: { reason, hidden: true }, ...props })
+
+      it.each([
+        ['choice', 'videoCall.qualityLimit.remoteHiddenChoice'],
+        ['bandwidth', 'videoCall.qualityLimit.remoteHiddenBandwidth'],
+      ])('says so on the tile and signs it hidden, naming %s', (reason, label) => {
+        const wrapper = hidden(reason)
+        expect(wrapper.find(HINT).text()).toBe('videoCall.qualityLimit.cameraHidden')
+        const icon = badge(wrapper).findComponent({ name: 'OsIcon' })
+        // Hidden by us, not switched off at the other end: not the sign of a lower layer.
+        expect(icon.attributes('icon')).toBeDefined()
+        expect(icon.vm.$attrs.icon).toBe(wrapper.vm.icons.eyeSlash)
+        expect(badge(wrapper).attributes('aria-label')).toBe(label)
+      })
+
+      it('leaves the hint to the sign on a small tile', () => {
+        const wrapper = hidden('choice', { avatarSize: 'small' })
+        expect(wrapper.find(HINT).exists()).toBe(false)
+        expect(badge(wrapper).exists()).toBe(true)
+      })
+
+      it('says nothing of it on a camera simply switched off', () => {
+        const wrapper = factory({ tile: buildTile() })
+        expect(wrapper.find(HINT).exists()).toBe(false)
+        expect(badge(wrapper).exists()).toBe(false)
+      })
     })
 
     it('shows nothing for a reason it does not know', () => {

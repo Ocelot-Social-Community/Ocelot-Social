@@ -41,6 +41,13 @@
       <span v-if="tile.isLocal && avatarSize !== 'small'" class="video-tile__fallback-text">
         {{ $t('videoCall.prejoin.cameraDisabled') }}
       </span>
+      <span
+        v-else-if="cameraHidden && avatarSize !== 'small'"
+        class="video-tile__fallback-text"
+        data-test="video-tile-camera-hidden"
+      >
+        {{ $t('videoCall.qualityLimit.cameraHidden') }}
+      </span>
     </div>
     <!--
       A camera or microphone of one's own that is on its way — it can take
@@ -96,7 +103,7 @@
         says what it sends, as we can change that; the others only that theirs arrives lower.
       -->
       <span
-        v-if="hasVideo && qualityLimitLabel"
+        v-if="(hasVideo || cameraHidden) && qualityLimitLabel"
         class="video-tile__quality"
         role="img"
         v-tooltip="{ content: qualityLimitLabel, placement: 'top', html: false }"
@@ -105,8 +112,12 @@
         "
         data-test="video-tile-quality-limit"
       >
+        <!-- The sign always: it marks the numbers as held back, not as what the camera can. -->
+        <os-icon
+          :icon="cameraHidden ? icons.eyeSlash : icons.levelDown"
+          class="video-tile__quality-icon"
+        />
         <template v-if="qualityLimitSize">{{ qualityLimitSize }}</template>
-        <os-icon v-else :icon="icons.levelDown" class="video-tile__quality-icon" />
       </span>
       <span v-if="tile.isLocal" class="video-tile__local-tag">({{ $t('videoCall.you') }})</span>
       <span v-if="tile.isScreen" class="video-tile__screen-tag">
@@ -158,6 +169,7 @@ export default {
     },
     // Why this camera's video is lower than it could be (VideoCall's qualityLimitOf): reason
     // 'cpu', 'bandwidth' or 'choice', and for our own camera what it sends (height, fps).
+    // hidden: a camera on at the other end that we do not receive at all.
     qualityLimit: {
       type: Object,
       default: null,
@@ -207,6 +219,10 @@ export default {
       if (!limit || !this.tile.isLocal || !limit.height) return null
       return limit.fps ? `${limit.height}p · ${limit.fps} fps` : `${limit.height}p`
     },
+    // A camera on at the other end that we do not receive (VideoCall's qualityLimitOf).
+    cameraHidden() {
+      return !!(this.qualityLimit && this.qualityLimit.hidden)
+    },
     qualityLimitLabel() {
       const limit = this.qualityLimit
       if (!limit) return null
@@ -223,6 +239,11 @@ export default {
         }
       }
       const params = { name: this.tile.name }
+      if (limit.hidden) {
+        return limit.reason === 'bandwidth'
+          ? this.$t('videoCall.qualityLimit.remoteHiddenBandwidth', params)
+          : this.$t('videoCall.qualityLimit.remoteHiddenChoice', params)
+      }
       switch (limit.reason) {
         case 'cpu':
           return this.$t('videoCall.qualityLimit.remoteCpu', params)
@@ -599,6 +620,7 @@ export default {
   margin-left: var(--space-xxx-small);
   vertical-align: middle;
   font-size: var(--font-size-x-small);
+  gap: var(--space-xxx-small);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   opacity: 0.85;

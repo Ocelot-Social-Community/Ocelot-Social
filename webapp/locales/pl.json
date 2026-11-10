@@ -2064,11 +2064,14 @@
       "unsupportedBrowser": "Twoja przeglądarka nie obsługuje audio/wideo."
     },
     "qualityLimit": {
+      "cameraHidden": "Kamera ukryta",
       "ownBandwidth": "Twoje wideo jest wysyłane w niższej jakości: połączenie nie pozwala na więcej.",
       "ownChoice": "Twoje wideo jest wysyłane w niższej jakości, zgodnie z wyborem w ustawieniach urządzeń.",
       "ownCpu": "Twoje wideo jest wysyłane w niższej jakości: urządzenie jest przeciążone.",
       "remoteChoice": "Wideo od {name} dociera w niższej jakości, zgodnie z wyborem w ustawieniach urządzeń.",
-      "remoteCpu": "Wideo od {name} dociera w niższej jakości: urządzenie jest przeciążone."
+      "remoteCpu": "Wideo od {name} dociera w niższej jakości: urządzenie jest przeciążone.",
+      "remoteHiddenBandwidth": "Kamera użytkownika {name} jest ukryta: twoje połączenie jest zbyt słabe.",
+      "remoteHiddenChoice": "Kamera użytkownika {name} jest ukryta, zgodnie z wyborem w ustawieniach urządzeń."
     },
     "reconnecting": "Utracono połączenie — ponowne łączenie…",
     "reloadPending": "Platforma ma nowy wygląd. Zostanie zastosowany, gdy tylko opuścisz rozmowę.",

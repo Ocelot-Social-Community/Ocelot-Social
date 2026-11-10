@@ -2238,6 +2238,9 @@ export default {
           Track && participant.isCameraEnabled
             ? findVideoPub(participant, Track.Source.Camera)
             : null
+        // Unsubscribed by us (see applyAudioOnly): LiveKit keeps the track until the server
+        // confirms, which on a weak line takes long — the tile would stay black meanwhile.
+        const cameraShown = !!cameraPub && cameraPub.isDesired !== false
         const screenPub =
           Track && participant.isScreenShareEnabled
             ? findVideoPub(participant, Track.Source.ScreenShare)
@@ -2253,12 +2256,14 @@ export default {
           identity: participant.identity,
           name: participant.name || participant.identity,
           profile,
-          videoTrack: cameraPub ? cameraPub.track : null,
+          videoTrack: cameraShown ? cameraPub.track : null,
           audioTrack,
           isLocal,
           isScreen: false,
           micEnabled,
           connectionQuality: participant.connectionQuality || 'unknown',
+          // On at the other end, but not received here: unsubscribed by us (see applyAudioOnly).
+          cameraHidden: !isLocal && !!participant.isCameraEnabled && !cameraShown,
         })
         if (screenPub) {
           tiles.push({
@@ -2822,10 +2827,17 @@ export default {
       }
       if (!this.isLive(room)) return
       // One entry per simulcast layer; the largest one going out is what the others get at best.
-      // A layer paused because nobody watches it is no limit — WebRTC names none for it.
-      const sending = (stats || []).filter((layer) => layer.frameHeight > 0)
+      // A layer paused because nobody watches it (dynacast) is no limit, and its stats keep the
+      // size of its last frame — the sender's own settings tell whether it is still on.
+      const encodings = this.senderEncodings(track)
+      const encodingOf = (layer) =>
+        encodings.length === 1 ? encodings[0] : encodings.find((e) => e.rid && e.rid === layer.rid)
+      const sending = (stats || []).filter(
+        (layer) => layer.frameHeight > 0 && (encodingOf(layer) || {}).active !== false,
+      )
       if (!sending.length) {
-        this.sentVideo = null
+        // Nothing goes out right now: what would, as the sender is set up.
+        this.sentVideo = this.configuredVideo(track, encodings)
         return
       }
       const top = sending.reduce((a, b) => (b.frameHeight > a.frameHeight ? b : a))
@@ -2837,6 +2849,32 @@ export default {
         height: top.frameHeight,
         fps: Math.round(top.framesPerSecond || 0),
         limitedBy,
+      }
+    },
+    senderEncodings(track) {
+      try {
+        const sender = track.sender
+        return (sender && sender.getParameters && sender.getParameters().encodings) || []
+      } catch {
+        return []
+      }
+    },
+    // What our camera sends once someone watches it: what it captures, scaled down and capped in
+    // frame rate by its largest layer. A layer switched off for good, like the ones the CPU
+    // relief leaves aside, has a frame rate of 0; one only paused keeps its own.
+    configuredVideo(track, encodings) {
+      const media = track.mediaStreamTrack
+      const settings = (media && media.getSettings && media.getSettings()) || {}
+      if (!settings.height) return null
+      const scaleOf = (encoding) => encoding.scaleResolutionDownBy || 1
+      const top = encodings
+        .filter((encoding) => encoding.maxFramerate !== 0)
+        .reduce((a, b) => (a && scaleOf(a) <= scaleOf(b) ? a : b), null)
+      const fps = Math.min(settings.frameRate || Infinity, (top && top.maxFramerate) || Infinity)
+      return {
+        height: Math.round(settings.height / (top ? scaleOf(top) : 1)),
+        fps: Number.isFinite(fps) ? Math.round(fps) : 0,
+        limitedBy: null,
       }
     },
     // Why a camera's video is lower than it could be, for the badge on its tile — or null. Only
@@ -2854,6 +2892,11 @@ export default {
         if (!reason) return null
         const sent = this.sentVideo
         return { reason, height: sent ? sent.height : null, fps: sent ? sent.fps : null }
+      }
+      // A camera we do not receive at all, by choice or for a weak line, looks like one switched
+      // off at the other end — unless the tile says otherwise.
+      if (tile.cameraHidden && this.videosOff) {
+        return { reason: this.receiveQuality === 'audio' ? 'choice' : 'bandwidth', hidden: true }
       }
       const cap = this.VideoQuality ? this.receiveCap() : null
       if (cap === null || cap === this.VideoQuality.HIGH) return null

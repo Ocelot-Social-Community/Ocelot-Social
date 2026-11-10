@@ -3107,6 +3107,31 @@ describe('VideoCall', () => {
       expect(wrapper.find('[data-test="video-call-audio-only"]').exists()).toBe(true)
     })
 
+    it('marks a camera it does not receive as hidden, for the weak line or by choice', async () => {
+      const { wrapper, camera } = await connected()
+      const bob = () => wrapper.vm.tiles.find((t) => t.identity === 'bob' && !t.isScreen)
+      wrapper.vm.refreshTiles()
+      expect(bob().cameraHidden).toBe(false)
+      wrapper.vm.setAudioOnly(true)
+      // At once, not only when the server confirms: until then LiveKit keeps the track,
+      // and no picture comes from it.
+      expect(camera.track).not.toBe(null)
+      expect(bob().videoTrack).toBe(null)
+      expect(bob().cameraHidden).toBe(true)
+      // LiveKit drops the track of a publication unsubscribed.
+      camera.track = null
+      wrapper.vm.refreshTiles()
+      expect(bob().cameraHidden).toBe(true)
+      expect(wrapper.vm.qualityLimitOf(bob())).toEqual({ reason: 'bandwidth', hidden: true })
+      // Ours is never hidden from us.
+      expect(wrapper.vm.tiles.find((t) => t.isLocal).cameraHidden).toBe(false)
+      wrapper.vm.setAudioOnly(false)
+      // Received again any moment: not ours to call hidden.
+      expect(wrapper.vm.qualityLimitOf(bob())).toBe(null)
+      wrapper.vm.setReceiveQuality('audio')
+      expect(wrapper.vm.qualityLimitOf(bob())).toEqual({ reason: 'choice', hidden: true })
+    })
+
     it('keeps counting while a weak line flips between poor and lost', async () => {
       jest.useFakeTimers()
       const { wrapper, room } = await connected()
@@ -3861,6 +3886,87 @@ describe('VideoCall', () => {
         room.localParticipant.getTrackPublication.mockReturnValue({ track: {} })
         await wrapper.vm.readSenderStats()
         expect(wrapper.vm.sentVideo).toBe(null)
+      })
+
+      describe('while nobody watches our camera', () => {
+        const paused = (room, { stats, encodings, settings }) => {
+          const track = sending(room, stats)
+          track.sender = { getParameters: () => ({ encodings }) }
+          track.mediaStreamTrack = { getSettings: () => settings }
+          return track
+        }
+
+        it('passes over a layer paused by the server, though its stats keep its last size', async () => {
+          const { wrapper, room } = await connected({ send: 'low' })
+          wrapper.setData({ cameraEnabled: true })
+          paused(room, {
+            stats: [
+              { rid: 'f', frameHeight: 720, qualityLimitationReason: 'none' },
+              { rid: 'h', frameHeight: 360, framesPerSecond: 24, qualityLimitationReason: 'none' },
+            ],
+            encodings: [
+              { rid: 'h', active: true, scaleResolutionDownBy: 2 },
+              { rid: 'f', active: false, scaleResolutionDownBy: 1 },
+            ],
+            settings: { height: 720, frameRate: 30 },
+          })
+          await wrapper.vm.readSenderStats()
+          expect(wrapper.vm.sentVideo).toEqual({ height: 360, fps: 24, limitedBy: null })
+        })
+
+        it('says what the sender is set up to send once all its layers are paused', async () => {
+          const { wrapper, room } = await connected({ send: 'low' })
+          wrapper.setData({ cameraEnabled: true })
+          paused(room, {
+            stats: [{ rid: 'q', frameHeight: 180, qualityLimitationReason: 'none' }],
+            encodings: [
+              { rid: 'q', active: false, scaleResolutionDownBy: 4 },
+              { rid: 'f', active: false },
+              { rid: 'h', active: false, scaleResolutionDownBy: 2 },
+            ],
+            settings: { height: 180, frameRate: 29.97 },
+          })
+          await wrapper.vm.readSenderStats()
+          expect(wrapper.vm.qualityLimitOf(own)).toEqual({ reason: 'choice', height: 180, fps: 30 })
+        })
+
+        it('takes the layer the relief keeps, at its frame rate, over the ones it switched off', async () => {
+          const { wrapper, room, constrained } = await connected()
+          wrapper.setData({ cameraEnabled: true })
+          constrained()
+          paused(room, {
+            stats: [],
+            encodings: [
+              { rid: 'q', active: true, scaleResolutionDownBy: 2, maxFramerate: 15 },
+              { rid: 'h', active: false, scaleResolutionDownBy: 1, maxFramerate: 0 },
+            ],
+            settings: { height: 720, frameRate: 30 },
+          })
+          await wrapper.vm.readSenderStats()
+          expect(wrapper.vm.qualityLimitOf(own)).toEqual({ reason: 'cpu', height: 360, fps: 15 })
+        })
+
+        it('reads a single layer without a rid, and keeps the capture as it is without settings', async () => {
+          const { wrapper, room } = await connected({ send: 'low' })
+          wrapper.setData({ cameraEnabled: true })
+          const track = paused(room, {
+            stats: [{ rid: 'x', frameHeight: 180, framesPerSecond: 30 }],
+            encodings: [{ active: false }],
+            settings: { height: 180 },
+          })
+          await wrapper.vm.readSenderStats()
+          expect(wrapper.vm.sentVideo).toEqual({ height: 180, fps: 0, limitedBy: null })
+          track.sender.getParameters = () => {
+            throw new Error('closed')
+          }
+          track.getSenderStats.mockResolvedValue([])
+          await wrapper.vm.readSenderStats()
+          expect(wrapper.vm.sentVideo).toEqual({ height: 180, fps: 0, limitedBy: null })
+          track.sender = {}
+          track.mediaStreamTrack = { getSettings: () => ({ frameRate: 30 }) }
+          await wrapper.vm.readSenderStats()
+          expect(wrapper.vm.sentVideo).toBe(null)
+        })
       })
 
       it('keeps what it knew when WebRTC fails to say, and drops an answer for a call left', async () => {
