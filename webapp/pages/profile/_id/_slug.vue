@@ -265,11 +265,17 @@
       </div>
     </div>
 
-    <os-modal
+    <os-confirm-dialog
       v-if="deleteUserData"
       :open="showDeleteModal"
       :title="$t('settings.deleteUserAccount.accountWarningIsAdmin')"
+      :confirm-label="$t('settings.deleteUserAccount.name')"
+      :cancel-label="$t('actions.cancel')"
       :close-label="$t('actions.close')"
+      :confirm-icon="icons.exclamationCircle"
+      variant="danger"
+      :loading="deleteLoading"
+      @confirm="confirmDeleteUser"
       @cancel="cancelDeleteUser"
     >
       <p>{{ $t('settings.deleteUserAccount.infoAdmin') }}</p>
@@ -299,22 +305,7 @@
           </p>
         </div>
       </div>
-
-      <template #footer="{ cancel }">
-        <os-button variant="primary" appearance="outline" @click="cancel">
-          {{ $t('actions.cancel') }}
-        </os-button>
-        <os-button
-          variant="danger"
-          appearance="filled"
-          :loading="deleteLoading"
-          @click="confirmDeleteUser"
-        >
-          <template #icon><os-icon :icon="icons.exclamationCircle" /></template>
-          {{ $t('settings.deleteUserAccount.name') }}
-        </os-button>
-      </template>
-    </os-modal>
+    </os-confirm-dialog>
   </div>
 </template>
 
@@ -324,7 +315,7 @@ import {
   OsCard,
   OsCounterIcon,
   OsIcon,
-  OsModal,
+  OsConfirmDialog,
   OsNumber,
   OsSpinner,
 } from '@ocelot-social/ui'
@@ -371,7 +362,7 @@ export default {
     OsButton,
     OsCounterIcon,
     OsIcon,
-    OsModal,
+    OsConfirmDialog,
     OsNumber,
     OsSpinner,
     SocialMedia,
@@ -637,8 +628,8 @@ export default {
         this.showDeleteModal = false
         this.$router.replace('/')
       } catch (err) {
+        // The dialog stays for another try; cancel closes it.
         this.$toastBackendError(err)
-        this.showDeleteModal = false
       } finally {
         this.deleteLoading = false
       }

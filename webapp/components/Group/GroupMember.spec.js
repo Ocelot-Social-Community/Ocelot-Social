@@ -279,7 +279,7 @@ describe('GroupMember', () => {
         beforeEach(() => {
           wrapper
             .find('div.os-modal-wrapper')
-            .find('[data-testid="os-modal-cancel"]')
+            .find('[data-testid="os-confirm-dialog-cancel"]')
             .trigger('click')
         })
 
@@ -292,16 +292,45 @@ describe('GroupMember', () => {
         beforeEach(() => {
           wrapper
             .find('div.os-modal-wrapper')
-            .find('[data-testid="os-modal-confirm"]')
+            .find('[data-testid="os-confirm-dialog-confirm"]')
             .trigger('click')
         })
 
-        it('toasts an error message', () => {
+        // One test, not two: the rejection is queued once, and every `it` clicks anew.
+        it('toasts an error message and keeps the modal open for another try', () => {
           expect(toastErrorMock).toHaveBeenCalledWith('Oh no!!')
+          expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(true)
         })
+      })
 
-        it('closes the modal', () => {
-          expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
+      describe('click on confirm while the mutation runs', () => {
+        it('keeps the modal open and loading until it is through', async () => {
+          // Reset first: other tests leave queued rejections on the shared mock. The default
+          // resolution is put back afterwards, the tests that follow rely on it.
+          apolloMock.mockReset()
+          let resolveMutation
+          apolloMock.mockImplementationOnce(
+            () => new Promise((resolve) => (resolveMutation = resolve)),
+          )
+          try {
+            wrapper
+              .find('div.os-modal-wrapper')
+              .find('[data-testid="os-confirm-dialog-confirm"]')
+              .trigger('click')
+            await wrapper.vm.$nextTick()
+            expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(true)
+            expect(wrapper.vm.removeLoading).toBe(true)
+            resolveMutation({ data: { RemoveUserFromGroup: { slug: 'user' } } })
+            await new Promise((resolve) => setTimeout(resolve, 0))
+            expect(wrapper.vm.removeLoading).toBe(false)
+            expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
+          } finally {
+            apolloMock.mockResolvedValue({
+              data: {
+                RemoveUserFromGroup: { user: { slug: 'user', id: 'user' }, membership: null },
+              },
+            })
+          }
         })
       })
 
@@ -310,7 +339,7 @@ describe('GroupMember', () => {
           jest.clearAllMocks()
           wrapper
             .find('div.os-modal-wrapper')
-            .find('[data-testid="os-modal-confirm"]')
+            .find('[data-testid="os-confirm-dialog-confirm"]')
             .trigger('click')
         })
 

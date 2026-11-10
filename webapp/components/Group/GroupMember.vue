@@ -111,32 +111,26 @@
         </tbody>
       </table>
     </div>
-    <os-modal
+    <os-confirm-dialog
       v-if="isOpen"
-      :open.sync="isOpen"
+      :open="isOpen"
       :title="$t('group.removeMemberTitle')"
+      :message="$t('group.removeMemberConfirmText', { name: userName })"
+      :confirm-label="$t('group.removeMember')"
+      :cancel-label="$t('actions.cancel')"
       :close-label="$t('actions.close')"
-      @confirm="removeUser()"
-    >
-      <p class="ds-text ds-text-size-large">
-        {{ $t('group.removeMemberConfirmText', { name: userName }) }}
-      </p>
-      <template #footer="{ confirm, cancel }">
-        <os-button appearance="outline" data-testid="os-modal-cancel" @click="cancel">
-          <template #icon><os-icon :icon="icons.close" /></template>
-          {{ $t('actions.cancel') }}
-        </os-button>
-        <os-button variant="danger" data-testid="os-modal-confirm" @click="confirm">
-          <template #icon><os-icon :icon="icons.check" /></template>
-          {{ $t('group.removeMember') }}
-        </os-button>
-      </template>
-    </os-modal>
+      :confirm-icon="icons.check"
+      :cancel-icon="icons.close"
+      variant="danger"
+      :loading="removeLoading"
+      @confirm="removeUser"
+      @cancel="closeRemoveDialog"
+    />
   </div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { OsBadge, OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsConfirmDialog, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { removeUserFromGroupMutation } from '~/graphql/groups.js'
 import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
@@ -158,8 +152,8 @@ export default {
   components: {
     OsBadge,
     OsButton,
+    OsConfirmDialog,
     OsIcon,
-    OsModal,
     AvatarImage,
   },
   props: {
@@ -196,6 +190,7 @@ export default {
       searchProcess: null,
       user: {},
       isOpen: false,
+      removeLoading: false,
       userId: null,
       userName: null,
     }
@@ -302,24 +297,28 @@ export default {
         this.$toastBackendError(error)
       }
     },
-    removeUser() {
-      this.$apollo
-        .mutate({
+    closeRemoveDialog() {
+      this.isOpen = false
+      this.userId = null
+    },
+    // The dialog stays open, its confirm button spinning and cancel blocked, until the mutation
+    // is through. Success and failure are reported by toasts; after a failure the dialog stays
+    // for another try.
+    async removeUser() {
+      this.removeLoading = true
+      try {
+        const { data } = await this.$apollo.mutate({
           mutation: removeUserFromGroupMutation(),
           variables: { groupId: this.groupId, userId: this.userId },
         })
-        .then(({ data }) => {
-          this.$emit('loadGroupMembers')
-          this.$toast.success(
-            this.$t('group.memberRemoved', { name: data.RemoveUserFromGroup.slug }),
-          )
-        })
-        .catch((error) => {
-          this.$toastBackendError(error)
-        })
-        .finally(() => {
-          this.userId = null
-        })
+        this.$emit('loadGroupMembers')
+        this.$toast.success(this.$t('group.memberRemoved', { name: data.RemoveUserFromGroup.slug }))
+        this.closeRemoveDialog()
+      } catch (error) {
+        this.$toastBackendError(error)
+      } finally {
+        this.removeLoading = false
+      }
     },
   },
 }
