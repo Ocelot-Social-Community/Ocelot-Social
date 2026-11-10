@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-import { lightDarkAt, lightOf } from '../dist/lightDark.js'
+import { darkOf, lightDarkAt, lightOf } from '../dist/lightDark.js'
 
 test('lightOf keeps the light half of light-dark(), commas inside it included', () => {
   assert.equal(lightOf('light-dark(rgb(1, 2, 3), rgb(4, 5, 6))'), 'rgb(1, 2, 3)')
@@ -36,4 +36,21 @@ test('light-dark( inside a quoted string is a name, not a function', () => {
   assert.equal(lightDarkAt(`"a \\" light-dark(" light-dark(red, blue)`), 19)
   assert.equal(lightOf(`'light-dark(', sans-serif`), `'light-dark(', sans-serif`)
   assert.equal(lightOf('light-dark("a,b", c)'), '"a,b"')
+})
+
+test('darkOf keeps the dark half, commas inside it included', () => {
+  assert.equal(darkOf('light-dark(#fff, #000)'), '#000')
+  assert.equal(darkOf('light-dark(rgb(1, 2, 3), rgb(4, 5, 6))'), 'rgb(4, 5, 6)')
+  assert.equal(
+    darkOf('0 1px light-dark(red, blue), 0 2px light-dark(#fff, #000)'),
+    '0 1px blue, 0 2px #000',
+  )
+  assert.equal(darkOf('light-dark(red, light-dark(a, b))'), 'b')
+  assert.equal(darkOf('var(--x)'), 'var(--x)')
+})
+
+test('darkOf leaves a light-dark() that is not exactly two non-empty arguments alone', () => {
+  assert.equal(darkOf('light-dark(red'), 'light-dark(red')
+  assert.equal(darkOf('light-dark(red, )'), 'light-dark(red, )')
+  assert.equal(darkOf('light-dark(red, blue, green)'), 'light-dark(red, blue, green)')
 })

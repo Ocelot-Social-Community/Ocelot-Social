@@ -1,6 +1,6 @@
-// The light half of a CSS light-dark() pair — one parser for everyone who has to do without a
-// colour scheme: the e-mail stylesheet, manifests and meta tags (brand build) and the webapp's
-// fallback for browsers that lack light-dark().
+// One half of a CSS light-dark() pair — one parser for everyone who has to do without a colour
+// scheme: the e-mail stylesheet, manifests and meta tags (brand build, the light half) and the
+// webapp's fallback for browsers that lack light-dark() (both halves).
 
 /**
  * `light-dark(a, b)` reduced to `a`. A mail, a manifest or a meta tag has no `color-scheme` to choose
@@ -9,6 +9,18 @@
  * keeps its own commas.
  */
 export function lightOf(value: string): string {
+  return halfOf(value, 0)
+}
+
+/**
+ * `light-dark(a, b)` reduced to `b`: the dark half, for a browser that has no light-dark() and gets
+ * the dark theme from a block of its own.
+ */
+export function darkOf(value: string): string {
+  return halfOf(value, 1)
+}
+
+function halfOf(value: string, half: 0 | 1): string {
   for (let at = lightDarkAt(value); at !== -1; at = lightDarkAt(value)) {
     const start = at + 'light-dark('.length
     let depth = 0
@@ -52,7 +64,8 @@ export function lightOf(value: string): string {
     ) {
       return value
     }
-    value = value.slice(0, at) + value.slice(start, comma).trim() + value.slice(end + 1)
+    const chosen = half === 0 ? value.slice(start, comma) : value.slice(comma + 1, end)
+    value = value.slice(0, at) + chosen.trim() + value.slice(end + 1)
   }
   return value
 }
