@@ -48,6 +48,17 @@ export const groupChatGated = (context) => context.policy?.getEffective('groupsE
 // conversation do. Asking only "not a group room" would take their conference chat for it.
 export const DIRECT_ROOM = 'NOT (room)-[:ROOM_FOR]->()'
 
+// Whether the room bound as `room` is a direct room between `currentUser` and someone a block
+// stands between, either way. Such a room stays readable and takes no new message (#10744). A
+// block reaches no group room: that room is the group's, not the two members' (and a call's
+// conference chat is not direct either).
+export const BLOCKED_IN_DIRECT_ROOM = `EXISTS {
+  MATCH (room)<-[:CHATS_IN]-(partner:User)
+  WHERE ${DIRECT_ROOM}
+    AND NOT partner = currentUser
+    AND (partner)-[:BLOCKED]-(currentUser)
+}`
+
 // Whether a room is a group room (has a ROOM_FOR edge to a Group). Used to block messaging in
 // a group room while the groups feature is off, without denying DM rooms (shared mutations).
 export const roomIsGroupRoom = async (roomId, session) => {
