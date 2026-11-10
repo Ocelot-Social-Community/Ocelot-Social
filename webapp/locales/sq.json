@@ -1126,6 +1126,13 @@
         "group_videoCall_join": "Merr pjesë në një thirrje video që po zhvillohet në grup."
       },
       "resultingType": "Me këto leje grupi është:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> do të mund t’i redaktojë rolet e grupit: kush e ka këtë rol mund të formësojë çdo rol përveç atij të pronarit, t’u heqë të drejta roleve të tjera dhe të ndryshojë atë që shohin jo-anëtarët. Jepjani rolin vetëm anëtarëve të cilëve do t’u besonit menaxhimin e grupit. <strong>{own}</strong>, roli juaj, nuk do të mund t’i redaktojë më rolet e grupit. Këtë mund ta zhbëjë vetëm një pronar.",
+        "confirm": "Ruaje gjithsesi",
+        "grant": "<strong>{roles}</strong> do të mund t’i redaktojë rolet e grupit: kush e ka këtë rol mund të formësojë çdo rol përveç atij të pronarit, t’u heqë të drejta roleve të tjera dhe të ndryshojë atë që shohin jo-anëtarët. Jepjani rolin vetëm anëtarëve të cilëve do t’u besonit menaxhimin e grupit.",
+        "lockout": "<strong>{own}</strong>, roli juaj, nuk do të mund t’i redaktojë më rolet e grupit. Këtë mund ta zhbëjë vetëm një pronar.",
+        "title": "Të ndryshohet kush i menaxhon rolet?"
+      },
       "saved": "Lejet u ruajtën",
       "saveFirst": "Fillimisht ruaj ose hidh poshtë — ka ndryshime të paruajtura.",
       "simple": {

@@ -1126,6 +1126,13 @@
         "group_videoCall_join": "Unirse a una videollamada en curso del grupo."
       },
       "resultingType": "Con estos permisos el grupo es:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> podrá editar los roles del grupo: quien tenga este rol puede configurar cualquier rol excepto el del propietario, quitar derechos a otros roles y cambiar lo que ven quienes no son miembros. Da el rol solo a miembros a los que confiarías la gestión del grupo. <strong>{own}</strong>, tu propio rol, ya no podrá editar los roles del grupo. Solo un propietario puede deshacerlo.",
+        "confirm": "Guardar de todos modos",
+        "grant": "<strong>{roles}</strong> podrá editar los roles del grupo: quien tenga este rol puede configurar cualquier rol excepto el del propietario, quitar derechos a otros roles y cambiar lo que ven quienes no son miembros. Da el rol solo a miembros a los que confiarías la gestión del grupo.",
+        "lockout": "<strong>{own}</strong>, tu propio rol, ya no podrá editar los roles del grupo. Solo un propietario puede deshacerlo.",
+        "title": "¿Cambiar quién gestiona los roles?"
+      },
       "saved": "Permisos guardados",
       "saveFirst": "Guarda o descarta primero: hay cambios sin guardar.",
       "simple": {

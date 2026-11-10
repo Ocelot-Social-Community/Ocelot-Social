@@ -1126,6 +1126,13 @@
         "group_videoCall_join": "An einem laufenden Videoanruf der Gruppe teilnehmen."
       },
       "resultingType": "Mit diesen Rechten ist die Gruppe:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> darf danach die Rollen der Gruppe bearbeiten: Wer diese Rolle hat, kann jede Rolle außer der des Inhabers gestalten, anderen Rollen Rechte entziehen und ändern, was Nicht-Mitglieder sehen. Gib die Rolle nur Mitgliedern, denen du die Verwaltung der Gruppe anvertraust. <strong>{own}</strong>, deine eigene Rolle, darf danach die Rollen der Gruppe nicht mehr bearbeiten. Rückgängig machen kann das dann nur ein Inhaber.",
+        "confirm": "Trotzdem speichern",
+        "grant": "<strong>{roles}</strong> darf danach die Rollen der Gruppe bearbeiten: Wer diese Rolle hat, kann jede Rolle außer der des Inhabers gestalten, anderen Rollen Rechte entziehen und ändern, was Nicht-Mitglieder sehen. Gib die Rolle nur Mitgliedern, denen du die Verwaltung der Gruppe anvertraust.",
+        "lockout": "<strong>{own}</strong>, deine eigene Rolle, darf danach die Rollen der Gruppe nicht mehr bearbeiten. Rückgängig machen kann das dann nur ein Inhaber.",
+        "title": "Rollenverwaltung ändern?"
+      },
       "saved": "Rechte gespeichert",
       "saveFirst": "Erst speichern oder verwerfen — es gibt ungesicherte Änderungen.",
       "simple": {

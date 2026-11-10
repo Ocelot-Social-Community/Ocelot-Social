@@ -1126,6 +1126,13 @@
         "group_videoCall_join": "Join a video call running in the group."
       },
       "resultingType": "With these rights the group is:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> may then edit the group's roles: its holders can shape every role but the owner's, take rights away from other roles and change what non-members see. Give the role only to members you would trust with running the group. <strong>{own}</strong>, your own role, may then no longer edit the group's roles. Only an owner can undo that.",
+        "confirm": "Save anyway",
+        "grant": "<strong>{roles}</strong> may then edit the group's roles: its holders can shape every role but the owner's, take rights away from other roles and change what non-members see. Give the role only to members you would trust with running the group.",
+        "lockout": "<strong>{own}</strong>, your own role, may then no longer edit the group's roles. Only an owner can undo that.",
+        "title": "Change who manages roles?"
+      },
       "saved": "Rights saved",
       "saveFirst": "Save or discard first — there are unsaved changes.",
       "simple": {
