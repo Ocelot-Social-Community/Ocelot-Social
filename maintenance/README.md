@@ -45,6 +45,8 @@ The override maps the container's port 3000 to 3001 and mounts `maintenance/app`
 docker compose up --build maintenance
 ```
 
+`packages/ui` is the exception to the reload: the page imports its built `dist`, not its sources. After a change in `packages/ui/src` run `(cd packages/ui && npm run build)` on the host; no image build is needed.
+
 The first build takes a while; later builds come from the cache.
 
 ## Testing & Linting
