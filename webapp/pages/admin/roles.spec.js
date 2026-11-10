@@ -239,9 +239,9 @@ describe('admin/roles.vue', () => {
       expect(vm.permissionHint(above, right)).toBeNull()
     })
 
-    // Not changeable by this viewer is not the same as fixed: the lock would claim nobody may
-    // change the role, while somebody above the viewer may.
-    it('does not lock the tab of a role the viewer may not change', () => {
+    // Ranked above the viewer is not the same as fixed: the lock says nobody may rename or delete
+    // the role, and only owner and user are like that.
+    it('does not lock the tab of a role above the viewer', () => {
       const wrapper = mountAs('moderator', [above])
 
       expect(wrapper.find('[data-test="role-tab-admin"]').exists()).toBe(true)
