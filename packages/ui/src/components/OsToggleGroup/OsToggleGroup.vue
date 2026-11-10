@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { defineComponent, getCurrentInstance, h, isVue2, ref } from 'vue-demi'
+  import { Comment, Text, defineComponent, getCurrentInstance, h, isVue2, ref } from 'vue-demi'
 
   import OsButton from '#src/components/OsButton/OsButton.vue'
   import { cn } from '#src/utils'
@@ -16,6 +16,36 @@
     'data-os-toggle-value',
   ])
 
+  /** A node the option slot renders, as far as telling an empty one apart goes. */
+  interface SlotNode {
+    /** Vue 2: set on a comment node. */
+    isComment?: boolean
+    /** Vue 2: the element's tag, missing on a text node. */
+    tag?: string
+    /** Vue 2: a text node's text. */
+    text?: string
+    /** Vue 3: the node's type — `Comment` or `Text` for those nodes. */
+    type?: unknown
+    /** Vue 3: a text node's text. */
+    children?: unknown
+  }
+
+  const isBlank = (text: unknown): boolean => typeof text === 'string' && text.trim() === ''
+
+  /**
+   * Whether a node from the option slot shows anything. A `v-if` that is false leaves a comment
+   * behind, and the template's line breaks between two of them a blank text node; handed to the
+   * button as a suffix, either would still open the gap after the label.
+   */
+  function isShown(node: SlotNode): boolean {
+    /* v8 ignore start -- Vue 2 only: its nodes carry flags instead of types */
+    if (isVue2) {
+      return !node.isComment && !(node.tag === undefined && isBlank(node.text))
+    }
+    /* v8 ignore stop */
+    return node.type !== Comment && !(node.type === Text && isBlank(node.children))
+  }
+
   /**
    * A row of buttons of which one is the current one — role tabs, a type picker, a three-way
    * switch. Built on OsButton, primary throughout: the current option filled, the rest outlined —
@@ -31,6 +61,7 @@
    * pointer events, which would swallow the very tooltip that says why it is disabled.
    *
    * @slot option - Extra content after an option's label, e.g. an icon. Props: `{ option, selected }`.
+   *   Rendered in the button's `suffix` slot, so it keeps the button's gap to the label.
    */
   export default defineComponent({
     name: 'OsToggleGroup',
@@ -181,15 +212,23 @@
             mouseenter: () => emit('hover', option.value),
             mouseleave: () => emit('hover', null),
           })
-          const extra = slots.option?.({ option, selected })
-          const content = extra ? [option.label, ...extra] : [option.label]
+          // The button's suffix slot, not the label's text: the suffix keeps the button's gap to
+          // the label, which a lock or a dot run straight into otherwise.
+          const shown = (slots.option?.({ option, selected }) ?? []).filter(isShown)
+          const extra = shown.length > 0 ? shown : null
 
           /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
           if (isVue2) {
             const button = h(
               OsButton,
-              { class: buttonClass, props: buttonProps, attrs: buttonAttrs, ...events },
-              content,
+              {
+                class: buttonClass,
+                props: buttonProps,
+                attrs: buttonAttrs,
+                ...events,
+                scopedSlots: extra ? { suffix: () => extra } : undefined,
+              },
+              [option.label],
             )
             return h(
               'span',
@@ -206,7 +245,9 @@
           const button = h(
             OsButton as Component,
             { class: buttonClass, ...buttonProps, ...buttonAttrs, ...events },
-            { default: () => content },
+            extra
+              ? { default: () => [option.label], suffix: () => extra }
+              : { default: () => [option.label] },
           )
           return h(
             'span',
