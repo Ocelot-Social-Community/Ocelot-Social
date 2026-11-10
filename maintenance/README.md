@@ -6,10 +6,48 @@ Built with **Nuxt 4** (static generation), **Tailwind CSS v4**, and the **@ocelo
 
 ## Development
 
+### Locally
+
+`@ocelot-social/ui` is a `file:` dependency, so the UI package has to be built once before the page can start (and again after a change in `packages/ui/src`).
+
 ```bash
+cd maintenance
+nvm use                                      # finds the .nvmrc in the repository root
+(cd ../packages/ui && npm install && npm run build)
 npm install
-npm run dev        # http://localhost:3000
+npm run dev                                  # http://localhost:3000
 ```
+
+The webapp also uses port 3000. To run both, give the maintenance page another port — the Docker setup below uses 3001:
+
+```bash
+npm run dev -- --port 3001                   # http://localhost:3001
+```
+
+**macOS: `connect EINVAL …/nuxt-vite-node-….sock`, every page answers 500.** Nuxt 4 talks to Vite over a Unix socket inside the system temp directory. On macOS that path is already long (`/var/folders/…`), and a Unix socket path may be at most 103 characters. Start with a short temp directory:
+
+```bash
+TMPDIR=/tmp npm run dev -- --port 3001
+```
+
+### With Docker
+
+From the repository root (the build context must contain `packages/ui/`). Build the UI package on the host first: `docker-compose.override.yml` mounts `packages/ui` from the host, which hides the copy built inside the image, so a fresh checkout without `packages/ui/dist` cannot resolve its UI imports.
+
+```bash
+(cd packages/ui && npm install && npm run build)
+docker compose up maintenance              # http://localhost:3001
+```
+
+The override maps the container's port 3000 to 3001 and mounts `maintenance/app`, `maintenance/public`, `nuxt.config.ts` and `packages/ui`, so changes to those reload without a rebuild. Everything else (for example `maintenance/locales` or `package.json`) is baked into the image: an existing image is not rebuilt by `up`, so after such a change start with a forced build:
+
+```bash
+docker compose up --build maintenance
+```
+
+`packages/ui` is the exception to the reload: the page imports its built `dist`, not its sources. After a change in `packages/ui/src` run `(cd packages/ui && npm run build)` on the host; no image build is needed.
+
+The first build takes a while; later builds come from the cache.
 
 ## Testing & Linting
 
