@@ -332,7 +332,7 @@
       "discard": "Descartar",
       "grantRoleManage": {
         "confirm": "Conceder de todos modos",
-        "message": "Estás concediendo a <strong>{role}</strong> el permiso «gestionar roles». Quien lo tenga puede configurar libremente cualquier rol excepto owner —también quitar derechos, incluso a roles por encima del suyo— y después cambiar el rol, bloquear o eliminar a quienes los tengan. Las cuentas y los contenidos eliminados no se pueden recuperar, ni siquiera por un owner. Concédelo solo a personas a las que confiarías poderes de administración. ¿Continuar?",
+        "message": "<strong>{role}</strong> recibe «gestionar roles»: quien tenga el rol puede configurar libremente cualquier rol excepto owner, también quitar derechos a roles superiores, y después cambiar el rol, bloquear o eliminar a quienes los tengan. Las cuentas y contenidos eliminados no se pueden recuperar, ni siquiera por un owner. Asigna el rol solo a personas a las que confiarías poderes de administración.",
         "title": "¿Conceder «gestionar roles»?"
       },
       "members": "{count} miembros",

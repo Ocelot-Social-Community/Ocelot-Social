@@ -332,7 +332,7 @@
       "discard": "Abandonner",
       "grantRoleManage": {
         "confirm": "Accorder quand même",
-        "message": "Vous accordez à <strong>{role}</strong> la permission « gérer les rôles ». Ses détenteurs peuvent façonner librement tous les rôles sauf owner — y compris retirer des droits, même à des rôles au-dessus du leur — puis changer le rôle, bloquer ou supprimer les détenteurs de ces rôles. Les comptes et contenus supprimés ne peuvent pas être restaurés, pas même par un owner. Ne l’accordez qu’à des personnes à qui vous confieriez des pouvoirs d’administration. Continuer ?",
+        "message": "<strong>{role}</strong> reçoit « gérer les rôles » : ses détenteurs peuvent façonner librement tous les rôles sauf owner, retirer aussi des droits à des rôles supérieurs, puis changer le rôle, bloquer ou supprimer leurs détenteurs. Les comptes et contenus supprimés ne peuvent pas être restaurés, pas même par un owner. N’attribuez ce rôle qu’à des personnes à qui vous confieriez des pouvoirs d’administration.",
         "title": "Accorder « gérer les rôles » ?"
       },
       "members": "{count} membres",

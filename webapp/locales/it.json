@@ -332,7 +332,7 @@
       "discard": "Scarta",
       "grantRoleManage": {
         "confirm": "Concedi comunque",
-        "message": "Stai concedendo a <strong>{role}</strong> il permesso «gestisci ruoli». Chi lo possiede può modellare liberamente ogni ruolo tranne owner — anche rimuovere diritti, persino da ruoli superiori al proprio — e poi cambiare ruolo, bloccare o eliminare chi li detiene. Account e contenuti eliminati non possono essere ripristinati, nemmeno da un owner. Concedilo solo a persone a cui affideresti poteri di amministrazione. Continuare?",
+        "message": "<strong>{role}</strong> riceve «gestisci ruoli»: chi ha il ruolo può modellare liberamente ogni ruolo tranne owner, togliere diritti anche a ruoli superiori e poi cambiare ruolo, bloccare o eliminare chi li detiene. Account e contenuti eliminati non possono essere ripristinati, nemmeno da un owner. Assegna il ruolo solo a persone a cui affideresti poteri di amministrazione.",
         "title": "Concedere «gestisci ruoli»?"
       },
       "members": "{count} membri",

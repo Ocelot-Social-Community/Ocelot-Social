@@ -332,7 +332,7 @@
       "discard": "Verwerpen",
       "grantRoleManage": {
         "confirm": "Toch toekennen",
-        "message": "Je geeft <strong>{role}</strong> de rechten “rollen beheren”. Wie die heeft, kan elke rol behalve owner vrij inrichten — ook rechten verwijderen, zelfs bij rollen boven de eigen rol — en daarna de houders van die rollen een andere rol geven, blokkeren of verwijderen. Verwijderde accounts en inhoud kunnen niet worden hersteld, ook niet door een owner. Ken het alleen toe aan mensen aan wie je beheerdersbevoegdheden zou toevertrouwen. Doorgaan?",
+        "message": "<strong>{role}</strong> krijgt “rollen beheren”: wie de rol heeft, kan elke rol behalve owner vrij inrichten, ook hogere rollen rechten afnemen, en daarna hun houders een andere rol geven, blokkeren of verwijderen. Verwijderde accounts en inhoud zijn niet te herstellen, ook niet door een owner. Wijs de rol alleen toe aan mensen aan wie je beheerdersbevoegdheden zou toevertrouwen.",
         "title": "“Rollen beheren” toekennen?"
       },
       "members": "{count} leden",

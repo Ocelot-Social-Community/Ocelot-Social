@@ -332,7 +332,7 @@
       "discard": "Verwerfen",
       "grantRoleManage": {
         "confirm": "Trotzdem vergeben",
-        "message": "Du gibst <strong>{role}</strong> die Berechtigung „Rollen verwalten“. Wer sie hat, kann jede Rolle außer owner frei gestalten — auch Rechte entfernen, selbst bei Rollen über der eigenen — und deren Inhaber danach umstufen, sperren oder löschen. Gelöschte Konten und Inhalte kann auch ein Owner nicht zurückholen. Vergib die Berechtigung nur an Personen, denen du Admin-Befugnisse anvertraust. Fortfahren?",
+        "message": "<strong>{role}</strong> erhält „Rollen verwalten“: Wer die Rolle hat, kann jede Rolle außer owner frei gestalten, auch höheren Rollen Rechte entziehen, und deren Inhaber dann umstufen, sperren oder löschen. Gelöschte Konten und Inhalte kann auch ein Owner nicht zurückholen. Weise die Rolle nur Personen zu, denen du Admin-Befugnisse anvertraust.",
         "title": "„Rollen verwalten“ vergeben?"
       },
       "members": "{count} Mitglieder",

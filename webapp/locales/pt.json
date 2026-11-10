@@ -332,7 +332,7 @@
       "discard": "Descartar",
       "grantRoleManage": {
         "confirm": "Conceder mesmo assim",
-        "message": "Você está concedendo a <strong>{role}</strong> a permissão “gerenciar funções”. Quem a tiver pode moldar livremente qualquer função, exceto owner — inclusive remover direitos, mesmo de funções acima da sua — e depois trocar a função, bloquear ou excluir quem as tem. Contas e conteúdos excluídos não podem ser restaurados, nem por um owner. Conceda-a apenas a pessoas a quem você confiaria poderes de administração. Continuar?",
+        "message": "<strong>{role}</strong> recebe “gerenciar funções”: quem tem a função pode moldar livremente qualquer função, exceto owner, tirar direitos também de funções superiores e depois trocar a função, bloquear ou excluir quem as tem. Contas e conteúdos excluídos não podem ser restaurados, nem por um owner. Atribua a função apenas a pessoas a quem você confiaria poderes de administração.",
         "title": "Conceder “gerenciar funções”?"
       },
       "members": "{count} membros",

@@ -332,7 +332,7 @@
       "discard": "Hidhi",
       "grantRoleManage": {
         "confirm": "Jepe gjithsesi",
-        "message": "Po i jepni <strong>{role}</strong> lejen „menaxho rolet“. Kush e ka mund të formësojë lirisht çdo rol përveç owner — përfshirë heqjen e të drejtave, madje edhe nga role mbi të vetin — dhe pastaj t’u ndryshojë rolin, t’i bllokojë ose t’i fshijë mbajtësit e tyre. Llogaritë dhe përmbajtjet e fshira nuk mund të rikthehen, as nga një owner. Jepeni vetëm personave të cilëve do t’u besonit kompetenca administratori. Të vazhdohet?",
+        "message": "<strong>{role}</strong> merr „menaxho rolet“: kush e ka rolin mund të formësojë lirisht çdo rol përveç owner, t’u heqë të drejta edhe roleve më të larta, dhe pastaj t’u ndryshojë rolin, t’i bllokojë ose t’i fshijë mbajtësit e tyre. Llogaritë dhe përmbajtjet e fshira nuk i rikthen dot as një owner. Jepjani rolin vetëm personave të cilëve do t’u besonit kompetenca administratori.",
         "title": "Të jepet „menaxho rolet“?"
       },
       "members": "{count} anëtarë",

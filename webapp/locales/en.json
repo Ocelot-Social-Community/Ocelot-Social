@@ -332,7 +332,7 @@
       "discard": "Discard",
       "grantRoleManage": {
         "confirm": "Grant anyway",
-        "message": "You are giving <strong>{role}</strong> the “manage roles” permission. Its holders can shape every role but owner freely — removing rights included, even from roles above their own — and then re-role, disable or delete the holders of those roles. Deleted accounts and content cannot be restored, not even by an owner. Grant it only to people you would trust with admin powers. Continue?",
+        "message": "<strong>{role}</strong> gets “manage roles”: its holders can shape every role but owner freely, strip rights from higher roles too, and then re-role, disable or delete their holders. Deleted accounts and content cannot be restored, not even by an owner. Assign the role only to people you would trust with admin powers.",
         "title": "Grant “manage roles”?"
       },
       "members": "{count} members",

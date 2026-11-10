@@ -332,7 +332,7 @@
       "discard": "Odrzuć",
       "grantRoleManage": {
         "confirm": "Nadaj mimo to",
-        "message": "Nadajesz roli <strong>{role}</strong> uprawnienie „zarządzanie rolami”. Kto je ma, może dowolnie kształtować każdą rolę oprócz owner — także odbierać prawa, nawet rolom wyższym niż własna — a następnie zmieniać rolę, blokować lub usuwać ich posiadaczy. Usuniętych kont i treści nie da się przywrócić, nawet przez ownera. Nadawaj je tylko osobom, którym powierzyłbyś uprawnienia administratora. Kontynuować?",
+        "message": "Rola <strong>{role}</strong> otrzymuje „zarządzanie rolami”: kto ją ma, może dowolnie kształtować każdą rolę oprócz owner, odbierać prawa także wyższym rolom, a potem zmieniać rolę, blokować lub usuwać ich posiadaczy. Usuniętych kont i treści nie przywróci nawet owner. Przypisuj tę rolę tylko osobom, którym powierzyłbyś uprawnienia administratora.",
         "title": "Nadać „zarządzanie rolami”?"
       },
       "members": "{count} członków",
