@@ -158,11 +158,11 @@ describe('postFilterToCypher access control operators', () => {
 
     // The group's own answer first — the mirrored `group.content.read` of its non-member role,
     // failing closed for a node the backfill has not reached yet.
-    expect(where).toContain('NOT (coalesce(g.nonMemberContentRead, false) = true)')
-    expect(where).toContain('AND NOT g.id IN $pf1')
+    expect(where).toContain('NOT (coalesce(withholdingGroup.nonMemberContentRead, false) = true)')
+    expect(where).toContain('AND NOT withholdingGroup.id IN $pf1')
     // …then the network side, which names GROUPS — the ones the viewer elevated in — and never
     // the type: a type list is what put every hidden group into a network admin's feed (#10506).
-    expect(where).toContain('AND NOT g.id IN $pf2')
+    expect(where).toContain('AND NOT withholdingGroup.id IN $pf2')
     expect(where).not.toContain("THEN 'hidden'")
     expect(where).toContain('NOT EXISTS {')
     expect(where).toContain('OR EXISTS { MATCH (post)<-[:WROTE]-(:User { id: $pf0 }) }')
@@ -213,7 +213,7 @@ describe('postFilterToCypher access control operators', () => {
     expect(params).toEqual({ pf0: null, pf1: [], pf2: [] })
   })
 
-  // One expression covers the anonymous visitor too: an empty group list makes `NOT g.id IN []`
+  // One expression covers the anonymous visitor too: an empty group list makes `NOT withholdingGroup.id IN []`
   // true for every group, and a null id matches no author. The clause still has to CONSTRAIN —
   // returning "no restriction" for a logged-out request would put every closed and hidden
   // group's posts on the public start page, which is why the parameters are pinned here rather
@@ -223,8 +223,8 @@ describe('postFilterToCypher access control operators', () => {
       filter: { invisibleTo: { viewerId: null, contentGroupIds: [] } },
     })
 
-    expect(where).toContain('NOT (coalesce(g.nonMemberContentRead, false) = true)')
-    expect(where).toContain('AND NOT g.id IN $pf1')
+    expect(where).toContain('NOT (coalesce(withholdingGroup.nonMemberContentRead, false) = true)')
+    expect(where).toContain('AND NOT withholdingGroup.id IN $pf1')
     expect(params).toEqual({ pf0: null, pf1: [], pf2: [] })
   })
 

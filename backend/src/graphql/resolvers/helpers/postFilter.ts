@@ -3,7 +3,7 @@
 /* eslint-disable security/detect-object-injection */
 import { UserInputError } from '@graphql/errors'
 
-import { nonMemberReadsContent } from './groupAccessCypher'
+import { groupContentWithheld } from './groupAccessCypher'
 import { orderClause } from './ordering'
 import { shoutsVisibleTo } from './shoutVisibility'
 
@@ -196,12 +196,7 @@ const translate = (
           // deploying this and running the backfill migration — at the value its seeded
           // template would give it, which for content is "public groups only".
           where: `(
-            NOT EXISTS {
-              MATCH (${alias})-[:IN]->(g:Group)
-              WHERE NOT (${nonMemberReadsContent('g')})
-                AND NOT g.id IN $${groupsParameter}
-                AND NOT g.id IN $${elevatedParameter}
-            }
+            NOT ${groupContentWithheld(alias, groupsParameter, elevatedParameter)}
             OR EXISTS { MATCH (${alias})<-[:WROTE]-(:User { id: $${parameter} }) }
           )`,
           params: {
