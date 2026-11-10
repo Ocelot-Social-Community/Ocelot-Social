@@ -206,6 +206,7 @@ describe('ProfileSlug', () => {
         const dialog = (mutate) => {
           const profileUser = { ...user.User[0], createdAt: '2020-01-01', commentsCount: 23 }
           const replace = jest.fn()
+          const toastBackendError = jest.fn()
           const rendered = render(ProfileSlug, {
             localVue,
             stubs: { ...stubs, DateTime: true },
@@ -213,7 +214,7 @@ describe('ProfileSlug', () => {
             mocks: {
               ...mocks,
               $router: { replace },
-              $toastBackendError: jest.fn(),
+              $toastBackendError: toastBackendError,
               $apollo: { ...mocks.$apollo, mutate },
               $policy: { get: () => true },
             },
@@ -221,7 +222,7 @@ describe('ProfileSlug', () => {
           const button = (name) =>
             rendered.container.querySelector(`[data-testid="os-confirm-dialog-${name}"]`)
           const isOpen = () => rendered.container.querySelector('[role="dialog"]') !== null
-          return { ...rendered, replace, button, isOpen }
+          return { ...rendered, replace, toastBackendError, button, isOpen }
         }
 
         it('deletes the user with posts and comments, then leaves the profile', async () => {
@@ -249,9 +250,12 @@ describe('ProfileSlug', () => {
         })
 
         it('reports a failed mutation and stays open for another try', async () => {
-          const mutate = jest.fn().mockRejectedValue(new Error('boom'))
-          const { button, isOpen, replace } = dialog(mutate)
+          const error = new Error('boom')
+          const mutate = jest.fn().mockRejectedValue(error)
+          const { button, isOpen, replace, toastBackendError } = dialog(mutate)
           await fireEvent.click(button('confirm'))
+          await waitFor(() => expect(toastBackendError).toHaveBeenCalledWith(error))
+          expect(mutate).toHaveBeenCalled()
           await waitFor(() => expect(button('confirm').disabled).toBe(false))
           expect(isOpen()).toBe(true)
           expect(replace).not.toHaveBeenCalled()
