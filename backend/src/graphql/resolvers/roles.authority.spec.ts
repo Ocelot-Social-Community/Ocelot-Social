@@ -160,16 +160,41 @@ describe('a moderator who may manage roles', () => {
       expect(rights(ADMIN_ROLE)).toEqual(before)
     })
 
-    it('cannot rename or delete the admin role', async () => {
+    it('cannot rename the admin role', async () => {
       const renamed = await mutate({
         mutation: RENAME_ROLE,
         variables: { name: ADMIN_ROLE, newName: 'former-admin' },
       })
-      const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: ADMIN_ROLE } })
 
       expect(errorCode(renamed.errors)).toBe('ROLE_CHANGE_NOT_OUTRANKED')
-      expect(errorCode(deleted.errors)).toBe('ROLE_CHANGE_NOT_OUTRANKED')
       expect(roleService.getRole(ADMIN_ROLE)).toBeDefined()
+    })
+
+    // Deleting needs no rank: only an empty role goes, so nobody loses a right by it.
+    it('cannot delete the admin role while somebody holds it', async () => {
+      const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: ADMIN_ROLE } })
+
+      expect(errorCode(deleted.errors)).toBe('ROLE_DELETE_ROLE_HAS_MEMBERS')
+      expect(roleService.getRole(ADMIN_ROLE)).toBeDefined()
+    })
+
+    it('deletes an empty role above their own', async () => {
+      await roleService.upsertRole(
+        { name: 'board', protected: false, permissions: rights(ADMIN_ROLE) },
+        'test',
+      )
+      const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: 'board' } })
+
+      expect(deleted.errors).toBeUndefined()
+      expect(roleService.getRole('board')).toBeUndefined()
+    })
+
+    it('cannot delete the owner or the user role', async () => {
+      for (const name of [OWNER_ROLE, USER_ROLE]) {
+        const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name } })
+
+        expect(errorCode(deleted.errors)).toBe('ROLE_DELETE_SYSTEM_ROLE')
+      }
     })
 
     it('gives their own role a right they did not hold', async () => {

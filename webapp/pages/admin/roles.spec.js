@@ -237,12 +237,11 @@ describe('admin/roles.vue', () => {
     const held = { key: 'badge.manage', available: true, grantableByCurrentUser: true }
     const notHeld = { key: 'policy.manage', available: true, grantableByCurrentUser: false }
 
-    it('leaves a role above the viewer untouched: no save, rename or delete, with a reason', () => {
+    it('leaves a role above the viewer unchanged: no save or rename, with a reason', () => {
       const { vm } = mountAs('moderator')
 
       expect(vm.mayChange(above)).toBe(false)
       expect(vm.canRename(above)).toBe(false)
-      expect(vm.canDelete({ ...above, memberCount: 0 })).toBe(false)
       expect(vm.saveDisabled(above)).toBe(true)
       expect(vm.saveHint(above)).toBe('admin.roles.notEditableHint')
       expect(vm.mayToggle(above, held)).toBe(false)
@@ -256,6 +255,16 @@ describe('admin/roles.vue', () => {
 
       expect(wrapper.find('[data-test="role-tab-admin"]').exists()).toBe(true)
       expect(wrapper.find('[data-test="role-tab-admin"] .role-tab__badge').exists()).toBe(false)
+    })
+
+    // Deleting takes nobody's rights: an empty role goes, whoever it ranks above.
+    it('lets the viewer delete a role above them once it is empty', () => {
+      const { vm } = mountAs('moderator')
+
+      expect(vm.canDelete({ ...above, memberCount: 0 })).toBe(true)
+      expect(vm.deleteHint({ ...above, memberCount: 0 })).toBe('')
+      expect(vm.canDelete(above)).toBe(false)
+      expect(vm.deleteHint(above)).toBe('admin.roles.cannotDeleteHasMembers')
     })
 
     it('lets the viewer grant in a role they outrank only what they hold', () => {

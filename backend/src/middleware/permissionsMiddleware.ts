@@ -295,7 +295,7 @@ const canCreateRole = rule({ cache: 'no_cache' })((_parent, args, context: Conte
   return refusal ? changeError(refusal) : true
 })
 
-// updateRole carries the new rights; renameRole and deleteRole only name the role.
+// updateRole carries the new rights; renameRole only names the role.
 const canChangeRole = rule({ cache: 'no_cache' })((_parent, args, context: Context) => {
   if (!hasPermissionEffective(context, 'role.manage')) {
     return false
@@ -307,6 +307,14 @@ const canChangeRole = rule({ cache: 'no_cache' })((_parent, args, context: Conte
   )
   return refusal ? changeError(refusal) : true
 })
+
+// Deleting a role needs `role.manage` only — no rank. RoleService deletes only an empty role, and
+// never `owner` or `user`: nobody loses a right by it, and nobody gains one, because a role built
+// anew holds only what its creator may hand out. A role above the deleter may be gone that way;
+// its rights are not.
+const canDeleteRole = rule({ cache: 'no_cache' })((_parent, _args, context: Context) =>
+  hasPermissionEffective(context, 'role.manage'),
+)
 
 // Same hierarchy guard for the report `review` mutation, which can disable the
 // reported resource. Only Users carry a role, so Posts/Comments pass through; a
@@ -949,7 +957,7 @@ export default shield(
       createRole: canCreateRole,
       updateRole: canChangeRole,
       renameRole: canChangeRole,
-      deleteRole: canChangeRole,
+      deleteRole: canDeleteRole,
       setUserRole: canSetUserRole,
 
       // Group roles: editing a group's own role definitions is the group's meta right, and

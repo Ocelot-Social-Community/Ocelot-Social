@@ -692,9 +692,10 @@ export default {
       return !samePermissions(this.selectedPermissions(form.permissions), form.baseline)
     },
     canDelete(role) {
-      // Protected (owner) and the implicit baseline (user) cannot be deleted, and a
-      // role with members would orphan them — reassign first (enforced by the backend).
-      return this.mayChange(role) && role.name !== 'user' && (role.memberCount || 0) === 0
+      // Any empty role but the fixed ones (owner, user), also one above the viewer: deleting takes
+      // nobody's rights, and a role with members would orphan them — reassign first. All three
+      // enforced by the backend.
+      return !role.protected && role.name !== 'user' && (role.memberCount || 0) === 0
     },
     hasMembers(role) {
       return (role.memberCount || 0) > 0
@@ -711,7 +712,7 @@ export default {
       if (this.canDelete(role)) return ''
       // A role that is only undeletable because it still has members gets the
       // specific "reassign first" hint.
-      if (this.mayChange(role) && role.name !== 'user' && this.hasMembers(role)) {
+      if (!role.protected && role.name !== 'user' && this.hasMembers(role)) {
         return this.$t('admin.roles.cannotDeleteHasMembers')
       }
       return this.$t('admin.roles.cannotDelete')
