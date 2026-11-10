@@ -470,6 +470,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Pelo menos um dos tópicos não existe.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "A descrição deve ter pelo menos {min} caracteres.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Um grupo que pessoas de fora não conseguem encontrar também não pode mostrar seus membros a elas.",
+    "GROUP_SAVE_NAME_TOO_LONG": "O nome do grupo deve ter no máximo {max} caracteres.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "O nome do grupo deve ter pelo menos {min} caracteres.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Este nome único de grupo já está em uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Poucos tópicos selecionados (pelo menos {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Tópicos demais selecionados (no máximo {max}).",

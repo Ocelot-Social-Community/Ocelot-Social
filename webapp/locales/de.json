@@ -470,6 +470,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Mindestens ein Thema gibt es nicht.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Die Beschreibung muss mindestens {min} Zeichen lang sein.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Eine Gruppe, die Außenstehende nicht finden können, kann ihnen auch ihre Mitglieder nicht zeigen.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Der Gruppenname darf höchstens {max} Zeichen lang sein.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Der Gruppenname muss mindestens {min} Zeichen lang sein.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Dieser eindeutige Gruppenname ist bereits vergeben.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Es sind zu wenige Themen ausgewählt (mindestens {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Es sind zu viele Themen ausgewählt (höchstens {max}).",

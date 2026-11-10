@@ -470,6 +470,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Ten minste één van de onderwerpen bestaat niet.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "De beschrijving moet minimaal {min} tekens lang zijn.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Een groep die buitenstaanders niet kunnen vinden, kan hun ook haar leden niet laten zien.",
+    "GROUP_SAVE_NAME_TOO_LONG": "De groepsnaam mag maximaal {max} tekens lang zijn.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "De groepsnaam moet minimaal {min} tekens lang zijn.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Deze unieke groepsnaam is al in gebruik.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Te weinig onderwerpen geselecteerd (minimaal {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Te veel onderwerpen geselecteerd (maximaal {max}).",
