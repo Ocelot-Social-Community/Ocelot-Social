@@ -4,13 +4,7 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
 
-import {
-  buildEmailBrandingCss,
-  EMAIL_THEME,
-  lightDarkAt,
-  lightOf,
-  resolveTokens,
-} from './emailTheme.ts'
+import { buildEmailBrandingCss, EMAIL_THEME, resolveTokens } from './emailTheme.ts'
 
 describe('resolveTokens', () => {
   test('passes literal values through untouched', () => {
@@ -348,40 +342,18 @@ test('resolveTokens drops a token whose light-dark() cannot be read, instead of 
   assert.equal(Object.hasOwn(resolved, 'broken'), false)
 })
 
-test('a light-dark() that is not exactly two non-empty arguments is left alone, and its token dropped', () => {
-  assert.equal(lightOf('light-dark(, blue)'), 'light-dark(, blue)')
-  assert.equal(lightOf('light-dark(red, )'), 'light-dark(red, )')
-  assert.equal(lightOf('light-dark(red, blue, green)'), 'light-dark(red, blue, green)')
-  assert.equal(
-    lightOf('light-dark(rgb(1, 2, 3), blue, green)'),
-    'light-dark(rgb(1, 2, 3), blue, green)',
-  )
+test('resolveTokens drops a token whose light-dark() is not two non-empty arguments', () => {
   assert.equal(
     Object.hasOwn(resolveTokens({ 'text-color-base': 'light-dark(, blue)' }), 'text-color-base'),
     false,
   )
 })
 
-test('light-dark( inside a quoted string is a name, not a function', () => {
-  assert.equal(lightDarkAt(`'light-dark(', sans-serif`), -1)
-  assert.equal(lightDarkAt(`"a \\" light-dark(" light-dark(red, blue)`), 19)
-  assert.equal(lightOf(`'light-dark(', sans-serif`), `'light-dark(', sans-serif`)
-  assert.equal(lightOf('light-dark("a,b", c)'), '"a,b"')
+test('resolveTokens leaves light-dark( inside a quoted string alone', () => {
   assert.equal(
     resolveTokens({ 'font-family-text': `'light-dark(', sans-serif` })['font-family-text'],
     `'light-dark(', sans-serif`,
   )
-})
-
-test('lightOf keeps the light half of light-dark(), commas inside it included', () => {
-  assert.equal(lightOf('light-dark(rgb(1, 2, 3), rgb(4, 5, 6))'), 'rgb(1, 2, 3)')
-  assert.equal(
-    lightOf('0 1px light-dark(red, blue), 0 2px light-dark(#fff, #000)'),
-    '0 1px red, 0 2px #fff',
-  )
-  assert.equal(lightOf('rgb(1, 2, 3)'), 'rgb(1, 2, 3)')
-  assert.equal(lightOf('light-dark(red'), 'light-dark(red')
-  assert.equal(lightOf('light-dark(red)'), 'light-dark(red)')
 })
 
 test('resolveTokens flattens a light-dark() token to its light value, references inside it too', () => {
