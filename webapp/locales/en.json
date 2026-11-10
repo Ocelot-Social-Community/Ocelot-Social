@@ -470,6 +470,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "At least one of the categories does not exist.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "The description must be at least {min} characters long.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "A group that outsiders cannot find cannot show them its members either.",
+    "GROUP_SAVE_NAME_TOO_LONG": "The group name must be at most {max} characters long.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "The group name must be at least {min} characters long.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "This unique group name is already taken.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",

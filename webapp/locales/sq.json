@@ -470,6 +470,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Një grup që të jashtmit nuk mund ta gjejnë, nuk mund t'u tregojë as anëtarët e tij.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Emri i grupit duhet të ketë jo më shumë se {max} karaktere.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Emri i grupit duhet të ketë të paktën {min} karaktere.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ky emër unik i grupit është i zënë tashmë.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Janë zgjedhur shumë pak tema (të paktën {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Janë zgjedhur shumë tema (më së shumti {max}).",

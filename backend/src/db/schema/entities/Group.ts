@@ -14,7 +14,11 @@ export const Group = defineEntity({
   label: 'Group',
   properties: {
     id: { type: 'string' },
-    name: { type: 'string', minLength: 3 },
+    // Only a floor. The brandable bounds live in branding.group.nameLengthMin/-Max and are enforced
+    // by the validation middleware where a name is written; a fixed 3 here would make the audit
+    // flag every name a brand with a lower minimum allowed. Must not exceed the branding's
+    // GROUP_NAME_LENGTH_FLOOR, which schema.spec.ts asserts.
+    name: { type: 'string', minLength: 1 },
     slug: { type: 'string', pattern: SLUG },
     about: { type: ['string', 'null'] },
     description: { type: 'string' },

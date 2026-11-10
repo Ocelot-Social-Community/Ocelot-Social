@@ -470,6 +470,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Как минимум одной из тем не существует.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Описание должно содержать не менее {min} символов.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Группа, которую посторонние не могут найти, не может и показать им своих участников.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Название группы должно содержать не более {max} символов.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Название группы должно содержать не менее {min} символов.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Это уникальное имя группы уже занято.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Выбрано слишком мало тем (минимум {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Выбрано слишком много тем (максимум {max}).",
