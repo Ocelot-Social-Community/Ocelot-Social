@@ -2,7 +2,7 @@
   import { computed, defineComponent, getCurrentInstance, h, isVue2 } from 'vue-demi'
 
   import OsSpinner from '#src/components/OsSpinner/OsSpinner.vue'
-  import { cn } from '#src/utils'
+  import { cn, shownNodes } from '#src/utils'
 
   import { buttonVariants } from './button.variants'
 
@@ -108,16 +108,14 @@
       /* v8 ignore stop */
 
       return () => {
-        const iconContent = slots.icon?.()
+        // Only what shows counts: a slot whose `v-if` is false still hands back a comment (and
+        // the line breaks around it), and the wrapper with its gap would render around nothing.
+        const iconContent = shownNodes(slots.icon?.())
         const defaultContent = slots.default?.()
-        const suffixContent = slots.suffix?.()
-        const hasIcon = iconContent && iconContent.length > 0
-        const hasSuffix = suffixContent && suffixContent.length > 0
-        const hasText =
-          defaultContent?.some((node: unknown) => {
-            const children = (node as Record<string, unknown>).children
-            return typeof children !== 'string' || children.trim().length > 0
-          }) ?? false
+        const suffixContent = shownNodes(slots.suffix?.())
+        const hasIcon = iconContent.length > 0
+        const hasSuffix = suffixContent.length > 0
+        const hasText = shownNodes(defaultContent).length > 0
 
         const size = props.size as ButtonSize
         const spinnerPx = SPINNER_PX[size] // eslint-disable-line security/detect-object-injection
@@ -131,8 +129,7 @@
         if (hasIcon) {
           const iconChildren = isLoading
             ? [
-                /* v8 ignore next -- iconContent guaranteed truthy by hasIcon check */
-                ...(iconContent || []),
+                ...iconContent,
                 createSpinner(spinnerPx, 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'),
               ]
             : iconContent
