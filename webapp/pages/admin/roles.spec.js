@@ -58,7 +58,7 @@ describe('admin/roles.vue', () => {
 
   it('locks the tabs of the roles that cannot be renamed or deleted: owner and user', () => {
     // `user` is the baseline everybody holds — as fixed as `owner`, which is the only one that
-    // is `protected`. The lock follows the rename rule rather than that flag.
+    // is `protected`.
     const wrapper = Wrapper()
     const locked = (name) =>
       wrapper.find(`[data-test="role-tab-${name}"] .role-tab__badge`).exists()
@@ -211,7 +211,7 @@ describe('admin/roles.vue', () => {
   // #10485: the page offers what the backend accepts — a role the viewer may change (their own,
   // or one they outrank), and in another role only rights they hold themselves.
   describe('what the viewer may change', () => {
-    const mountAs = (ownRoleName) => {
+    const mountAs = (ownRoleName, extraRoles = []) => {
       const wrapper = mount(Roles, {
         localVue,
         stubs,
@@ -221,7 +221,7 @@ describe('admin/roles.vue', () => {
           $apollo: { mutate: jest.fn(), queries: { roles: { refetch: jest.fn() } } },
           $store: { getters: { 'auth/user': { roleName: ownRoleName } } },
         },
-        data: () => ({ roles, permissionCatalog }),
+        data: () => ({ roles: [...roles, ...extraRoles], permissionCatalog }),
       })
       wrapper.vm.buildForms()
       return wrapper
@@ -247,6 +247,15 @@ describe('admin/roles.vue', () => {
       expect(vm.saveHint(above)).toBe('admin.roles.notEditableHint')
       expect(vm.mayToggle(above, held)).toBe(false)
       expect(vm.permissionHint(above, notHeld)).toBeNull()
+    })
+
+    // Not changeable by this viewer is not the same as fixed: the lock would claim nobody may
+    // change the role, while somebody above the viewer may.
+    it('does not lock the tab of a role the viewer may not change', () => {
+      const wrapper = mountAs('moderator', [above])
+
+      expect(wrapper.find('[data-test="role-tab-admin"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="role-tab-admin"] .role-tab__badge').exists()).toBe(false)
     })
 
     it('lets the viewer grant in a role they outrank only what they hold', () => {

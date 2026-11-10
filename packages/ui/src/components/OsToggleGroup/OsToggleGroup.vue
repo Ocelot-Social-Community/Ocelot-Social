@@ -31,6 +31,7 @@
    * pointer events, which would swallow the very tooltip that says why it is disabled.
    *
    * @slot option - Extra content after an option's label, e.g. an icon. Props: `{ option, selected }`.
+   *   Rendered in the button's `suffix` slot, so it keeps the button's gap to the label.
    */
   export default defineComponent({
     name: 'OsToggleGroup',
@@ -181,15 +182,23 @@
             mouseenter: () => emit('hover', option.value),
             mouseleave: () => emit('hover', null),
           })
+          // The button's suffix slot, not the label's text: the suffix keeps the button's gap to
+          // the label, which a lock or a dot run straight into otherwise. Output that shows
+          // nothing (a false `v-if`) opens no suffix — OsButton tells that apart itself.
           const extra = slots.option?.({ option, selected })
-          const content = extra ? [option.label, ...extra] : [option.label]
 
           /* v8 ignore start -- Vue 2 branch tested in webapp Jest tests */
           if (isVue2) {
             const button = h(
               OsButton,
-              { class: buttonClass, props: buttonProps, attrs: buttonAttrs, ...events },
-              content,
+              {
+                class: buttonClass,
+                props: buttonProps,
+                attrs: buttonAttrs,
+                ...events,
+                scopedSlots: extra ? { suffix: () => extra } : undefined,
+              },
+              [option.label],
             )
             return h(
               'span',
@@ -206,7 +215,9 @@
           const button = h(
             OsButton as Component,
             { class: buttonClass, ...buttonProps, ...buttonAttrs, ...events },
-            { default: () => content },
+            extra
+              ? { default: () => [option.label], suffix: () => extra }
+              : { default: () => [option.label] },
           )
           return h(
             'span',

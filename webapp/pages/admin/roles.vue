@@ -11,7 +11,7 @@
       :roles="orderedRoles"
       :active-name="activeRoleName"
       :label-for="(role) => role.name"
-      :badge-for="(role) => !canRename(role)"
+      :badge-for="isFixedRole"
       :badge-title="$t('admin.roles.protected')"
       :label="$t('admin.roles.title')"
       @select="setActive"
@@ -563,13 +563,16 @@ export default {
       this.cancelCreate()
       this.cancelRename()
     },
-    // Mandatory roles are load-bearing by name (owner ⇒ full catalog, user ⇒ the
-    // baseline fallback) and cannot be renamed — mirrors the backend guard.
-    // Fixed roles: `owner` (protected) and `user` (the baseline everybody holds) cannot be renamed
-    // or deleted — the backend refuses both (MANDATORY_ROLE_NAMES). The lock on their tabs reads
-    // this, so the two cannot disagree again; it used to follow `protected` and left `user` bare.
+    // Fixed roles: `owner` (protected) and `user` (the baseline everybody holds) are load-bearing
+    // by name (owner ⇒ full catalog, user ⇒ the baseline fallback) and cannot be renamed or
+    // deleted by anybody — the backend refuses both (MANDATORY_ROLE_NAMES). Only they carry the
+    // lock on their tab. A role this viewer may not change is a different matter: its form says
+    // so, and a lock there would claim the role is fixed for everybody.
+    isFixedRole(role) {
+      return Boolean(role.protected) || role.name === 'user'
+    },
     canRename(role) {
-      return !role.protected && role.name !== 'user' && this.mayChange(role)
+      return !this.isFixedRole(role) && this.mayChange(role)
     },
     // Whether the viewer may change this role at all (#10485): their own, or one their role
     // outranks — the backend's answer, so the page offers exactly what it would accept. A
