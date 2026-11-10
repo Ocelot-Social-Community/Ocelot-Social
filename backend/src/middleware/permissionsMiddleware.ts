@@ -10,7 +10,7 @@ import { createRequire } from 'node:module'
 import CONFIG from '@config/index'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
-import { viewerOutranksUser } from '@graphql/resolvers/helpers/actOnHierarchy'
+import { viewerOutranksRole, viewerOutranksUser } from '@graphql/resolvers/helpers/actOnHierarchy'
 import {
   elevatedIn,
   memberRoleHolds,
@@ -36,7 +36,6 @@ import {
   templateVisibility,
 } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
-import { dominatesInNetwork } from '@src/role'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
@@ -245,7 +244,7 @@ const isDeletingOwnAccount = rule({
 })
 
 // Act-on hierarchy guard for per-user destructive actions (delete, disable): the actor may only
-// act on a target whose role grants strictly less AUTHORITY than theirs (dominatesInNetwork() —
+// act on a target whose role grants strictly less AUTHORITY than theirs (outranksInNetwork() —
 // see role/authority.ts). Closes the privilege-escalation hole where a holder of
 // user.delete.any / user.disable could act on a peer or a higher-privileged user (admin/owner).
 //
@@ -349,8 +348,7 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   }
   // coalesce() in the statement above already guarantees a name, same as in
   // viewerOutranksUser.
-  const targetPermissions = context.role.permissionsForRole(row.get('roleName') as string)
-  if (dominatesInNetwork(context.effectivePermissions, targetPermissions)) {
+  if (viewerOutranksRole(context, row.get('roleName') as string)) {
     return true
   }
   // Explained to a moderator only, for the reason given at canActOnTargetUser.

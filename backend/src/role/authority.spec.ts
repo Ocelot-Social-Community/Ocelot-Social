@@ -8,6 +8,7 @@ import {
   dominatesInNetwork,
   mayAssignNetworkRole,
   mayChangeNetworkRole,
+  outranksInNetwork,
 } from './authority'
 import { DEFAULT_ROLES } from './defaults'
 import { dominates } from './dominance'
@@ -84,6 +85,34 @@ describe('dominatesInNetwork (act-on hierarchy over authority)', () => {
     for (const key of role(USER_ROLE)) {
       expect(PARTICIPATION_PERMISSIONS).toContain(key)
     }
+  })
+})
+
+// A custom role holding every right there is, as an owner may build it ("superadmin").
+const fullCatalog = (): Set<PermissionKey> => new Set(allPermissionKeys())
+
+describe(outranksInNetwork, () => {
+  const holder = (roleName: string, permissions = role(roleName)) => ({ roleName, permissions })
+  const owner = holder(OWNER_ROLE, fullCatalog())
+  const superadmin = holder('superadmin', fullCatalog())
+
+  it('lets an owner outrank a role holding the full catalog, which the sets alone call a peer', () => {
+    expect(dominatesInNetwork(owner.permissions, superadmin.permissions)).toBe(false)
+    expect(outranksInNetwork(owner, superadmin)).toBe(true)
+  })
+
+  it('lets nobody outrank an owner, not even with the full catalog', () => {
+    expect(outranksInNetwork(superadmin, owner)).toBe(false)
+  })
+
+  it('keeps owners peers', () => {
+    expect(outranksInNetwork(owner, owner)).toBe(false)
+  })
+
+  it('ranks everybody below the owner by their rights, as before', () => {
+    expect(outranksInNetwork(superadmin, holder(ADMIN_ROLE))).toBe(true)
+    expect(outranksInNetwork(holder(ADMIN_ROLE), superadmin)).toBe(false)
+    expect(outranksInNetwork(holder(MODERATOR_ROLE), holder(USER_ROLE))).toBe(true)
   })
 })
 
@@ -201,6 +230,29 @@ describe('mayChangeNetworkRole (#10485)', () => {
 
   it('ignores roles it outranks already when raising their own', () => {
     expect(change(ADMIN_ROLE, ADMIN_ROLE, [...role(ADMIN_ROLE)])).toBeNull()
+  })
+
+  it('lets an owner change a role holding the full catalog', () => {
+    const result = mayChangeNetworkRole({
+      actor: { permissions: fullCatalog(), roleName: OWNER_ROLE },
+      roleName: 'superadmin',
+      rolePermissions: fullCatalog(),
+      newPermissions: [...fullCatalog()].filter((key) => key !== 'branding.manage'),
+      otherRoles: others,
+    })
+
+    expect(result).toBeNull()
+  })
+
+  it('refuses an admin a role holding the full catalog', () => {
+    const result = mayChangeNetworkRole({
+      actor: { permissions: role(ADMIN_ROLE), roleName: ADMIN_ROLE },
+      roleName: 'superadmin',
+      rolePermissions: fullCatalog(),
+      otherRoles: others,
+    })
+
+    expect(result).toBe('notOutranked')
   })
 
   it('fills a role the actor outranks only with rights they hold', () => {

@@ -67,6 +67,30 @@ export function dominatesInNetwork(
   return dominates(authorityOf(actor), authorityOf(target))
 }
 
+/** Somebody in the network: their role's name and the rights it resolves to. */
+export interface NetworkHolder {
+  permissions: ReadonlySet<PermissionKey>
+  roleName: string
+}
+
+/**
+ * Whether the actor outranks a user or a role: the act-on rule with the owner placed by NAME.
+ *
+ * `owner` outranks everybody who is not an owner, and owners stay peers. The sets alone cannot
+ * say that: a custom role may hold the full catalog too, and then compares as a second owner —
+ * owners could neither change nor delete that role, nor disable or delete its holders, and nobody
+ * else could either. Below the owner, the sets decide as before (dominatesInNetwork).
+ */
+export function outranksInNetwork(actor: NetworkHolder, target: NetworkHolder): boolean {
+  if (target.roleName === OWNER_ROLE) {
+    return false
+  }
+  if (actor.roleName === OWNER_ROLE) {
+    return true
+  }
+  return dominatesInNetwork(actor.permissions, target.permissions)
+}
+
 /**
  * Whether the actor's rights cover a set they hand out: every AUTHORITY right in it is one the
  * actor holds. Nobody may give away power they do not have — to somebody else, to themselves,
@@ -88,10 +112,7 @@ export function coversInNetwork(
 /** Why a role change is refused, or `null` when it is allowed. */
 export type NetworkRoleRefusal = 'notOutranked' | 'notCovered' | 'ownerOnly' | 'wouldOutrank'
 
-interface Actor {
-  permissions: ReadonlySet<PermissionKey>
-  roleName: string
-}
+type Actor = NetworkHolder
 
 /**
  * Whether the actor may give a user a role (#10485). The same three rules the groups follow
@@ -144,7 +165,8 @@ export function mayAssignNetworkRole({
  * Whether the actor may change a role itself — its rights, its name, whether it exists.
  *
  * Changing a role acts on everybody who holds it, so it needs the standing to act on them: the
- * actor outranks the role, or it is the actor's OWN role. An admin edits the admin role; a
+ * actor outranks the role (outranksInNetwork — an owner outranks every role but `owner`), or it
+ * is the actor's OWN role. An admin edits the admin role; a
  * moderator who may manage roles does not.
  *
  * Their own role they shape freely — that is what `role.manage` is for, and it includes giving
@@ -181,7 +203,7 @@ export function mayChangeNetworkRole({
     )
     return overtaken ? 'wouldOutrank' : null
   }
-  if (!dominatesInNetwork(actor.permissions, rolePermissions)) {
+  if (!outranksInNetwork(actor, { roleName, permissions: rolePermissions })) {
     return 'notOutranked'
   }
   if (newPermissions && !coversInNetwork(actor.permissions, newPermissions)) {

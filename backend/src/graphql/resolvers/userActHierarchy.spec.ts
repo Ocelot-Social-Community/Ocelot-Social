@@ -21,6 +21,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { principalChangesDelivered } from '@root/test/principalChanges'
 import { serverPubsub } from '@src/context'
 import { listenForPrincipalChanges, principalEpoch } from '@src/context/principalEpoch'
+import { allPermissionKeys } from '@src/permission'
 import { DEFAULT_ROLES } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
@@ -42,7 +43,15 @@ const OFFICE: RoleDefinition = {
   permissions: ['user.delete.any', 'user.disable'],
 }
 
-const contextFn = () => ({ authenticatedUser, roles: [...DEFAULT_ROLES, OFFICE] })
+// A role holding every right there is, as an owner may build it. By rights alone it is a second
+// owner; the owner outranks it by name (outranksInNetwork).
+const SUPERADMIN: RoleDefinition = {
+  name: 'superadmin',
+  protected: false,
+  permissions: allPermissionKeys(),
+}
+
+const contextFn = () => ({ authenticatedUser, roles: [...DEFAULT_ROLES, OFFICE, SUPERADMIN] })
 
 // The refusal a holder of the right gets; somebody without the right still gets the generic
 // 'Not Authorized!' and learns nothing about the target's role.
@@ -53,7 +62,7 @@ const buildUser = (id: string, role: string) =>
 
 // Custom roles are not seeded: build the user without one and link a real Role node, so the
 // role resolves through an actual HAS_ROLE edge exactly like in production.
-const buildOfficeUser = async (id: string) => {
+const buildCustomRoleUser = async (id: string, roleName: string) => {
   await Factory.build(
     'user',
     { id, name: id, role: null },
@@ -61,11 +70,12 @@ const buildOfficeUser = async (id: string) => {
   )
   await database.write({
     query: `MATCH (u:User {id: $id})
-            MERGE (r:Role {id: 'office', name: 'office'})
+            MERGE (r:Role {id: $roleName, name: $roleName})
             MERGE (u)-[:HAS_ROLE]->(r)`,
-    variables: { id },
+    variables: { id, roleName },
   })
 }
+const buildOfficeUser = async (id: string) => buildCustomRoleUser(id, 'office')
 
 describe('act-on hierarchy', () => {
   // Counts what disableUser publishes, as index.ts does in production: a disabled user's open
@@ -103,6 +113,7 @@ describe('act-on hierarchy', () => {
     ])
     await buildOfficeUser('the-office')
     await buildOfficeUser('other-office')
+    await buildCustomRoleUser('the-superadmin', 'superadmin')
   })
 
   afterEach(async () => {
@@ -122,6 +133,17 @@ describe('act-on hierarchy', () => {
         mutate({ mutation: DISABLE_USER, variables: { id: 'plain-user', disable: true } }),
       ).resolves.toMatchObject({
         data: { disableUser: { id: 'plain-user', disabled: true } },
+        errors: undefined,
+      })
+    })
+
+    it('lets the owner disable the holder of a role with the full catalog', async () => {
+      await as('the-owner')
+
+      await expect(
+        mutate({ mutation: DISABLE_USER, variables: { id: 'the-superadmin', disable: true } }),
+      ).resolves.toMatchObject({
+        data: { disableUser: { id: 'the-superadmin', disabled: true } },
         errors: undefined,
       })
     })
@@ -387,6 +409,13 @@ describe('act-on hierarchy', () => {
       await expect(outranks('the-admin', 'the-office')).resolves.toBe(true)
       await expect(outranks('the-owner', 'the-admin')).resolves.toBe(true)
       await expect(outranks('the-moderator', 'the-admin')).resolves.toBe(false)
+    })
+
+    it('places the owner above a role holding the full catalog, and nobody else', async () => {
+      await expect(outranks('the-owner', 'the-superadmin')).resolves.toBe(true)
+      await expect(outranks('the-superadmin', 'the-owner')).resolves.toBe(false)
+      await expect(outranks('the-superadmin', 'the-admin')).resolves.toBe(true)
+      await expect(outranks('the-admin', 'the-superadmin')).resolves.toBe(false)
     })
 
     it('is false for oneself', async () => {

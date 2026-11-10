@@ -13,7 +13,7 @@ import SET_USER_ROLE from '@graphql/queries/roles/setUserRole.gql'
 import UPDATE_ROLE from '@graphql/queries/roles/updateRole.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { allPermissionKeys } from '@src/permission'
-import { ADMIN_ROLE, MODERATOR_ROLE, RoleService, USER_ROLE } from '@src/role'
+import { ADMIN_ROLE, MODERATOR_ROLE, OWNER_ROLE, RoleService, USER_ROLE } from '@src/role'
 
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
@@ -332,5 +332,55 @@ describe('an admin', () => {
     const { errors } = await setUserRole('admin', USER_ROLE)
 
     expect(errorCode(errors)).toBe('ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED')
+  })
+})
+
+// An owner may build a role holding every right there is. Compared by rights alone it was a second
+// owner — a peer — so no owner could change, rename or delete it afterwards, and nobody else
+// could either. The owner outranks it by name now.
+describe('an owner, with a role holding the full catalog', () => {
+  const SUPERADMIN = 'superadmin'
+
+  beforeEach(async () => {
+    await roleService.upsertRole(
+      { name: SUPERADMIN, protected: false, permissions: allPermissionKeys() },
+      'test',
+    )
+    authenticatedUser = await (await user('the-owner', OWNER_ROLE)).toJson()
+  })
+
+  it('is offered the role for changes', async () => {
+    const { data } = await query({ query: ROLES_OFFERED })
+    const offered = data.roles.find((role: { name: string }) => role.name === SUPERADMIN)
+
+    expect(offered.editableByCurrentUser).toBe(true)
+  })
+
+  it('changes, renames and deletes it', async () => {
+    const reduced = allPermissionKeys().filter((key) => key !== 'branding.manage')
+
+    expect((await updateRole(SUPERADMIN, reduced)).errors).toBeUndefined()
+    expect(rights(SUPERADMIN)).not.toContain('branding.manage')
+
+    await updateRole(SUPERADMIN, allPermissionKeys())
+
+    const renamed = await mutate({
+      mutation: RENAME_ROLE,
+      variables: { name: SUPERADMIN, newName: 'deputy' },
+    })
+
+    expect(renamed.errors).toBeUndefined()
+
+    const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: 'deputy' } })
+
+    expect(deleted.errors).toBeUndefined()
+    expect(roleService.getRole('deputy')).toBeUndefined()
+  })
+
+  it('still leaves the role out of an admin`s reach', async () => {
+    authenticatedUser = await (await user('the-admin', ADMIN_ROLE)).toJson()
+    const { errors } = await updateRole(SUPERADMIN, rights(ADMIN_ROLE))
+
+    expect(errorCode(errors)).toBe('ROLE_CHANGE_NOT_OUTRANKED')
   })
 })
