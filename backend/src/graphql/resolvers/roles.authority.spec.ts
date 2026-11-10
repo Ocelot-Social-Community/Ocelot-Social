@@ -328,6 +328,25 @@ describe('an admin', () => {
     expect(await roleOf('moderator')).toBe(USER_ROLE)
   })
 
+  // The one right the default admin lacks, videoCall.create_restricted, is participation: the
+  // coverage check leaves it out, so an admin may create a role holding the full catalog and take
+  // it themselves. Its authority is exactly the admin's — it must not rank them above their peers.
+  it('cannot lift themselves above their fellow admins with a role that only adds participation', async () => {
+    const created = await mutate({
+      mutation: CREATE_ROLE,
+      variables: { name: 'superadmin', permissions: allPermissionKeys() },
+    })
+
+    expect(created.errors).toBeUndefined()
+    expect((await setUserRole('other-admin', 'superadmin')).errors).toBeUndefined()
+
+    authenticatedUser = { ...authenticatedUser, roleName: 'superadmin' } as Context['user']
+    const { errors } = await setUserRole('admin', USER_ROLE)
+
+    expect(errorCode(errors)).toBe('ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED')
+    expect(await roleOf('admin')).toBe(ADMIN_ROLE)
+  })
+
   it('does not re-role a fellow admin', async () => {
     const { errors } = await setUserRole('admin', USER_ROLE)
 

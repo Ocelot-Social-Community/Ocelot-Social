@@ -58,24 +58,19 @@ describe('dominatesInNetwork (act-on hierarchy over authority)', () => {
     expect(dominatesInNetwork(set('user.disable'), set(...PARTICIPATION_PERMISSIONS))).toBe(true)
   })
 
-  it('keeps the default chain owner ⊋ admin ⊋ moderator ⊋ user', () => {
-    const owner = new Set(allPermissionKeys())
-
-    expect(dominatesInNetwork(owner, role(ADMIN_ROLE))).toBe(true)
+  it('keeps the default chain admin ⊋ moderator ⊋ user', () => {
     expect(dominatesInNetwork(role(ADMIN_ROLE), role(MODERATOR_ROLE))).toBe(true)
     expect(dominatesInNetwork(role(MODERATOR_ROLE), role(USER_ROLE))).toBe(true)
-    expect(dominatesInNetwork(owner, owner)).toBe(false)
   })
 
-  it('lets the full catalog (owner) outrank a role holding every authority right', () => {
-    const owner = new Set(allPermissionKeys())
-    const allAuthority = new Set(
-      allPermissionKeys().filter((key) => !PARTICIPATION_PERMISSIONS.includes(key)),
-    )
+  // The owner's rank is its name (outranksInNetwork), not its full catalog. A custom role reaches
+  // the full catalog by adding participation rights, which anybody may hand out — ranked by the
+  // catalog, an admin could create one, take it and outrank their fellow admins.
+  it('ranks the full catalog by its authority only, which the default admin holds all of', () => {
+    const fullCatalog = new Set(allPermissionKeys())
 
-    // Equal authority — without the owner rule these would be peers.
-    expect(dominatesInNetwork(owner, allAuthority)).toBe(true)
-    expect(dominatesInNetwork(allAuthority, owner)).toBe(false)
+    expect(dominatesInNetwork(fullCatalog, role(ADMIN_ROLE))).toBe(false)
+    expect(dominatesInNetwork(role(ADMIN_ROLE), fullCatalog)).toBe(false)
   })
 
   it('leaves the plain user role without any authority', () => {
@@ -109,8 +104,13 @@ describe(outranksInNetwork, () => {
     expect(outranksInNetwork(owner, owner)).toBe(false)
   })
 
-  it('ranks everybody below the owner by their rights, as before', () => {
-    expect(outranksInNetwork(superadmin, holder(ADMIN_ROLE))).toBe(true)
+  it('lets an owner outrank the default admin, whose authority equals theirs', () => {
+    expect(outranksInNetwork(owner, holder(ADMIN_ROLE))).toBe(true)
+  })
+
+  it('ranks everybody below the owner by their authority', () => {
+    // The full catalog adds only participation to the default admin: peers.
+    expect(outranksInNetwork(superadmin, holder(ADMIN_ROLE))).toBe(false)
     expect(outranksInNetwork(holder(ADMIN_ROLE), superadmin)).toBe(false)
     expect(outranksInNetwork(holder(MODERATOR_ROLE), holder(USER_ROLE))).toBe(true)
   })

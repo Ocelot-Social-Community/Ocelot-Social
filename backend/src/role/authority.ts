@@ -10,7 +10,6 @@
 // Only the rights listed below are left out. A key that is not listed counts — so a right
 // added to the catalog later is treated as authority until somebody decides otherwise, which
 // is the fail-safe direction for a destructive action: it can only block more, never less.
-import { allPermissionKeys } from '@src/permission'
 
 import { dominates } from './dominance'
 import { OWNER_ROLE } from './types'
@@ -44,26 +43,21 @@ const authorityOf = (permissions: ReadonlySet<PermissionKey>): Set<PermissionKey
   return authority
 }
 
-const holdsFullCatalog = (permissions: ReadonlySet<PermissionKey>): boolean =>
-  allPermissionKeys().every((key) => permissions.has(key))
-
 /**
  * Whether the actor outranks the target in the network: their AUTHORITY is a strict superset
  * of the target's. Peers, higher targets and incomparable roles stay blocked, exactly as with
  * the full sets — only participation no longer decides the ranking.
  *
- * The full catalog — what `owner` resolves to — outranks everybody who does not hold it. With
- * participation left out, that no longer follows from the sets: the default `admin` role holds
- * every authority right there is, and only participation set it below `owner` before. Two
- * holders of the full catalog stay peers (remove an owner by demoting first).
+ * Sets only, so the owner is not special here: the default `admin` holds every authority right
+ * there is, and by authority it is the owner's peer. The owner's rank comes from its name
+ * (outranksInNetwork). It used to come from "holds the full catalog" — which a role reaches by
+ * adding participation rights, and those the coverage check lets anybody hand out: an admin could
+ * create such a role, take it, and outrank their fellow admins.
  */
 export function dominatesInNetwork(
   actor: ReadonlySet<PermissionKey>,
   target: ReadonlySet<PermissionKey>,
 ): boolean {
-  if (holdsFullCatalog(actor) && !holdsFullCatalog(target)) {
-    return true
-  }
   return dominates(authorityOf(actor), authorityOf(target))
 }
 
@@ -77,9 +71,9 @@ export interface NetworkHolder {
  * Whether the actor outranks a user or a role: the act-on rule with the owner placed by NAME.
  *
  * `owner` outranks everybody who is not an owner, and owners stay peers. The sets alone cannot
- * say that: a custom role may hold the full catalog too, and then compares as a second owner —
- * owners could neither change nor delete that role, nor disable or delete its holders, and nobody
- * else could either. Below the owner, the sets decide as before (dominatesInNetwork).
+ * say that: by authority the default `admin` equals the owner, and a custom role may even hold
+ * the full catalog — owners could then neither change nor delete that role, nor disable or delete
+ * its holders. Below the owner, the sets decide (dominatesInNetwork).
  */
 export function outranksInNetwork(actor: NetworkHolder, target: NetworkHolder): boolean {
   if (target.roleName === OWNER_ROLE) {

@@ -240,7 +240,7 @@ describe('act-on hierarchy', () => {
       ).resolves.toMatchObject({ errors: [{ message: NOT_OUTRANKED }] })
     })
 
-    it('lets an owner delete an admin (owner = full catalog ⊋ admin)', async () => {
+    it('lets an owner delete an admin (the owner outranks every non-owner)', async () => {
       await as('the-owner')
 
       await expect(
@@ -411,10 +411,12 @@ describe('act-on hierarchy', () => {
       await expect(outranks('the-moderator', 'the-admin')).resolves.toBe(false)
     })
 
-    it('places the owner above a role holding the full catalog, and nobody else', async () => {
+    // The full catalog adds only participation to the default admin: by authority they are peers,
+    // and only the owner — by name — stands above both.
+    it('places the owner above a role holding the full catalog, and that role level with admin', async () => {
       await expect(outranks('the-owner', 'the-superadmin')).resolves.toBe(true)
       await expect(outranks('the-superadmin', 'the-owner')).resolves.toBe(false)
-      await expect(outranks('the-superadmin', 'the-admin')).resolves.toBe(true)
+      await expect(outranks('the-superadmin', 'the-admin')).resolves.toBe(false)
       await expect(outranks('the-admin', 'the-superadmin')).resolves.toBe(false)
     })
 
