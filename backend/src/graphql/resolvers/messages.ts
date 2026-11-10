@@ -21,6 +21,7 @@ import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherFiel
 import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
 import {
+  BLOCKED_IN_DIRECT_ROOM,
   DIRECT_ROOM,
   getRoomProperties,
   groupChatGated,
@@ -231,9 +232,11 @@ export default {
                WHERE NOT EXISTS {
                  MATCH (room)-[:ROOM_FOR]->(call:VideoCallSession)
                  WHERE call.endedAt IS NOT NULL
-               }`
+               }
+               AND NOT ${BLOCKED_IN_DIRECT_ROOM}`
             : `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user:User { id: $userId })
-               WHERE ${DIRECT_ROOM}`
+               WHERE ${DIRECT_ROOM}
+               AND NOT ${BLOCKED_IN_DIRECT_ROOM}`
 
           const createMessageCypher = `
             ${matchRoom}
@@ -303,6 +306,19 @@ export default {
               if (closed.records[0]?.get('closed') === true) {
                 throw new AppError(Errors.CHAT_CALL_ROOM_CLOSED)
               }
+            }
+            // Or a block between the two of a direct chat — the room stays, the writing ends.
+            const blocked = await transaction.run(
+              roomId
+                ? `MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
+                   WHERE ${BLOCKED_IN_DIRECT_ROOM}
+                   RETURN room.id`
+                : `MATCH (currentUser:User { id: $currentUserId })-[:BLOCKED]-(:User { id: $userId })
+                   RETURN currentUser.id`,
+              { currentUserId, roomId, userId },
+            )
+            if (blocked.records.length > 0) {
+              throw new AppError(Errors.CHAT_DIRECT_ROOM_BLOCKED)
             }
             return null
           }

@@ -210,6 +210,12 @@ const definitions = {
   },
   // posts, comments & events
   POST_DOES_NOT_EXIST: { type: 'BAD_USER_INPUT', text: 'Could not find post.' },
+  // #10744: a block in either direction between the commenter and the post's author ends
+  // commenting there — writing a new comment and editing an old one. Deleting one's own stays.
+  COMMENT_SAVE_BLOCKED: {
+    type: 'FORBIDDEN',
+    text: 'A block between you and the author of this post ends commenting on it.',
+  },
   COMMENT_SAVE_CONTENT_TOO_SHORT: {
     type: 'BAD_USER_INPUT',
     text: 'The comment must be at least {min} characters long.',
@@ -433,6 +439,12 @@ const definitions = {
   CHAT_ROOM_TARGET_MISSING: {
     type: 'BAD_USER_INPUT',
     text: 'Name either a chat or the user to chat with.',
+  },
+  // #10744: a block in either direction ends a direct chat — no new room, no new message in an
+  // existing one. What was written stays readable.
+  CHAT_DIRECT_ROOM_BLOCKED: {
+    type: 'FORBIDDEN',
+    text: 'A block between you and this person ends your direct chat. What was written stays readable.',
   },
   CHAT_ROOM_PARTNER_IS_SELF: {
     type: 'BAD_USER_INPUT',

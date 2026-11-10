@@ -70,6 +70,9 @@ export const OPEN_DIRECT_ROOM = `
   WITH currentUser, user, collect(room)[0] AS existingRoom
   WITH currentUser, user, existingRoom
   WHERE existingRoom IS NULL
+    // A block either way: no direct room to begin with (#10744) — neither by a first message
+    // nor by a first draft.
+    AND NOT (currentUser)-[:BLOCKED]-(user)
   CREATE (currentUser)-[:CHATS_IN]->(:Room {
     createdAt: toString(datetime()),
     id: apoc.create.uuid()
@@ -99,6 +102,17 @@ export const TOUCH_DRAFT = `
     THEN toString(datetime())
   END
 `
+
+// Whether the room bound as `room` is a direct room between `currentUser` and someone a block
+// stands between, either way. Such a room stays readable and takes no new message (#10744). A
+// block reaches no group room: that room is the group's, not the two members' (and a call's
+// conference chat is not direct either).
+export const BLOCKED_IN_DIRECT_ROOM = `EXISTS {
+  MATCH (room)<-[:CHATS_IN]-(partner:User)
+  WHERE ${DIRECT_ROOM}
+    AND NOT partner = currentUser
+    AND (partner)-[:BLOCKED]-(currentUser)
+}`
 
 // Whether a room is a group room (has a ROOM_FOR edge to a Group). Used to block messaging in
 // a group room while the groups feature is off, without denying DM rooms (shared mutations).
