@@ -329,6 +329,7 @@
       "deleteError": "Impossible de supprimer le rôle : {message}",
       "deleteSuccess": "Rôle supprimé.",
       "description": "Qui peut faire quoi sur l'ensemble du réseau. Créez des rôles et attribuez des droits — les modifications s'appliquent immédiatement.",
+      "discard": "Abandonner",
       "members": "{count} membres",
       "name": "Rôles et droits",
       "nameLabel": "Nom",

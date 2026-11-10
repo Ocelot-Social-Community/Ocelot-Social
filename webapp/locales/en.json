@@ -329,6 +329,7 @@
       "deleteError": "Could not delete role: {message}",
       "deleteSuccess": "Role deleted.",
       "description": "Who may do what across the network. Create roles and assign permissions — changes apply immediately.",
+      "discard": "Discard",
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
