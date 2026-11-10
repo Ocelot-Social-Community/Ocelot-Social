@@ -198,7 +198,7 @@
                banner's "load" does. Only when there is something to discard. -->
           <span class="role__action">
             <os-button
-              appearance="ghost"
+              appearance="outline"
               :disabled="!isDirty(activeRole) || saving"
               :data-test="`role-${activeRole.name}-discard`"
               @click="discardChanges(activeRole)"
