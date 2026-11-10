@@ -329,6 +329,7 @@
       "deleteError": "Roli nuk u fshi dot: {message}",
       "deleteSuccess": "Roli u fshi.",
       "description": "Kush mund të bëjë çfarë në të gjithë rrjetin. Krijo role dhe cakto të drejta — ndryshimet veprojnë menjëherë.",
+      "discard": "Hidhi",
       "members": "{count} anëtarë",
       "name": "Rolet dhe të drejtat",
       "nameLabel": "Emri",

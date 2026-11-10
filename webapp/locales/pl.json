@@ -329,6 +329,7 @@
       "deleteError": "Nie można usunąć roli: {message}",
       "deleteSuccess": "Rola usunięta.",
       "description": "Kto co może w całej sieci. Twórz role i przypisuj uprawnienia — zmiany działają natychmiast.",
+      "discard": "Odrzuć",
       "members": "{count} członków",
       "name": "Role i uprawnienia",
       "nameLabel": "Nazwa",

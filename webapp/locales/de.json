@@ -329,6 +329,7 @@
       "deleteError": "Rolle konnte nicht gelöscht werden: {message}",
       "deleteSuccess": "Rolle gelöscht.",
       "description": "Wer im Netzwerk was darf. Rollen anlegen und Rechte zuweisen — Änderungen gelten sofort.",
+      "discard": "Verwerfen",
       "members": "{count} Mitglieder",
       "name": "Rollen & Rechte",
       "nameLabel": "Name",

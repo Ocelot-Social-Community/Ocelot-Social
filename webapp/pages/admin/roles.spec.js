@@ -526,6 +526,58 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.isDirty(roles[1])).toBe(true)
   })
 
+  describe('discarding changes', () => {
+    const DISCARD = '[data-test="role-badge-setter-discard"]'
+
+    it('offers discard only while the draft differs from the saved rights', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find(DISCARD).attributes('disabled')).toBeDefined()
+
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find(DISCARD).attributes('disabled')).toBeUndefined()
+    })
+
+    it('puts the saved rights back into the form, without saving', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      wrapper.vm.forms['badge-setter'].permissions['badge.manage'] = false
+      await wrapper.vm.$nextTick()
+      await wrapper.find(DISCARD).trigger('click')
+
+      expect(wrapper.vm.forms['badge-setter'].permissions).toEqual({
+        'badge.manage': true,
+        'post.create': false,
+      })
+      expect(wrapper.vm.isDirty(roles[1])).toBe(false)
+      expect(mutate).not.toHaveBeenCalled()
+    })
+
+    it('settles a conflict the same way as loading the other admin`s version', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.setActive('badge-setter')
+      wrapper.vm.forms['badge-setter'].permissions['post.create'] = true
+      wrapper.setData({
+        roles: roles.map((r) => (r.name === 'badge-setter' ? { ...r, permissions: [] } : r)),
+      })
+      wrapper.vm.buildForms()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(true)
+
+      await wrapper.find(DISCARD).trigger('click')
+
+      expect(wrapper.vm.conflicts['badge-setter']).toBe(false)
+      expect(wrapper.vm.forms['badge-setter'].permissions['post.create']).toBe(false)
+      expect(wrapper.vm.forms['badge-setter'].permissions['badge.manage']).toBe(false)
+    })
+  })
+
   it('saveRole sends the selected permissions to updateRole', async () => {
     const wrapper = Wrapper()
     wrapper.vm.forms['badge-setter'].permissions['post.create'] = true

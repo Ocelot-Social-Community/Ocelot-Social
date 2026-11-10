@@ -329,6 +329,7 @@
       "deleteError": "Não foi possível excluir a função: {message}",
       "deleteSuccess": "Função excluída.",
       "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações são aplicadas de imediato.",
+      "discard": "Descartar",
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",

@@ -329,6 +329,7 @@
       "deleteError": "No se pudo eliminar el rol: {message}",
       "deleteSuccess": "Rol eliminado.",
       "description": "Quién puede hacer qué en toda la red. Crea roles y asigna permisos: los cambios se aplican de inmediato.",
+      "discard": "Descartar",
       "members": "{count} miembros",
       "name": "Roles y permisos",
       "nameLabel": "Nombre",
