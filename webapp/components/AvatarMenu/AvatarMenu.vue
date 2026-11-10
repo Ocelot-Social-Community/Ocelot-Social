@@ -29,7 +29,7 @@
         <b>{{ userName }}</b>
         <template v-if="user.roleName && user.roleName !== 'user'">
           <p class="ds-text ds-text-softer ds-text-size-small" style="margin-bottom: 0">
-            {{ user.roleName | camelCase }}
+            {{ networkRoleTitle(user.roleName) }}
           </p>
         </template>
         <hr />
@@ -64,6 +64,7 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters } from 'vuex'
 import Dropdown from '~/components/Dropdown'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
+import networkRoleLabel from '~/mixins/networkRoleLabel'
 
 export default {
   components: {
@@ -73,6 +74,7 @@ export default {
     OsMenuItem,
     AvatarImage,
   },
+  mixins: [networkRoleLabel],
   props: {
     placement: { type: String, default: 'top-end' },
   },

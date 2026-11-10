@@ -1406,6 +1406,10 @@
       "name": "Utenti"
     }
   },
+  "networkRoles": {
+    "owner": "Proprietario",
+    "user": "Utente"
+  },
   "notifications": {
     "comment": "Commento",
     "empty": "Spiacente, non hai notifiche al momento.",

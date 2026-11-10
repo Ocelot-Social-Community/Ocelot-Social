@@ -10,7 +10,7 @@
     <role-tabs
       :roles="orderedRoles"
       :active-name="activeRoleName"
-      :label-for="(role) => role.name"
+      :label-for="(role) => networkRoleLabel(role.name)"
       :badge-for="isFixedRole"
       :badge-title="$t('admin.roles.protected')"
       :label="$t('admin.roles.title')"
@@ -75,7 +75,7 @@
         <h3 class="role__name">
           <template v-if="!renaming">
             <span class="role__label">{{ $t('admin.roles.roleLabel') }}:</span>
-            {{ activeRole.name }}
+            {{ networkRoleLabel(activeRole.name) }}
             <button
               v-if="canRename(activeRole)"
               type="button"
@@ -256,13 +256,14 @@ import {
   updateRoleMutation,
 } from '~/graphql/admin/Roles.js'
 import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
+import networkRoleLabel from '~/mixins/networkRoleLabel'
 import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 
 const emptyPermissionMap = (catalog) =>
   catalog.reduce((map, permission) => ({ ...map, [permission.key]: false }), {})
 
 export default {
-  mixins: [confirmLeaveIfUnsavedChanges, warnBeforeUnload],
+  mixins: [confirmLeaveIfUnsavedChanges, networkRoleLabel, warnBeforeUnload],
   components: {
     ConfirmModal,
     ConflictBanner,

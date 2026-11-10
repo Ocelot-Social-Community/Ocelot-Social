@@ -135,6 +135,8 @@ export default [
             // the dock registry (components/Dock/modules.js) names each module's flag label
             '/^dock\\.[^.]+\\.flag$/',
             // enums: one key per value
+            // the fixed network roles (utils/networkRoles.js), looked up by role name
+            '/^networkRoles\\.(owner|user)$/',
             '/^notifications\\.reason\\./',
             '/^report\\.reason\\.category\\.options\\./',
             '/^settings\\.notifications\\./',

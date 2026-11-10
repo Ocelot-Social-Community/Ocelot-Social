@@ -1406,6 +1406,10 @@
       "name": "Përdoruesit"
     }
   },
+  "networkRoles": {
+    "owner": "Pronar",
+    "user": "Përdorues"
+  },
   "notifications": {
     "comment": "Koment",
     "empty": "Na vjen keq, nuk ke asnjë njoftim për momentin.",

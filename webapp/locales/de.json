@@ -1406,6 +1406,10 @@
       "name": "Nutzer"
     }
   },
+  "networkRoles": {
+    "owner": "Inhaber",
+    "user": "Nutzer"
+  },
   "notifications": {
     "comment": "Kommentar",
     "empty": "Bedaure, du hast momentan keinerlei Benachrichtigungen.",

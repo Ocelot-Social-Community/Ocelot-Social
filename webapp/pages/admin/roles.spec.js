@@ -68,6 +68,21 @@ describe('admin/roles.vue', () => {
     expect(locked('badge-setter')).toBe(false)
   })
 
+  // The fixed roles read translated — owner as "Inhaber", like a group's owner; a custom role as
+  // the name it was given.
+  it('names the fixed roles translated and every other role by its name', async () => {
+    const wrapper = Wrapper()
+
+    expect(wrapper.find('[data-test="role-tab-owner"]').text()).toContain('networkRoles.owner')
+    expect(wrapper.find('[data-test="role-tab-user"]').text()).toContain('networkRoles.user')
+    expect(wrapper.find('[data-test="role-tab-badge-setter"]').text()).toContain('badge-setter')
+
+    wrapper.vm.setActive('owner')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.role__name').text()).toContain('networkRoles.owner')
+  })
+
   it('renders a switcher tab for every role', () => {
     const wrapper = Wrapper()
     expect(wrapper.find('[data-test="role-tab-owner"]').exists()).toBe(true)
