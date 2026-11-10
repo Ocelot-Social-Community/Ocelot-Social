@@ -1,4 +1,4 @@
-import { render, fireEvent } from '@testing-library/vue'
+import { render, fireEvent, waitFor } from '@testing-library/vue'
 import { mount } from '@vue/test-utils'
 import ProfileSlug from './_slug.vue'
 import LocationPickerMap from '~/components/Map/LocationPickerMap'
@@ -200,6 +200,69 @@ describe('ProfileSlug', () => {
         })
         const cell = wrapper.getByText('common.comment').parentElement
         expect(cell.textContent.replace(/\s+/g, ' ').trim()).toBe('common.comment 23')
+      })
+
+      describe('the dialog for deleting the account', () => {
+        const dialog = (mutate) => {
+          const profileUser = { ...user.User[0], createdAt: '2020-01-01', commentsCount: 23 }
+          const replace = jest.fn()
+          const rendered = render(ProfileSlug, {
+            localVue,
+            stubs: { ...stubs, DateTime: true },
+            data: () => ({ ...user, deleteUserData: profileUser, showDeleteModal: true }),
+            mocks: {
+              ...mocks,
+              $router: { replace },
+              $toastBackendError: jest.fn(),
+              $apollo: { ...mocks.$apollo, mutate },
+              $policy: { get: () => true },
+            },
+          })
+          const button = (name) =>
+            rendered.container.querySelector(`[data-testid="os-confirm-dialog-${name}"]`)
+          const isOpen = () => rendered.container.querySelector('[role="dialog"]') !== null
+          return { ...rendered, replace, button, isOpen }
+        }
+
+        it('deletes the user with posts and comments, then leaves the profile', async () => {
+          const mutate = jest.fn().mockResolvedValue()
+          const { button, isOpen, replace } = dialog(mutate)
+          await fireEvent.click(button('confirm'))
+          await waitFor(() => expect(replace).toHaveBeenCalledWith('/'))
+          expect(mutate).toHaveBeenCalledWith(
+            expect.objectContaining({ variables: { id: 'u3', resource: ['Post', 'Comment'] } }),
+          )
+          expect(mocks.$toast.success).toHaveBeenCalledWith('settings.deleteUserAccount.success')
+          expect(isOpen()).toBe(false)
+        })
+
+        it('keeps the dialog open and the confirm button busy while the mutation runs', async () => {
+          let resolveMutation
+          const mutate = jest.fn(() => new Promise((resolve) => (resolveMutation = resolve)))
+          const { button, isOpen, replace } = dialog(mutate)
+          await fireEvent.click(button('confirm'))
+          expect(button('confirm').disabled).toBe(true)
+          expect(isOpen()).toBe(true)
+          resolveMutation()
+          await waitFor(() => expect(replace).toHaveBeenCalledWith('/'))
+          expect(isOpen()).toBe(false)
+        })
+
+        it('reports a failed mutation and closes without leaving the profile', async () => {
+          const mutate = jest.fn().mockRejectedValue(new Error('boom'))
+          const { button, isOpen, replace } = dialog(mutate)
+          await fireEvent.click(button('confirm'))
+          await waitFor(() => expect(isOpen()).toBe(false))
+          expect(replace).not.toHaveBeenCalled()
+        })
+
+        it('closes on cancel without deleting anything', async () => {
+          const mutate = jest.fn().mockResolvedValue()
+          const { button, isOpen } = dialog(mutate)
+          await fireEvent.click(button('cancel'))
+          await waitFor(() => expect(isOpen()).toBe(false))
+          expect(mutate).not.toHaveBeenCalled()
+        })
       })
 
       it("uses the green pin on someone else's profile", () => {

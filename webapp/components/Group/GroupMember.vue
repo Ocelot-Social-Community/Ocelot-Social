@@ -299,9 +299,11 @@ export default {
     },
     closeRemoveDialog() {
       this.isOpen = false
+      this.userId = null
     },
     // The dialog stays open, its confirm button spinning and cancel blocked, until the mutation
-    // is through; success and failure are reported by toasts, so it closes either way.
+    // is through. Success and failure are reported by toasts; after a failure the dialog stays
+    // for another try.
     async removeUser() {
       this.removeLoading = true
       try {
@@ -311,12 +313,11 @@ export default {
         })
         this.$emit('loadGroupMembers')
         this.$toast.success(this.$t('group.memberRemoved', { name: data.RemoveUserFromGroup.slug }))
+        this.closeRemoveDialog()
       } catch (error) {
         this.$toastBackendError(error)
       } finally {
         this.removeLoading = false
-        this.isOpen = false
-        this.userId = null
       }
     },
   },

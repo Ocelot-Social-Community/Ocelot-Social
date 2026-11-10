@@ -72,13 +72,13 @@ export default {
     },
     // The dialog stays open, its confirm button spinning and cancel blocked, until the mutation
     // is through: no second click, no closing under a running request. addMemberToGroup reports
-    // success and failure itself (toasts), so the dialog closes either way.
+    // success and failure itself (toasts); after a failure the dialog stays for another try.
     async confirmModal() {
       this.loading = true
-      try {
-        await this.addMemberToGroup()
-      } finally {
+      const added = await this.addMemberToGroup().finally(() => {
         this.loading = false
+      })
+      if (added) {
         this.isOpen = false
         this.$refs.selectUserSearch.clear()
       }
@@ -112,8 +112,10 @@ export default {
           }),
         )
         this.$emit('loadGroupMembers')
+        return true
       } catch (error) {
         this.$toastBackendError(error)
+        return false
       }
     },
   },

@@ -126,6 +126,18 @@ describe('AddGroupMember', () => {
       expect(wrapper.vm.loading).toBe(false)
     })
 
+    it('keeps the dialog open for another try when the mutation fails', async () => {
+      const mutate = jest.fn().mockRejectedValue(new Error('boom'))
+      const { wrapper } = factory({}, mutate)
+      wrapper.vm.user = { id: 'u1', name: 'Alice' }
+      wrapper.vm.isOpen = true
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.confirmModal()
+      expect(wrapper.vm.isOpen).toBe(true)
+      expect(wrapper.vm.loading).toBe(false)
+      expect(wrapper.vm.$refs.selectUserSearch.clear).not.toHaveBeenCalled()
+    })
+
     it('surfaces mutation errors via toast', async () => {
       const mutate = jest.fn().mockRejectedValue(new Error('boom'))
       const { wrapper, $toast } = factory({}, mutate)

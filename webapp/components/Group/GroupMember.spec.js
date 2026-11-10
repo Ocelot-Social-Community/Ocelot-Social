@@ -296,11 +296,29 @@ describe('GroupMember', () => {
             .trigger('click')
         })
 
-        it('toasts an error message', () => {
+        // One test, not two: the rejection is queued once, and every `it` clicks anew.
+        it('toasts an error message and keeps the modal open for another try', () => {
           expect(toastErrorMock).toHaveBeenCalledWith('Oh no!!')
+          expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(true)
         })
+      })
 
-        it('closes the modal', () => {
+      describe('click on confirm while the mutation runs', () => {
+        it('keeps the modal open and loading until it is through', async () => {
+          let resolveMutation
+          apolloMock.mockImplementationOnce(
+            () => new Promise((resolve) => (resolveMutation = resolve)),
+          )
+          wrapper
+            .find('div.os-modal-wrapper')
+            .find('[data-testid="os-confirm-dialog-confirm"]')
+            .trigger('click')
+          await wrapper.vm.$nextTick()
+          expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(true)
+          expect(wrapper.vm.removeLoading).toBe(true)
+          resolveMutation({ data: { RemoveUserFromGroup: { slug: 'user' } } })
+          await new Promise((resolve) => setTimeout(resolve, 0))
+          expect(wrapper.vm.removeLoading).toBe(false)
           expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
         })
       })
