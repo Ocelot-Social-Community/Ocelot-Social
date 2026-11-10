@@ -100,6 +100,14 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Description too short (at least {min} characters).',
   },
+  GROUP_SAVE_NAME_TOO_SHORT: {
+    type: 'BAD_USER_INPUT',
+    text: 'The group name must be at least {min} characters long.',
+  },
+  GROUP_SAVE_NAME_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The group name must be at most {max} characters long.',
+  },
   // A query selected a computed Group field (myRole, postsCount, …) without the group's id.
   GROUP_FIELD_GROUP_ID_MISSING: {
     type: 'BAD_USER_INPUT',

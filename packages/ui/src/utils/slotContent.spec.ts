@@ -14,6 +14,13 @@ describe(shownNodes, () => {
     expect(shownNodes(nodes)).toStrictEqual(nodes)
   })
 
+  // Blank means nothing but whitespace — not merely padded: a label with spaces around it shows.
+  it('keeps text padded with whitespace', () => {
+    const padded = h(Text, ' Save ')
+
+    expect(shownNodes([padded])).toStrictEqual([padded])
+  })
+
   it('answers an absent slot with an empty list', () => {
     expect(shownNodes(undefined)).toStrictEqual([])
     expect(shownNodes(null)).toStrictEqual([])

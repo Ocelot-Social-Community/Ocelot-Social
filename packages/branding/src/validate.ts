@@ -20,6 +20,14 @@ import type { BrandingConfig } from './schema.js'
 export const USER_NAME_LENGTH_FLOOR = 1
 
 /**
+ * The shortest group name any brand may require. Exported because the backend relies on it: its DB
+ * schema declares `Group.name` no stricter than this (asserted in `db/schema/schema.spec.ts`), so
+ * the audit never flags a name that a valid brand allowed. 1, not 0: a group without a name has
+ * nothing to show in its teaser or header.
+ */
+export const GROUP_NAME_LENGTH_FLOOR = 1
+
+/**
  * The shortest post title any brand may require. Exported because the backend relies on it: its DB
  * schema declares `Post.title` no stricter than this (asserted in `db/schema/schema.spec.ts`), so
  * the audit never flags a title that a valid brand allowed. 1, not 0: an empty title leaves nothing
@@ -61,7 +69,7 @@ export function validateBranding(config: BrandingConfig): string[] {
 
   const { group, user, post, registration, comment, category, badges, metadata, dateTime } = config
 
-  atLeast('group.nameLengthMin', group.nameLengthMin, 0)
+  atLeast('group.nameLengthMin', group.nameLengthMin, GROUP_NAME_LENGTH_FLOOR)
   atMost('group.nameLengthMin', group.nameLengthMin, 'group.nameLengthMax', group.nameLengthMax)
   atLeast('group.descriptionMinLength', group.descriptionMinLength, 0)
   atLeast('group.descriptionExcerptLength', group.descriptionExcerptLength, 0)

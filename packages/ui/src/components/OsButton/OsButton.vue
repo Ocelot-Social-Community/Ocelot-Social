@@ -148,6 +148,9 @@
           )
         }
 
+        // Filtered only to ask whether there is text; rendered as given. Unlike the icon and suffix,
+        // whose wrappers hold nothing else, the label's comments and spaces are part of how the
+        // caller wrote it — dropping the blank text between two words' elements would join them.
         if (defaultContent && hasText) {
           innerChildren.push(...(defaultContent as ReturnType<typeof h>[]))
         }
@@ -217,7 +220,11 @@
           return h(
             tag,
             {
-              class: [buttonClass, parentClass, parentDynClass].filter(Boolean),
+              // Merged like the Vue 3 branch below, not just listed: the caller's utilities must
+              // win over the button's own. Listed, `absolute` from the caller sat beside the base
+              // `relative`, and the stylesheet's order let `relative` win — a modal's close
+              // button dropped from its corner onto a line of its own.
+              class: cn(buttonClass, parentClass, parentDynClass),
               attrs: { ...buttonData, ...attrs },
               on: listeners,
             },

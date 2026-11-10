@@ -194,6 +194,18 @@
               {{ $t('admin.roles.save') }}
             </os-button>
           </span>
+          <!-- Back to the saved rights: the draft is rebuilt from the server set, as the conflict
+               banner's "load" does. Only when there is something to discard. -->
+          <span class="role__action">
+            <os-button
+              appearance="ghost"
+              :disabled="!isDirty(activeRole) || saving"
+              :data-test="`role-${activeRole.name}-discard`"
+              @click="discardChanges(activeRole)"
+            >
+              {{ $t('admin.roles.discard') }}
+            </os-button>
+          </span>
           <span class="role__action" :title="deleteHint(activeRole)">
             <os-button
               variant="danger"
@@ -499,6 +511,10 @@ export default {
       for (const key of keys) permissions[key] = true
       this.$set(this.forms, name, { permissions, baseline: [...keys] })
       this.$set(this.conflicts, name, false)
+    },
+    // Throw the draft away: the form shows the role's saved rights again.
+    discardChanges(role) {
+      this.loadServerVersion(role.name)
     },
     // Keep editing (keep mine): hide the banner but preserve the draft. Advance the draft's
     // baseline to the acknowledged server set so a plain rebuild does not re-pop the banner;

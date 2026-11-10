@@ -175,4 +175,15 @@ describe('ConfirmModal.vue', () => {
       expect(wrapper.find('.os-modal').exists()).toBe(false)
     })
   })
+
+  // OsButton in Vue 2 merges the classes it is given with its own, as in Vue 3: the close button's
+  // `absolute` replaces the button's base `relative`, so it stays in the dialog's corner instead of
+  // taking a line of its own under the title.
+  it('keeps the close button in the corner', () => {
+    wrapper = Wrapper()
+    const close = wrapper.find(CLOSE)
+
+    expect(close.classes()).toContain('absolute')
+    expect(close.classes()).not.toContain('relative')
+  })
 })
