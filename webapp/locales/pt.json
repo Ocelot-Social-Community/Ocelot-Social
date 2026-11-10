@@ -1396,6 +1396,10 @@
       "name": "Usuários"
     }
   },
+  "networkRoles": {
+    "owner": "Proprietário",
+    "user": "Usuário"
+  },
   "notifications": {
     "comment": "Comentário",
     "empty": "Desculpe, você não tem notificações no momento.",

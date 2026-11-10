@@ -1396,6 +1396,10 @@
       "name": "Gebruikers"
     }
   },
+  "networkRoles": {
+    "owner": "Eigenaar",
+    "user": "Gebruiker"
+  },
   "notifications": {
     "comment": "Reactie",
     "empty": "Sorry, je hebt op dit moment geen meldingen.",
