@@ -16,7 +16,7 @@ import { publishPrincipalChanged } from '@src/context/principalEpoch'
 
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
-import { memberHoldsInGroup, nonMemberReadsContent } from './helpers/groupAccessCypher'
+import { commentReadableBy, postReadableBy } from './helpers/groupAccessCypher'
 import normalizeEmail from './helpers/normalizeEmail'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
@@ -37,14 +37,7 @@ import type { Context } from '@src/context'
 // over a few dozen, and it would cost this module a per-request query it does not otherwise
 // need.
 const visiblePostFilter = `WHERE NOT related.disabled = true AND NOT related.deleted = true
-  AND (
-    NOT EXISTS {
-      MATCH (related)-[:IN]->(g:Group)
-      WHERE NOT (${nonMemberReadsContent('g')})
-        AND NOT ${memberHoldsInGroup('g', 'group.content.read', '$cypherParams.currentUserId')}
-    }
-    OR EXISTS { MATCH (related)<-[:WROTE]-(:User {id: $cypherParams.currentUserId}) }
-  )`
+  AND ${postReadableBy('related', '$cypherParams.currentUserId')}`
 
 export const getMutedUsers = async (context: Context) => {
   if (!context.user) {
@@ -867,9 +860,12 @@ export default {
       },
       hasMany: {
         friends: '-[:FRIENDS]-(related:User)',
-        contributions: '-[:WROTE]->(related:Post)',
-        comments: '-[:WROTE]->(related:Comment)',
-        shouted: `-[:SHOUTED]->(related:Post) WHERE ${shoutsVisibleTo('parent', '$cypherParams.currentUserId')}`,
+        // What the user wrote and shouted, as far as the viewer reads it: a post in a closed or
+        // hidden group, or a comment under one, stays inside the group (#10629).
+        contributions: `-[:WROTE]->(related:Post) WHERE ${postReadableBy('related', '$cypherParams.currentUserId')}`,
+        comments: `-[:WROTE]->(related:Comment) WHERE ${commentReadableBy('related', '$cypherParams.currentUserId')}`,
+        shouted: `-[:SHOUTED]->(related:Post) WHERE ${shoutsVisibleTo('parent', '$cypherParams.currentUserId')}
+          AND ${postReadableBy('related', '$cypherParams.currentUserId')}`,
         categories: '-[:CATEGORIZED]->(related:Category)',
         badgeTrophies: '<-[:REWARDED]-(related:Badge)',
         // Counterpart of the invitedBy hasOne above.

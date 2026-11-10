@@ -5,6 +5,7 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { v4 as uuid } from 'uuid'
 
+import { commentReadableBy, postReadableBy } from './helpers/groupAccessCypher'
 import { nodeQuery } from './helpers/nodeQuery'
 import Resolver from './helpers/Resolver'
 
@@ -21,6 +22,9 @@ const commentQuery = nodeQuery({
   orderingEnum: '_CommentOrdering',
   // Oldest first: a comment list reads as a thread.
   defaultOrder: { field: 'createdAt', direction: 'ASC' as const },
+  // A comment in a closed or hidden group is the group's: it reaches who reads the group, and
+  // its author. Without this the query listed every comment of every group, to anyone.
+  readableBy: commentReadableBy,
 })
 
 export default {
@@ -124,7 +128,9 @@ export default {
     ...Resolver('Comment', {
       hasOne: {
         author: '<-[:WROTE]-(related:User)',
-        post: '-[:COMMENTS]->(related:Post)',
+        // A comment can be readable while its post is not — one's own, under a post in a group
+        // one has left. The post stays where it is.
+        post: `-[:COMMENTS]->(related:Post) WHERE ${postReadableBy('related', '$cypherParams.currentUserId')}`,
       },
       count: {
         postObservingUsersCount:

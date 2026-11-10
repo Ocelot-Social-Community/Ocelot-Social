@@ -1,4 +1,5 @@
 import cypherFields from './helpers/cypherField'
+import { postReadableBy } from './helpers/groupAccessCypher'
 import { nodeQuery } from './helpers/nodeQuery'
 import Resolver from './helpers/Resolver'
 
@@ -35,7 +36,8 @@ export default {
   Tag: {
     ...Resolver('Tag', {
       hasMany: {
-        taggedPosts: '<-[:TAGGED]-(related:Post)',
+        // Only what the viewer reads: a tag gathers posts from every group.
+        taggedPosts: `<-[:TAGGED]-(related:Post) WHERE ${postReadableBy('related', '$cypherParams.currentUserId')}`,
       },
     }),
     ...cypherFields('Tag', {

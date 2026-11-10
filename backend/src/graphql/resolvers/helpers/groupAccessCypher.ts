@@ -129,6 +129,46 @@ export const memberHoldsInGroup = (
     }`
 
 /**
+ * Whether the post bound as `post` sits in a group that keeps its content from the viewer
+ * whose id is `viewerIdExpression`: closed to non-members, and the viewer's role there does
+ * not open it.
+ *
+ * {@link groupContentWithheld} asks the same with the viewer's groups handed in as a list, as
+ * the post query computes them once per request. This form asks the membership in place, for
+ * the field resolvers, whose statements see only `$cypherParams`. Neither counts an
+ * elevation: a list reached through a user, a tag or a category is not a look into one group
+ * (#10506).
+ */
+export const groupContentWithheldFrom = (post: string, viewerIdExpression: string): string =>
+  `EXISTS {
+      MATCH (${post})-[:IN]->(withholdingGroup:Group)
+      WHERE NOT (${nonMemberReadsContent('withholdingGroup')})
+        AND NOT ${memberHoldsInGroup('withholdingGroup', 'group.content.read', viewerIdExpression)}
+    }`
+
+/**
+ * Whether the viewer may read the post bound as `post`: its group lets them, or they wrote it.
+ * The post visibility rule (`invisibleTo` in postFilter.ts), for a statement of its own.
+ */
+export const postReadableBy = (post: string, viewerIdExpression: string): string => `(
+    NOT ${groupContentWithheldFrom(post, viewerIdExpression)}
+    OR EXISTS { MATCH (${post})<-[:WROTE]-(:User { id: ${viewerIdExpression} }) }
+  )`
+
+/**
+ * Whether the viewer may read the comment bound as `comment`: its post's group lets them, or
+ * they wrote it. Not the post's author — a post stays its author's, the members' comments
+ * under it stay the group's (#10629).
+ */
+export const commentReadableBy = (comment: string, viewerIdExpression: string): string => `(
+    EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: ${viewerIdExpression} }) }
+    OR NOT EXISTS {
+      MATCH (${comment})-[:COMMENTS]->(commentedPost:Post)
+      WHERE ${groupContentWithheldFrom('commentedPost', viewerIdExpression)}
+    }
+  )`
+
+/**
  * The same question where an EXISTS subquery cannot go: as a value in a WITH or RETURN.
  *
  * Two statements, used together — the OPTIONAL MATCH binds the viewer's role in that group (at
