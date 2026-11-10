@@ -1,9 +1,7 @@
 import {
   findPreferredDevice,
   loadDevicePreferences,
-  loadQualityPreference,
   saveDevicePreference,
-  saveQualityPreference,
 } from './devicePreferences'
 
 const STORAGE_KEY = 'ocelot-video-call-devices'
@@ -28,39 +26,6 @@ describe('devicePreferences', () => {
       // An array would lose whatever is stored on it by name.
       localStorage.setItem(STORAGE_KEY, '[]')
       expect(loadDevicePreferences()).toEqual({})
-    })
-  })
-
-  describe('quality preferences', () => {
-    it('are auto as long as nothing was chosen', () => {
-      expect(loadQualityPreference('send')).toBe('auto')
-      expect(loadQualityPreference('receive')).toBe('auto')
-    })
-
-    it('keep each direction apart, and the devices beside them', () => {
-      saveDevicePreference('videoinput', { deviceId: 'cam-1', label: 'Webcam' })
-      saveQualityPreference('send', 'low')
-      saveQualityPreference('receive', 'audio')
-      expect(loadQualityPreference('send')).toBe('low')
-      expect(loadQualityPreference('receive')).toBe('audio')
-      expect(loadDevicePreferences().videoinput.deviceId).toBe('cam-1')
-    })
-
-    it('store auto as no choice at all', () => {
-      saveQualityPreference('send', 'medium')
-      saveQualityPreference('send', 'auto')
-      expect(loadDevicePreferences().quality).toEqual({})
-      expect(loadQualityPreference('send')).toBe('auto')
-    })
-
-    it('take no choice that is not on offer, nor one for the wrong direction', () => {
-      saveQualityPreference('send', 'audio')
-      saveQualityPreference('sideways', 'low')
-      saveQualityPreference('receive', 'ultra')
-      expect(loadDevicePreferences()).toEqual({})
-      // Stored by an older or newer version that offered something else.
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ quality: { send: 'ultra' } }))
-      expect(loadQualityPreference('send')).toBe('auto')
     })
   })
 

@@ -590,11 +590,7 @@ import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
 import CallNotice from './CallNotice.vue'
-import {
-  loadQualityPreference,
-  saveDevicePreference,
-  saveQualityPreference,
-} from './devicePreferences'
+import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
@@ -761,7 +757,9 @@ export default {
       receiveReliefForced: false,
       // A cap was put on the remote cameras in this call; until then there is none to lift.
       receiveCapped: false,
-      // The video quality the user asked for, sent and received (see devicePreferences).
+      // The video quality the user asked for, sent and received ('auto' or one of
+      // devicePreferences' SEND_QUALITIES / RECEIVE_QUALITIES). For this call only: the next
+      // one judges anew what the line and the device allow (see cleanup).
       sendQuality: 'auto',
       receiveQuality: 'auto',
       // Our camera is being started anew — with its full quality, or another capture.
@@ -1337,8 +1335,6 @@ export default {
     // who keeps talking never jumps around the chip row.
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
-    this.sendQuality = loadQualityPreference('send')
-    this.receiveQuality = loadQualityPreference('receive')
     this.micRestart = null
     this.micSilenceProbe = null
     // Tracks whose events we listen to — publishing a track anew must not
@@ -2672,7 +2668,6 @@ export default {
       // A choice made now outweighs the relief the user accepted before.
       this.receiveReliefForced = false
       this.settleRelief()
-      saveQualityPreference('receive', quality)
       // The user's choice, not a weak line: the automatic mode and its notice give way. What
       // the line is like stays known (qualityClass), for when the cameras come back.
       if (quality === 'audio') {
@@ -2700,7 +2695,6 @@ export default {
       this.sendQuality = quality
       this.sendReliefForced = false
       this.settleRelief()
-      saveQualityPreference('send', quality)
       const room = this.room
       if (!room || !this.Track) return
       const defaults = { ...room.options.videoCaptureDefaults }
@@ -3101,6 +3095,9 @@ export default {
       }
     },
     async cleanup() {
+      // A quality chosen holds for this call only.
+      this.sendQuality = 'auto'
+      this.receiveQuality = 'auto'
       // Before the disconnect: a check must not resubscribe on a room going away.
       this.stopAudioWatchdog()
       // First, before the disconnect below is awaited: nothing may ask for the call's chat

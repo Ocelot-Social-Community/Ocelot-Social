@@ -3242,11 +3242,15 @@ describe('VideoCall', () => {
         this.isDesired = on
       }),
     })
-    const stored = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}').quality
+    // Nothing of the quality is kept in the browser: it holds for one call only.
+    const stored = () => localStorage.getItem(STORAGE_KEY)
 
-    const connected = async (quality) => {
-      if (quality) localStorage.setItem(STORAGE_KEY, JSON.stringify({ quality }))
+    const connected = async (quality = {}) => {
       const built = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+      built.wrapper.setData({
+        sendQuality: quality.send || 'auto',
+        receiveQuality: quality.receive || 'auto',
+      })
       built.wrapper.vm.$apollo = {
         mutate: jest
           .fn()
@@ -3284,16 +3288,28 @@ describe('VideoCall', () => {
       warn.mockRestore()
     })
 
-    it('starts the next call on the choice, capturing our camera as chosen', async () => {
+    it('joins on a choice made before, capturing our camera as chosen', async () => {
       const { wrapper, room } = await connected({ send: 'low', receive: 'medium' })
       expect(wrapper.vm.sendQuality).toBe('low')
       expect(wrapper.vm.receiveQuality).toBe('medium')
       expect(room.opts.videoCaptureDefaults).toEqual({ resolution: { width: 320, height: 180 } })
     })
 
+    it('starts every call on auto, whatever the one before was set to', async () => {
+      const { wrapper } = await connected({ send: 'low', receive: 'audio' })
+      await wrapper.vm.cleanup()
+      expect(wrapper.vm.sendQuality).toBe('auto')
+      expect(wrapper.vm.receiveQuality).toBe('auto')
+      expect(stored()).toBe(null)
+      // A choice an older version kept in the browser is not taken up either.
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ quality: { send: 'low' } }))
+      const fresh = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' }).wrapper
+      expect(fresh.vm.sendQuality).toBe('auto')
+    })
+
     it('captures the chosen camera so as well', async () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ quality: { send: 'medium' } }))
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+      wrapper.setData({ sendQuality: 'medium' })
       wrapper.vm.$apollo = {
         mutate: jest
           .fn()
@@ -3332,12 +3348,12 @@ describe('VideoCall', () => {
     })
 
     describe('received', () => {
-      it('caps every camera, not the screen shares, and remembers it', async () => {
+      it('caps every camera, not the screen shares, and keeps nothing of it', async () => {
         const { wrapper, camera, screen } = await connected()
         wrapper.vm.setReceiveQuality('medium')
         expect(camera.setVideoQuality).toHaveBeenLastCalledWith(1)
         expect(screen.setVideoQuality).not.toHaveBeenCalled()
-        expect(stored()).toEqual({ receive: 'medium' })
+        expect(stored()).toBe(null)
       })
 
       it('lifts the cap again on auto, and caps at the top layer for high', async () => {
@@ -3348,7 +3364,6 @@ describe('VideoCall', () => {
         camera.setVideoQuality.mockClear()
         wrapper.vm.setReceiveQuality('high')
         expect(camera.setVideoQuality).toHaveBeenLastCalledWith(2)
-        expect(stored()).toEqual({ receive: 'high' })
       })
 
       it('touches no camera as long as nothing was ever capped', async () => {
@@ -3436,17 +3451,16 @@ describe('VideoCall', () => {
         }
       })
 
-      it('is only remembered outside a call', async () => {
+      it('is only taken note of outside a call', async () => {
         const { wrapper } = factory({ show: false })
         wrapper.vm.setReceiveQuality('low')
         wrapper.vm.setReceiveQuality('low')
         expect(wrapper.vm.receiveQuality).toBe('low')
-        expect(stored()).toEqual({ receive: 'low' })
       })
     })
 
     describe('sent', () => {
-      it('captures our camera anew as chosen, and remembers it', async () => {
+      it('captures our camera anew as chosen', async () => {
         const { wrapper, room, ownCamera } = await connected()
         wrapper.setData({ cameraEnabled: true, cameraDeviceId: 'cam-1' })
         await wrapper.vm.setSendQuality('medium')
@@ -3456,14 +3470,12 @@ describe('VideoCall', () => {
         expect(room.localParticipant.setCameraEnabled).toHaveBeenCalledWith(true, {
           deviceId: 'cam-1',
         })
-        expect(stored()).toEqual({ send: 'medium' })
       })
 
       it("goes back to LiveKit's own capture on auto", async () => {
         const { wrapper, room } = await connected({ send: 'low' })
         await wrapper.vm.setSendQuality('auto')
         expect(room.options.videoCaptureDefaults).toEqual({})
-        expect(stored()).toEqual({})
       })
 
       it('gives a camera switched off its new capture when it is switched on', async () => {
@@ -3731,7 +3743,7 @@ describe('VideoCall', () => {
         })
       })
 
-      it('waits for a camera being started anew, and is only remembered outside a call', async () => {
+      it('waits for a camera being started anew, and is only taken note of outside a call', async () => {
         const { wrapper, room } = await connected()
         wrapper.setData({ renewingCamera: true })
         await wrapper.vm.setSendQuality('low')
@@ -3741,7 +3753,6 @@ describe('VideoCall', () => {
         await idle.vm.setSendQuality('high')
         await idle.vm.setSendQuality('high')
         expect(idle.vm.sendQuality).toBe('high')
-        expect(stored()).toEqual({ send: 'high' })
       })
     })
 
