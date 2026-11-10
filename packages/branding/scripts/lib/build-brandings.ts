@@ -372,24 +372,42 @@ const NAMED_COLOURS = new Set([
   'whitesmoke',
   'yellow',
   'yellowgreen',
-  'transparent',
 ])
 
+/**
+ * A brand that opts into both schemes but gives a token ONE colour — the dark theme then shows the
+ * light value.
+ *
+ * Only a token the framework itself declares as a light-dark() pair is checked: there a literal
+ * really does replace two values with one. A token the framework keeps single (the primary, success
+ * and danger colours, which are meant to be the same in both schemes), the brand's own variables and
+ * third-party ones are none of this check's business — flagging them buried the real findings under
+ * dozens of warnings. `transparent` and `color-mix(var(…))` are skipped for the same reason: the first
+ * is the same in both schemes, the second follows whatever its variables do.
+ */
 export function singleSchemeColours(
   id: string,
   colorScheme: string,
   declared: Record<string, string>,
+  framework: Record<string, string> = FRAMEWORK_TOKENS,
 ): string[] {
   if (colorScheme !== 'light dark') {
     return []
   }
   return Object.entries(declared)
-    .filter(
-      ([, value]) =>
-        /^(#|rgba?\(|hsla?\(|hwb\(|lab\(|lch\(|oklab\(|oklch\(|color\(|color-mix\()/i.test(
-          value.trim(),
-        ) || NAMED_COLOURS.has(value.trim().toLowerCase()),
-    )
+    .filter(([name, value]) => {
+      if (!Object.hasOwn(framework, name) || !framework[name].includes('light-dark(')) {
+        return false
+      }
+      const v = value.trim()
+      if (v.includes('var(')) {
+        return false
+      }
+      return (
+        /^(#|rgba?\(|hsla?\(|hwb\(|lab\(|lch\(|oklab\(|oklch\(|color\(|color-mix\()/i.test(v) ||
+        NAMED_COLOURS.has(v.toLowerCase())
+      )
+    })
     .map(
       ([name]) =>
         `  ! ${id}: --${name} is one colour for both schemes — declare it as light-dark(light, dark)`,

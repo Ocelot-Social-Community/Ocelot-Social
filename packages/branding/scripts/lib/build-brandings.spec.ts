@@ -916,6 +916,24 @@ test('singleSchemeColours: every CSS named colour and the newer colour functions
   )
 })
 
+test('singleSchemeColours: only a token the framework declares as a pair is checked', () => {
+  const warn = (declared: Record<string, string>) =>
+    singleSchemeColours('b', 'light dark', declared, {
+      'color-header-background': 'light-dark(white, black)',
+      'color-primary': 'rgb(1, 2, 3)',
+    })
+  // The framework keeps these single, or does not know them at all.
+  assert.deepEqual(warn({ 'color-primary': '#123456' }), [])
+  assert.deepEqual(warn({ 'my-brand-accent': '#123456', '--wf-gap': '#abcdef' }), [])
+  // `transparent` is the same in both schemes; `color-mix(var(…))` follows its variables.
+  assert.deepEqual(warn({ 'color-header-background': 'transparent' }), [])
+  assert.deepEqual(
+    warn({ 'color-header-background': 'color-mix(in srgb, var(--color-primary) 10%, white)' }),
+    [],
+  )
+  assert.equal(warn({ 'color-header-background': '#123456' }).length, 1)
+})
+
 test('a light-dark() pair is not reported because a media rule overrides it with a literal', async () => {
   const dir = brandDir({
     config: `export default (d) => d({ theme: { colorScheme: 'light dark' }, assets: { css: ['assets/theme.css'] } })\n`,
