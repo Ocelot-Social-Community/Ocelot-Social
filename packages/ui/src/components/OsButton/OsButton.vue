@@ -220,7 +220,11 @@
           return h(
             tag,
             {
-              class: [buttonClass, parentClass, parentDynClass].filter(Boolean),
+              // Merged like the Vue 3 branch below, not just listed: the caller's utilities must
+              // win over the button's own. Listed, `absolute` from the caller sat beside the base
+              // `relative`, and the stylesheet's order let `relative` win — a modal's close
+              // button dropped from its corner onto a line of its own.
+              class: cn(buttonClass, parentClass, parentDynClass),
               attrs: { ...buttonData, ...attrs },
               on: listeners,
             },
