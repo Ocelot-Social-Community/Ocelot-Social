@@ -21,10 +21,12 @@ import type { Context } from '@src/context'
 // Who may change which network role, and give whom which role (#10485).
 //
 // `role.manage` alone used to decide all of it: a moderator holding it demoted an admin on stage,
-// and nothing stopped them from making themselves an admin either. Now the same rules as inside a
-// group decide — outrank whom you act on, hold what you hand out — with one difference the network
-// wants: one's OWN role is shaped freely, because that is what `role.manage` is for. Only never
-// above a role it does not outrank today.
+// and nothing stopped them from making themselves an admin either. Giving roles now follows the
+// same rules as inside a group — outrank whom you act on, hold what you hand out.
+//
+// Shaping the roles themselves does not: `role.manage` is the right to shape every role but `owner`
+// freely, removing rights included and adding any right there is. That makes it a key to
+// everything below the owner, who is the anchor (#10869 audit log, #10870 owner notification).
 //
 // Against a real database: the shield, the resolver, the role service and the HAS_ROLE edges.
 
@@ -41,17 +43,7 @@ const ROLES_OFFERED = parse(`
   query {
     roles {
       name
-      editableByCurrentUser
       assignableByCurrentUser
-    }
-  }
-`)
-
-const CATALOG_OFFERED = parse(`
-  query {
-    permissionCatalog {
-      key
-      grantableByCurrentUser
     }
   }
 `)
@@ -151,31 +143,48 @@ describe('a moderator who may manage roles', () => {
     })
   })
 
-  describe('changing roles', () => {
-    it('cannot take rights away from the admin role', async () => {
-      const before = rights(ADMIN_ROLE)
-      const { errors } = await updateRole(ADMIN_ROLE, [])
+  // `role.manage` shapes every role but `owner` freely — removing rights included, and adding any
+  // right there is. Whom a role is given to stays ranked (above).
+  describe('shaping roles', () => {
+    it('takes rights away from the admin role', async () => {
+      const { errors } = await updateRole(ADMIN_ROLE, ['post.create'])
 
-      expect(errorCode(errors)).toBe('ROLE_CHANGE_NOT_OUTRANKED')
-      expect(rights(ADMIN_ROLE)).toEqual(before)
+      expect(errors).toBeUndefined()
+      expect(rights(ADMIN_ROLE)).toEqual(['post.create'])
     })
 
-    it('cannot rename the admin role', async () => {
-      const renamed = await mutate({
-        mutation: RENAME_ROLE,
-        variables: { name: ADMIN_ROLE, newName: 'former-admin' },
+    it('puts a right they do not hold into another role', async () => {
+      const { errors } = await updateRole(USER_ROLE, [...rights(USER_ROLE), 'policy.manage'])
+
+      expect(errors).toBeUndefined()
+      expect(rights(USER_ROLE)).toContain('policy.manage')
+    })
+
+    it('gives their own role any right', async () => {
+      const { errors } = await updateRole(MODERATOR_ROLE, allPermissionKeys())
+
+      expect(errors).toBeUndefined()
+      expect(rights(MODERATOR_ROLE)).toEqual(expect.arrayContaining(allPermissionKeys()))
+    })
+
+    it('creates a role with rights they do not hold', async () => {
+      const { errors } = await mutate({
+        mutation: CREATE_ROLE,
+        variables: { name: 'deputy', permissions: ['policy.manage'] },
       })
 
-      expect(errorCode(renamed.errors)).toBe('ROLE_CHANGE_NOT_OUTRANKED')
-      expect(roleService.getRole(ADMIN_ROLE)).toBeDefined()
+      expect(errors).toBeUndefined()
+      expect(rights('deputy')).toEqual(['policy.manage'])
     })
 
-    // Deleting needs no rank: only an empty role goes, so nobody loses a right by it.
-    it('cannot delete the admin role while somebody holds it', async () => {
-      const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: ADMIN_ROLE } })
+    it('renames a role above their own', async () => {
+      const renamed = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: ADMIN_ROLE, newName: 'board' },
+      })
 
-      expect(errorCode(deleted.errors)).toBe('ROLE_DELETE_ROLE_HAS_MEMBERS')
-      expect(roleService.getRole(ADMIN_ROLE)).toBeDefined()
+      expect(renamed.errors).toBeUndefined()
+      expect(roleService.getRole('board')).toBeDefined()
     })
 
     it('deletes an empty role above their own', async () => {
@@ -189,43 +198,38 @@ describe('a moderator who may manage roles', () => {
       expect(roleService.getRole('board')).toBeUndefined()
     })
 
-    it('cannot delete the owner or the user role', async () => {
-      for (const name of [OWNER_ROLE, USER_ROLE]) {
-        const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name } })
+    it('cannot delete a role while somebody holds it', async () => {
+      const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: ADMIN_ROLE } })
 
-        expect(errorCode(deleted.errors)).toBe('ROLE_DELETE_SYSTEM_ROLE')
+      expect(errorCode(deleted.errors)).toBe('ROLE_DELETE_ROLE_HAS_MEMBERS')
+      expect(roleService.getRole(ADMIN_ROLE)).toBeDefined()
+    })
+
+    // The anchor: the owner role is not shaped by anybody.
+    it('cannot change, rename or delete the owner role', async () => {
+      const updated = await updateRole(OWNER_ROLE, [])
+      const renamed = await mutate({
+        mutation: RENAME_ROLE,
+        variables: { name: OWNER_ROLE, newName: 'boss' },
+      })
+      const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: OWNER_ROLE } })
+
+      for (const { errors } of [updated, renamed, deleted]) {
+        expect(errors).toBeDefined()
       }
+
+      expect(roleService.getRole(OWNER_ROLE)).toBeDefined()
     })
 
-    it('gives their own role a right they did not hold', async () => {
-      // `role.manage` is the right to shape roles, their own included.
-      const { errors } = await updateRole(MODERATOR_ROLE, [...rights(MODERATOR_ROLE), 'post.pin'])
+    it('cannot delete the user role', async () => {
+      const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: USER_ROLE } })
 
-      expect(errors).toBeUndefined()
-      expect(rights(MODERATOR_ROLE)).toContain('post.pin')
+      expect(errorCode(deleted.errors)).toBe('ROLE_DELETE_SYSTEM_ROLE')
     })
 
-    it('cannot raise their own role above the admins, to re-role them after all', async () => {
-      // An admin role missing one right: every admin right plus that one would outrank it.
-      await roleService.upsertRole(
-        {
-          name: ADMIN_ROLE,
-          protected: false,
-          permissions: rights(ADMIN_ROLE).filter((key) => key !== 'branding.manage'),
-        },
-        'test',
-      )
-      const { errors } = await updateRole(MODERATOR_ROLE, [
-        ...rights(ADMIN_ROLE),
-        'branding.manage',
-        'role.manage',
-      ])
-
-      expect(errorCode(errors)).toBe('ROLE_SAVE_WOULD_OUTRANK')
-      expect(rights(MODERATOR_ROLE)).not.toContain('branding.manage')
-    })
-
-    it('may come level with the admins, which still does not let them act on one', async () => {
+    // Shaping a role is not giving it: the admin keeps their role until somebody who outranks
+    // them changes it.
+    it('may make their own role equal to the admins`, which still does not let them re-role one', async () => {
       const { errors } = await updateRole(MODERATOR_ROLE, rights(ADMIN_ROLE))
 
       expect(errors).toBeUndefined()
@@ -233,73 +237,19 @@ describe('a moderator who may manage roles', () => {
         'ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED',
       )
     })
-
-    it('cannot fill a role they outrank with rights they do not hold', async () => {
-      const { errors } = await updateRole(USER_ROLE, [...rights(USER_ROLE), 'user.delete.any'])
-
-      expect(errorCode(errors)).toBe('ROLE_SAVE_NOT_COVERED')
-      expect(rights(USER_ROLE)).not.toContain('user.delete.any')
-    })
-
-    it('changes a role they outrank within their own rights', async () => {
-      const { errors } = await updateRole(USER_ROLE, [...rights(USER_ROLE), 'badge.manage'])
-
-      expect(errors).toBeUndefined()
-      expect(rights(USER_ROLE)).toContain('badge.manage')
-    })
-
-    it('cannot create a role with rights they do not hold', async () => {
-      const { errors } = await mutate({
-        mutation: CREATE_ROLE,
-        variables: { name: 'deputy', permissions: ['policy.manage'] },
-      })
-
-      expect(errorCode(errors)).toBe('ROLE_SAVE_NOT_COVERED')
-      expect(roleService.getRole('deputy')).toBeUndefined()
-    })
-
-    it('creates a role within their own rights', async () => {
-      const { errors } = await mutate({
-        mutation: CREATE_ROLE,
-        variables: { name: 'deputy', permissions: ['user.disable'] },
-      })
-
-      expect(errors).toBeUndefined()
-      expect(rights('deputy')).toEqual(['user.disable'])
-    })
   })
 
-  // The admin pages offer exactly what the mutations above accept.
-  it('is offered only the roles and rights they may hand out', async () => {
+  // The admin pages offer exactly what setUserRole accepts.
+  it('is offered only the roles they may hand out', async () => {
     const { data } = await query({ query: ROLES_OFFERED })
     const offered = Object.fromEntries(
-      (
-        data?.roles as {
-          name: string
-          editableByCurrentUser: boolean
-          assignableByCurrentUser: boolean
-        }[]
-      ).map((role) => [role.name, [role.editableByCurrentUser, role.assignableByCurrentUser]]),
+      (data?.roles as { name: string; assignableByCurrentUser: boolean }[]).map((role) => [
+        role.name,
+        role.assignableByCurrentUser,
+      ]),
     )
 
-    expect(offered).toEqual({
-      owner: [false, false],
-      admin: [false, false],
-      moderator: [true, true],
-      user: [true, true],
-    })
-
-    const catalog = await query({ query: CATALOG_OFFERED })
-    const grantable = new Map(
-      (catalog.data?.permissionCatalog as { key: string; grantableByCurrentUser: boolean }[]).map(
-        (entry) => [entry.key, entry.grantableByCurrentUser],
-      ),
-    )
-
-    expect(grantable.get('user.disable')).toBe(true)
-    expect(grantable.get('policy.manage')).toBe(false)
-    // Participation gives no power over others; anybody who may shape roles may hand it out.
-    expect(grantable.get('post.create')).toBe(true)
+    expect(offered).toEqual({ owner: false, admin: false, moderator: true, user: true })
   })
 })
 
@@ -376,55 +326,5 @@ describe('an admin', () => {
     const { errors } = await setUserRole('admin', USER_ROLE)
 
     expect(errorCode(errors)).toBe('ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED')
-  })
-})
-
-// An owner may build a role holding every right there is. Compared by rights alone it was a second
-// owner — a peer — so no owner could change, rename or delete it afterwards, and nobody else
-// could either. The owner outranks it by name now.
-describe('an owner, with a role holding the full catalog', () => {
-  const SUPERADMIN = 'superadmin'
-
-  beforeEach(async () => {
-    await roleService.upsertRole(
-      { name: SUPERADMIN, protected: false, permissions: allPermissionKeys() },
-      'test',
-    )
-    authenticatedUser = await (await user('the-owner', OWNER_ROLE)).toJson()
-  })
-
-  it('is offered the role for changes', async () => {
-    const { data } = await query({ query: ROLES_OFFERED })
-    const offered = data.roles.find((role: { name: string }) => role.name === SUPERADMIN)
-
-    expect(offered.editableByCurrentUser).toBe(true)
-  })
-
-  it('changes, renames and deletes it', async () => {
-    const reduced = allPermissionKeys().filter((key) => key !== 'branding.manage')
-
-    expect((await updateRole(SUPERADMIN, reduced)).errors).toBeUndefined()
-    expect(rights(SUPERADMIN)).not.toContain('branding.manage')
-
-    await updateRole(SUPERADMIN, allPermissionKeys())
-
-    const renamed = await mutate({
-      mutation: RENAME_ROLE,
-      variables: { name: SUPERADMIN, newName: 'deputy' },
-    })
-
-    expect(renamed.errors).toBeUndefined()
-
-    const deleted = await mutate({ mutation: DELETE_ROLE, variables: { name: 'deputy' } })
-
-    expect(deleted.errors).toBeUndefined()
-    expect(roleService.getRole('deputy')).toBeUndefined()
-  })
-
-  it('still leaves the role out of an admin`s reach', async () => {
-    authenticatedUser = await (await user('the-admin', ADMIN_ROLE)).toJson()
-    const { errors } = await updateRole(SUPERADMIN, rights(ADMIN_ROLE))
-
-    expect(errorCode(errors)).toBe('ROLE_CHANGE_NOT_OUTRANKED')
   })
 })

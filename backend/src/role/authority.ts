@@ -103,8 +103,14 @@ export function coversInNetwork(
   return true
 }
 
-/** Why a role change is refused, or `null` when it is allowed. */
-export type NetworkRoleRefusal = 'notOutranked' | 'notCovered' | 'ownerOnly' | 'wouldOutrank'
+/**
+ * Why a role assignment is refused, or `null` when it is allowed.
+ *
+ * Shaping roles themselves — creating, changing, renaming, deleting — has no such rule:
+ * `role.manage` is the right to shape every role but `owner` freely, removing rights included.
+ * That makes it a key to everything below the owner; the owner is the anchor (#10869, #10870).
+ */
+export type NetworkRoleRefusal = 'notOutranked' | 'notCovered' | 'ownerOnly'
 
 type Actor = NetworkHolder
 
@@ -150,57 +156,6 @@ export function mayAssignNetworkRole({
     return 'notOutranked'
   }
   if (!coversInNetwork(actor.permissions, assignedPermissions)) {
-    return 'notCovered'
-  }
-  return null
-}
-
-/**
- * Whether the actor may change a role itself — its rights, its name, whether it exists.
- *
- * Changing a role acts on everybody who holds it, so it needs the standing to act on them: the
- * actor outranks the role (outranksInNetwork — an owner outranks every role but `owner`), or it
- * is the actor's OWN role. An admin edits the admin role; a
- * moderator who may manage roles does not.
- *
- * Their own role they shape freely — that is what `role.manage` is for, and it includes giving
- * themselves a right. With one limit: it must not come to outrank a role it does not outrank
- * today (`otherRoles`). Otherwise a moderator would add every admin right plus one and then
- * re-role the admins after all.
- *
- * A role they outrank they can only fill with rights they hold (`newPermissions`): editing it
- * must not lift its holders above the actor.
- */
-export function mayChangeNetworkRole({
-  actor,
-  roleName,
-  rolePermissions,
-  newPermissions,
-  otherRoles = [],
-}: {
-  actor: Actor
-  roleName: string
-  rolePermissions: ReadonlySet<PermissionKey>
-  newPermissions?: Iterable<PermissionKey>
-  otherRoles?: readonly { name: string; permissions: ReadonlySet<PermissionKey> }[]
-}): NetworkRoleRefusal | null {
-  if (roleName === actor.roleName) {
-    if (!newPermissions) {
-      return null
-    }
-    const raised = new Set(newPermissions)
-    const overtaken = otherRoles.some(
-      (other) =>
-        other.name !== roleName &&
-        !dominatesInNetwork(actor.permissions, other.permissions) &&
-        dominatesInNetwork(raised, other.permissions),
-    )
-    return overtaken ? 'wouldOutrank' : null
-  }
-  if (!outranksInNetwork(actor, { roleName, permissions: rolePermissions })) {
-    return 'notOutranked'
-  }
-  if (newPermissions && !coversInNetwork(actor.permissions, newPermissions)) {
     return 'notCovered'
   }
   return null

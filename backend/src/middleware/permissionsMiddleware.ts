@@ -20,10 +20,7 @@ import {
 } from '@graphql/resolvers/helpers/groupAccessCypher'
 import {
   assignmentError,
-  changeError,
   roleAssignmentRefusal,
-  roleChangeRefusal,
-  roleCreateRefusal,
 } from '@graphql/resolvers/helpers/networkRoleAuthority'
 import { inviteCodeAllowsRegistration } from '@graphql/resolvers/inviteCodes'
 import {
@@ -287,34 +284,12 @@ const canSetUserRole = rule({ cache: 'no_cache' })(async (_parent, args, context
   return refusal ? assignmentError(refusal) : true
 })
 
-const canCreateRole = rule({ cache: 'no_cache' })((_parent, args, context: Context) => {
-  if (!hasPermissionEffective(context, 'role.manage')) {
-    return false
-  }
-  const refusal = roleCreateRefusal(context, args.permissions as string[])
-  return refusal ? changeError(refusal) : true
-})
-
-// updateRole carries the new rights; renameRole only names the role.
-const canChangeRole = rule({ cache: 'no_cache' })((_parent, args, context: Context) => {
-  if (!hasPermissionEffective(context, 'role.manage')) {
-    return false
-  }
-  const refusal = roleChangeRefusal(
-    context,
-    args.name as string,
-    args.permissions as string[] | undefined,
-  )
-  return refusal ? changeError(refusal) : true
-})
-
-// Deleting a role needs `role.manage` only — no rank. RoleService deletes only an empty role, and
-// never `owner` or `user`: nobody loses a right by it, and nobody gains one, because a role built
-// anew holds only what its creator may hand out. A role above the deleter may be gone that way;
-// its rights are not.
-const canDeleteRole = rule({ cache: 'no_cache' })((_parent, _args, context: Context) =>
-  hasPermissionEffective(context, 'role.manage'),
-)
+// Shaping roles — creating, changing, renaming, deleting — needs `role.manage` and nothing else:
+// that right is for shaping every role but `owner` freely, removing rights included, and adding
+// any right there is. RoleService keeps the anchors: `owner` cannot be changed, renamed or
+// deleted, `user` cannot be renamed or deleted, and a role with members cannot be deleted.
+// Whom a role is given to stays ranked (canSetUserRole).
+const canShapeRoles = hasPermission('role.manage')
 
 // Same hierarchy guard for the report `review` mutation, which can disable the
 // reported resource. Only Users carry a role, so Posts/Comments pass through; a
@@ -954,10 +929,10 @@ export default shield(
       adminRevokeApiKey: hasPermission('apiKey.administer'),
       adminRevokeUserApiKeys: hasPermission('apiKey.administer'),
 
-      createRole: canCreateRole,
-      updateRole: canChangeRole,
-      renameRole: canChangeRole,
-      deleteRole: canDeleteRole,
+      createRole: canShapeRoles,
+      updateRole: canShapeRoles,
+      renameRole: canShapeRoles,
+      deleteRole: canShapeRoles,
       setUserRole: canSetUserRole,
 
       // Group roles: editing a group's own role definitions is the group's meta right, and

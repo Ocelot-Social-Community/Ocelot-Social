@@ -7,7 +7,6 @@ import {
   coversInNetwork,
   dominatesInNetwork,
   mayAssignNetworkRole,
-  mayChangeNetworkRole,
   outranksInNetwork,
 } from './authority'
 import { DEFAULT_ROLES } from './defaults'
@@ -179,84 +178,5 @@ describe('mayAssignNetworkRole (#10485)', () => {
     const owner = { permissions: set(...allPermissionKeys()), roleName: OWNER_ROLE }
 
     expect(assign(owner, OWNER_ROLE, USER_ROLE)).toBeNull()
-  })
-})
-
-describe('mayChangeNetworkRole (#10485)', () => {
-  const others = [ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE].map((name) => ({
-    name,
-    permissions: role(name),
-  }))
-  const change = (
-    actorRole: string,
-    roleName: string,
-    newPermissions?: PermissionKey[],
-    actorPermissions = role(actorRole),
-  ) =>
-    mayChangeNetworkRole({
-      actor: { permissions: actorPermissions, roleName: actorRole },
-      roleName,
-      rolePermissions: role(roleName),
-      newPermissions,
-      otherRoles: others,
-    })
-
-  it('refuses a role the actor neither holds nor outranks', () => {
-    expect(change(MODERATOR_ROLE, ADMIN_ROLE)).toBe('notOutranked')
-  })
-
-  it('lets the actor shape their own role, giving it a right they lacked', () => {
-    expect(change(ADMIN_ROLE, ADMIN_ROLE, [...role(ADMIN_ROLE)])).toBeNull()
-    expect(change(MODERATOR_ROLE, MODERATOR_ROLE, [...role(MODERATOR_ROLE), 'post.pin'])).toBeNull()
-  })
-
-  it('renames or deletes their own role without a rights check', () => {
-    expect(change(MODERATOR_ROLE, MODERATOR_ROLE)).toBeNull()
-  })
-
-  it('refuses raising their own role above a role it does not outrank today', () => {
-    // An admin role short of one right is outranked by every admin right plus that one.
-    const shortAdmin = new Set([...role(ADMIN_ROLE)].filter((key) => key !== 'branding.manage'))
-    const result = mayChangeNetworkRole({
-      actor: { permissions: role(MODERATOR_ROLE), roleName: MODERATOR_ROLE },
-      roleName: MODERATOR_ROLE,
-      rolePermissions: role(MODERATOR_ROLE),
-      newPermissions: [...shortAdmin, 'branding.manage'],
-      otherRoles: [{ name: ADMIN_ROLE, permissions: shortAdmin }],
-    })
-
-    expect(result).toBe('wouldOutrank')
-  })
-
-  it('ignores roles it outranks already when raising their own', () => {
-    expect(change(ADMIN_ROLE, ADMIN_ROLE, [...role(ADMIN_ROLE)])).toBeNull()
-  })
-
-  it('lets an owner change a role holding the full catalog', () => {
-    const result = mayChangeNetworkRole({
-      actor: { permissions: fullCatalog(), roleName: OWNER_ROLE },
-      roleName: 'superadmin',
-      rolePermissions: fullCatalog(),
-      newPermissions: [...fullCatalog()].filter((key) => key !== 'branding.manage'),
-      otherRoles: others,
-    })
-
-    expect(result).toBeNull()
-  })
-
-  it('refuses an admin a role holding the full catalog', () => {
-    const result = mayChangeNetworkRole({
-      actor: { permissions: role(ADMIN_ROLE), roleName: ADMIN_ROLE },
-      roleName: 'superadmin',
-      rolePermissions: fullCatalog(),
-      otherRoles: others,
-    })
-
-    expect(result).toBe('notOutranked')
-  })
-
-  it('fills a role the actor outranks only with rights they hold', () => {
-    expect(change(MODERATOR_ROLE, USER_ROLE, [...role(USER_ROLE), 'badge.manage'])).toBeNull()
-    expect(change(MODERATOR_ROLE, USER_ROLE, ['policy.manage'])).toBe('notCovered')
   })
 })

@@ -15,7 +15,6 @@ export {
   coversInNetwork,
   dominatesInNetwork,
   mayAssignNetworkRole,
-  mayChangeNetworkRole,
   outranksInNetwork,
 } from './authority'
 export type { NetworkHolder, NetworkRoleRefusal } from './authority'
