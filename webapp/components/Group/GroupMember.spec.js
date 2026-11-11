@@ -320,14 +320,19 @@ describe('GroupMember', () => {
             await wrapper.vm.$nextTick()
             expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(true)
             expect(wrapper.vm.removeLoading).toBe(true)
-            resolveMutation({ data: { RemoveUserFromGroup: { slug: 'user' } } })
+            resolveMutation({
+              data: { RemoveUserFromGroup: { user: { id: 'user', name: 'Huey', slug: 'huey' } } },
+            })
             await new Promise((resolve) => setTimeout(resolve, 0))
             expect(wrapper.vm.removeLoading).toBe(false)
             expect(wrapper.find('div.os-modal-wrapper').exists()).toBe(false)
           } finally {
             apolloMock.mockResolvedValue({
               data: {
-                RemoveUserFromGroup: { user: { slug: 'user', id: 'user' }, membership: null },
+                RemoveUserFromGroup: {
+                  user: { id: 'user', name: 'Huey', slug: 'huey' },
+                  membership: null,
+                },
               },
             })
           }
@@ -356,6 +361,11 @@ describe('GroupMember', () => {
 
         it('toasts a success message', () => {
           expect(toastSuccessMock).toHaveBeenCalledWith('group.memberRemoved')
+          // The text names the user twice, by name and by @slug — both must reach it.
+          expect(mocks.$t).toHaveBeenCalledWith('group.memberRemoved', {
+            name: 'Huey',
+            slug: 'huey',
+          })
         })
 
         it('closes the modal', () => {

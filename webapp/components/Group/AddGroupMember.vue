@@ -97,7 +97,7 @@ export default {
       // a system role: a group may relabel it, never rename or delete it — which is also why
       // the label comes from the definition when the page could read one.
       const newRole = USUAL_GROUP_ROLE
-      const username = this.user.name
+      const { name, slug } = this.user
       try {
         await this.$apollo.mutate({
           mutation: setGroupMemberRoleMutation(),
@@ -108,7 +108,8 @@ export default {
             role: this.roleLabel(
               this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
             ),
-            name: username,
+            name,
+            slug,
           }),
         )
         this.$emit('loadGroupMembers')

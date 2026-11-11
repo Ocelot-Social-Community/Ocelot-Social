@@ -312,7 +312,8 @@ export default {
           variables: { groupId: this.groupId, userId: this.userId },
         })
         this.$emit('loadGroupMembers')
-        this.$toast.success(this.$t('group.memberRemoved', { name: data.RemoveUserFromGroup.slug }))
+        const { name, slug } = data.RemoveUserFromGroup.user
+        this.$toast.success(this.$t('group.memberRemoved', { name, slug }))
         this.closeRemoveDialog()
       } catch (error) {
         this.$toastBackendError(error)

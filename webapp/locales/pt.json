@@ -975,7 +975,7 @@
     },
     "actionRadius": "Raio de ação do grupo",
     "addMember": "Adicionar membro",
-    "addMemberToGroupSuccess": "“{name}” foi adicionado ao grupo com o papel “{role}”!",
+    "addMemberToGroupSuccess": "“{name}” (@{slug}) foi adicionado ao grupo com o papel “{role}”!",
     "addUser": "Adicionar usuário",
     "addUserNoOptions": "Nenhum usuário encontrado!",
     "addUserPlaceholder": "Nome de usuário",
@@ -1058,7 +1058,7 @@
       "title": "Você realmente quer sair do grupo?"
     },
     "memberOutranked": "Não podes alterar a função desta pessoa: tem pelo menos tanto quanto tu.",
-    "memberRemoved": "O usuário “{name}” foi removido do grupo!",
+    "memberRemoved": "O usuário “{name}” (@{slug}) foi removido do grupo!",
     "members": "Membros",
     "membersAdministrationList": {
       "avatar": "Avatar",

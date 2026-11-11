@@ -975,7 +975,7 @@
     },
     "actionRadius": "Радиус действия группы",
     "addMember": "Добавить участника",
-    "addMemberToGroupSuccess": "«{name}» добавлен в группу с ролью «{role}»!",
+    "addMemberToGroupSuccess": "«{name}» (@{slug}) добавлен в группу с ролью «{role}»!",
     "addUser": "Добавить пользователя",
     "addUserNoOptions": "Пользователи не найдены!",
     "addUserPlaceholder": "Имя пользователя",
@@ -1058,7 +1058,7 @@
       "title": "Ты действительно хочешь выйти из группы?"
     },
     "memberOutranked": "Вы не можете изменить роль этого человека — у него прав не меньше, чем у вас.",
-    "memberRemoved": "Пользователь «{name}» удалён из группы!",
+    "memberRemoved": "Пользователь «{name}» (@{slug}) удалён из группы!",
     "members": "Участники",
     "membersAdministrationList": {
       "avatar": "Аватар",
