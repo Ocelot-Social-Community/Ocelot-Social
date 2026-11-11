@@ -975,7 +975,7 @@
     },
     "actionRadius": "Rrezja e veprimit të grupit",
     "addMember": "Shto anëtar",
-    "addMemberToGroupSuccess": "„<b>{name}</b>“ (<b>@{slug}</b>) u shtua në grup me rolin „{role}“!",
+    "addMemberToGroupSuccess": "„<b>{name}</b>“ (<b>@{slug}</b>) u shtua në grup me rolin „<b>{role}</b>“!",
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",

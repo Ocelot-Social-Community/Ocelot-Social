@@ -975,7 +975,7 @@
     },
     "actionRadius": "Радиус действия группы",
     "addMember": "Добавить участника",
-    "addMemberToGroupSuccess": "«<b>{name}</b>» (<b>@{slug}</b>) добавлен в группу с ролью «{role}»!",
+    "addMemberToGroupSuccess": "«<b>{name}</b>» (<b>@{slug}</b>) добавлен в группу с ролью «<b>{role}</b>»!",
     "addUser": "Добавить пользователя",
     "addUserNoOptions": "Пользователи не найдены!",
     "addUserPlaceholder": "Имя пользователя",

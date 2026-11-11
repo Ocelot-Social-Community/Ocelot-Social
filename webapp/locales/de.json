@@ -975,7 +975,7 @@
     },
     "actionRadius": "Aktionsradius der Gruppe",
     "addMember": "Mitglied hinzufügen",
-    "addMemberToGroupSuccess": "„<b>{name}</b>“ (<b>@{slug}</b>) wurde der Gruppe mit der Rolle „{role}“ hinzugefügt!",
+    "addMemberToGroupSuccess": "„<b>{name}</b>“ (<b>@{slug}</b>) wurde der Gruppe mit der Rolle „<b>{role}</b>“ hinzugefügt!",
     "addUser": "Nutzer hinzufügen",
     "addUserNoOptions": "Keine Nutzer gefunden!",
     "addUserPlaceholder": "Nutzername",
