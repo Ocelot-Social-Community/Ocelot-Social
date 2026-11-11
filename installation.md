@@ -71,6 +71,19 @@ $ docker compose -f docker-compose.yml up
 This will start all required Docker containers.  
 In development, make sure your database is running on `http://localhost:7474/browser/` — production publishes only the Bolt port `7687`, not the Neo4j Browser.
 
+#### Published Ports Bind to Loopback
+
+All ports the compose files publish (`docker-compose.yml`, `docker-compose.override.yml`, `docker-compose.test.yml`) bind to `127.0.0.1`, so the stack is reachable from your own machine only. This is deliberate: Neo4j runs with `NEO4J_AUTH=none` and MinIO's root credentials are in the repository, so on a shared network — café or conference Wi-Fi — anyone could otherwise read and write the database and the uploads.
+
+To reach the stack from another machine, for example when it runs on a VM or server and the browser does not, set `DEV_BIND_ADDRESS` to the address to bind to:
+
+```bash
+# in main folder — all interfaces, or a single one such as 192.168.1.5; IPv6 in brackets, e.g. [::]
+$ DEV_BIND_ADDRESS=0.0.0.0 docker compose up
+```
+
+Compose also reads it from a `.env` file in the main folder (which is gitignored). Only do this on a network you trust, or put a firewall in front of it: the services are no better protected than before. An SSH tunnel (`ssh -L 3000:localhost:3000 <host>`) gets you there without exposing anything. Containers reach each other by service name, which this does not affect.
+
 Prepare database once before you start by running the following command in a second terminal:
 
 ```bash

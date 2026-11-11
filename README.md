@@ -137,7 +137,7 @@ $ docker compose exec backend npm run db:migrate -- up
 $ docker compose exec backend npm run db:seed
 ```
 
-Then open <http://localhost:3000> and log in with one of the [demo accounts](#demo). The full guide — production compose, local installation without Docker, Apple Silicon and the one-time MinIO volume migration — is in [installation.md](./installation.md).
+Then open <http://localhost:3000> and log in with one of the [demo accounts](#demo). The ports are published on `127.0.0.1` only. The full guide — production compose, opening the ports to other machines with `DEV_BIND_ADDRESS`, local installation without Docker, Apple Silicon and the one-time MinIO volume migration — is in [installation.md](./installation.md).
 
 ### Repository Layout
 

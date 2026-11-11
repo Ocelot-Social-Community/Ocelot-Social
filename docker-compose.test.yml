@@ -127,8 +127,8 @@ services:
   mailserver:
     image: maildev/maildev:3.0.0
     ports:
-      - 1080:1080
-      - 1025:1025
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:1080:1080"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:1025:1025"
 
   minio:
     # MinIO stopped publishing free community images: Docker Hub deleted the
@@ -164,8 +164,8 @@ services:
     # developer — not worth a permanently root-running service in here.
     image: cgr.dev/chainguard/minio
     ports:
-      - 9000:9000
-      - 9001:9001
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:9000:9000"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:9001:9001"
     volumes:
       - minio_data:/data
     environment:

@@ -56,14 +56,14 @@ services:
   neo4j:
     ports:
       # Also expose the neo4j query browser
-      - 7474:7474
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:7474:7474"
 
   mailserver:
     image: maildev/maildev:3.0.0
     container_name: mailserver
     ports:
-      - 1080:1080
-      - 1025:1025
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:1080:1080"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:1025:1025"
 
   minio:
     # MinIO stopped publishing free community images: Docker Hub deleted the
@@ -103,8 +103,8 @@ services:
       # API at http://localhost:9000 (see backend/test/helpers.ts), so without
       # this port mapping image/file-touching tests fail with
       # "AWS SDK error wrapper for AggregateError".
-      - 9000:9000
-      - 9001:9001
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:9000:9000"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:9001:9001"
     volumes:
       - minio_data:/data
     environment:
@@ -136,7 +136,7 @@ services:
     # in step, so development renders images the way production does.
     image: shumc/imagor:1.9.12
     ports:
-      - 8000:8000
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:8000:8000"
     environment:
       PORT: 8000
       IMAGOR_SECRET: mysecret # secret key for URL signature
@@ -154,7 +154,7 @@ services:
     build:
       target: development
     ports:
-      - "3001:3000"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:3001:3000"
     environment:
       # The support address on the page. Deployment config, not branding — each network sets it in its
       # helmfile, and the brand archives deliberately carry no e-mail. `nuxt dev` reads it here; a
@@ -186,7 +186,7 @@ services:
       target: development
     command: /bin/sh -c "npm install && node scripts/fix-storybook-webpack.js && npm run storybook"
     ports:
-      - 3002:3002
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:3002:3002"
     environment:
       - NODE_ENV=development
     volumes:
@@ -216,7 +216,7 @@ services:
       dockerfile: ./.vuepress/Dockerfile
       target: production
     ports:
-      - "8080:8080"
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:8080:8080"
 
 volumes:
   minio_data:

@@ -2,6 +2,13 @@
 # which defines the development settings. The override.yml is loaded by default. Therefore it
 # is required to explicitly define if you want an production build:
 # > docker-compose -f docker-compose.yml up
+#
+# Every published port here, in docker-compose.override.yml and in docker-compose.test.yml binds to
+# loopback, not to all interfaces: Neo4j runs without authentication and MinIO's credentials are in
+# this repository, so on a shared network anyone could otherwise read and write the data. To reach
+# the stack from another machine (dev stack on a VM, browser elsewhere), set DEV_BIND_ADDRESS, e.g.
+# > DEV_BIND_ADDRESS=0.0.0.0 docker compose up
+# See installation.md. Containers talk to each other by service name and are not affected.
 
 services:
   webapp:
@@ -13,7 +20,7 @@ services:
     depends_on:
       - backend
     ports:
-      - 3000:3000
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:3000:3000"
     environment:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
@@ -34,7 +41,7 @@ services:
     depends_on:
       - neo4j
     ports:
-      - 4000:4000
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:4000:4000"
     environment:
       # Envs used in Dockerfile
       # - DOCKER_WORKDIR="/app"
@@ -66,7 +73,7 @@ services:
       # community edition 👆🏼, because we have no enterprise licence 👇🏼 at the moment
       target: community
     ports:
-      - 7687:7687
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:7687:7687"
     volumes:
       - neo4j_data:/data
     environment:
@@ -92,7 +99,7 @@ services:
       context: ./packages/ui
       target: production
     ports:
-      - 6006:6006
+      - "${DEV_BIND_ADDRESS:-127.0.0.1}:6006:6006"
 
 volumes:
   neo4j_data:
