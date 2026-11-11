@@ -82,14 +82,17 @@
     border-radius: 50%;
 
     color: var(--os-counter-icon-color, var(--color-primary-contrast));
-    background-color: var(--os-counter-icon-bg, var(--color-primary));
+    background-color: var(--os-counter-icon-bg, var(--color-primary-fill, var(--color-primary)));
     font-size: 10px;
     line-height: 1;
     text-align: center;
   }
 
   .os-counter-icon__count--danger {
-    background-color: var(--os-counter-icon-danger-bg, var(--color-danger));
+    background-color: var(
+      --os-counter-icon-danger-bg,
+      var(--color-danger-fill, var(--color-danger))
+    );
   }
 
   .os-counter-icon__count--soft {

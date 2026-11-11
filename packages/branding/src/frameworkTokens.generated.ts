@@ -112,6 +112,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-danger-active': 'color-mix(in srgb, var(--color-danger-dark), black 20%)',
   'color-danger-contrast': 'var(--text-color-danger-inverse)',
   'color-danger-dark': 'rgb(158, 43, 28)',
+  'color-danger-fill':
+    'light-dark(var(--color-danger), color-mix(in srgb, var(--color-danger), black 4%))',
   'color-danger-hover': 'var(--color-danger-dark)',
   'color-danger-inverse': 'rgb(253, 243, 242)',
   'color-danger-light': 'rgb(242, 97, 65)',
@@ -130,6 +132,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-info': 'var(--color-secondary)',
   'color-info-active': 'color-mix(in srgb, var(--color-secondary), black 15%)',
   'color-info-contrast': 'var(--text-color-secondary-inverse)',
+  'color-info-fill':
+    'light-dark(var(--color-info), color-mix(in srgb, var(--color-info), black 17%))',
   'color-info-hover': 'rgb(10, 161, 255)',
   'color-logo': 'light-dark(rgb(0, 0, 0), rgb(232, 230, 236))',
   'color-map-marker-current-user': 'rgb(247, 150, 64)',
@@ -153,6 +157,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-primary-active': 'color-mix(in srgb, var(--color-primary-dark), black 20%)',
   'color-primary-contrast': 'var(--text-color-primary-inverse)',
   'color-primary-dark': 'rgb(25, 122, 49)',
+  'color-primary-fill':
+    'light-dark(var(--color-primary), color-mix(in srgb, var(--color-primary), black 27%))',
   'color-primary-highlight': 'rgb(25, 194, 67)',
   'color-primary-hover': 'var(--color-primary-dark)',
   'color-primary-inverse': 'rgb(241, 253, 244)',
@@ -166,11 +172,15 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-secondary': 'rgb(0, 142, 230)',
   'color-secondary-active': 'color-mix(in srgb, var(--color-secondary), black 15%)',
   'color-secondary-contrast': 'var(--text-color-secondary-inverse)',
+  'color-secondary-fill':
+    'light-dark(var(--color-secondary), color-mix(in srgb, var(--color-secondary), black 17%))',
   'color-secondary-hover': 'rgb(10, 161, 255)',
   'color-secondary-inverse': 'rgb(240, 249, 255)',
   'color-success': 'rgb(23, 181, 63)',
   'color-success-active': 'color-mix(in srgb, var(--color-success), black 15%)',
   'color-success-contrast': 'var(--text-color-primary-inverse)',
+  'color-success-fill':
+    'light-dark(var(--color-success), color-mix(in srgb, var(--color-success), black 27%))',
   'color-success-hover': 'rgb(26, 203, 71)',
   'color-success-inverse': 'rgb(241, 253, 244)',
   'color-text-soft': 'var(--text-color-soft)',
@@ -182,6 +192,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-warning': 'rgb(230, 121, 25)',
   'color-warning-active': 'color-mix(in srgb, var(--color-warning), black 15%)',
   'color-warning-contrast': 'var(--text-color-primary-inverse)',
+  'color-warning-fill':
+    'light-dark(var(--color-warning), color-mix(in srgb, var(--color-warning), black 24%))',
   'color-warning-highlight': 'rgb(233, 137, 53)',
   'color-warning-hover': 'var(--color-warning-highlight)',
   'color-warning-inverse': 'rgb(253, 247, 241)',
