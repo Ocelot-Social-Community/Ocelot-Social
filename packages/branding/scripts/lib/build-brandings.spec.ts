@@ -105,6 +105,17 @@ test('findConfig locates brand.config.mjs, or null when there is none', () => {
   assert.equal(findConfig(brandDir({})), null)
 })
 
+test('buildBrandArchive: a brand that names no network is labelled by its id, not as ocelot.social', async () => {
+  const built = await buildBrandArchive(
+    brandDir({
+      config: `export default (d) => d({ logos: { signupPath: 'assets/logo-squared.svg' } })\n`,
+      assets: { 'logo-squared.svg': '<svg/>' },
+    }),
+  )
+  assert.equal(built.label, 'acme')
+  assert.equal(readManifest(readTarGz(built.gz)).label, 'acme')
+})
+
 test('buildBrandArchive throws when the brand has no config file', async () => {
   await assert.rejects(async () => buildBrandArchive(brandDir({})), /no brand\.config/)
 })
