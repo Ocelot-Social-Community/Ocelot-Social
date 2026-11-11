@@ -87,6 +87,13 @@ Every custom property the framework declares (`webapp/assets/css/root-tokens.css
 `ocelot-ui-variables.css`) is something a brand may set — the admin lists them. Taking one away turns
 every brand's value for it into a silent no-op, so it is a decision, never a side effect of a refactor.
 
+The greys are the **neutral scale**, `--color-neutral-0` (almost black) to `--color-neutral-100`
+(white), in steps of 5 to 10 with finer ones between (`-5`, `-12`, `-15`, `-47`, `-53`, `-73`).
+They are fixed values and not for a brand to change: the semantic tokens (`--background-color-*`,
+`--text-color-*`, `--border-color-*`, the chat and tooltip tokens) point at them, in the light half
+and in the dark one of a pair, and it is those a brand sets. A grey that has no step yet gets a step
+of its own rather than a literal.
+
 - **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
   `scripts/public-tokens.snapshot.json`, the list of names that have been public.
 - **Renaming or removing** one breaks the brands that set it, so it is a deliberate step. The
