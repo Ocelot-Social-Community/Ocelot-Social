@@ -46,8 +46,23 @@ const threadQuery = parse(`
   }
 `)
 
+const searchQuery = parse(`
+  query {
+    searchPosts(query: "group", firstPosts: 10, postsOffset: 0) {
+      posts {
+        id
+        commentsCount
+      }
+    }
+  }
+`)
+
 interface Thread {
   Post: { id: string; commentsCount: number; comments: { id: string }[] }[]
+}
+
+interface Search {
+  searchPosts: { posts: { id: string; commentsCount: number }[] }
 }
 
 interface Export {
@@ -178,8 +193,29 @@ describe.each(['public', 'closed', 'hidden'])('a post in a %s group', (template)
       await cleanDatabase()
     })
 
+    // The search used to project its own unfiltered count, which bypassed Post.commentsCount.
+    it('counts in the search what the thread counts', async () => {
+      await as(author)
+      const result = await query({ query: searchQuery })
+
+      expect(result.errors).toBeUndefined()
+      expect((result.data as Search).searchPosts.posts).toEqual([
+        { id: 'post', commentsCount: template === 'public' ? 3 : 1 },
+      ])
+    })
+
     it('still shows the author their post', async () => {
       await expect(thread(author)).resolves.toMatchObject([{ id: 'post' }])
+    })
+
+    // `deleted` and `disabled` are optional on Comment, so older data may lack them — such a
+    // comment is neither, and is counted like the list shows it.
+    it('counts a comment that lacks deleted and disabled', async () => {
+      await database.write({
+        query: `MATCH (comment:Comment { id: 'by-member' }) REMOVE comment.deleted, comment.disabled`,
+      })
+
+      await expect(thread(member)).resolves.toMatchObject([{ id: 'post', commentsCount: 3 }])
     })
 
     it('still shows a member every comment', async () => {

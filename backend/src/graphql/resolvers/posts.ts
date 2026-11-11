@@ -976,7 +976,7 @@ export default {
               UNWIND $ids AS __id
               MATCH (post:Post { id: __id })
               OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
-                WHERE NOT comment.deleted = true AND NOT comment.disabled = true
+                WHERE NOT coalesce(comment.deleted, false) AND NOT coalesce(comment.disabled, false)
                 AND ${commentReadable('comment', 'post')}
               RETURN __id AS __id, count(comment) AS __value
             `,

@@ -62,14 +62,14 @@ const searchPostsSetup = {
           OPTIONAL MATCH (user)-[block:MUTED]->(author)
           WITH user, resource, author, block, score`,
   whereClause: postWhereClause,
+  // No commentsCount here: Post.commentsCount counts only the comments the viewer may read (a
+  // former member sees their own, not the members'), and a value projected here would bypass it.
   withClause: `WITH resource, author, score,
-  [(resource)<-[:COMMENTS]-(comment:Comment) | comment] AS comments,
   [(resource)<-[:SHOUTED]-(user:User) | user] AS shouter`,
   returnClause: `resource {
     .*,
     __typename: 'Post',
     author: properties(author),
-    commentsCount: toString(size(comments)),
     shoutedCount: toString(size(shouter)),
     clickedCount: toString(resource.clickedCount),
     viewedTeaserCount: toString(resource.viewedTeaserCount)
