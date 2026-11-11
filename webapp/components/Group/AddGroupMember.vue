@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { escape } from 'lodash'
 import { OsConfirmDialog } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
@@ -97,7 +98,7 @@ export default {
       // a system role: a group may relabel it, never rename or delete it — which is also why
       // the label comes from the definition when the page could read one.
       const newRole = USUAL_GROUP_ROLE
-      const username = this.user.name
+      const { name, slug } = this.user
       try {
         await this.$apollo.mutate({
           mutation: setGroupMemberRoleMutation(),
@@ -105,10 +106,15 @@ export default {
         })
         this.$toast.success(
           this.$t('group.addMemberToGroupSuccess', {
-            role: this.roleLabel(
-              this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
+            // The toast renders its text as HTML; the role's label, the name and the slug are
+            // user content (a group names its roles itself): escape them.
+            role: escape(
+              this.roleLabel(
+                this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
+              ),
             ),
-            name: username,
+            name: escape(name),
+            slug: escape(slug),
           }),
         )
         this.$emit('loadGroupMembers')

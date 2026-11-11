@@ -975,7 +975,7 @@
     },
     "actionRadius": "Actieradius van de groep",
     "addMember": "Lid toevoegen",
-    "addMemberToGroupSuccess": "“{name}” is toegevoegd aan de groep met de rol “{role}”!",
+    "addMemberToGroupSuccess": "“<b>{name}</b>” (<b>@{slug}</b>) is toegevoegd aan de groep met de rol “<b>{role}</b>”!",
     "addUser": "Gebruiker toevoegen",
     "addUserNoOptions": "Geen gebruikers gevonden!",
     "addUserPlaceholder": "Gebruikersnaam",
@@ -1058,7 +1058,7 @@
       "title": "Wil je de groep echt verlaten?"
     },
     "memberOutranked": "Je kunt de rol van deze persoon niet wijzigen — die heeft minstens evenveel als jij.",
-    "memberRemoved": "Gebruiker “{name}” is uit de groep verwijderd!",
+    "memberRemoved": "Gebruiker “<b>{name}</b>” (<b>@{slug}</b>) is uit de groep verwijderd!",
     "members": "Leden",
     "membersAdministrationList": {
       "avatar": "Avatar",

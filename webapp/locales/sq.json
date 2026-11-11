@@ -975,7 +975,7 @@
     },
     "actionRadius": "Rrezja e veprimit të grupit",
     "addMember": "Shto anëtar",
-    "addMemberToGroupSuccess": "„{name}“ u shtua në grup me rolin „{role}“!",
+    "addMemberToGroupSuccess": "„<b>{name}</b>“ (<b>@{slug}</b>) u shtua në grup me rolin „<b>{role}</b>“!",
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",
@@ -1058,7 +1058,7 @@
       "title": "A dëshiron vërtet të largohesh nga grupi?"
     },
     "memberOutranked": "Nuk mund ta ndryshosh rolin e kësaj personi — ka të paktën aq sa ti.",
-    "memberRemoved": "Përdoruesi „{name}“ u hoq nga grupi!",
+    "memberRemoved": "Përdoruesi „<b>{name}</b>“ (<b>@{slug}</b>) u hoq nga grupi!",
     "members": "Anëtarët",
     "membersAdministrationList": {
       "avatar": "Avatari",

@@ -975,7 +975,7 @@
     },
     "actionRadius": "Action radius of the group",
     "addMember": "Add Member",
-    "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
+    "addMemberToGroupSuccess": "“<b>{name}</b>” (<b>@{slug}</b>) was added to the group with the role “<b>{role}</b>”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": "User name",
@@ -1058,7 +1058,7 @@
       "title": "Do you really want to leave the group?"
     },
     "memberOutranked": "You cannot change this person’s role — they hold at least as much as you do.",
-    "memberRemoved": "User “{name}” was removed from group!",
+    "memberRemoved": "User “<b>{name}</b>” (<b>@{slug}</b>) was removed from group!",
     "members": "Members",
     "membersAdministrationList": {
       "avatar": "Avatar",
