@@ -7,7 +7,7 @@
 // invariant lives inside ONE bucket domain (group/user/post/category/comment → behavior), so
 // cross-brand composition cannot violate them — no need (and it would be wrong) to re-validate +
 // throw at runtime.
-import { COLOR_SCHEMES } from './theme.js'
+import { COLOR_SCHEMES, MAP_STYLE_IDS } from './theme.js'
 
 import type { BrandingConfig } from './schema.js'
 
@@ -116,6 +116,15 @@ export function validateBranding(config: BrandingConfig): string[] {
     violations.push(
       `theme.colorScheme must be one of ${COLOR_SCHEMES.map((s) => `'${s}'`).join(', ')} (got '${config.theme.colorScheme}')`,
     )
+  }
+
+  for (const theme of ['light', 'dark'] as const) {
+    const id = config.map.defaultStyle[theme]
+    if (!MAP_STYLE_IDS.includes(id)) {
+      violations.push(
+        `map.defaultStyle.${theme} must be one of ${MAP_STYLE_IDS.map((s) => `'${s}'`).join(', ')} (got '${id}')`,
+      )
+    }
   }
 
   return violations
