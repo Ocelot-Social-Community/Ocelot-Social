@@ -29,7 +29,8 @@ git mv branding/middlewares branding/data overlays/   # only if the brand ships 
 git mv branding brandings/<name>
 ```
 
-Only `brand.config.ts` and `brand.config.mjs` are read; a `brand.config.js` is not.
+Only `brand.config.ts` and `brand.config.mjs` are read. A brand folder with only a
+`brand.config.js` fails the build: rename it to `.mjs` (plain ESM) or port it to `.ts`.
 
 **Which brand a network renders is deployment configuration**, not part of the images: the
 `activeBranding` policy (admin), else `OCELOT_ACTIVE_BRANDING=<brandId>` on backend, webapp and
@@ -44,7 +45,7 @@ The maintenance page is static, so with several brands the image holds one compl
 it is served exactly when the database is out of reach.
 
 The build fails when a repo still has `branding/`, when a folder under `brandings/` ships
-`middlewares/` or `data/`, and when two brands share a `brandId`.
+`middlewares/` or `data/` or has only a `brand.config.js`, and when two brands share a `brandId`.
 
 The same layout works for a config dir under `deployment/configurations/<name>/` in a monorepo
 build (`--build-arg BRAND=<name>`). The maintenance dev server and `npm run brand -- <name>` in

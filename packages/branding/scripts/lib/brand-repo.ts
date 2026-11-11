@@ -87,6 +87,12 @@ export function resolveBrandRepo(root: string): BrandRepo {
     }
     if (findConfig(dir)) {
       brands.push({ name, dir, id: brandId(dir) })
+    } else if (existsSync(join(dir, 'brand.config.js'))) {
+      // Skipping it would build the repo without this brand — and could make another one the sole,
+      // default brand. A config the author wrote is never silently dropped.
+      throw new Error(
+        `[brand-repo] ${BRANDINGS_DIR}/${name}/brand.config.js is not read any more — rename it to brand.config.mjs (plain ESM) or port it to brand.config.ts`,
+      )
     } else {
       warnings.push(`[brand-repo] ${BRANDINGS_DIR}/${name}/ has no brand.config.(ts|mjs) — skipped`)
     }

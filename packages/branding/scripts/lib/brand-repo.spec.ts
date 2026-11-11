@@ -98,9 +98,17 @@ describe('resolveBrandRepo', () => {
     assert.equal(resolveBrandRepo(root).soleBrand?.name, 'a')
   })
 
-  test('a brand.config.js is not a brand config', () => {
-    const root = repo({ 'brandings/a/brand.config.js': CONFIG })
-    assert.deepEqual(resolveBrandRepo(root).brands, [])
+  test('a brand.config.js fails instead of dropping the brand, even next to a valid one', () => {
+    const root = repo({ ...brand('brandings/a', 'a'), 'brandings/old/brand.config.js': CONFIG })
+    assert.throws(
+      () => resolveBrandRepo(root),
+      /brandings\/old\/brand.config.js is not read any more — rename it to brand.config.mjs .* or port it to brand.config.ts/,
+    )
+  })
+
+  test('a brand.config.js next to a .ts config is not in the way', () => {
+    const root = repo({ ...brand('brandings/a', 'a'), 'brandings/a/brand.config.js': '' })
+    assert.equal(resolveBrandRepo(root).soleBrand?.id, 'a')
   })
 
   test('two brands with the same id fail', () => {
