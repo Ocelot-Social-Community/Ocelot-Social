@@ -400,12 +400,12 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --color-toast-green: var(--color-success);
+  --color-toast-green: var(--color-success-fill);
 
-  --color-toast-red: var(--color-danger);
-  --color-toast-orange: var(--color-warning);
+  --color-toast-red: var(--color-danger-fill);
+  --color-toast-orange: var(--color-warning-fill);
   --color-toast-yellow: var(--color-yellow);
-  --color-toast-blue: var(--color-secondary);
+  --color-toast-blue: var(--color-secondary-fill);
   /**
  * @tokens Ribbon Color
  */
