@@ -350,7 +350,7 @@ export default {
         MAP_STYLES.map(({ id, url }) => [id, { url, title: mapStyleLabel(this.$t, id) }]),
       )
     },
-    // A dark page opens on the dark tiles; a style the user picked always wins.
+    // A page opens on the brand's default style for its theme (vanilla: outdoors in both); a style the user picked always wins.
     defaultStyleUrl() {
       return defaultMapStyleUrl(this.dark)
     },
