@@ -22,7 +22,7 @@ describe('the plugin', () => {
   it('adds the dark halves for "system" when the device prefers dark', async () => {
     const out = await run(':root { --bg: light-dark(#fff, #000); }')
     expect(out).toMatch(
-      /@media \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme='light'\]\):not\(\[data-theme='dark'\]\)\s*\{\s*--bg: #000;?\s*\}\s*\}/,
+      /@media \(prefers-color-scheme: dark\)\s*\{\s*:root:not\(\[data-theme='light'\], \[data-theme='dark'\]\)\s*\{\s*--bg: #000;?\s*\}\s*\}/,
     )
   })
 
