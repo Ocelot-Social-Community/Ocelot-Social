@@ -1289,6 +1289,7 @@
   },
   "login": {
     "email": "Электронная почта",
+    "emailPlaceholder": "femanon@example.org",
     "failure": "Неверный адрес электронной почты или пароль.",
     "forgotPassword": "Забыли пароль?",
     "hello": "Здравствуйте",

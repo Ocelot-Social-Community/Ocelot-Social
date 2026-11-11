@@ -1289,6 +1289,7 @@
   },
   "login": {
     "email": "La tua email",
+    "emailPlaceholder": "femanon@example.org",
     "failure": "Indirizzo e-mail o password errati.",
     "forgotPassword": "Password dimenticata?",
     "hello": "Ciao",
