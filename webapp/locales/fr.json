@@ -975,7 +975,7 @@
     },
     "actionRadius": "Rayon d'action du groupe",
     "addMember": "Ajouter un membre",
-    "addMemberToGroupSuccess": "« {name} » (@{slug}) a été ajouté au groupe avec le rôle « {role} » !",
+    "addMemberToGroupSuccess": "« <b>{name}</b> » (<b>@{slug}</b>) a été ajouté au groupe avec le rôle « {role} » !",
     "addUser": "Ajouter un utilisateur",
     "addUserNoOptions": "Aucun utilisateur trouvé !",
     "addUserPlaceholder": "Nom d'utilisateur",
@@ -1058,7 +1058,7 @@
       "title": "Veux-tu vraiment quitter le groupe ?"
     },
     "memberOutranked": "Tu ne peux pas changer le rôle de cette personne : elle détient au moins autant que toi.",
-    "memberRemoved": "L'utilisateur « {name} » (@{slug}) a été retiré du groupe !",
+    "memberRemoved": "L'utilisateur « <b>{name}</b> » (<b>@{slug}</b>) a été retiré du groupe !",
     "members": "Membres",
     "membersAdministrationList": {
       "avatar": "Avatar",

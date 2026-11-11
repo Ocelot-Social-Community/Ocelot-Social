@@ -106,10 +106,13 @@ export default {
         })
         this.$toast.success(
           this.$t('group.addMemberToGroupSuccess', {
-            role: this.roleLabel(
-              this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
+            // The toast renders its text as HTML; the role's label, the name and the slug are
+            // user content (a group names its roles itself): escape them.
+            role: escape(
+              this.roleLabel(
+                this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
+              ),
             ),
-            // The toast renders its text as HTML and a name is user content: escape it.
             name: escape(name),
             slug: escape(slug),
           }),

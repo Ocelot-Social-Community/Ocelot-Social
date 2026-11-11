@@ -975,7 +975,7 @@
     },
     "actionRadius": "Радіус дії групи",
     "addMember": "Додати учасника",
-    "addMemberToGroupSuccess": "«{name}» (@{slug}) додано до групи з роллю «{role}»!",
+    "addMemberToGroupSuccess": "«<b>{name}</b>» (<b>@{slug}</b>) додано до групи з роллю «{role}»!",
     "addUser": "Додати користувача",
     "addUserNoOptions": "Користувачів не знайдено!",
     "addUserPlaceholder": "Ім'я користувача",
@@ -1058,7 +1058,7 @@
       "title": "Ви дійсно хочете вийти з групи?"
     },
     "memberOutranked": "Ви не можете змінити роль цієї людини — вона має щонайменше стільки ж, скільки ви.",
-    "memberRemoved": "Користувача «{name}» (@{slug}) видалено з групи!",
+    "memberRemoved": "Користувача «<b>{name}</b>» (<b>@{slug}</b>) видалено з групи!",
     "members": "Учасники",
     "membersAdministrationList": {
       "avatar": "Аватар",

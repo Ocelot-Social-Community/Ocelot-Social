@@ -113,6 +113,22 @@ describe('AddGroupMember', () => {
       expect(wrapper.vm.isOpen).toBe(false)
     })
 
+    it('escapes the label a group gave the role, as it does the name', async () => {
+      const mutate = jest.fn().mockResolvedValue()
+      const { wrapper, $toast } = factory(
+        { groupRoles: [{ name: 'usual', label: '<u>Member</u>' }] },
+        mutate,
+      )
+      wrapper.vm.user = { id: 'u1', name: 'Alice', slug: 'alice' }
+      wrapper.vm.isOpen = true
+      await wrapper.vm.$nextTick()
+      wrapper.vm.confirmModal()
+      await flushPromises()
+      expect($toast.success).toHaveBeenCalledWith(
+        expect.stringContaining('&lt;u&gt;Member&lt;/u&gt;'),
+      )
+    })
+
     it('keeps the dialog open and loading until the mutation is through', async () => {
       let resolveMutation
       const mutate = jest.fn(() => new Promise((resolve) => (resolveMutation = resolve)))
