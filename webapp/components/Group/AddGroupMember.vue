@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { escape } from 'lodash'
 import { OsConfirmDialog } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
@@ -108,8 +109,9 @@ export default {
             role: this.roleLabel(
               this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
             ),
-            name,
-            slug,
+            // The toast renders its text as HTML and a name is user content: escape it.
+            name: escape(name),
+            slug: escape(slug),
           }),
         )
         this.$emit('loadGroupMembers')

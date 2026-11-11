@@ -129,6 +129,7 @@
   </div>
 </template>
 <script>
+import { escape } from 'lodash'
 import { mapGetters } from 'vuex'
 import { OsBadge, OsButton, OsConfirmDialog, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
@@ -313,7 +314,10 @@ export default {
         })
         this.$emit('loadGroupMembers')
         const { name, slug } = data.RemoveUserFromGroup.user
-        this.$toast.success(this.$t('group.memberRemoved', { name, slug }))
+        // The toast renders its text as HTML and a name is user content: escape it.
+        this.$toast.success(
+          this.$t('group.memberRemoved', { name: escape(name), slug: escape(slug) }),
+        )
         this.closeRemoveDialog()
       } catch (error) {
         this.$toastBackendError(error)

@@ -94,7 +94,7 @@ describe('AddGroupMember', () => {
     it('calls the mutation, shows success, emits loadGroupMembers, and closes', async () => {
       const mutate = jest.fn().mockResolvedValue()
       const { wrapper, $toast } = factory({}, mutate)
-      wrapper.vm.user = { id: 'u1', name: 'Alice', slug: 'alice' }
+      wrapper.vm.user = { id: 'u1', name: '<i>Alice</i>', slug: 'alice' }
       wrapper.vm.isOpen = true
       await wrapper.vm.$nextTick()
       wrapper.vm.confirmModal()
@@ -104,9 +104,10 @@ describe('AddGroupMember', () => {
           variables: { groupId: 'g1', userId: 'u1', roleName: 'usual' },
         }),
       )
-      // The text names the user twice, by name and by @slug — both must reach it.
+      // The text names the user twice, by name and by @slug — both must reach it, as plain text:
+      // a toast renders HTML, so a name with markup in it is escaped.
       expect($toast.success).toHaveBeenCalledWith(
-        expect.stringMatching(/"name":"Alice","slug":"alice"/),
+        expect.stringContaining('"name":"&lt;i&gt;Alice&lt;/i&gt;","slug":"alice"'),
       )
       expect(wrapper.emitted('loadGroupMembers')).toBeTruthy()
       expect(wrapper.vm.isOpen).toBe(false)
