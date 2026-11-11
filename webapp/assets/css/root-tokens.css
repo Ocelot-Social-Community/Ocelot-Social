@@ -506,15 +506,15 @@
   /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
      as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
      constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
-  --chat-sidemenu-background-over: light-dark(#f6f6f6, var(--color-neutral-10));
+  --chat-sidemenu-background-over: light-dark(var(--color-neutral-90), var(--color-neutral-10));
   /* vue-advanced-chat's own palette, one token per literal it shipped with (constants/chat.js).
      Names must never equal one of the library's own --chat-* variables: it sets those on its root
      from these values, and a var() naming itself is a cycle the browser throws away. */
   --chat-accent: light-dark(#1976d2, rgb(100, 170, 240));
-  --chat-accent-contrast: light-dark(#fff, var(--color-neutral-0));
-  --chat-border-color: light-dark(#e1e4e8, var(--color-neutral-15));
+  --chat-accent-contrast: light-dark(var(--color-neutral-100), var(--color-neutral-0));
+  --chat-border-color: light-dark(var(--color-neutral-80), var(--color-neutral-15));
   --chat-search-border-color: light-dark(#e1e5e8, var(--color-neutral-15));
-  --chat-hover-background: light-dark(#f6f6f6, var(--color-neutral-10));
+  --chat-hover-background: light-dark(var(--color-neutral-90), var(--color-neutral-10));
   --chat-text-strong: light-dark(#0a0a0a, var(--color-neutral-80));
   --chat-text-muted: light-dark(#9ca6af, var(--color-neutral-47));
   --chat-text-subtle: light-dark(#757e85, var(--color-neutral-53));
@@ -527,7 +527,7 @@
   --chat-reply-color: light-dark(#6e6e6e, var(--color-neutral-60));
   --chat-tag-color: light-dark(#0d579c, rgb(110, 170, 235));
   --chat-image-background: light-dark(#ddd, var(--color-neutral-12));
-  --chat-reaction-background: light-dark(#eee, var(--color-neutral-12));
+  --chat-reaction-background: light-dark(var(--color-neutral-85), var(--color-neutral-12));
   --chat-reaction-border-hover: light-dark(#ddd, var(--color-neutral-20));
   --chat-reaction-me-background: light-dark(#cfecf5, rgb(30, 60, 75));
   --chat-reaction-me-border: light-dark(#3b98b8, rgb(59, 152, 184));
