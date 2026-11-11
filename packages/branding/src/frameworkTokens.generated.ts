@@ -169,12 +169,10 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
     'light-dark(color-mix(in srgb, var(--color-warning), black 20%), color-mix(in srgb, var(--color-warning), black 35%))',
   'color-ribbon-article':
     'light-dark(rgb(10, 161, 255), color-mix(in srgb, rgb(10, 161, 255), black 18%))',
-  'color-ribbon-article-shadow':
-    'light-dark(#0064a3, color-mix(in srgb, rgb(10, 161, 255), black 40%))',
+  'color-ribbon-article-shadow': 'light-dark(#0064a3, color-mix(in srgb, #0064a3, black 5%))',
   'color-ribbon-event':
     'light-dark(rgb(160, 103, 255), color-mix(in srgb, rgb(160, 103, 255), black 14%))',
-  'color-ribbon-event-shadow':
-    'light-dark(#6001ff, color-mix(in srgb, rgb(160, 103, 255), black 40%))',
+  'color-ribbon-event-shadow': 'light-dark(#6001ff, color-mix(in srgb, #6001ff, black 7%))',
   'color-secondary': 'rgb(0, 142, 230)',
   'color-secondary-active': 'color-mix(in srgb, var(--color-secondary), black 15%)',
   'color-secondary-contrast': 'var(--text-color-secondary-inverse)',

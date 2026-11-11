@@ -415,13 +415,13 @@
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
   /* A ribbon is a surface under white 0.7rem text, so each colour is a pair: the vanilla colour in light, */
-  /* darkened in dark (article and pinned 18%, event 14%; the shadow corner 40%, 40%, 35% — darker than the */
-  /* surface it sits on). Text 4.0 to 4.6:1 on purpose, brighter than AA's 4.5 was wanted. A brand sets the */
-  /* token as one value for both themes, or as its own light-dark() pair, the dark half derived from the */
-  /* light one in the brand's own CSS. */
+  /* darkened in dark by black x% of the light value (article and pinned 18%, event 14%). The shadow corner */
+  /* is darkened from its own light value: article 5%, event 7%, pinned 35% of the warning colour. Text */
+  /* 4.0 to 4.6:1 on purpose, brighter than AA's 4.5 was wanted. A brand sets the token as one value for */
+  /* both themes, or as its own light-dark() pair, the dark half derived from the light one in its own CSS. */
   --color-ribbon-article: light-dark(rgb(10, 161, 255), color-mix(in srgb, rgb(10, 161, 255), black 18%));
   /* The build-time color.adjust() of --color-ribbon-article, kept at its exact vanilla value. */
-  --color-ribbon-article-shadow: light-dark(#0064a3, color-mix(in srgb, rgb(10, 161, 255), black 40%));
+  --color-ribbon-article-shadow: light-dark(#0064a3, color-mix(in srgb, #0064a3, black 5%));
 
   --color-ribbon-event: light-dark(rgb(160, 103, 255), color-mix(in srgb, rgb(160, 103, 255), black 14%));
   --color-ribbon-announcement: light-dark(var(--background-color-warning), color-mix(in srgb, var(--background-color-warning), black 18%));
@@ -429,7 +429,7 @@
   --color-ribbon-announcement-shadow: light-dark(color-mix(in srgb, var(--color-warning), black 20%), color-mix(in srgb, var(--color-warning), black 35%));
   /*  Literal, not derived: this used to be a build-time color.adjust() of --color-ribbon-event. */
   /*  Kept at its exact vanilla value — a color-mix() approximation would have shifted the colour. */
-  --color-ribbon-event-shadow: light-dark(#6001ff, color-mix(in srgb, rgb(160, 103, 255), black 40%));
+  --color-ribbon-event-shadow: light-dark(#6001ff, color-mix(in srgb, #6001ff, black 7%));
   /**
  * @tokens Chat Color
  */
