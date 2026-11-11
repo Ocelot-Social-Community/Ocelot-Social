@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.0.9](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.8...ui-v0.0.9) (2026-11-11)
+
+
+### Features
+
+* **other:** a count on osbadge, round around one digit ([#10797](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10797)) ([fd7ef75](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/fd7ef750e9855fdbc816649c4d69dc5db460771f))
+* **other:** video call shall have much more space ([#10540](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10540)) ([d2dd10d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d2dd10d4f1774f47888e247d1951c59d3dceedb6))
+* **package/ui:** a confirm dialog that takes its texts as props, modals with sizes and focus handling ([#10550](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10550)) ([8e8d24f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/8e8d24f348ad23dafeea00a0ea4104bfda2477bb))
+* **package/ui:** a drawer component, OsDrawer, slides in from a screen edge ([#10730](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10730)) ([363e6c6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/363e6c64d8d4d72d08d38562a88535ed328f7a70))
+* **package/ui:** the storybook renders the autodocs pages its stories ask for ([#10741](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10741)) ([22efc95](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/22efc95c43e48077383ed25f661d5eefb01e4036))
+* **webapp:** dark mode — chat, video call and maps ([#10856](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10856)) ([e269837](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/e269837c845325b025901141f1782cc7a304395e))
+* **webapp:** dark mode — theme tokens, theme switch, components and pages ([#10855](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10855)) ([d992289](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d992289abf6ab7689330be1237bbd87c90e4207c))
+* **webapp:** fullscreen for the video call ([#10542](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10542)) ([ab6753a](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ab6753a2f8af12eba7aa7cffa223678b967f7317))
+
+
+### Bug Fixes
+
+* **package/ui:** a button whose icon or suffix slot shows nothing gets no empty gap ([#10875](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10875)) ([898bf7c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/898bf7c0d890456a0d78ef39418e816effc9deef))
+* **package/ui:** a dialog's close button no longer drops below its title under Vue 2 ([#10871](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10871)) ([34f8d7d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/34f8d7d290eff7f93b871873108d5e3c901ce544))
+* **package/ui:** the open stories of OsModal no longer cover its docs page ([#10742](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10742)) ([68cb0fb](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/68cb0fb0e49da8e43c32c949b3c0022f70dfe78a))
+* **webapp:** filled surfaces and ribbons are darker in the dark mode, by what wcag aa asks ([#10906](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10906)) ([4085928](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4085928525b7bf28ff7bb9786ba2170da3b3b8c8))
+* **webapp:** the role tabs lock only fixed roles, set apart from the name ([#10868](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10868)) ([423a47b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/423a47be8123c1bc58d220cdff1e76570195af99))
+
+
+### Code Refactoring
+
+* **other:** one light-dark() parser, and small leftovers of the dark mode ([#10882](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10882)) ([ef82273](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ef82273303724c647adcbeee404e9013676d81f3))
+* **webapp:** the theme switch icons live in packages/ui ([#10862](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10862)) ([421abd9](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/421abd9b6c8ebbf822db15592f166d993595d5c5))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.5 to 26.6.6 in /packages/ui ([#10834](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10834)) ([a2aa377](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a2aa377d457f9f95c8784bed0cb8086d76905477))
+* **deps-dev:** bump eslint from 10.12.0 to 10.13.0 in /packages/ui ([#10706](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10706)) ([10f9803](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/10f98030e74b06d4fc4dc9a264540a9f0ba1552d))
+* **deps-dev:** bump eslint from 10.13.0 to 10.14.0 in /packages/ui ([#10832](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10832)) ([f4710c4](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f4710c44585b916e7ae807e6b5eb5310d2c29e1f))
+* **deps-dev:** bump eslint-plugin-jsdoc from 65.3.6 to 65.4.0 in /packages/ui ([#10711](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10711)) ([a50b91c](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a50b91c80a8716718231c727dd3c510c0bf8de95))
+* **deps-dev:** bump eslint-plugin-jsdoc from 65.4.0 to 65.4.2 in /packages/ui ([#10770](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10770)) ([46c5f5b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/46c5f5b4c4ab4a47e451e12b3d213e3bdaa9a945))
+* **deps-dev:** bump eslint-plugin-jsdoc from 65.4.2 to 65.4.3 in /packages/ui ([#10849](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10849)) ([e329cf6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/e329cf685ca61e373c53dd20e73eb6875a75f3d9))
+* **deps-dev:** bump eslint-plugin-playwright from 2.12.1 to 2.12.2 in /packages/ui ([#10833](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10833)) ([48ca7f3](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/48ca7f372375dd469189568e16803a90fccc89c4))
+* **deps-dev:** bump eslint-plugin-vuejs-accessibility from 2.6.2 to 2.6.3 in /packages/ui ([#10767](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10767)) ([a066ca9](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a066ca9e4fb4d0f32f354186cf7b7d4fd5655dc3))
+* **deps-dev:** bump glob from 13.0.6 to 14.0.2 in /packages/ui ([#10763](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10763)) ([d562967](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d5629679f7ff001e65f521747a78ea0dae8578d4))
+* **deps-dev:** bump glob from 14.0.2 to 14.0.3 in /packages/ui ([#10831](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10831)) ([87c66fb](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/87c66fb6b59bf1d32923160e5e18968f15400868))
+* **deps-dev:** bump tailwind-csstree from 0.4.1 to 0.4.2 in /packages/ui ([#10835](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10835)) ([4e0f3bd](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4e0f3bd52b6e10b989e44768789ee87d1a0ea4a6))
+* **deps-dev:** bump the size-limit group in /packages/ui with 2 updates ([#10754](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10754)) ([bbe39fb](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/bbe39fb859cadce150dd9874a24ae73a61eaa170))
+* **deps-dev:** bump the storybook group in /packages/ui with 3 updates ([#10702](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10702)) ([82f5fdd](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/82f5fdde2b622ff598a458b13be91a40fdf2ee30))
+* **deps-dev:** bump the storybook group in /packages/ui with 4 updates ([#10759](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10759)) ([430092a](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/430092a38ca40d5f5738e2fa06ebe4d7737625a6))
+* **deps-dev:** bump the tailwind group in /packages/ui with 3 updates ([#10848](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10848)) ([3e99b73](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/3e99b7381140eb2449cc3d0c17715eb58e449a9f))
+* **deps-dev:** bump the vitest group in /packages/ui with 2 updates ([#10830](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10830)) ([5a3cd6f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/5a3cd6fda31960488b7a3102c47abd4ee0ce131f))
+* **deps-dev:** bump vue-tsc from 3.3.13 to 3.3.14 in /packages/ui in the vue group ([#10829](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10829)) ([dc6d7ca](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/dc6d7ca8eabf30ebd5165a3a4cf395152f840216))
+* **deps:** bump node from 26.12.0-alpine to 26.12.1-alpine in /packages/ui ([#10772](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10772)) ([26f78c6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/26f78c6add9d3da1109d2746463475398335bcea))
+* **deps:** bump node from 26.12.1-alpine to 26.13.0-alpine in /packages/ui ([#10810](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10810)) ([aca4060](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/aca40609eccbcd64db18846720d6c23e533758a0))
+
 ## [0.0.8](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.7...ui-v0.0.8) (2026-10-20)
 
 
