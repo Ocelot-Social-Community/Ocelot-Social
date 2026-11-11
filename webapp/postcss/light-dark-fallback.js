@@ -6,7 +6,7 @@
 //
 //   :root                          the light halves   — the default
 //   :root[data-theme='dark']       the dark halves    — the user chose dark
-//   @media (prefers-color-scheme: dark) { :root:not([data-theme='light'], [data-theme='dark']) }
+//   @media (prefers-color-scheme: dark) { :root[data-theme='system'], :root:not([data-theme]) }
 //                                  the dark halves    — "system", and the device is dark
 //
 // That is the decision theme-dark.css makes for a current browser with `color-scheme`, written out for
@@ -14,9 +14,9 @@
 //
 // The pairs stay one declaration in the source (see theme-dark.css); this is only the fallback.
 // A brand's `:root:root` colour replaces the pair in both themes in a current browser. So no block here
-// may be MORE specific than `:root:root` (0,2,0): the selector list inside :not() counts as one
-// attribute, which keeps the system block at 0,2,0 — a brand loaded later wins, as it does there.
-// (`:not()` with a list: Chrome 88, Firefox 84, Safari 9; older, the system block alone is dropped.)
+// may be MORE specific than `:root:root` (0,2,0): both system selectors are 0,2,0, so a brand loaded
+// later wins, as it does there. The app only ever sets 'system', 'light' or 'dark' (utils/theme.js);
+// no `:not()` list, which Chrome before 88 would drop.
 
 // One parser for the whole project (packages/branding); the plugin is CommonJS and so is its dist.
 const { lightOf, darkOf } = require('@ocelot-social/branding')
@@ -47,7 +47,7 @@ module.exports = () => ({
     supports.append(block(":root[data-theme='dark']", dark))
     supports.append(
       new AtRule({ name: 'media', params: '(prefers-color-scheme: dark)' }).append(
-        block(":root:not([data-theme='light'], [data-theme='dark'])", dark),
+        block(":root[data-theme='system'], :root:not([data-theme])", dark),
       ),
     )
     root.append(supports)
