@@ -330,10 +330,14 @@
       "deleteSuccess": "Rolle gelöscht.",
       "description": "Wer im Netzwerk was darf. Rollen anlegen und Rechte zuweisen — Änderungen gelten sofort.",
       "discard": "Verwerfen",
+      "grantRoleManage": {
+        "confirm": "Trotzdem vergeben",
+        "message": "<strong>{role}</strong> erhält „Rollen verwalten“: Wer die Rolle hat, kann jede Rolle außer owner frei gestalten, auch höheren Rollen Rechte entziehen, und deren Inhaber dann umstufen, sperren oder löschen. Gelöschte Konten und Inhalte kann auch ein Owner nicht zurückholen. Weise die Rolle nur Personen zu, denen du Admin-Befugnisse anvertraust.",
+        "title": "„Rollen verwalten“ vergeben?"
+      },
       "members": "{count} Mitglieder",
       "name": "Rollen & Rechte",
       "nameLabel": "Name",
-      "notEditableHint": "Du kannst nur deine eigene Rolle ändern und Rollen, die weniger Befugnisse haben als deine.",
       "perm": {
         "apiKey_administer": "API-Schlüssel anderer Nutzer verwalten.",
         "apiKey_create": "Persönliche API-Schlüssel erstellen.",
@@ -367,7 +371,6 @@
         "videoCall_create_open": "Einen Videoanruf in einer Gruppe starten, die jeder betreten kann — die also auffindbar ist und ohne Freigabe beigetreten werden kann.",
         "videoCall_create_restricted": "Einen Videoanruf in einer Gruppe starten, die man nicht einfach betreten kann: Der Beitritt braucht eine Freigabe oder Einladung, oder die Gruppe ist unsichtbar."
       },
-      "permNotHeld": "Dieses Recht hast du selbst nicht, darum kannst du es nicht vergeben.",
       "permUnavailable": "Funktion nicht konfiguriert – das Recht hat keine Wirkung.",
       "permUnavailableLink": "Konfiguration ansehen",
       "protected": "geschützt",
@@ -528,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "Du kannst keine Rolle vergeben, deren Rechte du selbst nicht hast.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Nur ein Inhaber darf die Inhaber-Rolle vergeben oder ändern.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "Du kannst nur die Rolle von Nutzern ändern, deren Rolle weniger Befugnisse hat als deine.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "Du kannst nur deine eigene Rolle ändern und Rollen, die weniger Befugnisse haben als deine.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "Die Rolle „{name}“ ist noch {count} Nutzern zugewiesen und kann nicht gelöscht werden.",
     "ROLE_DELETE_SYSTEM_ROLE": "Die Rolle „{name}“ ist eine Systemrolle und kann nicht gelöscht werden.",
     "ROLE_DOES_NOT_EXIST": "Die Rolle „{name}“ gibt es nicht.",
@@ -536,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "Die Rolle „{name}“ ist eine Systemrolle und kann nicht umbenannt werden.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Die Rolle „{name}“ gibt es bereits.",
     "ROLE_SAVE_NAME_INVALID": "Der Rollenname muss 2 bis 50 Zeichen lang sein und darf nur Buchstaben, Ziffern, „_“ und „-“ enthalten; das erste Zeichen muss ein Buchstabe oder eine Ziffer sein.",
-    "ROLE_SAVE_NOT_COVERED": "Eine Rolle kann nur Rechte enthalten, die du selbst hast.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Eine Rolle kann nicht als geschützt angelegt oder markiert werden.",
-    "ROLE_SAVE_WOULD_OUTRANK": "Deine eigene Rolle kann nicht über eine Rolle gehoben werden, die sie heute nicht überragt.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Das kannst du nur bei Nutzern tun, deren Rolle weniger Befugnisse gewährt als deine.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Du darfst die Nutzerverwaltung nicht durchsuchen.",
     "USER_DOES_NOT_EXIST": "Der Nutzer wurde nicht gefunden.",

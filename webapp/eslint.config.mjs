@@ -160,6 +160,7 @@ export default [
             '/^(admin|settings)\\.api-keys\\.revoke/',
             '/^admin\\.groupRoles\\.saved$/',
             '/^admin\\.roles\\.selfLockout\\./',
+            '/^admin\\.roles\\.grantRoleManage\\./',
             '/^admin\\.users\\.delete\\.(message|submit)$/',
             '/^components\\.registration\\.[^.]+\\.(title|buttonTitle)/',
             '/^delete\\.((comment|contribution)\\.(title|message)|cancel|submit)$/',

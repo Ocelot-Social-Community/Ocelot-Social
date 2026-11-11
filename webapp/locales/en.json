@@ -330,10 +330,14 @@
       "deleteSuccess": "Role deleted.",
       "description": "Who may do what across the network. Create roles and assign permissions — changes apply immediately.",
       "discard": "Discard",
+      "grantRoleManage": {
+        "confirm": "Grant anyway",
+        "message": "<strong>{role}</strong> gets “manage roles”: its holders can shape every role but owner freely, strip rights from higher roles too, and then re-role, disable or delete their holders. Deleted accounts and content cannot be restored, not even by an owner. Assign the role only to people you would trust with admin powers.",
+        "title": "Grant “manage roles”?"
+      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
-      "notEditableHint": "You can only change your own role and roles that grant less authority than yours.",
       "perm": {
         "apiKey_administer": "Administer other users’ API keys.",
         "apiKey_create": "Create personal API keys.",
@@ -367,7 +371,6 @@
         "videoCall_create_open": "Start a video call in a group a stranger can walk into — one anybody may find and join without approval.",
         "videoCall_create_restricted": "Start a video call in a group one cannot simply walk into: joining needs approval, an invite, or the group is unlisted."
       },
-      "permNotHeld": "You do not hold this right yourself, so you cannot hand it out.",
       "permUnavailable": "Feature not configured — granting this has no effect.",
       "permUnavailableLink": "View configuration",
       "protected": "protected",
@@ -528,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "You cannot hand out a role with rights you do not hold yourself.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Only an owner may assign or change the owner role.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "You can only change the role of users whose role grants less authority than yours.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "You can only change your own role or roles that grant less authority than yours.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "The role “{name}” is still assigned to {count} users and cannot be deleted.",
     "ROLE_DELETE_SYSTEM_ROLE": "The role “{name}” is a system role and cannot be deleted.",
     "ROLE_DOES_NOT_EXIST": "The role “{name}” does not exist.",
@@ -536,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "The role “{name}” is a system role and cannot be renamed.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "The role “{name}” already exists.",
     "ROLE_SAVE_NAME_INVALID": "The role name must be 2 to 50 characters long and may only contain letters, digits, “_” and “-”; the first character must be a letter or a digit.",
-    "ROLE_SAVE_NOT_COVERED": "A role can only contain rights you hold yourself.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "A role cannot be created or marked as protected.",
-    "ROLE_SAVE_WOULD_OUTRANK": "Your own role cannot be raised above a role that yours does not outrank today.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "You can only do this to users whose role grants less authority than yours.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "You are not allowed to search the user administration.",
     "USER_DOES_NOT_EXIST": "The user could not be found.",

@@ -221,9 +221,10 @@
       </template>
     </section>
 
-    <!-- Soft warning when an admin is about to strip role.manage from their own
-         role (a self-lockout, recoverable only by an owner). Not a hard block —
-         the owner role is the real failsafe. -->
+    <!-- Soft warnings around role.manage: an admin about to strip it from their own role
+         (a self-lockout, recoverable only by an owner), or about to give it to a role (its
+         holders shape every role but owner freely). Not hard blocks — the owner role is the
+         real failsafe. -->
     <confirm-modal
       v-if="showConfirmModal"
       :modalData="confirmModalData"
@@ -575,27 +576,17 @@ export default {
     canRename(role) {
       return !this.isFixedRole(role) && this.mayChange(role)
     },
-    // Whether the viewer may change this role at all (#10485): their own, or one their role
-    // outranks — the backend's answer, so the page offers exactly what it would accept. A
-    // field that is missing (an older backend) reads as "may".
+    // `role.manage` shapes every role but the protected `owner` freely — its rights included,
+    // removing and adding any. The page is only reachable with that right.
     mayChange(role) {
-      return !role.protected && role.editableByCurrentUser !== false
+      return !role.protected
     },
-    isOwnRole(role) {
-      return role.name === this.$store?.getters?.['auth/user']?.roleName
-    },
-    // A right can be switched in a role the viewer may change, when the feature exists, and —
-    // outside their own role, which `role.manage` lets them shape freely — when they hold it.
+    // A right can be switched in any role the viewer may change, when its feature exists.
     mayToggle(role, permission) {
-      if (!this.mayChange(role) || permission.available === false) return false
-      return this.isOwnRole(role) || permission.grantableByCurrentUser !== false
+      return this.mayChange(role) && permission.available !== false
     },
-    permissionHint(role, permission) {
-      if (permission.available === false) return this.$t('admin.roles.permUnavailable')
-      if (this.mayChange(role) && !this.mayToggle(role, permission)) {
-        return this.$t('admin.roles.permNotHeld')
-      }
-      return null
+    permissionHint(_role, permission) {
+      return permission.available === false ? this.$t('admin.roles.permUnavailable') : null
     },
     startRename() {
       this.creating = false
@@ -693,9 +684,10 @@ export default {
       return !samePermissions(this.selectedPermissions(form.permissions), form.baseline)
     },
     canDelete(role) {
-      // Protected (owner) and the implicit baseline (user) cannot be deleted, and a
-      // role with members would orphan them — reassign first (enforced by the backend).
-      return this.mayChange(role) && role.name !== 'user' && (role.memberCount || 0) === 0
+      // Any empty role but the fixed ones (owner, user), also one above the viewer: deleting takes
+      // nobody's rights, and a role with members would orphan them — reassign first. All three
+      // enforced by the backend.
+      return !role.protected && role.name !== 'user' && (role.memberCount || 0) === 0
     },
     hasMembers(role) {
       return (role.memberCount || 0) > 0
@@ -705,14 +697,13 @@ export default {
       return !this.mayChange(role) || !this.isDirty(role) || this.saving
     },
     saveHint(role) {
-      if (role.protected) return this.$t('admin.roles.protectedHint')
-      return this.mayChange(role) ? '' : this.$t('admin.roles.notEditableHint')
+      return role.protected ? this.$t('admin.roles.protectedHint') : ''
     },
     deleteHint(role) {
       if (this.canDelete(role)) return ''
       // A role that is only undeletable because it still has members gets the
       // specific "reassign first" hint.
-      if (this.mayChange(role) && role.name !== 'user' && this.hasMembers(role)) {
+      if (!role.protected && role.name !== 'user' && this.hasMembers(role)) {
         return this.$t('admin.roles.cannotDeleteHasMembers')
       }
       return this.$t('admin.roles.cannotDelete')
@@ -728,27 +719,41 @@ export default {
       if (typeof this.$can !== 'function' || !this.$can('role.manage')) return false
       return !this.selectedPermissions(this.forms[role.name].permissions).includes('role.manage')
     },
+    // Does saving `role` give it role.manage it did not hold? That right shapes every role but
+    // `owner` freely — removing rights from roles above its holder included, which then lets
+    // them act on those roles' holders. A soft confirm with the risks, like the self-lockout.
+    grantsRoleManage(role) {
+      if (role.protected || role.permissions.includes('role.manage')) return false
+      return this.selectedPermissions(this.forms[role.name].permissions).includes('role.manage')
+    },
+    confirmSave(role, ident) {
+      this.confirmModalData = {
+        titleIdent: `admin.roles.${ident}.title`,
+        messageIdent: `admin.roles.${ident}.message`,
+        messageParams: { role: role.name },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.exclamationCircle,
+            textIdent: `admin.roles.${ident}.confirm`,
+            callback: () => this.performSave(role),
+          },
+          cancel: {
+            icon: this.icons.close,
+            textIdent: 'actions.cancel',
+            callback: () => {},
+          },
+        },
+      }
+      this.showConfirmModal = true
+    },
     saveRole(role) {
       if (this.wouldLockSelfOut(role)) {
-        this.confirmModalData = {
-          titleIdent: 'admin.roles.selfLockout.title',
-          messageIdent: 'admin.roles.selfLockout.message',
-          messageParams: { role: role.name },
-          buttons: {
-            confirm: {
-              danger: true,
-              icon: this.icons.exclamationCircle,
-              textIdent: 'admin.roles.selfLockout.confirm',
-              callback: () => this.performSave(role),
-            },
-            cancel: {
-              icon: this.icons.close,
-              textIdent: 'actions.cancel',
-              callback: () => {},
-            },
-          },
-        }
-        this.showConfirmModal = true
+        this.confirmSave(role, 'selfLockout')
+        return undefined
+      }
+      if (this.grantsRoleManage(role)) {
+        this.confirmSave(role, 'grantRoleManage')
         return undefined
       }
       return this.performSave(role)

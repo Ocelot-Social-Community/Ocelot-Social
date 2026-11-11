@@ -174,10 +174,10 @@ Feature: Admin roles & permissions (RBAC)
     Then I see a toaster with status "success"
     And I do not see the element with test id "user-delete-peter"
 
-  # G — #10485: role.manage is no lever against those above. A moderator holding it demoted an
-  # admin on stage. Now they re-role only users they outrank, and the admin role is not theirs
-  # to change — the page offers neither, and the backend would refuse both.
-  Scenario: A moderator who may manage roles cannot touch the admins
+  # G — #10485: role.manage is no lever against the people above. A moderator holding it demoted
+  # an admin on stage; they still re-role only users they outrank. The roles themselves are theirs
+  # to shape freely — the admin role too — except owner, the anchor nobody changes.
+  Scenario: A moderator who may manage roles shapes every role but owner, yet assigns only below
     Given the role "moderator" has the permission "role.manage"
     And I am logged in as "moderator"
     When I navigate to page "/admin/users"
@@ -185,9 +185,10 @@ Feature: Admin roles & permissions (RBAC)
     And I do not see the element with test id "user-role-select-admin"
     When I navigate to page "/admin/roles"
     And I select the role "admin"
-    Then the save button for role "admin" is disabled
+    Then the permission "comment.create" for role "admin" should "be.enabled"
     And the delete button for role "admin" is disabled
-    And the permission "comment.create" for role "admin" should "be.disabled"
     When I select the role "user"
-    Then the permission "comment.create" for role "user" should "be.enabled"
-    And the permission "policy.manage" for role "user" should "be.disabled"
+    Then the permission "policy.manage" for role "user" should "be.enabled"
+    When I select the role "owner"
+    Then the permission "comment.create" for role "owner" should "be.disabled"
+    And the delete button for role "owner" is disabled
