@@ -1,31 +1,56 @@
 // light-dark() is understood by Chrome 123, Firefox 120 and Safari 17.5. A browser older than that
 // keeps the custom properties (they accept any tokens) but drops every declaration that READS one —
-// no text colour, no background, no border, in the light theme too. For those browsers this plugin
-// adds, after the :root rule, the same custom properties with the LIGHT half of each pair, inside
-// `@supports not (color: light-dark(red, blue))`: they get the light theme, never the dark one, and
-// a current browser skips the block.
+// no text colour, no background, no border, in either theme. For those browsers this plugin adds
+// the same custom properties with each half of every pair, inside
+// `@supports not (color: light-dark(red, blue))`; a current browser skips the whole block:
+//
+//   :root                          the light halves   — the default
+//   :root[data-theme='dark']       the dark halves    — the user chose dark
+//   @media (prefers-color-scheme: dark) { :root[data-theme='system'], :root:not([data-theme]) }
+//                                  the dark halves    — "system", and the device is dark
+//
+// That is the decision theme-dark.css makes for a current browser with `color-scheme`, written out for
+// one that cannot. A browser without prefers-color-scheme (before 2019) follows the cookie only.
 //
 // The pairs stay one declaration in the source (see theme-dark.css); this is only the fallback.
+// A brand's `:root:root` colour replaces the pair in both themes in a current browser. So no block here
+// may be MORE specific than `:root:root` (0,2,0): both system selectors are 0,2,0, so a brand loaded
+// later wins, as it does there. The app only ever sets 'system', 'light' or 'dark' (utils/theme.js);
+// no `:not()` list, which Chrome before 88 would drop.
 
 // One parser for the whole project (packages/branding); the plugin is CommonJS and so is its dist.
-const { lightOf } = require('@ocelot-social/branding')
+const { lightOf, darkOf } = require('@ocelot-social/branding')
 
 const SUPPORTS = 'not (color: light-dark(red, blue))'
 
 module.exports = () => ({
   postcssPlugin: 'ocelot-light-dark-fallback',
   Once(root, { AtRule, Rule, Declaration }) {
-    const fallback = new Map()
+    const light = new Map()
+    const dark = new Map()
     root.walkRules(':root', (rule) => {
       if (rule.parent.type !== 'root') return
       rule.walkDecls(/^--/, (decl) => {
-        if (decl.value.includes('light-dark(')) fallback.set(decl.prop, lightOf(decl.value))
+        if (!decl.value.includes('light-dark(')) return
+        light.set(decl.prop, lightOf(decl.value))
+        dark.set(decl.prop, darkOf(decl.value))
       })
     })
-    if (!fallback.size) return
-    const block = new Rule({ selector: ':root' })
-    for (const [prop, value] of fallback) block.append(new Declaration({ prop, value }))
-    root.append(new AtRule({ name: 'supports', params: SUPPORTS }).append(block))
+    if (!light.size) return
+    const block = (selector, values) => {
+      const rule = new Rule({ selector })
+      for (const [prop, value] of values) rule.append(new Declaration({ prop, value }))
+      return rule
+    }
+    const supports = new AtRule({ name: 'supports', params: SUPPORTS })
+    supports.append(block(':root', light))
+    supports.append(block(":root[data-theme='dark']", dark))
+    supports.append(
+      new AtRule({ name: 'media', params: '(prefers-color-scheme: dark)' }).append(
+        block(":root[data-theme='system'], :root:not([data-theme])", dark),
+      ),
+    )
+    root.append(supports)
   },
 })
 module.exports.postcss = true
