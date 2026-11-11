@@ -68,4 +68,80 @@ describe('the plugin', () => {
     expect(out).not.toMatch(/@supports[\s\S]*--c: red/)
     expect(out).not.toMatch(/@supports[\s\S]*--c: blue/)
   })
+
+  describe('a pair that mixes', () => {
+    const MIX = '@supports not (color: color-mix(in srgb, red, blue))'
+    const css =
+      ':root { --fill: light-dark(var(--p), color-mix(in srgb, var(--p), black 25%)); --bg: light-dark(#fff, #000); }'
+
+    it('adds a block without color-mix inside the @supports rule, for the mixing token only', async () => {
+      const out = await run(css)
+      const inner = out.slice(out.indexOf(MIX))
+      expect(out).toContain(MIX)
+      expect(inner).toMatch(/:root\[data-theme='dark'\]\s*\{\s*--fill: var\(--p\);?\s*\}/)
+      expect(inner).not.toContain('--bg')
+      expect(inner).not.toContain('color-mix(in srgb, var(--p), black')
+    })
+
+    it('puts it after the dark blocks, in all three places', async () => {
+      const out = await run(css)
+      expect(out.indexOf(MIX)).toBeGreaterThan(out.indexOf("[data-theme='system']"))
+      expect(out.slice(out.indexOf(MIX)).match(/--fill: var\(--p\)/g)).toHaveLength(3)
+    })
+
+    it('adds nothing for a pair without color-mix', async () => {
+      expect(await run(':root { --bg: light-dark(#fff, #000); }')).not.toContain('color-mix')
+    })
+
+    it('takes the first colour out of a nested mix, whatever its own parentheses hold', async () => {
+      const out = await run(
+        ':root { --a: light-dark(red, color-mix(in srgb, color-mix(in srgb, rgb(1, 2, 3), white 10%), black 25%)); }',
+      )
+      expect(out.slice(out.indexOf(MIX))).toContain('--a: rgb(1, 2, 3)')
+    })
+
+    it('keeps a mix of one colour as that colour', async () => {
+      const out = await run(':root { --a: light-dark(red, color-mix(in srgb, blue)); }')
+      expect(out.slice(out.indexOf(MIX))).toContain('--a: blue')
+    })
+  })
+
+  describe('a token that mixes and is no pair', () => {
+    const MIX = '@supports not (color: color-mix(in srgb, red, blue))'
+
+    it('gets its own :root block without the mix, whatever else the file holds', async () => {
+      const out = await run(
+        ':root { --active: color-mix(in srgb, var(--p), black 20%); --size: 4px; }',
+      )
+      expect(out).toMatch(
+        /@supports not \(color: color-mix\(in srgb, red, blue\)\)\s*\{\s*:root\s*\{\s*--active: var\(--p\);?\s*\}\s*\}/,
+      )
+      expect(out).not.toContain('light-dark')
+      expect(out.slice(out.indexOf(MIX))).not.toContain('--size')
+    })
+
+    it('drops the percentage of the colour it keeps, before or after it', async () => {
+      const out = await run(
+        ':root { --a: color-mix(in srgb, red 30%, blue); --b: color-mix(in srgb, 30% red, blue); }',
+      )
+      expect(out).toContain('--a: red')
+      expect(out).toContain('--b: red')
+    })
+
+    it('turns a tint into transparent, not into the full colour', async () => {
+      const out = await run(
+        ':root { --a: color-mix(in srgb, var(--c) 14%, transparent); --b: color-mix(in srgb, transparent, var(--c) 14%); }',
+      )
+      expect(out.slice(out.indexOf(MIX))).toContain('--a: transparent')
+      expect(out.slice(out.indexOf(MIX))).toContain('--b: transparent')
+    })
+
+    it('comes once, next to the pairs block when there is one', async () => {
+      const out = await run(
+        ':root { --a: color-mix(in srgb, red, black 10%); --b: light-dark(#fff, #000); }',
+      )
+      expect(out.match(/@supports not \(color: light-dark/g)).toHaveLength(1)
+      expect(out.slice(out.indexOf(MIX))).toContain('--a: red')
+    })
+  })
 })

@@ -384,9 +384,10 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --color-donation-bar: var(--color-primary);
+  --color-donation-bar: var(--color-primary-fill);
 
-  --color-donation-bar-light: var(--color-primary-light);
+  /* The stripe next to the fill: lighter than it in both themes (in dark the plain primary, the fill is darker). */
+  --color-donation-bar-light: light-dark(var(--color-primary-light), var(--color-primary));
   /* The label lies half on the filled green, half on the grey: in the dark theme its light text needs a
      dark halo to read on the green. None in the light theme, where the text is dark. */
   --donation-bar-label-shadow:
@@ -400,12 +401,12 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --color-toast-green: var(--color-success);
+  --color-toast-green: var(--color-success-fill);
 
-  --color-toast-red: var(--color-danger);
-  --color-toast-orange: var(--color-warning);
+  --color-toast-red: var(--color-danger-fill);
+  --color-toast-orange: var(--color-warning-fill);
   --color-toast-yellow: var(--color-yellow);
-  --color-toast-blue: var(--color-secondary);
+  --color-toast-blue: var(--color-secondary-fill);
   /**
  * @tokens Ribbon Color
  */
@@ -413,17 +414,22 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --color-ribbon-article: rgb(10, 161, 255);
+  /* A ribbon is a surface under white 0.7rem text, so each colour is a pair: the vanilla colour in light, */
+  /* darkened in dark by black x% of the light value (article and pinned 18%, event 14%). The shadow corner */
+  /* is darkened from its own light value: article 5%, event 7%, pinned 35% of the warning colour. Text */
+  /* 4.0 to 4.6:1 on purpose, brighter than AA's 4.5 was wanted. A brand sets the token as one value for */
+  /* both themes, or as its own light-dark() pair, the dark half derived from the light one in its own CSS. */
+  --color-ribbon-article: light-dark(rgb(10, 161, 255), color-mix(in srgb, rgb(10, 161, 255), black 18%));
   /* The build-time color.adjust() of --color-ribbon-article, kept at its exact vanilla value. */
-  --color-ribbon-article-shadow: #0064a3;
+  --color-ribbon-article-shadow: light-dark(#0064a3, color-mix(in srgb, #0064a3, black 5%));
 
-  --color-ribbon-event: rgb(160, 103, 255);
-  --color-ribbon-announcement: var(--background-color-warning);
+  --color-ribbon-event: light-dark(rgb(160, 103, 255), color-mix(in srgb, rgb(160, 103, 255), black 14%));
+  --color-ribbon-announcement: light-dark(var(--background-color-warning), color-mix(in srgb, var(--background-color-warning), black 18%));
   /*  color-mix() rather than a fixed literal: this one follows a brand's warning colour live. */
-  --color-ribbon-announcement-shadow: color-mix(in srgb, var(--color-warning), black 20%);
+  --color-ribbon-announcement-shadow: light-dark(color-mix(in srgb, var(--color-warning), black 20%), color-mix(in srgb, var(--color-warning), black 35%));
   /*  Literal, not derived: this used to be a build-time color.adjust() of --color-ribbon-event. */
   /*  Kept at its exact vanilla value — a color-mix() approximation would have shifted the colour. */
-  --color-ribbon-event-shadow: #6001ff;
+  --color-ribbon-event-shadow: light-dark(#6001ff, color-mix(in srgb, #6001ff, black 7%));
   /**
  * @tokens Chat Color
  */

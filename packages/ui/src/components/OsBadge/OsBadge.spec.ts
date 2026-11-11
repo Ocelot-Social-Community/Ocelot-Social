@@ -65,7 +65,7 @@ describe('osBadge', () => {
         props: { variant: 'primary' },
       })
 
-      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary-fill,var(--color-primary))]')
       expect(wrapper.classes()).toContain('text-[var(--color-primary-contrast)]')
     })
 
@@ -74,7 +74,7 @@ describe('osBadge', () => {
         props: { variant: 'danger' },
       })
 
-      expect(wrapper.classes()).toContain('bg-[var(--color-danger)]')
+      expect(wrapper.classes()).toContain('bg-[var(--color-danger-fill,var(--color-danger))]')
       expect(wrapper.classes()).toContain('text-[var(--color-danger-contrast)]')
     })
   })

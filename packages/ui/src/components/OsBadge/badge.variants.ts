@@ -13,8 +13,10 @@ export const badgeVariants = cva(
     variants: {
       variant: {
         default: 'text-[var(--color-default-contrast)] bg-[var(--color-default)]',
-        primary: 'text-[var(--color-primary-contrast)] bg-[var(--color-primary)]',
-        danger: 'text-[var(--color-danger-contrast)] bg-[var(--color-danger)]',
+        primary:
+          'text-[var(--color-primary-contrast)] bg-[var(--color-primary-fill,var(--color-primary))]',
+        danger:
+          'text-[var(--color-danger-contrast)] bg-[var(--color-danger-fill,var(--color-danger))]',
       },
       size: {
         sm: 'text-[0.75rem] py-[0.2em] px-[0.8em]',
