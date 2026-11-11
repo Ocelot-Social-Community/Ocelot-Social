@@ -4,8 +4,10 @@
 //
 //   node scripts/build-dev-brandings.ts
 //
-// "Compatible" = the config dir has a brand.config.(ts|mjs|js) (the new typed format). Old-format
-// deployment configs (constants/*.js only) are skipped and listed, so it's obvious what was left out.
+// "Compatible" = a brand with a brand.config.(ts|mjs|js) (the new typed format). A config dir is a
+// brand repo: every brandings/<name>/ of it is built, or its deprecated single branding/ (see
+// lib/brand-repo.ts). Config dirs without one (old format, constants/*.js only) are skipped and listed,
+// so it's obvious what was left out.
 //
 // NOTHING has to be configured to pick the results up: `../deployment/configurations` is one of the
 // conventional locations both apps search by default (src/discover.ts DEFAULT_ROOTS), and archives are
@@ -31,7 +33,8 @@ import { existsSync, readdirSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { findConfig, publishBrandArchive } from './lib/build-brandings.ts'
+import { resolveBrandRepo } from './lib/brand-repo.ts'
+import { publishBrandArchive } from './lib/build-brandings.ts'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 // packages/branding/scripts → repo root
@@ -49,9 +52,20 @@ for (const entry of readdirSync(configurationsRoot, { withFileTypes: true })) {
   if (!entry.isDirectory()) {
     continue
   }
-  const brandDir = join(configurationsRoot, entry.name, 'branding')
-  if (existsSync(brandDir) && findConfig(brandDir)) {
-    compatible.push(brandDir)
+  // A config dir is a brand repo: brandings/<name>/ (several brands) or the deprecated branding/.
+  let brandRepo
+  try {
+    brandRepo = resolveBrandRepo(join(configurationsRoot, entry.name))
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error)
+    skipped.push(entry.name)
+    continue
+  }
+  for (const warning of brandRepo.warnings) {
+    console.error(`${warning} (${entry.name})`)
+  }
+  if (brandRepo.brands.length) {
+    compatible.push(...brandRepo.brands.map((brand) => brand.dir))
   } else {
     skipped.push(entry.name)
   }

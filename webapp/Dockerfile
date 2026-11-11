@@ -123,8 +123,8 @@ COPY webapp/ .
 # webpack/babel cache for incremental rebuilds when the webapp source itself changes.)
 RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
     npm run build
-# Per-brand, AFTER the cached build: bake <id>.tar.gz + DEFAULT marker into ./deployment/configurations
-# — the discovery root, named exactly as in a repo checkout so the running code finds it without being
+# Per-brand, AFTER the cached build: bake <id>.tar.gz (+ the DEFAULT marker for a sole brand) into
+# ./deployment/configurations — the discovery root, named exactly as in a repo checkout so the running code finds it without being
 # told where to look. The app applies colours/logos/title/OG/manifest/static pages/locales at RUNTIME
 # from that archive, so the nuxt bundle above stays brand-agnostic and cached. The builder is copied in
 # AFTER the nuxt build so it cannot invalidate that expensive cached layer; it stays in this stage only
@@ -135,31 +135,31 @@ RUN --mount=type=cache,target=/app/node_modules/.cache,sharing=locked \
 # wins and the baked one only covers the window before the first successful sync. That is its whole
 # purpose — a brand image must never render vanilla because the backend is slow or down.
 COPY --from=branding-tools ./app/ /brand-tools/
-# Path 1 — MONOREPO build (docker compose, ocelot's own branded images): the brand's TYPED config is
-# read from deployment/configurations/<BRAND>, bind-mounted so no brand data lands in a layer. Pick it
-# with `--build-arg BRAND=<name>`; empty = vanilla. A plain RUN: it executes HERE and never downstream.
+# Path 1 — MONOREPO build (docker compose, ocelot's own branded images): the brand repo is
+# deployment/configurations/<BRAND>, bind-mounted so no brand data lands in a layer. Pick it with
+# `--build-arg BRAND=<name>`; empty = vanilla. A plain RUN: it executes HERE and never downstream.
 ARG BRAND=""
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
-    if [ -n "$BRAND" ] && ls "/brands/$BRAND/branding/brand.config."* >/dev/null 2>&1; then \
-      node /brand-tools/scripts/build-brand-archive.ts "/brands/$BRAND/branding" ./deployment/configurations --default && \
-      echo "[branding] baked brand: $BRAND"; \
+    if [ -n "$BRAND" ] && [ -d "/brands/$BRAND" ]; then \
+      node /brand-tools/scripts/bake-brand-repo.ts "/brands/$BRAND" --archives ./deployment/configurations; \
     else \
       echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
 # Path 2 — BRAND REPO build (`FROM webapp-build`, context = brand repo root): same bake, from the
-# repo's own ./branding/. ONBUILD because only ONBUILD re-runs in the child build. The `[g]` glob makes
-# the copy optional, so ocelot's own vanilla self-build (no ./branding/) skips it — the same idiom the
-# backend uses.
+# repo's own brandings/<name>/ (or the deprecated single ./branding/) — every brand; only a SOLE brand
+# is marked as the default, otherwise $OCELOT_ACTIVE_BRANDING names it (see
+# packages/branding/scripts/lib/brand-repo.ts). ONBUILD because only ONBUILD re-runs in the
+# child build. The `[g]`/`[s]` globs make the copies optional, so ocelot's own vanilla self-build skips
+# them — the same idiom the backend uses.
 #
 # This is what keeps a brand image branded on its own: without it the webapp would start vanilla and
 # only become branded once the backend answered, which is exactly the flash a down backend turns
 # permanent. The second copy costs a stale-archive risk, and that is contained by the search path: the
 # cache out-ranks this directory the moment a sync lands, so a brand that changed only ever shows the
 # baked version until the backend has been reached — never after.
-ONBUILD COPY brandin[g]/ /brand/
-ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
-      node /brand-tools/scripts/build-brand-archive.ts /brand ./deployment/configurations --default; \
-    else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
+ONBUILD COPY brandin[g]/ /brand-repo/branding/
+ONBUILD COPY branding[s]/ /brand-repo/brandings/
+ONBUILD RUN node /brand-tools/scripts/bake-brand-repo.ts /brand-repo --archives ./deployment/configurations
 # The assembly below also has to be ONBUILD: a plain RUN would leave the brand image with the /build
 # that ocelot CI assembled.
 ONBUILD RUN mkdir /build && \

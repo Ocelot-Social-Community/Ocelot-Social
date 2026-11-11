@@ -37,6 +37,19 @@ The archive is a **library of bucket instances** (`manifest.json` + sparse `frag
 
 **i18n overrides** can be authored inline (`locales: { de: { … } }` in the config) or, more conveniently, as conventional JSON files in the brand dir: `locales/<code>.json` (whole locale) and/or `locales/<code>/<feature>.json` (modular — a locale split into per‑feature namespace files so a feature owns its slice). The build deep‑merges them all into `locales` (file wins per leaf). Either way the runtime is identical — the modular split is authoring‑only, not runtime tree‑shaking.
 
+### Several brands in one repo
+
+A brand repo keeps its brands under `brandings/<name>/`, one folder each, and may hold several — for
+example a current design and an older one the network can switch back to, or a theme that another
+brand's identity is composed with. The image builds bake every one of them
+(`scripts/bake-brand-repo.ts`), and the images do not choose among them: the deployment names the
+active brand with `OCELOT_ACTIVE_BRANDING=<brandId>` (or an admin, via `activeBranding`). Only a
+repo's sole brand is marked as the images' default. The static maintenance page gets one page per
+brand and serves the one `OCELOT_ACTIVE_BRANDING` names (`scripts/build-maintenance-sites.ts`);
+backend overlays (`middlewares/`, `data/`) are compiled in, so at most one brand may ship them. A
+single `branding/` folder is the older layout; it still builds, with a deprecation warning. The
+rules: `scripts/lib/brand-repo.ts`.
+
 ## Consuming the resolved config (backend / webapp)
 
 `branding` is a **named** export that resolves at _access_ time — read a value inside a function/component and it reflects the runtime‑injected brand (or the framework defaults when none is injected):

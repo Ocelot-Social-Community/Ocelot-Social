@@ -2,6 +2,51 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## Branding: a brand repo can hold several brands — `branding/` becomes `brandings/<name>/`
+
+A brand repo (the build context of `FROM backend-build` / `webapp-build` / `maintenance-build`) may
+now ship several brands, one folder each under `brandings/`. Every one of them is baked into the
+images as its own archive, so the network can switch between them (`activeBranding`) or compose
+them per bucket (`brandingComposition`, e.g. the theme of one brand with the identity of another)
+without a rebuild.
+
+```
+brandings/
+  acme/          ← brand.config.ts, package.json (brandId), assets/, …
+  acme-classic/
+```
+
+**Which brand a network renders is deployment configuration**, not part of the images: the
+`activeBranding` policy (admin), else `OCELOT_ACTIVE_BRANDING=<brandId>` on backend, webapp and
+maintenance. With a single brand nothing changes — it is still marked as the images' default and
+needs no configuration. **With several, set `OCELOT_ACTIVE_BRANDING`**, otherwise the network
+renders unbranded until an admin picks one (the build log says so).
+
+What cannot follow a runtime choice is solved without one:
+
+- **Maintenance page** — it is static, so the image holds one complete page per brand (under
+  `_brands/<brandId>/`, plus a vanilla root) and its entrypoint serves the one
+  `OCELOT_ACTIVE_BRANDING` names. The chart takes the value from `backend.env` unless
+  `maintenance.env` states its own, like `SUPPORT_EMAIL`. An admin's choice does not reach this
+  page — it is served exactly when the database is out of reach.
+- **Backend overlays** (`middlewares/`, `data/`) are compiled into the image, so at most one brand
+  of a repo may ship them; whichever does provides them.
+
+The build fails when two brands ship overlays, when two brands share a `brandId`, and when the repo
+has both `branding/` and `brandings/`.
+
+**Action** — none required: a single `branding/` folder is still built as before, with a
+deprecation warning in the build log. To move to the new layout:
+
+```bash
+mkdir brandings
+git mv branding brandings/<name>
+```
+
+The same layout works for a config dir under `deployment/configurations/<name>/` in a monorepo
+build (`--build-arg BRAND=<name>`). The maintenance dev server and `npm run brand -- <name>` in
+`maintenance/` show one brand: the only one, or the one `OCELOT_ACTIVE_BRANDING` names.
+
 ## imagor 1.5.4 → 1.9.12
 
 The chart's image proxy moves from `shumc/imagor:1.5.4` to `1.9.12` — the version the development
