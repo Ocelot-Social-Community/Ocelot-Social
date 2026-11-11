@@ -424,6 +424,15 @@
   /*  Literal, not derived: this used to be a build-time color.adjust() of --color-ribbon-event. */
   /*  Kept at its exact vanilla value — a color-mix() approximation would have shifted the colour. */
   --color-ribbon-event-shadow: #6001ff;
+  /*  What the ribbon (white text, 0.7rem) is painted with: the colour above in light; in dark darkened, */
+  /*  article and pinned 18%, event 14% (text 4.0:1 and 4.2:1 — below 4.5:1 on purpose, brighter was wanted). */
+  /*  The shadow corner goes darker than the surface it sits on: 40%, 40% and 35% of the colour. */
+  --color-ribbon-article-fill: light-dark(var(--color-ribbon-article), color-mix(in srgb, var(--color-ribbon-article), black 18%));
+  --color-ribbon-article-shadow-fill: light-dark(var(--color-ribbon-article-shadow), color-mix(in srgb, var(--color-ribbon-article), black 40%));
+  --color-ribbon-event-fill: light-dark(var(--color-ribbon-event), color-mix(in srgb, var(--color-ribbon-event), black 14%));
+  --color-ribbon-event-shadow-fill: light-dark(var(--color-ribbon-event-shadow), color-mix(in srgb, var(--color-ribbon-event), black 40%));
+  --color-ribbon-announcement-fill: light-dark(var(--color-ribbon-announcement), color-mix(in srgb, var(--color-ribbon-announcement), black 18%));
+  --color-ribbon-announcement-shadow-fill: light-dark(var(--color-ribbon-announcement-shadow), color-mix(in srgb, var(--color-ribbon-announcement), black 35%));
   /**
  * @tokens Chat Color
  */

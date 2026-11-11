@@ -68,7 +68,10 @@
        under 4.5:1 contrast with white text, which only matters here
        (Storybook/axe never see --color-ribbon-article, since it's a
        webapp-only token) — the real app is unaffected either way. */
-    background-color: var(--os-ribbon-bg, var(--color-ribbon-article, rgb(0, 119, 182)));
+    background-color: var(
+      --os-ribbon-bg,
+      var(--color-ribbon-article-fill, var(--color-ribbon-article, rgb(0, 119, 182)))
+    );
     font-size: var(--os-ribbon-font-size, 0.7rem);
     font-weight: var(--os-ribbon-font-weight, 600);
   }
@@ -85,31 +88,50 @@
     border-width: var(--os-ribbon-shadow-size, 3px) 4px var(--os-ribbon-shadow-size, 3px)
       var(--os-ribbon-shadow-size, 3px);
     border-style: solid;
-    border-color: var(--os-ribbon-bg-shadow, var(--color-ribbon-article-shadow, #0064a3))
+    border-color: var(
+        --os-ribbon-bg-shadow,
+        var(--color-ribbon-article-shadow-fill, var(--color-ribbon-article-shadow, #0064a3))
+      )
       transparent transparent
-      var(--os-ribbon-bg-shadow, var(--color-ribbon-article-shadow, #0064a3));
+      var(
+        --os-ribbon-bg-shadow,
+        var(--color-ribbon-article-shadow-fill, var(--color-ribbon-article-shadow, #0064a3))
+      );
   }
 
   .os-ribbon--event {
     /* Same reasoning as .os-ribbon's own background above — darker than the
        app's --color-ribbon-event so the Storybook/axe-only literal fallback
        clears 4.5:1 contrast with white text. */
-    background-color: var(--os-ribbon-event-bg, var(--color-ribbon-event, rgb(111, 66, 193)));
+    background-color: var(
+      --os-ribbon-event-bg,
+      var(--color-ribbon-event-fill, var(--color-ribbon-event, rgb(111, 66, 193)))
+    );
   }
 
   .os-ribbon--event::before {
-    border-color: var(--os-ribbon-event-bg-shadow, var(--color-ribbon-event-shadow, #6001ff))
+    border-color: var(
+        --os-ribbon-event-bg-shadow,
+        var(--color-ribbon-event-shadow-fill, var(--color-ribbon-event-shadow, #6001ff))
+      )
       transparent transparent
-      var(--os-ribbon-event-bg-shadow, var(--color-ribbon-event-shadow, #6001ff));
+      var(
+        --os-ribbon-event-bg-shadow,
+        var(--color-ribbon-event-shadow-fill, var(--color-ribbon-event-shadow, #6001ff))
+      );
   }
 
   /* The pinned ribbon reads --color-ribbon-announcement and its shadow, as the source app's did;
      both default to the shared warning color, so a brand overriding that re-themes this ribbon
-     too. The warning color itself is the fallback for an app that defines none of these. */
+     too. The -fill tokens are the dark-mode versions of them, the warning color itself the
+     fallback for an app that defines none of these. */
   .os-ribbon--pinned {
     background-color: var(
       --os-ribbon-pinned-bg,
-      var(--color-ribbon-announcement, var(--color-warning, rgb(230, 121, 25)))
+      var(
+        --color-ribbon-announcement-fill,
+        var(--color-ribbon-announcement, var(--color-warning, rgb(230, 121, 25)))
+      )
     );
   }
 
@@ -117,16 +139,22 @@
     border-color: var(
         --os-ribbon-pinned-bg-shadow,
         var(
-          --color-ribbon-announcement-shadow,
-          color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+          --color-ribbon-announcement-shadow-fill,
+          var(
+            --color-ribbon-announcement-shadow,
+            color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+          )
         )
       )
       transparent transparent
       var(
         --os-ribbon-pinned-bg-shadow,
         var(
-          --color-ribbon-announcement-shadow,
-          color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+          --color-ribbon-announcement-shadow-fill,
+          var(
+            --color-ribbon-announcement-shadow,
+            color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+          )
         )
       );
   }

@@ -164,11 +164,23 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'color-primary-inverse': 'rgb(241, 253, 244)',
   'color-primary-light': 'rgb(96, 214, 98)',
   'color-ribbon-announcement': 'var(--background-color-warning)',
+  'color-ribbon-announcement-fill':
+    'light-dark(var(--color-ribbon-announcement), color-mix(in srgb, var(--color-ribbon-announcement), black 18%))',
   'color-ribbon-announcement-shadow': 'color-mix(in srgb, var(--color-warning), black 20%)',
+  'color-ribbon-announcement-shadow-fill':
+    'light-dark(var(--color-ribbon-announcement-shadow), color-mix(in srgb, var(--color-ribbon-announcement), black 35%))',
   'color-ribbon-article': 'rgb(10, 161, 255)',
+  'color-ribbon-article-fill':
+    'light-dark(var(--color-ribbon-article), color-mix(in srgb, var(--color-ribbon-article), black 18%))',
   'color-ribbon-article-shadow': '#0064a3',
+  'color-ribbon-article-shadow-fill':
+    'light-dark(var(--color-ribbon-article-shadow), color-mix(in srgb, var(--color-ribbon-article), black 40%))',
   'color-ribbon-event': 'rgb(160, 103, 255)',
+  'color-ribbon-event-fill':
+    'light-dark(var(--color-ribbon-event), color-mix(in srgb, var(--color-ribbon-event), black 14%))',
   'color-ribbon-event-shadow': '#6001ff',
+  'color-ribbon-event-shadow-fill':
+    'light-dark(var(--color-ribbon-event-shadow), color-mix(in srgb, var(--color-ribbon-event), black 40%))',
   'color-secondary': 'rgb(0, 142, 230)',
   'color-secondary-active': 'color-mix(in srgb, var(--color-secondary), black 15%)',
   'color-secondary-contrast': 'var(--text-color-secondary-inverse)',
