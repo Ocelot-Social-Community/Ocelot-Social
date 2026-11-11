@@ -22,7 +22,6 @@ const brandOf = (id: string): RepoBrand => ({ name: id, dir: `/repo/brandings/${
 const repoOf = (...ids: string[]): BrandRepo => {
   const brands = ids.map(brandOf)
   return {
-    layout: ids.length ? 'brandings' : 'none',
     brands,
     soleBrand: brands.length === 1 ? brands[0] : null,
     overlayDir: null,

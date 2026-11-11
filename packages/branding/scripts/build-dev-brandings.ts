@@ -4,9 +4,9 @@
 //
 //   node scripts/build-dev-brandings.ts
 //
-// "Compatible" = a brand with a brand.config.(ts|mjs|js) (the new typed format). A config dir is a
-// brand repo: every brandings/<name>/ of it is built, or its deprecated single branding/ (see
-// lib/brand-repo.ts). Config dirs without one (old format, constants/*.js only) are skipped and listed,
+// "Compatible" = a brand with a brand.config.(ts|mjs) (the new typed format). A config dir is a
+// brand repo: every brandings/<name>/ of it is built (see lib/brand-repo.ts); one still in the former
+// single branding/ layout is listed as skipped, with the migration steps. Config dirs without one (old format, constants/*.js only) are skipped and listed,
 // so it's obvious what was left out.
 //
 // NOTHING has to be configured to pick the results up: `../deployment/configurations` is one of the
@@ -52,7 +52,7 @@ for (const entry of readdirSync(configurationsRoot, { withFileTypes: true })) {
   if (!entry.isDirectory()) {
     continue
   }
-  // A config dir is a brand repo: brandings/<name>/ (several brands) or the deprecated branding/.
+  // A config dir is a brand repo: brandings/<name>/, one folder per brand.
   let brandRepo
   try {
     brandRepo = resolveBrandRepo(join(configurationsRoot, entry.name))

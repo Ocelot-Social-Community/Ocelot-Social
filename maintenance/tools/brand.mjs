@@ -66,8 +66,7 @@ function reset() {
 /**
  * A brand argument as a directory. A path to a brand dir is taken as is; a bare name is a brand repo
  * under deployment/configurations and resolves to the brand $OCELOT_ACTIVE_BRANDING names, else to
- * its only brand (brandings/<name>/, or the deprecated single branding/) — the brand the running
- * maintenance image would serve.
+ * its only brand under brandings/<name>/ — the brand the running maintenance image would serve.
  */
 async function resolveBrandDir(arg) {
   const hasConfig = (dir) =>

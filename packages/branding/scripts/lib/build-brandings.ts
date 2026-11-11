@@ -173,8 +173,10 @@ export function brandVersion(brandDir: string): string | null {
   return readBrandPkg(brandDir)?.version ?? null
 }
 
+// `.ts` (type-checked against the schema) or `.mjs` (plain ESM, no TypeScript). No `.js`: whether that
+// loads as ESM or CommonJS depends on the brand repo's package.json, and no consumer accepted it anyway.
 export function findConfig(brandDir: string): string | null {
-  for (const name of ['brand.config.ts', 'brand.config.mjs', 'brand.config.js']) {
+  for (const name of ['brand.config.ts', 'brand.config.mjs']) {
     const p = join(brandDir, name)
     if (existsSync(p)) {
       return p
@@ -842,7 +844,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   const warnings: string[] = []
   const configPath = findConfig(dir)
   if (!configPath) {
-    throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
+    throw new Error(`no brand.config.(ts|mjs) in ${dir}`)
   }
   const config = await loadConfig(configPath)
   // Brands may author i18n overrides as conventional locales/<code>.json files (in addition to, or

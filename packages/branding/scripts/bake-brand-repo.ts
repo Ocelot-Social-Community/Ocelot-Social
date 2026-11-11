@@ -5,16 +5,17 @@
 //                                          [--brand-to <dir> [--select <id>]]
 //
 //   --archives <dir>     publish every brand into <dir> (`<id>.tar.gz` + versioned); a SOLE brand also
-//                        gets the DEFAULT marker, so a single-brand image needs no configuration
-//   --overlays-to <dir>  copy the backend overlays (middlewares/, data/) of the one brand that ships
-//                        them to <dir>; left absent when none does
+//                        gets the DEFAULT marker, so a single-brand image needs no configuration. With
+//                        several, a marker left in <dir> by an earlier bake is removed.
+//   --overlays-to <dir>  copy the repo's overlays/ (middlewares/, data/) to <dir>; left absent when it
+//                        ships none
 //   --brand-to <dir>     copy ONE brand's directory to <dir>: the one --select names (brand id or
 //                        directory name; the Dockerfiles pass $OCELOT_ACTIVE_BRANDING), else the sole
 //                        brand; left absent when that is ambiguous. An unknown --select fails.
 //
 // No brand at all is not an error: the image stays vanilla, as before.
-import { cpSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { cpSync, existsSync, rmSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 
 import {
   ACTIVE_BRANDING_ENV,
@@ -71,6 +72,14 @@ if (archivesDir) {
     }
     console.log(
       `[branding] baked ${id}${version ? ` v${version}` : ''}${isDefault ? ' (default)' : ''} → ${resolve(archivesDir)}`,
+    )
+  }
+  // A marker from an earlier single-brand bake into the same directory would keep naming that brand.
+  const staleMarker = join(archivesDir, 'DEFAULT')
+  if (!repo.soleBrand && existsSync(staleMarker)) {
+    rmSync(staleMarker)
+    console.log(
+      `[branding] removed the DEFAULT marker of an earlier bake from ${resolve(archivesDir)}`,
     )
   }
   if (repo.brands.length > 1) {

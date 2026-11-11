@@ -1,24 +1,21 @@
 // Resolve a BRAND REPO — the build context of a downstream brand build (`FROM backend-build` / `FROM
 // webapp-build` / `FROM maintenance-build`), or a config dir under deployment/configurations/<name> —
-// into the brands it holds.
+// into the brands it holds and the backend overlays it ships.
 //
-// Two layouts:
-//   • brandings/<name>/   one directory per brand; a repo may hold several. Each one with a
-//                         brand.config.* becomes its own archive, so the live network can switch between
-//                         them (activeBranding) or compose them per bucket (brandingComposition).
-//   • branding/           the original single-brand layout. Still built, with a deprecation warning.
-// Both at once is an error: the repo would hold two answers to which brand it is.
+//   brandings/<name>/   one directory per brand; a repo may hold several. Each one with a brand.config.*
+//                       becomes its own archive, so the live network can switch between them
+//                       (activeBranding) or compose them per bucket (brandingComposition).
+//   overlays/           code and seed data compiled into the BACKEND image, independent of any brand:
+//                       middlewares/ → src/middleware/branding/, data/ → src/db/data/.
+//
+// The former single-brand layout, branding/, is no longer read: a repo that still has it fails with
+// the migration steps instead of building something else than its author expects.
 //
 // There is no build-time "default brand". Which brand a network renders is deployment configuration —
 // the activeBranding policy, else $OCELOT_ACTIVE_BRANDING — so one set of images serves every brand of
 // the repo. The one exception is a repo with a SOLE brand: that one is marked as the image's fallback,
-// as before, so a single-brand deployment needs no configuration at all.
-//
-// What cannot follow a runtime choice is solved without one:
-//   • the static maintenance page is generated once per brand and picked when its container starts
-//     (see build-maintenance-sites.ts);
-//   • the backend overlays (middlewares/, data/) are compiled into the image, so at most ONE brand may
-//     ship them — two would need a choice the image cannot make.
+// so a single-brand deployment needs no configuration at all. The static maintenance page, which
+// cannot ask at runtime, gets one page per brand (see maintenance-sites.ts).
 import { cpSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
@@ -26,29 +23,25 @@ import { brandId, findConfig } from './build-brandings.ts'
 
 export const LEGACY_DIR = 'branding'
 export const BRANDINGS_DIR = 'brandings'
+export const OVERLAYS_DIR = 'overlays'
 /** The env var a deployment names its brand with; read by the backend, the webapp and the maintenance page. */
 export const ACTIVE_BRANDING_ENV = 'OCELOT_ACTIVE_BRANDING'
-/** Backend overlay folders: code and seed data compiled into the image, so only one brand can have them. */
+/** What overlays/ may hold: code and seed data compiled into the backend image. */
 export const OVERLAY_DIRS = ['middlewares', 'data']
 
 export interface RepoBrand {
-  /** Directory name (`branding` for the legacy layout). */
+  /** Directory name under brandings/. */
   name: string
   dir: string
   id: string
 }
 
 export interface BrandRepo {
-  layout: 'brandings' | 'legacy' | 'none'
   /** Every brand with a brand.config.*, sorted by directory name. */
   brands: RepoBrand[]
   /** The repo's only brand, or null when it holds none or several — the image's fallback brand. */
   soleBrand: RepoBrand | null
-  /**
-   * The folder whose middlewares/ and data/ are compiled into the backend image: the one brand that
-   * ships them, or a legacy `branding/` even without a brand.config — old-format brands still keep
-   * them there. Null when there is none.
-   */
+  /** The repo's overlays/ when it ships any middlewares/ or data/, else null. */
   overlayDir: string | null
   warnings: string[]
 }
@@ -65,53 +58,43 @@ const hasOverlayFiles = (dir: string): boolean =>
     (sub) => isDir(join(dir, sub)) && readdirSync(join(dir, sub)).some((f) => f !== '.gitkeep'),
   )
 
-const names = (brands: RepoBrand[]): string => brands.map((b) => b.name).join(', ')
+const moveOverlays = `move its ${OVERLAY_DIRS.join('/ and ')}/ to ${OVERLAYS_DIR}/`
 
 export function resolveBrandRepo(root: string): BrandRepo {
   const repo = resolve(root)
-  const legacyDir = join(repo, LEGACY_DIR)
   const multiDir = join(repo, BRANDINGS_DIR)
-  const hasLegacy = hasContent(legacyDir)
-  const hasMulti = hasContent(multiDir)
+  const overlaysDir = join(repo, OVERLAYS_DIR)
   const warnings: string[] = []
 
-  if (hasLegacy && hasMulti) {
+  if (hasContent(join(repo, LEGACY_DIR))) {
     throw new Error(
-      `[brand-repo] ${repo} has both ${LEGACY_DIR}/ and ${BRANDINGS_DIR}/ — move ${LEGACY_DIR}/ to ${BRANDINGS_DIR}/<name>/`,
+      `[brand-repo] ${LEGACY_DIR}/ is no longer supported — ${moveOverlays} (if any), then move ${LEGACY_DIR}/ to ${BRANDINGS_DIR}/<name>/`,
     )
-  }
-
-  if (hasLegacy) {
-    warnings.push(
-      `[brand-repo] ${LEGACY_DIR}/ is deprecated — move it to ${BRANDINGS_DIR}/<name>/, which can hold several brands`,
-    )
-    const brands = findConfig(legacyDir)
-      ? [{ name: LEGACY_DIR, dir: legacyDir, id: brandId(legacyDir) }]
-      : []
-    return {
-      layout: 'legacy',
-      brands,
-      soleBrand: brands[0] ?? null,
-      overlayDir: legacyDir,
-      warnings,
-    }
-  }
-
-  if (!hasMulti) {
-    return { layout: 'none', brands: [], soleBrand: null, overlayDir: null, warnings }
   }
 
   const brands: RepoBrand[] = []
-  for (const name of readdirSync(multiDir).sort()) {
+  const misplaced: string[] = []
+  const names = hasContent(multiDir) ? readdirSync(multiDir).sort() : []
+  for (const name of names) {
     const dir = join(multiDir, name)
     if (!isDir(dir)) {
       continue
     }
+    // Overlays inside a brand would be compiled in whichever brand is active — they are the repo's,
+    // not the brand's. Failing here also catches a migrated branding/ that kept them.
+    if (hasOverlayFiles(dir)) {
+      misplaced.push(name)
+    }
     if (findConfig(dir)) {
       brands.push({ name, dir, id: brandId(dir) })
     } else {
-      warnings.push(`[brand-repo] ${BRANDINGS_DIR}/${name}/ has no brand.config.* — skipped`)
+      warnings.push(`[brand-repo] ${BRANDINGS_DIR}/${name}/ has no brand.config.(ts|mjs) — skipped`)
     }
+  }
+  if (misplaced.length) {
+    throw new Error(
+      `[brand-repo] ${misplaced.map((n) => `${BRANDINGS_DIR}/${n}/`).join(', ')} ship ${OVERLAY_DIRS.join('/ or ')}/ — those belong to the repo, not to a brand: ${moveOverlays}`,
+    )
   }
 
   const seen = new Map<string, string>()
@@ -124,22 +107,24 @@ export function resolveBrandRepo(root: string): BrandRepo {
     }
     seen.set(brand.id, brand.name)
   }
-
-  const withOverlays = brands.filter((brand) => hasOverlayFiles(brand.dir))
-  if (withOverlays.length > 1) {
-    throw new Error(
-      `[brand-repo] several brands ship ${OVERLAY_DIRS.join('/ or ')}/ (${names(withOverlays)}) — those are compiled into the backend image, so only one brand of a repo may have them`,
-    )
+  if (names.length && !brands.length) {
+    warnings.push(`[brand-repo] ${BRANDINGS_DIR}/ holds no brand with a brand.config — vanilla`)
   }
-  if (!brands.length) {
-    warnings.push(`[brand-repo] ${BRANDINGS_DIR}/ holds no brand with a brand.config.* — vanilla`)
+
+  if (hasContent(overlaysDir)) {
+    for (const entry of readdirSync(overlaysDir).sort()) {
+      if (!OVERLAY_DIRS.includes(entry) && entry !== '.gitkeep') {
+        warnings.push(
+          `[brand-repo] ${OVERLAYS_DIR}/${entry} is not one of ${OVERLAY_DIRS.map((d) => `${d}/`).join(', ')} — ignored`,
+        )
+      }
+    }
   }
 
   return {
-    layout: 'brandings',
     brands,
     soleBrand: brands.length === 1 ? brands[0] : null,
-    overlayDir: withOverlays[0]?.dir ?? null,
+    overlayDir: hasOverlayFiles(overlaysDir) ? overlaysDir : null,
     warnings,
   }
 }
@@ -163,7 +148,7 @@ export function selectBrand(repo: BrandRepo, wanted?: string): RepoBrand | null 
   return brand
 }
 
-/** Copy the repo's overlay folder (see BrandRepo.overlayDir) to `target`. False when there is none. */
+/** Copy the repo's overlays (see BrandRepo.overlayDir) to `target`. False when there are none. */
 export function copyOverlays(repo: BrandRepo, target: string): boolean {
   if (!repo.overlayDir) {
     return false

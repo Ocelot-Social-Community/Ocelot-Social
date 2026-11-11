@@ -44,50 +44,35 @@ const brand = (path: string, id: string): Record<string, string> => ({
 describe('resolveBrandRepo', () => {
   test('an empty repo is vanilla, without warnings', () => {
     const r = resolveBrandRepo(repo())
-    assert.equal(r.layout, 'none')
     assert.deepEqual(r.brands, [])
     assert.equal(r.soleBrand, null)
     assert.equal(r.overlayDir, null)
     assert.deepEqual(r.warnings, [])
   })
 
-  test('empty branding/ and brandings/ (what ONBUILD COPY leaves behind) count as absent', () => {
+  test('empty brandings/ and overlays/ (what ONBUILD COPY leaves behind) count as absent', () => {
     const root = repo()
-    mkdirSync(join(root, 'branding'))
-    mkdirSync(join(root, 'brandings'))
-    assert.equal(resolveBrandRepo(root).layout, 'none')
-  })
-
-  test('a legacy branding/ is the sole brand and the overlay folder, with a deprecation warning', () => {
-    const root = repo(brand('branding', 'acme'))
+    for (const dir of ['branding', 'brandings', 'overlays']) {
+      mkdirSync(join(root, dir))
+    }
     const r = resolveBrandRepo(root)
-    assert.equal(r.layout, 'legacy')
-    assert.deepEqual(r.brands, [{ name: 'branding', dir: join(root, 'branding'), id: 'acme' }])
-    assert.equal(r.soleBrand, r.brands[0])
-    assert.equal(r.overlayDir, join(root, 'branding'))
-    assert.match(r.warnings[0], /branding\/ is deprecated/)
-  })
-
-  test('a legacy branding/ without brand.config still provides the backend overlays', () => {
-    const root = repo({ 'branding/middlewares/x.ts': '' })
-    const r = resolveBrandRepo(root)
-    assert.equal(r.layout, 'legacy')
     assert.deepEqual(r.brands, [])
-    assert.equal(r.soleBrand, null)
-    assert.equal(r.overlayDir, join(root, 'branding'))
+    assert.deepEqual(r.warnings, [])
   })
 
-  test('branding/ and brandings/ together is an error', () => {
-    const root = repo({ ...brand('branding', 'a'), ...brand('brandings/b', 'b') })
-    assert.throws(() => resolveBrandRepo(root), /both branding\/ and brandings\//)
+  test('a branding/ folder fails with the migration steps', () => {
+    assert.throws(
+      () => resolveBrandRepo(repo(brand('branding', 'acme'))),
+      /branding\/ is no longer supported — move its middlewares\/ and data\/ to overlays\/ \(if any\), then move branding\/ to brandings\/<name>\//,
+    )
+    assert.throws(() => resolveBrandRepo(repo({ 'branding/data/d.ts': '' })), /no longer supported/)
   })
 
   test('a single brand in brandings/ is the sole brand', () => {
     const root = repo(brand('brandings/acme', 'acme'))
     const r = resolveBrandRepo(root)
-    assert.equal(r.layout, 'brandings')
-    assert.equal(r.soleBrand?.name, 'acme')
-    assert.equal(r.overlayDir, null)
+    assert.deepEqual(r.brands, [{ name: 'acme', dir: join(root, 'brandings/acme'), id: 'acme' }])
+    assert.equal(r.soleBrand, r.brands[0])
     assert.deepEqual(r.warnings, [])
   })
 
@@ -113,6 +98,11 @@ describe('resolveBrandRepo', () => {
     assert.equal(resolveBrandRepo(root).soleBrand?.name, 'a')
   })
 
+  test('a brand.config.js is not a brand config', () => {
+    const root = repo({ 'brandings/a/brand.config.js': CONFIG })
+    assert.deepEqual(resolveBrandRepo(root).brands, [])
+  })
+
   test('two brands with the same id fail', () => {
     const root = repo({ ...brand('brandings/a', 'same'), ...brand('brandings/b', 'same') })
     assert.throws(() => resolveBrandRepo(root), /share the brand id "same"/)
@@ -121,35 +111,51 @@ describe('resolveBrandRepo', () => {
   test('a directory without brand.config is skipped with a warning; no brand at all is vanilla', () => {
     const root = repo({ 'brandings/draft/README.md': '' })
     const r = resolveBrandRepo(root)
-    assert.equal(r.layout, 'brandings')
     assert.deepEqual(r.brands, [])
     assert.equal(r.soleBrand, null)
-    assert.equal(r.overlayDir, null)
     assert.match(r.warnings[0], /brandings\/draft\/ has no brand.config/)
     assert.match(r.warnings[1], /holds no brand/)
   })
 
-  test('the one brand shipping overlays provides them, whichever it is; a lone .gitkeep is none', () => {
-    const root = repo({
-      ...brand('brandings/main', 'main'),
-      ...brand('brandings/side', 'side'),
-      'brandings/main/middlewares/.gitkeep': '',
-      'brandings/side/data/seed.ts': '',
-    })
-    assert.equal(resolveBrandRepo(root).overlayDir, join(root, 'brandings/side'))
-  })
-
-  test('two brands shipping overlays fail: the image can compile in only one', () => {
+  test('overlays/ provides the backend overlays, independent of the brands', () => {
     const root = repo({
       ...brand('brandings/a', 'a'),
       ...brand('brandings/b', 'b'),
-      'brandings/a/middlewares/m.ts': '',
-      'brandings/b/data/d.ts': '',
+      'overlays/middlewares/m.ts': '',
+    })
+    assert.equal(resolveBrandRepo(root).overlayDir, join(root, 'overlays'))
+    const withoutBrands = repo({ 'overlays/data/d.ts': '' })
+    assert.equal(resolveBrandRepo(withoutBrands).overlayDir, join(withoutBrands, 'overlays'))
+  })
+
+  test('overlays/ holding only .gitkeep files ships nothing', () => {
+    const root = repo({ 'overlays/middlewares/.gitkeep': '', 'overlays/data/.gitkeep': '' })
+    assert.equal(resolveBrandRepo(root).overlayDir, null)
+  })
+
+  test('anything in overlays/ besides middlewares/ and data/ is reported as ignored', () => {
+    const root = repo({ 'overlays/public/x.svg': '', 'overlays/.gitkeep': '' })
+    const r = resolveBrandRepo(root)
+    assert.equal(r.warnings.length, 1)
+    assert.match(r.warnings[0], /overlays\/public is not one of middlewares\/, data\/ — ignored/)
+  })
+
+  test('overlays inside a brand fail and point to overlays/ — a lone .gitkeep is none', () => {
+    const root = repo({
+      ...brand('brandings/a', 'a'),
+      ...brand('brandings/b', 'b'),
+      'brandings/a/middlewares/.gitkeep': '',
+      'brandings/b/data/seed.ts': '',
     })
     assert.throws(
       () => resolveBrandRepo(root),
-      /several brands ship middlewares\/ or data\/ \(a, b\)/,
+      /^Error: \[brand-repo\] brandings\/b\/ ship middlewares\/ or data\/ — .*move its middlewares\/ and data\/ to overlays\//,
     )
+  })
+
+  test('a migrated branding/ without brand.config that kept its overlays fails instead of losing them', () => {
+    const root = repo({ 'brandings/old/middlewares/m.ts': '' })
+    assert.throws(() => resolveBrandRepo(root), /brandings\/old\/ ship middlewares\/ or data\//)
   })
 })
 
@@ -178,16 +184,20 @@ describe('selectBrand', () => {
 })
 
 describe('copyOverlays', () => {
-  test('copies the overlay folders of the brand that ships them, nothing else', () => {
-    const root = repo({ ...brand('brandings/acme', 'acme'), 'brandings/acme/data/d.ts': 'x' })
+  test('copies the overlay folders of overlays/, nothing else', () => {
+    const root = repo({
+      ...brand('brandings/acme', 'acme'),
+      'overlays/data/d.ts': 'x',
+      'overlays/public/p.svg': '',
+    })
     const target = join(repo(), 'brand')
     assert.equal(copyOverlays(resolveBrandRepo(root), target), true)
     assert.equal(readFileSync(join(target, 'data/d.ts'), 'utf8'), 'x')
     assert.equal(existsSync(join(target, 'middlewares')), false)
-    assert.equal(existsSync(join(target, 'brand.config.mjs')), false)
+    assert.equal(existsSync(join(target, 'public')), false)
   })
 
-  test('copies nothing when no brand ships overlays', () => {
+  test('copies nothing when the repo ships no overlays', () => {
     const target = join(repo(), 'brand')
     assert.equal(copyOverlays(resolveBrandRepo(repo(brand('brandings/a', 'a'))), target), false)
     assert.equal(existsSync(target), false)
@@ -221,7 +231,7 @@ describe('bake-brand-repo CLI', () => {
   })
 
   test('copies the overlays to --overlays-to', () => {
-    const root = repo({ ...brand('brandings/acme', 'acme'), 'brandings/acme/data/d.ts': 'x' })
+    const root = repo({ ...brand('brandings/acme', 'acme'), 'overlays/data/d.ts': 'x' })
     const target = join(repo(), 'brand')
     assert.match(run([root, '--overlays-to', target]), /backend overlays from/)
     assert.ok(existsSync(join(target, 'data/d.ts')))
@@ -255,13 +265,24 @@ describe('bake-brand-repo CLI', () => {
     assert.match(result.stderr, /^\[brand-repo\] no brand "nope"/)
   })
 
-  test('a legacy branding/ is baked as the default, with the deprecation warning on stderr', () => {
-    const root = repo(brand('branding', 'acme'))
+  test('a multi-brand bake removes the DEFAULT marker an earlier single-brand bake left behind', () => {
+    const out = join(repo(), 'out')
+    run([repo(brand('brandings/acme', 'acme')), '--archives', out])
+    assert.ok(existsSync(join(out, 'DEFAULT')))
+    assert.match(
+      run([several(), '--archives', out]),
+      /removed the DEFAULT marker of an earlier bake/,
+    )
+    assert.equal(existsSync(join(out, 'DEFAULT')), false)
+  })
+
+  test('layout warnings go to stderr, the bake goes on', () => {
+    const root = repo({ ...brand('brandings/acme', 'acme'), 'brandings/draft/README.md': '' })
     const out = join(repo(), 'out')
     const result = spawnSync(process.execPath, [cli, root, '--archives', out], { encoding: 'utf8' })
     assert.equal(result.status, 0)
-    assert.match(result.stderr, /branding\/ is deprecated/)
-    assert.equal(readFileSync(join(out, 'DEFAULT'), 'utf8').trim(), 'acme')
+    assert.match(result.stderr, /brandings\/draft\/ has no brand.config/)
+    assert.ok(existsSync(join(out, 'acme.tar.gz')))
   })
 
   test('a vanilla repo bakes nothing and says so', () => {
@@ -271,10 +292,10 @@ describe('bake-brand-repo CLI', () => {
   })
 
   test('a layout error fails with the rule that was broken, without a stack trace', () => {
-    const root = repo({ ...brand('branding', 'a'), ...brand('brandings/b', 'b') })
+    const root = repo(brand('branding', 'a'))
     const result = spawnSync(process.execPath, [cli, root], { encoding: 'utf8' })
     assert.equal(result.status, 1)
-    assert.match(result.stderr, /^\[brand-repo\] .*both branding\/ and brandings\//)
+    assert.match(result.stderr, /^\[brand-repo\] branding\/ is no longer supported/)
     assert.doesNotMatch(result.stderr, /\bat resolveBrandRepo\b/)
   })
 

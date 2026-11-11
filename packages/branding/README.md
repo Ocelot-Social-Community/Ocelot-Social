@@ -46,9 +46,10 @@ brand's identity is composed with. The image builds bake every one of them
 active brand with `OCELOT_ACTIVE_BRANDING=<brandId>` (or an admin, via `activeBranding`). Only a
 repo's sole brand is marked as the images' default. The static maintenance page gets one page per
 brand and serves the one `OCELOT_ACTIVE_BRANDING` names (`scripts/build-maintenance-sites.ts`);
-backend overlays (`middlewares/`, `data/`) are compiled in, so at most one brand may ship them. A
-single `branding/` folder is the older layout; it still builds, with a deprecation warning. The
-rules: `scripts/lib/brand-repo.ts`.
+backend overlays (`middlewares/`, `data/`) are compiled in, so they belong to the repo, not to a
+brand: they live in `overlays/`, and a brand folder that ships them fails the build. The former
+single `branding/` folder is no longer built; a repo that still has it fails with the migration
+steps. The rules: `scripts/lib/brand-repo.ts`.
 
 ## Consuming the resolved config (backend / webapp)
 

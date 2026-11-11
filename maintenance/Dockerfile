@@ -62,7 +62,7 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
     if [ -n "$BRAND" ] && [ -d "/brands/$BRAND" ]; then \
       node /brand-tools/scripts/bake-brand-repo.ts "/brands/$BRAND" \
         --brand-to /tmp/brand --select "$OCELOT_ACTIVE_BRANDING" && \
-      if [ -f /tmp/brand/brand.config.ts ] || [ -f /tmp/brand/brand.config.mjs ]; then \
+      if [ -d /tmp/brand ]; then \
         node /brand-tools/scripts/build-maintenance-branding.ts /tmp/brand /app && \
         echo "[maintenance] baked brand: $BRAND"; \
       fi; \
@@ -116,7 +116,8 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
 # BRAND arg). Only ONBUILD triggers re-run downstream, so the generation must be ONBUILD:
 # nuxt.config.ts decides at BUILD time which overlays exist, so generating before the bake would freeze
 # the vanilla theme into the static output. The `[g]`/`[s]` globs make both folders optional, so
-# ocelot's own build (Path 1, context = monorepo root, neither folder) adds nothing.
+# ocelot's own build (Path 1, context = monorepo root, neither folder) adds nothing. A former single
+# branding/ is copied only so the generation fails with the migration steps.
 ONBUILD COPY brandin[g]/ /brand-repo/branding/
 ONBUILD COPY branding[s]/ /brand-repo/brandings/
 # The support address shown on the page: deployment config, not branding (backend and webapp read

@@ -98,11 +98,13 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
 # Branding from a brand repo (`FROM backend-build`, context = brand repo root). The `[g]`/`[s]` globs
-# make both folders optional, so the SAME image serves ocelot's own vanilla self-build too (`FROM build
-# AS test`, context = repo root → neither folder → the committed src/ defaults stay). Layouts:
+# make every folder optional, so the SAME image serves ocelot's own vanilla self-build too (`FROM build
+# AS test`, context = repo root → no such folder → the committed src/ defaults stay). Layout:
 # packages/branding/scripts/lib/brand-repo.ts.
 #   • brandings/<name>/  one folder per brand, several allowed
-#   • branding/          the old single-brand layout, still built with a deprecation warning
+#   • overlays/          middlewares/ + data/, compiled into this image — the repo's, not a brand's
+#   • branding/          the former single-brand layout: copied only so the bake can fail with the
+#                        migration steps instead of silently building a vanilla image
 #
 # Runtime branding: EVERY brand of the repo is baked as an archive into ./deployment/configurations —
 # the discovery root, named exactly as in a repo checkout so the running code finds it without being
@@ -116,11 +118,12 @@ COPY backend/ .
 # Flat inside the root (`<id>.tar.gz` + `<id>-<version>.tar.gz` [+ DEFAULT]), not nested per brand:
 # discovery is recursive either way, and the DEFAULT marker is read from the root itself.
 #
-# Per-brand overlays (code/seed data not yet ported to the runtime archive) are compiled into the image,
-# so at most ONE brand of a repo may ship them (or a legacy branding/, with or without a brand.config);
-# the bake fails on two. It copies that brand's middlewares/ + data/ to /brand, taken from there.
+# Overlays (code/seed data not yet ported to the runtime archive) are compiled into the image, so they
+# cannot follow the active brand: they live in the repo's overlays/, next to the brands, and a brand
+# folder that ships them fails the bake. It copies overlays/middlewares/ + data/ to /brand.
 ONBUILD COPY brandin[g]/ /brand-repo/branding/
 ONBUILD COPY branding[s]/ /brand-repo/brandings/
+ONBUILD COPY overlay[s]/ /brand-repo/overlays/
 ONBUILD RUN node /brand-tools/scripts/bake-brand-repo.ts /brand-repo \
       --archives ./deployment/configurations --overlays-to /brand && \
     if [ -d /brand/middlewares ]; then cp -r /brand/middlewares/. src/middleware/branding/; fi && \

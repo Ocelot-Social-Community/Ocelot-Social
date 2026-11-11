@@ -146,11 +146,11 @@ RUN --mount=type=bind,source=deployment/configurations,target=/brands \
       echo "[branding] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
 # Path 2 — BRAND REPO build (`FROM webapp-build`, context = brand repo root): same bake, from the
-# repo's own brandings/<name>/ (or the deprecated single ./branding/) — every brand; only a SOLE brand
-# is marked as the default, otherwise $OCELOT_ACTIVE_BRANDING names it (see
-# packages/branding/scripts/lib/brand-repo.ts). ONBUILD because only ONBUILD re-runs in the
-# child build. The `[g]`/`[s]` globs make the copies optional, so ocelot's own vanilla self-build skips
-# them — the same idiom the backend uses.
+# repo's own brandings/<name>/ — every brand; only a SOLE brand is marked as the default, otherwise
+# $OCELOT_ACTIVE_BRANDING names it (see packages/branding/scripts/lib/brand-repo.ts). A former single
+# ./branding/ is copied only so the bake fails with the migration steps. ONBUILD because only ONBUILD
+# re-runs in the child build. The `[g]`/`[s]` globs make the copies optional, so ocelot's own vanilla
+# self-build skips them — the same idiom the backend uses.
 #
 # This is what keeps a brand image branded on its own: without it the webapp would start vanilla and
 # only become branded once the backend answered, which is exactly the flash a down backend turns
