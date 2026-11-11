@@ -384,9 +384,10 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --color-donation-bar: var(--color-primary);
+  --color-donation-bar: var(--color-primary-fill);
 
-  --color-donation-bar-light: var(--color-primary-light);
+  /* The stripe next to the fill: lighter than it in both themes (in dark the plain primary, the fill is darker). */
+  --color-donation-bar-light: light-dark(var(--color-primary-light), var(--color-primary));
   /* The label lies half on the filled green, half on the grey: in the dark theme its light text needs a
      dark halo to read on the green. None in the light theme, where the text is dark. */
   --donation-bar-label-shadow:
