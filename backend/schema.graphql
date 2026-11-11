@@ -133,10 +133,6 @@ union ChatTarget = Group | User
 
 """A comment written by a user in reply to a post."""
 type Comment {
-  """
-  Former ActivityPub activity id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
-  """
-  activityId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   author: User
 
   """Comment body as rich text (HTML)."""
@@ -1711,10 +1707,6 @@ type PolicyValueChanged {
 A contribution — an article or event — written by a user, optionally within a group.
 """
 type Post {
-  """
-  Former ActivityPub activity id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
-  """
-  activityId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
   author: User
   categories: [Category]
 
@@ -1786,11 +1778,6 @@ type Post {
 
   """Precise longitude of the event's map pin (Event posts), see lat."""
   lng: Float
-
-  """
-  Former ActivityPub object id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
-  """
-  objectId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
 
   """Number of users observing this post."""
   observingUsersCount: Int!
@@ -2526,11 +2513,6 @@ type User {
   """Category slugs the user has activated as their content filter."""
   activeCategories: [String]
 
-  """
-  Former ActivityPub actor id. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
-  """
-  actorId: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
-
   """Whether the user permits embedded iframes in content they view."""
   allowEmbedIframes: Boolean
   avatar: Image
@@ -2634,11 +2616,6 @@ type User {
   Whether the current user's role grants strictly more authority than this user's — the act-on hierarchy that disableUser and DeleteUser enforce on top of user.disable / user.delete.any. Always false for oneself.
   """
   outrankedByCurrentUser: Boolean!
-
-  """
-  Former ActivityPub public key. Nothing has written it since ActivityPub was removed; older nodes may still carry a value.
-  """
-  publicKey: String @deprecated(reason: "ActivityPub was removed; this field will be removed in a later release.")
 
   """The invite code this user redeemed on registration, if any."""
   redeemedInviteCode: InviteCode
