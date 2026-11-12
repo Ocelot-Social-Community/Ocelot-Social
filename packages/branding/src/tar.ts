@@ -12,8 +12,8 @@ import { createTar, parseTar } from 'nanotar'
 
 // Sanity ceiling on the DECOMPRESSED size of an archive. A brand archive is normally tens of KB to a
 // few MB (logos + fonts + html); this caps a gzip-bomb's blowup (a tiny .gz that inflates to GBs) so a
-// hostile/corrupt archive throws instead of OOMing the process — relevant once archives can be uploaded
-// (docu/branding-buckets-konzept.md §12), harmless for the trusted baked/dev archives of today.
+// hostile/corrupt archive throws instead of OOMing the process — relevant once archives can be uploaded,
+// harmless for the trusted baked/dev archives of today.
 export const MAX_ARCHIVE_BYTES = 128 * 1024 * 1024
 
 /** Bundle `[{ name, data }]` file entries into a gzipped tar buffer. */

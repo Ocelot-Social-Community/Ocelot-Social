@@ -1,6 +1,6 @@
 // The bucket taxonomy — a TOTAL partition of BrandingConfig into named, independently composable
 // slices. This is what lets a brand reuse another brand's content per slice (e.g. the colour THEME
-// of brand B with the IDENTITY of brand A). See docu/branding-buckets-konzept.md §4.
+// of brand B with the IDENTITY of brand A).
 //
 // Each bucket owns a set of dot-paths into BrandingConfig. Split domains are owned at the SUB-PATH
 // level by different buckets (e.g. `assets.css`→theme, `assets.favicon`→logos, `assets.html`→legal;
@@ -41,7 +41,7 @@ export interface ArchiveManifest {
   label: string
   /**
    * Version of the `@ocelot-social/branding` package the archive was BUILT with — the schema / API
-   * compatibility axis (see docu/branding-buckets-konzept.md §11), distinct from `version` (the
+   * compatibility axis, distinct from `version` (the
    * brand's own iteration). Injected by the build; null when unknown.
    */
   schemaVersion: string | null
