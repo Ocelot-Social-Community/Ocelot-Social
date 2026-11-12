@@ -251,9 +251,8 @@ export interface BrandingConfig {
     applicationDescription: string
     organizationName: string
     organizationJurisdiction: string
-    // NOTE: no `cookieName` — the auth cookie name is INFRA, not branding (see
-    // docu/branding-buckets-konzept.md). It was unreachable here in the first place: @nuxtjs/apollo
-    // bakes its token name into the generated plugin at BUILD time, so the cookie was always written
+    // NOTE: no `cookieName` — the auth cookie name is INFRA, not branding. It was unreachable here in the first
+    // place: @nuxtjs/apollo bakes its token name into the generated plugin at BUILD time, so the cookie was always written
     // under the framework default while the auth store checked for the branded name — a login that
     // worked but reported "no cookie". It is the webapp's `COOKIE_NAME` deployment variable now
     // (webapp/utils/authCookie.js), settable per instance without a rebuild but NOT switchable while
