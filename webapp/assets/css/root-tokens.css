@@ -108,7 +108,7 @@
   --background-color-selected: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.1));
   /* A filled surface one step below --background-color-softest, and the hover of a softer surface. */
   --background-color-muted: light-dark(var(--color-neutral-80), var(--color-neutral-15));
-  --background-color-softer-hover: light-dark(rgb(224, 224, 224), var(--color-neutral-15));
+  --background-color-softer-hover: light-dark(var(--color-neutral-80), var(--color-neutral-15));
   /* Dims the page under an open menu. */
   --background-color-overlay: light-dark(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5));
   /* See-through panels over a map. */
@@ -485,7 +485,7 @@
      declaration — the name rendered in the inherited colour. Same family and same value as
      --text-color-base (the message colour), which is what it visually pairs with. */
   /* The docked chat window (layouts/default.vue .chat-modul) and its close link. */
-  --chat-module-background: light-dark(rgb(233, 228, 228), var(--color-neutral-10));
+  --chat-module-background: light-dark(var(--color-neutral-80), var(--color-neutral-10));
   --chat-module-close-color: light-dark(blue, rgb(120, 170, 255));
   --chat-message-bg-others: light-dark(var(--color-neutral-80), var(--color-neutral-12));
   /* Roles that read a neutral step on purpose and look the same in both themes. */
@@ -513,12 +513,12 @@
   --chat-accent: light-dark(#1976d2, rgb(100, 170, 240));
   --chat-accent-contrast: light-dark(var(--color-neutral-100), var(--color-neutral-0));
   --chat-border-color: light-dark(var(--color-neutral-80), var(--color-neutral-15));
-  --chat-search-border-color: light-dark(#e1e5e8, var(--color-neutral-15));
+  --chat-search-border-color: light-dark(var(--color-neutral-80), var(--color-neutral-15));
   --chat-hover-background: light-dark(var(--color-neutral-90), var(--color-neutral-10));
   --chat-text-strong: light-dark(#0a0a0a, var(--color-neutral-80));
   --chat-text-muted: light-dark(#9ca6af, var(--color-neutral-47));
   --chat-text-subtle: light-dark(#757e85, var(--color-neutral-53));
-  --chat-deleted-background: light-dark(#dadfe2, var(--color-neutral-12));
+  --chat-deleted-background: light-dark(var(--color-neutral-80), var(--color-neutral-12));
   --chat-selected-background: light-dark(#c2dcf2, rgb(40, 60, 90));
   --chat-notice-background: light-dark(#e5effa, rgb(38, 44, 58));
   --chat-notice-color: light-dark(#505a62, var(--color-neutral-60));
@@ -526,9 +526,9 @@
   --chat-shade: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08));
   --chat-reply-color: light-dark(#6e6e6e, var(--color-neutral-60));
   --chat-tag-color: light-dark(#0d579c, rgb(110, 170, 235));
-  --chat-image-background: light-dark(#ddd, var(--color-neutral-12));
+  --chat-image-background: light-dark(var(--color-neutral-80), var(--color-neutral-12));
   --chat-reaction-background: light-dark(var(--color-neutral-85), var(--color-neutral-12));
-  --chat-reaction-border-hover: light-dark(#ddd, var(--color-neutral-20));
+  --chat-reaction-border-hover: light-dark(var(--color-neutral-80), var(--color-neutral-20));
   --chat-reaction-me-background: light-dark(#cfecf5, rgb(30, 60, 75));
   --chat-reaction-me-border: light-dark(#3b98b8, rgb(59, 152, 184));
   --chat-reaction-me-color: light-dark(#0b59b3, rgb(140, 190, 240));
@@ -560,7 +560,7 @@
   /* Under the tiles while they load, and the controls drawn over the map (mapbox-gl's own and ours). */
   /* mapbox-gl ships its control icons as dark SVG data URIs — only a filter can lighten them. */
   /* Read by packages/ui OsLocationMap, which ships its own literal fallbacks. */
-  --map-background: light-dark(rgb(229, 229, 229), var(--color-neutral-10));
+  --map-background: light-dark(var(--color-neutral-80), var(--color-neutral-10));
   --map-control-background: var(--background-color-base);
   --map-control-icon-filter: none;
   /**
