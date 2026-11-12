@@ -73,7 +73,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'chat-icon-soft': 'light-dark(#9e9e9e, var(--color-neutral-47))',
   'chat-icon-strong': 'light-dark(#000, var(--color-neutral-80))',
   'chat-image-background': 'light-dark(var(--color-neutral-80), var(--color-neutral-12))',
-  'chat-message-bg-me': 'light-dark(var(--color-primary-light), rgb(30, 70, 40))',
+  'chat-message-bg-me':
+    'light-dark(var(--color-primary-light), color-mix(in srgb, var(--background-color-base) 70%, var(--color-primary)))',
   'chat-message-bg-others': 'light-dark(var(--color-neutral-80), var(--color-neutral-12))',
   'chat-message-checkmark': 'var(--text-color-soft)',
   'chat-message-checkmark-seen': 'var(--text-color-secondary)',
@@ -103,7 +104,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'chat-selected-background': 'light-dark(#c2dcf2, rgb(40, 60, 90))',
   'chat-shade': 'light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08))',
   'chat-shade-strong': 'light-dark(rgba(0, 0, 0, 0.15), rgba(255, 255, 255, 0.15))',
-  'chat-sidemenu-background-active': 'light-dark(var(--color-primary-light), rgb(30, 70, 40))',
+  'chat-sidemenu-background-active':
+    'light-dark(var(--color-primary-light), color-mix(in srgb, var(--background-color-base) 70%, var(--color-primary)))',
   'chat-sidemenu-background-over': 'light-dark(var(--color-neutral-90), var(--color-neutral-10))',
   'chat-sidemenu-bg': 'light-dark(var(--color-neutral-100), var(--color-neutral-5))',
   'chat-tag-color': 'light-dark(#0d579c, rgb(110, 170, 235))',

@@ -448,8 +448,11 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --chat-message-bg-me: light-dark(var(--color-primary-light), rgb(30, 70, 40));
-  --chat-sidemenu-background-active: light-dark(var(--color-primary-light), rgb(30, 70, 40));
+  /* The own bubble and the active room: the brand's primary in light; in dark 30% of it over the page's */
+  /* dark ground, so a brand with another primary does not get green bubbles. The ground comes FIRST: a */
+  /* browser without color-mix() keeps the first colour, and that must be a ground the text can be read on. */
+  --chat-message-bg-me: light-dark(var(--color-primary-light), color-mix(in srgb, var(--background-color-base) 70%, var(--color-primary)));
+  --chat-sidemenu-background-active: light-dark(var(--color-primary-light), color-mix(in srgb, var(--background-color-base) 70%, var(--color-primary)));
   --chat-new-message-color: rgb(10, 161, 255);
   /* The chat's own names for roles that already carry a light and a dark value, so a brand can
      recolour just the chat (checkmarks, the unread counter, the message text, the icons) without
