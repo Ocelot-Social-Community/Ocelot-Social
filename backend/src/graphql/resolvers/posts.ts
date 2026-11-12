@@ -66,13 +66,6 @@ const NOTIFIED_FOR_RESOURCE_CYPHER = `
   ${NOTIFICATION_PROJECTION_SUFFIX}
 `
 
-const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
-  MATCH (:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
-  WHERE NOT coalesce(resource.deleted, false)
-    AND NOT coalesce(resource.disabled, false)
-  ${NOTIFICATION_PROJECTION_SUFFIX}
-`
-
 // Both wrappers used to branch on `isEmpty(params.filter)` and build `{ OR: [pinned, {}] }` for
 // the empty case. That branch was redundant twice over: spreading an empty (or absent) filter
 // produces exactly `{}` anyway, so the two arms were the same value — and by the time either runs,
@@ -185,6 +178,17 @@ const commentReadable = (comment: string, post: string): string => `(
   EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
   OR NOT ${groupContentWithheld(post, 'contentGroupIds', 'elevatedGroupIds')}
 )`
+
+// Only for comments the reader may read (commentReadable, above). A notification carries its
+// comment, so one written while the reader was in the group must not outlive their access to it:
+// a post stays visible to its author after they leave, its members' comments do not.
+const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
+  MATCH (post:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+    AND ${commentReadable('resource', 'post')}
+  ${NOTIFICATION_PROJECTION_SUFFIX}
+`
 
 // ORDER BY from `_CommentOrdering`. Oldest first by default — how a thread reads, and what
 // the webapp asks for.
@@ -1033,12 +1037,15 @@ export default {
       if (!currentUserId || !parent?.id) {
         return []
       }
+      const scope = await commentScope(context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction((transaction) =>
           transaction.run(NOTIFIED_COMMENTS_FOR_POST_CYPHER, {
             userId: currentUserId,
             postId: parent.id,
+            cypherParams: { currentUserId },
+            ...scope,
           }),
         )
         return result.records.map((record) => record.get('notification'))

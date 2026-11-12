@@ -57,6 +57,25 @@ const searchQuery = parse(`
   }
 `)
 
+const unreadQuery = parse(`
+  query {
+    Post(id: "post") {
+      unreadCommentNotificationsByCurrentUser {
+        from {
+          ... on Comment {
+            id
+            content
+          }
+        }
+      }
+    }
+  }
+`)
+
+interface Unread {
+  Post: { unreadCommentNotificationsByCurrentUser: { from: { id: string } }[] }[]
+}
+
 interface Thread {
   Post: { id: string; commentsCount: number; comments: { id: string }[] }[]
 }
@@ -98,6 +117,17 @@ const buildUser = async (id: string): Promise<Viewer> => {
 
 const as = async (viewer: Viewer) => {
   authenticatedUser = await viewer.toJson()
+}
+
+const unreadCommentIds = async (viewer: Viewer) => {
+  await as(viewer)
+  const result = await query({ query: unreadQuery })
+
+  expect(result.errors).toBeUndefined()
+
+  return (result.data as Unread).Post[0].unreadCommentNotificationsByCurrentUser
+    .map(({ from }) => from.id)
+    .sort()
 }
 
 const join = async (viewer: Viewer, template: string) => {
@@ -229,6 +259,10 @@ describe.each(['public', 'closed', 'hidden'])('a post in a %s group', (template)
     })
 
     if (template === 'public') {
+      it("still hands the author the unread notifications of the members' comments", async () => {
+        await expect(unreadCommentIds(author)).resolves.toEqual(['after-departure', 'by-member'])
+      })
+
       it('shows the author every comment, as anyone may read them', async () => {
         await expect(thread(author)).resolves.toEqual([
           {
@@ -243,6 +277,12 @@ describe.each(['public', 'closed', 'hidden'])('a post in a %s group', (template)
         await expect(thread(author)).resolves.toEqual([
           { id: 'post', commentsCount: 1, comments: [{ id: 'by-author' }] },
         ])
+      })
+
+      // The author observes their post, so the member's comment from before the departure was
+      // notified to them. The notification carries the comment: it must not outlive the access.
+      it("hands the author no unread notification of the members' comments", async () => {
+        await expect(unreadCommentIds(author)).resolves.toEqual([])
       })
 
       it("exports the author's own comment but not the members'", async () => {
