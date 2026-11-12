@@ -1,6 +1,6 @@
 <template>
   <div class="editor">
-    <menu-bar :editor="editor" :toggleLinkInput="toggleLinkInput" />
+    <menu-bar ref="menuBar" :editor="editor" :toggleLinkInput="toggleLinkInput" />
     <editor-content ref="editor" :editor="editor" class="ds-input editor-content" />
     <context-menu ref="contextMenu" />
     <suggestion-list
@@ -21,6 +21,8 @@
         @blur.native.capture="toggleLinkInput()"
         @keydown.native.esc.prevent="toggleLinkInput()"
         @keydown.native.enter.prevent="enterLink()"
+        @keydown.native.ctrl.k.prevent="toggleLinkInput()"
+        @keydown.native.meta.k.prevent="toggleLinkInput()"
       />
     </div>
   </div>
@@ -36,6 +38,7 @@ import * as key from '../../constants/keycodes'
 import { HASHTAG, MENTION } from '../../constants/editor'
 import defaultExtensions from './defaultExtensions'
 import EventHandler from './plugins/eventHandler'
+import LinkShortcut from './plugins/linkShortcut'
 import Hashtag from './nodes/Hashtag'
 import Mention from './nodes/Mention'
 import MenuBar from './MenuBar'
@@ -105,7 +108,7 @@ export default {
             // the opening "@" would re-open a list that was closed long ago.
             items: () => [],
             onEnter: (props) => this.openSuggestionList(props, MENTION),
-            onChange: this.updateSuggestionList,
+            onChange: (props) => this.updateSuggestionList(props, MENTION),
             onExit: this.closeSuggestionList,
             onKeyDown: this.navigateSuggestionList,
             onFilter: () => [],
@@ -119,7 +122,7 @@ export default {
             // Loaded like the mentions, see above.
             items: () => [],
             onEnter: (props) => this.openSuggestionList(props, HASHTAG),
-            onChange: this.updateSuggestionList,
+            onChange: (props) => this.updateSuggestionList(props, HASHTAG),
             onExit: this.closeSuggestionList,
             onKeyDown: this.navigateSuggestionList,
             onFilter: () => [],
@@ -161,6 +164,8 @@ export default {
         ...this.optionalExtensions,
         ...defaultExtensions(this),
         new EventHandler(),
+        // Only here, not in defaultExtensions: the read-only ContentViewer shares those.
+        new LinkShortcut({ onShortcut: () => this.toggleLinkInputByShortcut() }),
         new History(),
       ],
       onUpdate: (e) => {
@@ -285,11 +290,17 @@ export default {
       this._suggestionOpening = true
       this.loadSuggestions()
       this.showSuggestionMenu(view)
-      this.insertMentionOrHashtag = command
+      this.insertMentionOrHashtag = command || this.insertMentionOrHashtag
     },
-    updateSuggestionList({ query, range, view }) {
-      // No list was opened for it — see isBeingTyped.
-      if (!this.suggestionType) return
+    updateSuggestionList(props, suggestionType) {
+      const { query, range, view } = props
+      // Closing the link popup returns focus to the same active mention/hashtag match.
+      // The plugin emits onChange (not onEnter) when typing resumes, so reopen the Vue list.
+      if (!this.suggestionType) {
+        if (!this.isBeingTyped({ range, view })) return
+        this.openSuggestionList(props, suggestionType)
+        return
+      }
       this.query = this.sanitizeQuery(query)
       this.suggestionRange = range
       this.navigatedItemIndex = 0
@@ -466,6 +477,16 @@ export default {
         this.isLinkInputActive = false
         this.editor.focus()
       }
+    },
+    // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored to that button.
+    toggleLinkInputByShortcut() {
+      if (this.suggestionType) {
+        this.closeSuggestionList()
+      }
+      this.toggleLinkInput(
+        this.editor.getMarkAttrs('link'),
+        this.$refs.menuBar.$refs.linkButton.$el,
+      )
     },
     setLinkUrl(url) {
       const normalizedLinks = url ? linkify().match(url) : null

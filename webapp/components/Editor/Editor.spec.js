@@ -696,4 +696,150 @@ describe('Editor.vue', () => {
       })
     })
   })
+
+  // Ctrl+K opens the same link input as the toolbar's link button (#4666). jsdom reports no
+  // platform, so `Mod` means Ctrl here; Editor.mac.spec.js covers Cmd+K.
+  describe('link shortcut', () => {
+    const pressKey = (target, key, modifiers) => {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...modifiers,
+      })
+      target.dispatchEvent(event)
+      return event
+    }
+    const editorElement = () => wrapper.vm.editor.view.dom
+    const linkButton = () => wrapper.find('button[aria-label="editor.legend.link"]').element
+    const linkInput = () => wrapper.vm.$refs.linkInput.querySelector('input')
+    const linkInputShown = () => wrapper.vm.$refs.linkInput.style.display !== 'none'
+    const settle = async () => {
+      await Vue.nextTick()
+      await Vue.nextTick()
+    }
+
+    beforeEach(async () => {
+      mocks.$t = (key) => key
+      propsData.value = '<p>Example text</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      const { state, dispatch } = wrapper.vm.editor.view
+      dispatch(
+        state.tr.setSelection(TextSelection.create(state.doc, 1, state.doc.content.size - 1)),
+      )
+      await Vue.nextTick()
+    })
+
+    describe('Ctrl+K in the editor', () => {
+      let event
+
+      beforeEach(async () => {
+        event = pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+      })
+
+      it('keeps the browser from handling it', () => {
+        expect(event.defaultPrevented).toBe(true)
+      })
+
+      it('shows the link input', () => {
+        expect(wrapper.vm.isLinkInputActive).toBe(true)
+        expect(linkInputShown()).toBe(true)
+      })
+
+      it('opens the link menu at the toolbar link button', () => {
+        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
+      })
+
+      it('links the selected text with the URL entered', async () => {
+        expect(linkInputShown()).toBe(true)
+        linkInput().value = 'https://example.org'
+        linkInput().dispatchEvent(new Event('input'))
+        pressKey(linkInput(), 'Enter', {})
+        await settle()
+        expect(wrapper.vm.editor.getHTML()).toMatch(
+          /<a href="https:\/\/example\.org"[^>]*>Example text<\/a>/,
+        )
+        expect(wrapper.vm.isLinkInputActive).toBe(false)
+        expect(wrapper.vm.$refs.contextMenu.menu).toBeFalsy()
+      })
+
+      it.each([
+        ['Ctrl+K', { ctrlKey: true }],
+        ['Cmd+K', { metaKey: true }],
+      ])('closes the link input again with %s in it, adding no link', async (name, modifiers) => {
+        const again = pressKey(linkInput(), 'k', modifiers)
+        await settle()
+        expect(again.defaultPrevented).toBe(true)
+        expect(wrapper.vm.isLinkInputActive).toBe(false)
+        expect(wrapper.vm.$refs.contextMenu.menu).toBeFalsy()
+        expect(wrapper.vm.editor.getHTML()).toBe('<p>Example text</p>')
+      })
+
+      // Closing hands the focus back to the editor, so the input's blur handler runs right after.
+      it('stays closed when the input then loses the focus', async () => {
+        expect(linkInputShown()).toBe(true)
+        pressKey(linkInput(), 'k', { ctrlKey: true })
+        await settle()
+        linkInput().dispatchEvent(new FocusEvent('blur'))
+        await settle()
+        expect(wrapper.vm.isLinkInputActive).toBe(false)
+        expect(wrapper.vm.$refs.contextMenu.menu).toBeFalsy()
+        expect(linkInputShown()).toBe(false)
+      })
+    })
+
+    it('closes an active mention suggestion before opening the link input', async () => {
+      propsData.value = ''
+      propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+      wrapper = Wrapper()
+      await Vue.nextTick()
+
+      const { view } = wrapper.vm.editor
+      view.dispatch(view.state.tr.insertText('@'))
+      await settle()
+      await flushPromises()
+      expect(wrapper.vm.suggestionType).toBe('mention')
+
+      const shortcut = pressKey(editorElement(), 'k', { ctrlKey: true })
+      await settle()
+
+      expect(shortcut.defaultPrevented).toBe(true)
+      expect(wrapper.vm.suggestionType).toBe('')
+      expect(wrapper.vm.suggestionRange).toBeNull()
+      expect(wrapper.vm.filteredItems).toEqual([])
+      expect(wrapper.vm.isLinkInputActive).toBe(true)
+      expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
+      expect(wrapper.vm.navigateSuggestionList({ event: { keyCode: 13 } })).toBe(false)
+
+      // Return to the editor and continue the active mention. The plugin calls onChange,
+      // not onEnter, for the same match; its suggestions must be restored.
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      view.dispatch(view.state.tr.insertText('p'))
+      await settle()
+      await flushPromises()
+
+      expect(wrapper.vm.isLinkInputActive).toBe(false)
+      expect(wrapper.vm.suggestionType).toBe('mention')
+      expect(wrapper.vm.filteredItems).toEqual([peter])
+      expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('p')
+    })
+
+    it('still opens the link input from the toolbar link button', async () => {
+      await wrapper.find('button[aria-label="editor.legend.link"]').trigger('click')
+      await settle()
+      expect(wrapper.vm.isLinkInputActive).toBe(true)
+      expect(linkInputShown()).toBe(true)
+      expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
+    })
+
+    it('still makes the selection bold with Ctrl+B', async () => {
+      const event = pressKey(editorElement(), 'b', { ctrlKey: true })
+      await Vue.nextTick()
+      expect(event.defaultPrevented).toBe(true)
+      expect(wrapper.vm.editor.getHTML()).toBe('<p><strong>Example text</strong></p>')
+    })
+  })
 })

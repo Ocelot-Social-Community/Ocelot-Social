@@ -1,4 +1,5 @@
 import mapboxgl from 'mapbox-gl'
+import { defineBranding, setBranding } from '@ocelot-social/branding'
 import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import VueMeta from 'vue-meta'
@@ -750,19 +751,35 @@ describe('map', () => {
           expect(popover.classList.contains('map-style-popover--open')).toBe(false)
         })
 
-        it('moves the active mark along when the theme switches the tiles', async () => {
-          const buttons = container.querySelectorAll('.map-style-popover-btn')
+        it('keeps the tiles when the theme switches and the brand has one style for both', async () => {
           wrapper.vm.dark = true
           await wrapper.vm.$nextTick()
-          // v-mapbox's watcher on mapOptions.style does the map.setStyle — no call of our own.
-          expect(wrapper.vm.mapOptions.style).toBe(
-            wrapper.vm.availableStyles['navigation-night'].url,
+          // Vanilla: outdoors in the light and in the dark theme.
+          expect(wrapper.vm.mapOptions.style).toBe(wrapper.vm.availableStyles.outdoors.url)
+        })
+
+        it("moves the active mark along when the theme switches to the brand's other tiles", async () => {
+          setBranding(
+            defineBranding({
+              map: { defaultStyle: { light: 'outdoors', dark: 'navigation-night' } },
+            }),
           )
-          expect(mapSetStyleMock).not.toHaveBeenCalled()
-          expect(buttons[1].classList.contains('map-style-popover-btn--active')).toBe(true)
-          expect(buttons[1].getAttribute('aria-selected')).toBe('true')
-          expect(buttons[0].classList.contains('map-style-popover-btn--active')).toBe(false)
-          expect(buttons[0].getAttribute('aria-selected')).toBe('false')
+          try {
+            const buttons = container.querySelectorAll('.map-style-popover-btn')
+            wrapper.vm.dark = true
+            await wrapper.vm.$nextTick()
+            // v-mapbox's watcher on mapOptions.style does the map.setStyle — no call of our own.
+            expect(wrapper.vm.mapOptions.style).toBe(
+              wrapper.vm.availableStyles['navigation-night'].url,
+            )
+            expect(mapSetStyleMock).not.toHaveBeenCalled()
+            expect(buttons[1].classList.contains('map-style-popover-btn--active')).toBe(true)
+            expect(buttons[1].getAttribute('aria-selected')).toBe('true')
+            expect(buttons[0].classList.contains('map-style-popover-btn--active')).toBe(false)
+            expect(buttons[0].getAttribute('aria-selected')).toBe('false')
+          } finally {
+            setBranding(undefined)
+          }
         })
 
         it('clicking style button sets correct style and closes popover', () => {

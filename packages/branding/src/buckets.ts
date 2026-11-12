@@ -134,8 +134,8 @@ export const BUCKET_NAMES: BucketName[] = [
 /** Which config paths each bucket owns. Longest matching path wins (see file header). */
 export const BUCKET_PATHS: Record<BucketName, string[]> = {
   // The reusable LOOK: colours (incl. the browser-chrome/PWA theme_color, = the color-primary token),
-  // fonts, brand stylesheet, layouts, donation-bar colour style. The headline unit a brand pulls.
-  theme: ['theme', 'donation', 'login.layout', 'registration.layout', 'assets.css'],
+  // fonts, brand stylesheet, layouts, donation-bar colour style, the default map styles. The headline unit a brand pulls.
+  theme: ['theme', 'donation', 'map', 'login.layout', 'registration.layout', 'assets.css'],
   // WHO the instance is: names, organisation, jurisdiction, OG image, cookie name, version, the
   // brand's self-description. (locales is CROSS-CUTTING — see below — not owned by a bucket.)
   identity: ['metadata', 'about'],

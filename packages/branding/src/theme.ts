@@ -15,10 +15,19 @@
 // stores them in `theme.tokens`, which is how a value gets out of CSS and into a manifest or a mail.
 import { FRAMEWORK_TOKENS } from './frameworkTokens.js'
 
-import type { BrandingConfig, ColorScheme } from './schema.js'
+import type { BrandingConfig, ColorScheme, MapStyleId } from './schema.js'
 
 /** The colour schemes a brand may declare (`theme.colorScheme`). */
 export const COLOR_SCHEMES: readonly ColorScheme[] = ['light', 'dark', 'light dark']
+
+/** The map styles a brand may choose as a default (`map.defaultStyle`): the ones the maps offer. */
+export const MAP_STYLE_IDS: readonly MapStyleId[] = [
+  'outdoors',
+  'navigation-night',
+  'streets',
+  'satellite',
+  'dark',
+]
 
 /** Vanilla — no brand at all — has both schemes; every brand defaults to light (defaults.ts). */
 export const VANILLA_COLOR_SCHEME: ColorScheme = 'light dark'
