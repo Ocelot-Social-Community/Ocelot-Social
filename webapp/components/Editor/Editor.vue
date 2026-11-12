@@ -8,6 +8,8 @@
     />
     <editor-content ref="editor" :editor="editor" class="ds-input editor-content" />
     <context-menu ref="contextMenu" />
+    <!-- Where the tooltip of an unfinished mention or hashtag is anchored, see showUnfinishedTooltip -->
+    <span ref="unfinishedAnchor" class="unfinished-anchor" aria-hidden="true" />
     <suggestion-list
       ref="suggestions"
       :suggestion-type="suggestionType"
@@ -35,6 +37,7 @@
 
 <script>
 import { Editor, EditorContent } from 'tiptap'
+import { createTooltip, destroyTooltip } from 'v-tooltip'
 import { History } from 'tiptap-extensions'
 import linkify from 'linkify-it'
 import { replace, build } from 'xregexp/xregexp-all.js'
@@ -44,6 +47,10 @@ import { HASHTAG, MENTION } from '../../constants/editor'
 import defaultExtensions from './defaultExtensions'
 import EventHandler from './plugins/eventHandler'
 import LinkShortcut from './plugins/linkShortcut'
+import UnfinishedSuggestions, {
+  UNFINISHED_CLASS,
+  UNFINISHED_TYPE_ATTRIBUTE,
+} from './plugins/unfinishedSuggestions'
 import Hashtag from './nodes/Hashtag'
 import Mention from './nodes/Mention'
 import MenuBar from './MenuBar'
@@ -55,6 +62,8 @@ import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 // How long typing has to pause before the suggestions are asked for.
 const SUGGESTION_DEBOUNCE_MS = 150
+// As long as the app's other tooltips wait before they show (plugins/v-tooltip.js).
+const UNFINISHED_TOOLTIP_DELAY_MS = 750
 
 export default {
   components: {
@@ -171,6 +180,12 @@ export default {
         new EventHandler(),
         // Only here, not in defaultExtensions: the read-only ContentViewer shares those.
         new LinkShortcut({ onShortcut: () => this.toggleLinkInputByShortcut() }),
+        // Also only here: a mention or hashtag typed and not chosen from the list is framed.
+        new UnfinishedSuggestions({
+          types: [this.mentionSuggestions && MENTION, this.hashtagSuggestions && HASHTAG].filter(
+            Boolean,
+          ),
+        }),
         new History(),
       ],
       onUpdate: (e) => {
@@ -180,6 +195,9 @@ export default {
           this.onUpdate(e)
         }, 300)
       },
+      // ProseMirror takes a frame off (or the whole element) when its text stops being unfinished:
+      // the tooltip must not stay on a word that is no longer framed.
+      onTransaction: () => this.closeUnfinishedTooltipIfGone(),
       onFocus: () => {
         // Back in the editor with the cursor still in the "@…"/"#…" it left: the list returns.
         // (A click elsewhere in the text moves the cursor out, and the plugin closes the list.)
@@ -202,8 +220,13 @@ export default {
         }
       },
     })
+    this.editor.view.dom.addEventListener('mouseover', this.showUnfinishedTooltip)
+    this.editor.view.dom.addEventListener('mouseout', this.hideUnfinishedTooltip)
   },
   beforeDestroy() {
+    this.editor.view.dom.removeEventListener('mouseover', this.showUnfinishedTooltip)
+    this.editor.view.dom.removeEventListener('mouseout', this.hideUnfinishedTooltip)
+    this.hideUnfinishedTooltip()
     clearTimeout(this._throttleTimer)
     clearTimeout(this._suggestionTimer)
     this.editor.destroy()
@@ -480,6 +503,13 @@ export default {
       this.linkUrl = null
     },
     toggleLinkInput(attrs, element) {
+      // Opening the link input, by the shortcut or by the toolbar button, while a mention or
+      // hashtag list is open (or suspended because the focus left for the button): the list steps
+      // aside and comes back when the input closes, whichever way it was opened.
+      if (attrs && element && this.suggestionType && !this.isLinkInputActive) {
+        this._resumeSuggestion = this._activeSuggestion
+        this.closeSuggestionList()
+      }
       if (this.$refs.contextMenu.menu) {
         this.$refs.contextMenu.hideContextMenu()
         this.isLinkInputActive = false
@@ -497,19 +527,68 @@ export default {
         this.resumeSuggestionList()
       }
     },
+    // The tooltip on a framed, unfinished mention or hashtag: what is missing and what to do. It is
+    // the app's tooltip (v-tooltip) like every other, with the delay the others have.
+    //
+    // It is not put on the frame itself: v-tooltip writes a class onto its target, ProseMirror
+    // notices the change in its DOM, draws the frame anew and the target is gone: the tooltip
+    // stood in the corner of the page and opened again and again. It is put on an anchor next to
+    // the editor instead, which is laid over the frame while the pointer is on it.
+    showUnfinishedTooltip(event) {
+      const frame = event.target.closest && event.target.closest(`.${UNFINISHED_CLASS}`)
+      if (!frame || frame === this._unfinishedFrame) return
+      this.hideUnfinishedTooltip()
+      this._unfinishedFrame = frame
+      this._unfinishedTooltipTimer = setTimeout(
+        () => this.openUnfinishedTooltip(frame),
+        UNFINISHED_TOOLTIP_DELAY_MS,
+      )
+    },
+    openUnfinishedTooltip(frame) {
+      this._unfinishedTooltipTimer = null
+      const anchor = this.$refs.unfinishedAnchor
+      if (!anchor || !this.isUnfinishedFrame(frame)) return
+      const { left, top, width, height } = frame.getBoundingClientRect()
+      Object.assign(anchor.style, {
+        left: `${left}px`,
+        top: `${top}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+      })
+      // Spelled out so the i18n lint sees both keys in use.
+      const content =
+        frame.getAttribute(UNFINISHED_TYPE_ATTRIBUTE) === HASHTAG
+          ? this.$t('editor.unfinished.hashtag')
+          : this.$t('editor.unfinished.mention')
+      createTooltip(anchor, { content, placement: 'bottom', trigger: 'manual' }).show()
+    },
+    hideUnfinishedTooltip(event) {
+      // Moving on within the same frame is not leaving it.
+      if (event && this._unfinishedFrame && this._unfinishedFrame.contains(event.relatedTarget)) {
+        return
+      }
+      clearTimeout(this._unfinishedTooltipTimer)
+      this._unfinishedTooltipTimer = null
+      this._unfinishedFrame = null
+      const anchor = this.$refs.unfinishedAnchor
+      if (anchor && anchor._tooltip) destroyTooltip(anchor)
+    },
+    isUnfinishedFrame(element) {
+      return this.editor.view.dom.contains(element) && element.classList.contains(UNFINISHED_CLASS)
+    },
+    // ProseMirror takes the frame off, or the whole element, when its text stops being unfinished:
+    // the tooltip must not stay on a word that is no longer framed.
+    closeUnfinishedTooltipIfGone() {
+      if (this._unfinishedFrame && !this.isUnfinishedFrame(this._unfinishedFrame)) {
+        this.hideUnfinishedTooltip()
+      }
+    },
     // Ctrl+K closed the list of a mention or hashtag that is still being typed. The plugin's match
     // lives on and reports no change when the focus returns to it, so without Enter, Esc or a
     // typed letter nothing would open the list again: do it here.
     resumeSuggestionList() {
       const resume = this._resumeSuggestion
       this._resumeSuggestion = null
-      // Opening the link input, by the shortcut or by the toolbar button, while a mention or
-      // hashtag list is open (or suspended because the focus left for the button): the list steps
-      // aside and comes back when the input closes, whichever way it was opened.
-      if (attrs && element && this.suggestionType && !this.isLinkInputActive) {
-        this._resumeSuggestion = this._activeSuggestion
-        this.closeSuggestionList()
-      }
       if (!resume || this.suggestionType) return
       this.openSuggestionList(resume.props, resume.suggestionType)
     },
@@ -567,6 +646,21 @@ li > p {
 .editor {
   display: flex;
   flex-direction: column;
+
+  /* Nothing to see or to hit: only where the tooltip of an unfinished mention or hashtag hangs. */
+  .unfinished-anchor {
+    position: fixed;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* A mention or hashtag that was typed and not chosen from the list: nobody is notified and no
+     tag is connected (see plugins/unfinishedSuggestions.js). */
+  .unfinished-suggestion {
+    outline: 1px solid var(--border-color-base);
+    outline-offset: 1px;
+    border-radius: var(--border-radius-base);
+  }
 
   .hashtag {
     color: var(--color-primary);
