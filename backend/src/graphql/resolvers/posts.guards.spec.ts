@@ -18,6 +18,7 @@ import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 import { createLoaders } from '@context/loaders'
 import { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
+import { createReadScopes } from '@graphql/resolvers/helpers/viewerGroups'
 
 import postsResolvers from './posts'
 
@@ -45,6 +46,7 @@ const fieldContext = () =>
   ({
     driver,
     loaders: createLoaders(driver, null),
+    readScopes: createReadScopes(),
     cypherParams: { currentUserId: null },
   }) as unknown as Context
 

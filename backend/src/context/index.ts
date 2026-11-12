@@ -1,6 +1,7 @@
 import databaseContext from '@context/database'
 import { createLoaders } from '@context/loaders'
 import pubsubContext from '@context/pubsub'
+import { createReadScopes } from '@graphql/resolvers/helpers/viewerGroups'
 import CONFIG from '@src/config'
 import { createGroupAuthorizationScope } from '@src/groupRole/requestScope'
 import { decode } from '@src/jwt/decode'
@@ -77,6 +78,9 @@ export const getContext =
         effectivePermissions,
         policy,
       }),
+      // "Which groups does this viewer read", asked once per request rather than once per
+      // batch that filters on it. Built here for the same reason as the two above.
+      readScopes: createReadScopes(),
     }
     return result
   }
