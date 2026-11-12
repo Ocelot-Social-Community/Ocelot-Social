@@ -30,7 +30,7 @@ export const findUnfinished = (text, types) => {
   return found
 }
 
-// Stands for what is no plain text: a node of its own (a chosen mention, a hard break) and text
+// Stands for what is no plain text: a node of its own (a chosen mention, say) and text
 // that is a link. A match cannot run over it, and it is no word boundary a "@" may follow.
 const NOT_TEXT = '\uFFFC'
 
@@ -51,7 +51,8 @@ export const textOfBlock = (block, blockPos) => {
         positions.push(childPos + i)
       }
     } else {
-      text += NOT_TEXT
+      // A hard line break ends a word like a space does; anything else that is no text does not.
+      text += child.type.name === 'hard_break' ? '\n' : NOT_TEXT
       positions.push(childPos)
     }
   })

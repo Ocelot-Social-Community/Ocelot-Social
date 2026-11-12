@@ -829,6 +829,13 @@ describe('Editor.vue', () => {
       expect(framed()).toEqual([])
     })
 
+    it('starts a word after a hard line break, for mentions and for hashtags', async () => {
+      propsData.value = '<p>Text<br>@pet<br>#hall</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual(['@pet', '#hall'])
+    })
+
     it('frames no hashtag when the editor offers none', async () => {
       propsData.hashtagSuggestions = undefined
       wrapper = Wrapper()
