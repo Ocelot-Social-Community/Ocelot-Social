@@ -773,11 +773,16 @@ describe('Editor.vue', () => {
 
       it("shows the app's tooltip, after the usual delay, on an anchor and not on the frame", () => {
         const [mention, hashtag] = frames()
+        mention.getBoundingClientRect = () => ({ left: 10, top: 20, width: 30, height: 15 })
         hover(mention)
         jest.advanceTimersByTime(700)
         expect(anchor()._tooltip).toBeUndefined()
         jest.advanceTimersByTime(100)
         expect(anchor()._tooltip.options.title).toBe('editor.unfinished.mention')
+        expect(anchor().style.left).toBe('10px')
+        expect(anchor().style.top).toBe('20px')
+        expect(anchor().style.width).toBe('30px')
+        expect(anchor().style.height).toBe('15px')
         // ProseMirror must find nothing changed on its frame.
         expect(mention._tooltip).toBeUndefined()
         expect(mention.className).toBe('unfinished-suggestion')
@@ -808,6 +813,20 @@ describe('Editor.vue', () => {
         await placeCursor(8) // "Hi @pet|": the mention is being typed, its frame is gone
         expect(anchor()._tooltip).toBeUndefined()
       })
+    })
+
+    it('finds a word that is split between differently marked texts', async () => {
+      propsData.value = '<p><strong>@</strong>pet and <em>#ha</em>ll</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual(['@', 'pet', '#ha', 'll'])
+    })
+
+    it('does not take the "@" of an email address for a mention, whatever marks it', async () => {
+      propsData.value = '<p>mail name<strong>@domain</strong>.de or <strong>x</strong>@domain</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual([])
     })
 
     it('frames no hashtag when the editor offers none', async () => {
