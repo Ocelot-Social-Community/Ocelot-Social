@@ -39,7 +39,7 @@ The archive is a **library of bucket instances** (`manifest.json` + sparse `frag
 
 ## Buckets
 
-The branding config is split into six **buckets**. Every leaf of the config belongs to exactly one of them, so a brand can take one slice from another brand and the rest from itself — for example the colours of brand B with the identity of brand A.
+The branding config is split into six **buckets**. Every leaf of the config except `locales` belongs to exactly one of them, so a brand can take one slice from another brand and the rest from itself — for example the colours of brand B with the identity of brand A.
 
 | Bucket       | Owns                                                                                                                            |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -50,7 +50,7 @@ The branding config is split into six **buckets**. Every leaf of the config belo
 | `navigation` | `headerMenu`, `links.landingPage`, `links.footerOrder`                                                                          |
 | `behavior`   | Framework rules and limits: `group`, `user`, `post`, `comment`, `dateTime`, `badges`, `category`, the registration code lengths |
 
-Some domains are split by sub-path (`assets.css` belongs to `theme`, `assets.favicon` to `logos`, `assets.html` to `legal`); the longest matching path wins. `locales` belongs to no bucket: it accumulates from every source.
+Some domains are split by sub-path (`assets.css` belongs to `theme`, `assets.favicon` to `logos`, `assets.html` to `legal`); the longest matching path wins. `locales` belongs to no bucket: it rides along with every bucket instance of a brand and accumulates from every source. A brand that changes only `locales` provides no instance, so its `locales` are not composed.
 
 An archive holds **instances** of these buckets, one sparse file per instance (`fragments/<type>.<name>.json`), listed in `manifest.json`. It may hold several instances of one type (a `dark` and a `light` theme) and need not provide every type. A bucket is only written if the brand actually changes it; everything else is inherited from the framework defaults at load time. A classic full brand yields one instance per type, named `default`.
 
