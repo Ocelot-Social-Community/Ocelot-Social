@@ -35,6 +35,26 @@ export const nonMemberReadsGroup = (group: string): string =>
 export const nonMemberReadsContent = (group: string): string =>
   `coalesce(${group}.nonMemberContentRead, false) = true`
 
+/**
+ * Whether the post bound as `post` sits in a group whose content the viewer may NOT read: the
+ * group keeps it from non-members, the viewer's own role there does not open it (the group ids
+ * in `contentGroupsParameter`), and no elevation reads into it (`elevatedGroupsParameter`).
+ *
+ * The group half of the post visibility rule (`invisibleTo` in postFilter.ts), without that
+ * rule's exception for the author. A post stays its author's; what members wrote under it is
+ * the group's, and reaches only who reads the group (#10629).
+ */
+export const groupContentWithheld = (
+  post: string,
+  contentGroupsParameter: string,
+  elevatedGroupsParameter: string,
+): string => `EXISTS {
+      MATCH (${post})-[:IN]->(withholdingGroup:Group)
+      WHERE NOT (${nonMemberReadsContent('withholdingGroup')})
+        AND NOT withholdingGroup.id IN $${contentGroupsParameter}
+        AND NOT withholdingGroup.id IN $${elevatedGroupsParameter}
+    }`
+
 /** The group opened its member list to people who are not in it (`group.members.read`). */
 export const nonMemberReadsMembers = (group: string): string =>
   `coalesce(${group}.showMembers, false) = true`

@@ -18,7 +18,7 @@ import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
-import { nonMemberReadsContent } from './helpers/groupAccessCypher'
+import { groupContentWithheld, nonMemberReadsContent } from './helpers/groupAccessCypher'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
@@ -62,13 +62,6 @@ const NOTIFIED_FOR_RESOURCE_CYPHER = `
   MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
   WHERE resource.id IN $resourceIds
     AND NOT coalesce(resource.deleted, false)
-    AND NOT coalesce(resource.disabled, false)
-  ${NOTIFICATION_PROJECTION_SUFFIX}
-`
-
-const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
-  MATCH (:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
-  WHERE NOT coalesce(resource.deleted, false)
     AND NOT coalesce(resource.disabled, false)
   ${NOTIFICATION_PROJECTION_SUFFIX}
 `
@@ -161,6 +154,41 @@ const filterEventDates = (params) => {
   }
   return params
 }
+
+/**
+ * The groups whose comments the viewer reads, for `groupContentWithheld`.
+ *
+ * A post can be visible while what was written under it is not: its author keeps the post after
+ * leaving the group, but the members' comments stay the group's (#10629). Every elevation counts
+ * here: the post was already let through by the visibility rule, which decides what a request
+ * may name.
+ */
+const commentScope = async (
+  context: Context,
+): Promise<{ contentGroupIds: string[]; elevatedGroupIds: string[] }> => {
+  const { contentGroupIds, elevatedGroupIds } = await viewerScope(context)
+  return { contentGroupIds, elevatedGroupIds }
+}
+
+/**
+ * A comment under a visible post that the viewer may read: they wrote it — what one writes stays
+ * one's own, as the post does — or they read the group.
+ */
+const commentReadable = (comment: string, post: string): string => `(
+  EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
+  OR NOT ${groupContentWithheld(post, 'contentGroupIds', 'elevatedGroupIds')}
+)`
+
+// Only for comments the reader may read (commentReadable, above). A notification carries its
+// comment, so one written while the reader was in the group must not outlive their access to it:
+// a post stays visible to its author after they leave, its members' comments do not.
+const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
+  MATCH (post:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+    AND ${commentReadable('resource', 'post')}
+  ${NOTIFICATION_PROJECTION_SUFFIX}
+`
 
 // ORDER BY from `_CommentOrdering`. Oldest first by default — how a thread reads, and what
 // the webapp asks for.
@@ -870,8 +898,6 @@ export default {
         eventLocation: '-[:IS_IN]->(related:Location)',
       },
       count: {
-        commentsCount:
-          '<-[:COMMENTS]-(related:Comment) WHERE NOT related.deleted = true AND NOT related.disabled = true',
         shoutedCount:
           '<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true',
         emotionsCount: '<-[related:EMOTED]-(:User)',
@@ -926,14 +952,43 @@ export default {
                 UNWIND $ids AS __id
                 MATCH (post:Post { id: __id })
                 OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
+                  WHERE ${commentReadable('comment', 'post')}
                 WITH __id, comment ORDER BY ${order}
                 RETURN __id AS __id, collect(comment { .* }) AS __value
               `,
+              params: await commentScope(context),
             })
             return ids.map((id) => unwrap(byId.get(id) ?? []))
           })
           .load(parent.id as string)
       )
+    },
+    // Counted like the list above: in a group the viewer does not read, nothing.
+    commentsCount: async (parent, _params, context: Context) => {
+      if (typeof parent?.commentsCount !== 'undefined') {
+        return parent.commentsCount
+      }
+      if (!parent?.id) {
+        return 0
+      }
+      return context.loaders
+        .forField('Post.commentsCount', async (ids) => {
+          const { byId } = await runBatch({
+            context,
+            ids,
+            cypher: `
+              UNWIND $ids AS __id
+              MATCH (post:Post { id: __id })
+              OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
+                WHERE NOT coalesce(comment.deleted, false) AND NOT coalesce(comment.disabled, false)
+                AND ${commentReadable('comment', 'post')}
+              RETURN __id AS __id, count(comment) AS __value
+            `,
+            params: await commentScope(context),
+          })
+          return ids.map((id) => unwrap(byId.get(id) ?? 0))
+        })
+        .load(parent.id as string)
     },
     ...cypherFields('Post', {
       postType: {
@@ -982,12 +1037,15 @@ export default {
       if (!currentUserId || !parent?.id) {
         return []
       }
+      const scope = await commentScope(context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction((transaction) =>
           transaction.run(NOTIFIED_COMMENTS_FOR_POST_CYPHER, {
             userId: currentUserId,
             postId: parent.id,
+            cypherParams: { currentUserId },
+            ...scope,
           }),
         )
         return result.records.map((record) => record.get('notification'))
