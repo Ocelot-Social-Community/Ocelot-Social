@@ -18,7 +18,11 @@ import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
-import { groupContentWithheld, nonMemberReadsContent } from './helpers/groupAccessCypher'
+import {
+  nonMemberReadsContent,
+  optionalWithholdingGroupMatch,
+  readsWithholdingGroupContent,
+} from './helpers/groupAccessCypher'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
@@ -163,7 +167,7 @@ const filterEventDates = (params) => {
 }
 
 /**
- * The groups whose comments the viewer reads, for `groupContentWithheld`.
+ * The groups whose comments the viewer reads, for `optionalWithholdingGroupMatch`.
  *
  * A post can be visible while what was written under it is not: its author keeps the post after
  * leaving the group, but the members' comments stay the group's (#10629). Every elevation counts
@@ -178,12 +182,23 @@ const commentScope = async (
 }
 
 /**
- * A comment under a visible post that the viewer may read: they wrote it — what one writes stays
- * one's own, as the post does — or they read the group.
+ * Binds `readsGroup` once per post: whether the viewer reads the group the post sits in (or the
+ * post sits in none). The comments below it are then filtered on that value, not on a group
+ * lookup of their own — which named only the post, and ran once per comment of every post in a
+ * feed.
  */
-const commentReadable = (comment: string, post: string): string => `(
-  EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
-  OR NOT ${groupContentWithheld(post, 'contentGroupIds', 'elevatedGroupIds')}
+const bindReadsGroup = (post: string, carried: string): string => `
+  ${optionalWithholdingGroupMatch(post, 'contentGroupIds', 'elevatedGroupIds')}
+  WITH ${carried}, ${post}, ${readsWithholdingGroupContent} AS readsGroup`
+
+/**
+ * A comment under a visible post that the viewer may read: they read the group — the case of
+ * nearly every post anyone sees, which leaves the author lookup unasked — or they wrote it: what
+ * one writes stays one's own, as the post does.
+ */
+const commentReadable = (comment: string): string => `(
+  readsGroup
+  OR EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
 )`
 
 // ORDER BY from `_CommentOrdering`. Oldest first by default — how a thread reads, and what
@@ -947,8 +962,9 @@ export default {
               cypher: `
                 UNWIND $ids AS __id
                 MATCH (post:Post { id: __id })
+                ${bindReadsGroup('post', '__id')}
                 OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
-                  WHERE ${commentReadable('comment', 'post')}
+                  WHERE ${commentReadable('comment')}
                 WITH __id, comment ORDER BY ${order}
                 RETURN __id AS __id, collect(comment { .* }) AS __value
               `,
@@ -975,9 +991,10 @@ export default {
             cypher: `
               UNWIND $ids AS __id
               MATCH (post:Post { id: __id })
+              ${bindReadsGroup('post', '__id')}
               OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
                 WHERE NOT comment.deleted = true AND NOT comment.disabled = true
-                AND ${commentReadable('comment', 'post')}
+                AND ${commentReadable('comment')}
               RETURN __id AS __id, count(comment) AS __value
             `,
             params: await commentScope(context),
