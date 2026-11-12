@@ -1,6 +1,11 @@
 <template>
   <div class="editor">
-    <menu-bar ref="menuBar" :editor="editor" :toggleLinkInput="toggleLinkInput" />
+    <menu-bar
+      ref="menuBar"
+      :editor="editor"
+      :toggleLinkInput="toggleLinkInput"
+      :linkInputActive="isLinkInputActive"
+    />
     <editor-content ref="editor" :editor="editor" class="ds-input editor-content" />
     <context-menu ref="contextMenu" />
     <suggestion-list
@@ -498,15 +503,18 @@ export default {
     resumeSuggestionList() {
       const resume = this._resumeSuggestion
       this._resumeSuggestion = null
+      // Opening the link input, by the shortcut or by the toolbar button, while a mention or
+      // hashtag list is open (or suspended because the focus left for the button): the list steps
+      // aside and comes back when the input closes, whichever way it was opened.
+      if (attrs && element && this.suggestionType && !this.isLinkInputActive) {
+        this._resumeSuggestion = this._activeSuggestion
+        this.closeSuggestionList()
+      }
       if (!resume || this.suggestionType) return
       this.openSuggestionList(resume.props, resume.suggestionType)
     },
     // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored to that button.
     toggleLinkInputByShortcut() {
-      if (this.suggestionType) {
-        this._resumeSuggestion = this._activeSuggestion
-        this.closeSuggestionList()
-      }
       this.toggleLinkInput(
         this.editor.getMarkAttrs('link'),
         this.$refs.menuBar.$refs.linkButton.$el,

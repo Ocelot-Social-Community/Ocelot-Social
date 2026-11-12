@@ -897,3 +897,44 @@ describe('Editor.vue', () => {
     })
   })
 })
+    it('brings the list back after the toolbar link button was clicked and the input closed with Esc', async () => {
+      propsData.value = ''
+      propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+      wrapper = Wrapper()
+      await Vue.nextTick()
+
+      const { view } = wrapper.vm.editor
+      view.dispatch(view.state.tr.insertText('@p'))
+      await settle()
+      await flushPromises()
+      expect(wrapper.vm.suggestionType).toBe('mention')
+
+      await wrapper.find('button[aria-label="editor.legend.link"]').trigger('click')
+      await settle()
+      expect(wrapper.vm.isLinkInputActive).toBe(true)
+      expect(wrapper.vm.suggestionType).toBe('')
+
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      await flushPromises()
+
+      expect(wrapper.vm.isLinkInputActive).toBe(false)
+      expect(wrapper.vm.suggestionType).toBe('mention')
+      expect(wrapper.vm.filteredItems).toEqual([peter])
+    })
+
+    it('shows the toolbar link button as pressed while the link input is open', async () => {
+      const pressed = () =>
+        wrapper.find('button[aria-label="editor.legend.link"]').attributes('data-appearance') ||
+        wrapper.find('button[aria-label="editor.legend.link"]').classes().join(' ')
+      const before = pressed()
+      pressKey(editorElement(), 'k', { ctrlKey: true })
+      await settle()
+      expect(wrapper.vm.isLinkInputActive).toBe(true)
+      expect(pressed()).not.toEqual(before)
+
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      expect(pressed()).toEqual(before)
+    })
+
