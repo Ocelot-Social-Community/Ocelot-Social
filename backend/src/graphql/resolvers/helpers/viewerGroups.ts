@@ -57,24 +57,49 @@ export interface GroupReadScope {
 }
 
 /**
- * The groups the viewer may read by virtue of their membership, resolved ONCE per request and
- * handed to the filter wrappers rather than asked per candidate post. The viewer's memberships
- * do not change while a query runs, so looking them up inside the row loop is pure repetition —
- * and a measurable one: profiled against 20.000 posts, the per-post form costs 1.480.665 db
- * hits where the hoisted form costs 348.020.
+ * {@link groupReadScope} and {@link elevatedReadScope}, remembered for one request.
  *
- * The result is bounded by how many groups a person joins, not by the size of the database.
- * That is what separates it from the id lists this code used to build: `filterInvisiblePosts`
- * once collected every post id the viewer must not see, which for an anonymous visitor was
- * every post in every non-public group.
+ * A request asks them more than once: the post query for its filter, and then every batched
+ * field below it that filters on the same groups — `Post.comments` and `Post.commentsCount` each
+ * ask once per batch. Asked afresh, each is a round trip before the batch statement can even
+ * start, on the path of every feed.
  *
- * It used to be one list — "the groups I am an active member of" — because membership WAS the
- * answer. It is two lists now because the role decides, and a group may grant reading its
- * content to its applicants or withhold it from its members.
+ * Remembered for the same reason, and under the same conditions, as `groupAuthorization`
+ * (groupRole/requestScope.ts): the viewer's memberships and elevations do not change while one
+ * request is resolved, and the memo is built in `getContext`, so it never outlives the context
+ * it belongs to. A subscription rebuilds its context whenever it reads the viewer again
+ * (context/subscription.ts), which replaces these with it — there they last one refresh window,
+ * not the life of the socket.
  *
- * Anonymous viewers hold no memberships, so they skip the query entirely.
+ * A promise is remembered, not its value, so that resolvers asking at the same time share one
+ * lookup. A lookup that fails is forgotten: the next asker tries again instead of inheriting
+ * the error.
  */
-export const groupReadScope = async (context: Context): Promise<GroupReadScope> => {
+export interface ReadScopes {
+  groupRead: Remembered<GroupReadScope>
+  elevatedRead: Remembered<string[]>
+}
+
+interface Remembered<T> {
+  promise?: Promise<T>
+}
+
+export const createReadScopes = (): ReadScopes => ({ groupRead: {}, elevatedRead: {} })
+
+const remembered = async <T>(slot: Remembered<T>, load: () => Promise<T>): Promise<T> => {
+  if (!slot.promise) {
+    const loading = load()
+    slot.promise = loading
+    // Nothing else writes the slot while it holds a pending promise, so the one to forget is
+    // always this one.
+    loading.catch(() => {
+      slot.promise = undefined
+    })
+  }
+  return slot.promise
+}
+
+const loadGroupReadScope = async (context: Context): Promise<GroupReadScope> => {
   // Anonymous first: a visitor holds no membership AND no network right, so there is nothing
   // to look up in either direction.
   if (!context.user) {
@@ -105,6 +130,29 @@ export const groupReadScope = async (context: Context): Promise<GroupReadScope> 
   }
   return { readableGroupIds, contentGroupIds, readableVisibilities }
 }
+
+/**
+ * The groups the viewer may read by virtue of their membership, resolved ONCE per request and
+ * handed to the filter wrappers rather than asked per candidate post. The viewer's memberships
+ * do not change while a query runs, so looking them up inside the row loop is pure repetition —
+ * and a measurable one: profiled against 20.000 posts, the per-post form costs 1.480.665 db
+ * hits where the hoisted form costs 348.020.
+ *
+ * The result is bounded by how many groups a person joins, not by the size of the database.
+ * That is what separates it from the id lists this code used to build: `filterInvisiblePosts`
+ * once collected every post id the viewer must not see, which for an anonymous visitor was
+ * every post in every non-public group.
+ *
+ * It used to be one list — "the groups I am an active member of" — because membership WAS the
+ * answer. It is two lists now because the role decides, and a group may grant reading its
+ * content to its applicants or withhold it from its members.
+ *
+ * Anonymous viewers hold no memberships, so they skip the query entirely.
+ *
+ * Asked at most once per request (see {@link createReadScopes}).
+ */
+export const groupReadScope = async (context: Context): Promise<GroupReadScope> =>
+  remembered(context.readScopes.groupRead, async () => loadGroupReadScope(context))
 
 /**
  * What the post visibility rule needs to know about the viewer.
@@ -142,15 +190,7 @@ const ELEVATED_READ_SCOPE_QUERY = `
   RETURN group.id AS groupId
 `
 
-/**
- * The groups with a live elevation whose content the viewer's network rights cover.
- *
- * Both halves are needed. The elevation alone is not enough: it outlives a right withdrawn from
- * the viewer's role, and a group can turn hidden while it runs. The right alone is what this
- * replaces. Without a right that could read anything, the query is skipped — which is everybody
- * but the moderators and admins.
- */
-export const elevatedReadScope = async (context: Context): Promise<string[]> => {
+const loadElevatedReadScope = async (context: Context): Promise<string[]> => {
   if (!context.user) {
     return []
   }
@@ -167,6 +207,19 @@ export const elevatedReadScope = async (context: Context): Promise<string[]> => 
   })
   return result.records.map((record) => record.get('groupId') as string)
 }
+
+/**
+ * The groups with a live elevation whose content the viewer's network rights cover.
+ *
+ * Both halves are needed. The elevation alone is not enough: it outlives a right withdrawn from
+ * the viewer's role, and a group can turn hidden while it runs. The right alone is what this
+ * replaces. Without a right that could read anything, the query is skipped — which is everybody
+ * but the moderators and admins.
+ *
+ * Asked at most once per request (see {@link createReadScopes}).
+ */
+export const elevatedReadScope = async (context: Context): Promise<string[]> =>
+  remembered(context.readScopes.elevatedRead, async () => loadElevatedReadScope(context))
 
 export const viewerScope = async (context: Context): Promise<ViewerScope> => {
   const [{ contentGroupIds }, elevatedGroupIds] = await Promise.all([
