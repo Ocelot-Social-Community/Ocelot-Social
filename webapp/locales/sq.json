@@ -898,7 +898,11 @@
         "participant": "Të përfshirë në postim"
       }
     },
-    "placeholder": "Lër mendimet tuaja frymëzuese …"
+    "placeholder": "Lër mendimet tuaja frymëzuese …",
+    "unfinished": {
+      "hashtag": "Nuk është zgjedhur asnjë hashtag: kështu hashtagu nuk lidhet. Zgjidhe nga lista.",
+      "mention": "Nuk është zgjedhur asnjë përdorues: kështu askush nuk njoftohet. Zgjidh emrin nga lista."
+    }
   },
   "error-pages": {
     "403-default": "Nuk je i autorizuar për këtë faqe!",

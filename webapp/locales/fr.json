@@ -898,7 +898,11 @@
         "participant": "Participent à la publication"
       }
     },
-    "placeholder": "Écrivez quelque chose d'inspirant..."
+    "placeholder": "Écrivez quelque chose d'inspirant...",
+    "unfinished": {
+      "hashtag": "Aucun hashtag n’est choisi : ainsi, le hashtag n’est pas relié. Choisissez-le dans la liste.",
+      "mention": "Aucun utilisateur n’est choisi : ainsi, personne n’est notifié. Choisissez le nom dans la liste."
+    }
   },
   "error-pages": {
     "403-default": "Non autorisé à accéder à cette page !",

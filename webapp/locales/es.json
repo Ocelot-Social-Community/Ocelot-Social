@@ -898,7 +898,11 @@
         "participant": "Participan en la publicación"
       }
     },
-    "placeholder": "Deje sus pensamientos inspiradores...."
+    "placeholder": "Deje sus pensamientos inspiradores....",
+    "unfinished": {
+      "hashtag": "No se ha elegido ningún hashtag: así el hashtag no se vincula. Elíjalo de la lista.",
+      "mention": "No se ha elegido ningún usuario: así no se notifica a nadie. Elija el nombre de la lista."
+    }
   },
   "error-pages": {
     "403-default": "No autorizado a esta página",
