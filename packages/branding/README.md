@@ -122,6 +122,46 @@ every brand's value for it into a silent no-op, so it is a decision, never a sid
   still declared, so the test stays green, yet a value a brand sets for `--old` reaches nobody. To
   break on purpose, remove the old name from the stylesheets and from the snapshot.
 
+## The dark mode: what a brand sets
+
+The dark mode is carried by the tokens themselves: most colours in `root-tokens.css` and
+`ocelot-ui-variables.css` are a pair, `--x: light-dark(<light>, <dark>)`. Whether a brand has the dark
+theme at all is `theme.colorScheme`: `'light'` (the default of every brand, the theme it always had),
+`'dark'`, or `'light dark'` (the person chooses; vanilla has both).
+
+- **A token a brand sets as one value applies to both themes.** `--color-primary: rgb(0, 122, 255)` is
+  that colour in light and in dark. To give a theme its own colour, set the token as a pair, and derive
+  the dark half from the light one in the brand's own CSS if you want to:
+
+  ```css
+  :root {
+    --brand-ribbon: rgb(0, 168, 181);
+    --color-ribbon-article: light-dark(
+      var(--brand-ribbon),
+      color-mix(in srgb, var(--brand-ribbon), black 18%)
+    );
+  }
+  ```
+
+  A variable of the brand's own (`--brand-ribbon`) that the brand's CSS reads is fine; it is not looked
+  at as a token of the framework.
+
+- **A surface that carries text has its own token.** `--color-primary-fill`, `-secondary-fill`,
+  `-success-fill`, `-info-fill`, `-danger-fill` and `-warning-fill` are what badges, filled buttons,
+  counters and toasts are painted with: the brand's colour in light, in dark darkened so that the text
+  on it reads (about 4.5:1) and the surface still stands off the dark ground. They follow the colour
+  a brand sets (`--color-primary`), so a brand needs no dark step of its own; it can set the `-fill`
+  token as a pair when it wants one. The colour itself (`--color-primary`) stays what text, links and
+  borders use, bright on the dark ground.
+- **Surfaces of their own** (the ribbons, the donation bar, the chat bubbles) are tokens of their own and
+  carry the dark half in the token: set it as one value or as a pair, as above. The own chat bubble
+  and the active room are the primary colour mixed into the dark ground, so they follow a brand's primary.
+- **Tokens that fewer places read than before the dark mode.** A brand that set one of them reaches
+  fewer places now: `--text-color-inverse` is read in 3 places instead of 14 (text over video reads
+  `--video-on-media-color`), `--background-color-primary` is read in none.
+- **Browsers without `light-dark()`** (before Chrome 123, Firefox 120, Safari 17.5) get both themes from
+  generated fallback blocks; `color-mix()` (Chrome 111) is taken out there, leaving the first colour.
+
 ## Changing the schema
 
 The schema **shape** (the set of config leaf paths + their types + the bucket partition) is locked by a
