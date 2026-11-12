@@ -46,13 +46,19 @@
  */
 
   --color-neutral-0: rgb(25, 23, 28);
+  --color-neutral-5: rgb(30, 29, 34);
   --color-neutral-10: rgb(40, 37, 45);
+  --color-neutral-12: rgb(48, 46, 54);
+  --color-neutral-15: rgb(58, 55, 64);
   --color-neutral-20: rgb(75, 69, 84);
   --color-neutral-30: rgb(100, 92, 112);
   --color-neutral-40: rgb(112, 103, 126);
+  --color-neutral-47: rgb(140, 133, 152);
   --color-neutral-50: rgb(151, 143, 163);
+  --color-neutral-53: rgb(160, 153, 172);
   --color-neutral-60: rgb(177, 171, 186);
   --color-neutral-70: rgb(203, 199, 209);
+  --color-neutral-73: rgb(212, 208, 218);
   --color-neutral-80: rgb(229, 227, 232);
   --color-neutral-85: rgb(239, 238, 241);
   --color-neutral-90: rgb(245, 244, 246);
@@ -63,11 +69,11 @@
  * @presenter Color
  */
 
-  --text-color-base: light-dark(var(--color-neutral-20), rgb(212, 208, 218));
-  --text-color-soft: light-dark(var(--color-neutral-40), rgb(178, 172, 188));
-  --text-color-softer: light-dark(var(--color-neutral-60), rgb(140, 133, 152));
-  --text-color-disabled: light-dark(var(--color-neutral-60), rgb(110, 104, 120));
-  --text-color-inverse: light-dark(var(--color-neutral-95), rgb(24, 23, 27));
+  --text-color-base: light-dark(var(--color-neutral-20), var(--color-neutral-73));
+  --text-color-soft: light-dark(var(--color-neutral-40), var(--color-neutral-60));
+  --text-color-softer: light-dark(var(--color-neutral-60), var(--color-neutral-47));
+  --text-color-disabled: light-dark(var(--color-neutral-60), var(--color-neutral-40));
+  --text-color-inverse: light-dark(var(--color-neutral-95), var(--color-neutral-0));
   --text-color-link: var(--color-primary);
   --text-color-link-active: var(--color-primary-highlight);
   --text-color-primary: var(--color-primary);
@@ -79,20 +85,20 @@
   --text-color-danger: var(--color-danger);
   --text-color-danger-inverse: var(--color-danger-inverse);
   /* Icon and control text on light surfaces (map controls) — darker than --text-color-base. */
-  --text-color-strong: light-dark(rgb(51, 51, 51), rgb(240, 238, 243));
+  --text-color-strong: light-dark(rgb(51, 51, 51), var(--color-neutral-85));
   /**
  * @tokens Color Background
  * @presenter Color
  */
 
-  --background-color-base: light-dark(var(--color-neutral-100), rgb(24, 23, 27));
-  --background-color-soft: light-dark(var(--color-neutral-95), rgb(30, 29, 34));
-  --background-color-softer: light-dark(var(--color-neutral-90), rgb(38, 36, 43));
-  --background-color-softer-active: light-dark(var(--color-neutral-95), rgb(30, 29, 34));
-  --background-color-softest: light-dark(var(--color-neutral-85), rgb(48, 46, 54));
+  --background-color-base: light-dark(var(--color-neutral-100), var(--color-neutral-0));
+  --background-color-soft: light-dark(var(--color-neutral-95), var(--color-neutral-5));
+  --background-color-softer: light-dark(var(--color-neutral-90), var(--color-neutral-10));
+  --background-color-softer-active: light-dark(var(--color-neutral-95), var(--color-neutral-5));
+  --background-color-softest: light-dark(var(--color-neutral-85), var(--color-neutral-12));
   --background-color-inverse: light-dark(var(--color-neutral-0), rgb(240, 239, 242));
   --background-color-inverse-soft: light-dark(var(--color-neutral-10), rgb(220, 218, 225));
-  --background-color-disabled: light-dark(var(--color-neutral-90), rgb(38, 36, 43));
+  --background-color-disabled: light-dark(var(--color-neutral-90), var(--color-neutral-10));
   --background-color-primary: var(--color-primary);
   --background-color-primary-inverse: var(--color-primary-inverse);
   --background-color-warning: var(--color-warning);
@@ -101,8 +107,8 @@
   --background-color-pressed: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.12));
   --background-color-selected: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.1));
   /* A filled surface one step below --background-color-softest, and the hover of a softer surface. */
-  --background-color-muted: light-dark(var(--color-neutral-80), rgb(58, 55, 64));
-  --background-color-softer-hover: light-dark(rgb(224, 224, 224), rgb(60, 57, 66));
+  --background-color-muted: light-dark(var(--color-neutral-80), var(--color-neutral-15));
+  --background-color-softer-hover: light-dark(var(--color-neutral-80), var(--color-neutral-15));
   /* Dims the page under an open menu. */
   --background-color-overlay: light-dark(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.5));
   /* See-through panels over a map. */
@@ -113,11 +119,11 @@
  * @presenter Color
  */
 
-  --border-color-base: light-dark(var(--color-neutral-60), rgb(95, 90, 104));
-  --border-color-soft: light-dark(var(--color-neutral-70), rgb(75, 71, 83));
-  --border-color-softer: light-dark(var(--color-neutral-80), rgb(58, 55, 64));
-  --border-color-softest: light-dark(var(--color-neutral-85), rgb(48, 46, 54));
-  --border-color-strong: light-dark(var(--color-neutral-20), rgb(178, 172, 188));
+  --border-color-base: light-dark(var(--color-neutral-60), var(--color-neutral-30));
+  --border-color-soft: light-dark(var(--color-neutral-70), var(--color-neutral-20));
+  --border-color-softer: light-dark(var(--color-neutral-80), var(--color-neutral-15));
+  --border-color-softest: light-dark(var(--color-neutral-85), var(--color-neutral-12));
+  --border-color-strong: light-dark(var(--color-neutral-20), var(--color-neutral-60));
   --border-color-active: var(--color-primary);
   --border-color-danger: var(--color-danger);
   /**
@@ -312,7 +318,7 @@
   --shadow-color-raised: light-dark(rgb(189, 189, 189), rgba(0, 0, 0, 0.6));
   --scrollbar-thumb-color: light-dark(rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.25));
   /* Fill of the monochrome logo SVG. */
-  --color-logo: light-dark(rgb(0, 0, 0), rgb(232, 230, 236));
+  --color-logo: light-dark(rgb(0, 0, 0), var(--color-neutral-80));
   /**
  * @tokens Effects
  */
@@ -370,13 +376,13 @@
   /* Brand knobs whose framework default used to live in an SCSS var() fallback. That fallback
      disappeared when the tokens became plain var(--x) references, so the default is declared
      here — one visible source instead of a value hidden in a fallback. */
-  --color-header-background: light-dark(var(--color-neutral-100), rgb(30, 29, 34));
+  --color-header-background: light-dark(var(--color-neutral-100), var(--color-neutral-5));
 
   /**
  * @tokens Footer Color
  */
 
-  --color-footer-background: light-dark(var(--color-neutral-100), rgb(30, 29, 34));
+  --color-footer-background: light-dark(var(--color-neutral-100), var(--color-neutral-5));
   --color-footer-link: var(--color-primary);
   /**
  * @tokens Locale Menu Color
@@ -487,9 +493,9 @@
      declaration — the name rendered in the inherited colour. Same family and same value as
      --text-color-base (the message colour), which is what it visually pairs with. */
   /* The docked chat window (layouts/default.vue .chat-modul) and its close link. */
-  --chat-module-background: light-dark(rgb(233, 228, 228), rgb(38, 36, 43));
+  --chat-module-background: light-dark(var(--color-neutral-80), var(--color-neutral-10));
   --chat-module-close-color: light-dark(blue, rgb(120, 170, 255));
-  --chat-message-bg-others: light-dark(var(--color-neutral-80), rgb(48, 46, 54));
+  --chat-message-bg-others: light-dark(var(--color-neutral-80), var(--color-neutral-12));
   /* Roles that read a neutral step on purpose and look the same in both themes. */
   --video-surface: var(--color-neutral-10);
   --video-surface-deep: var(--color-neutral-0);
@@ -498,53 +504,53 @@
      dark video surfaces (status, notices). Both stay dark in both themes, so the text stays light in both —
      --text-color-inverse turns dark. */
   --video-on-media-color: var(--color-neutral-95);
-  --text-color-muted: light-dark(var(--color-neutral-50), rgb(160, 153, 172));
+  --text-color-muted: light-dark(var(--color-neutral-50), var(--color-neutral-53));
   --text-color-on-primary: var(--color-neutral-100);
   --shadow-ink: var(--color-neutral-0);
   /* Tooltips (tooltip.css): inverse in light, so they stand off the page; dark in dark too. */
-  --tooltip-background: light-dark(var(--background-color-inverse-soft), rgb(58, 55, 64));
-  --tooltip-color: light-dark(var(--text-color-inverse), rgb(232, 230, 236));
-  --chat-sidemenu-bg: light-dark(var(--color-neutral-100), rgb(30, 29, 34));
+  --tooltip-background: light-dark(var(--background-color-inverse-soft), var(--color-neutral-15));
+  --tooltip-color: light-dark(var(--text-color-inverse), var(--color-neutral-80));
+  --chat-sidemenu-bg: light-dark(var(--color-neutral-100), var(--color-neutral-5));
   /* The hover partner of --chat-sidemenu-bg. Carried over as a literal because the SCSS side had it
      as one too ($chat-sidemenu-background-over); it is a token rather than a value inlined in
      constants/chatTokens.js so a brand can actually reach it, like every other chat token. */
-  --chat-sidemenu-background-over: light-dark(#f6f6f6, rgb(38, 36, 43));
+  --chat-sidemenu-background-over: light-dark(var(--color-neutral-90), var(--color-neutral-10));
   /* vue-advanced-chat's own palette, one token per literal it shipped with (constants/chat.js).
      Names must never equal one of the library's own --chat-* variables: it sets those on its root
      from these values, and a var() naming itself is a cycle the browser throws away. */
   --chat-accent: light-dark(#1976d2, rgb(100, 170, 240));
-  --chat-accent-contrast: light-dark(#fff, rgb(24, 23, 27));
-  --chat-border-color: light-dark(#e1e4e8, rgb(58, 55, 64));
-  --chat-search-border-color: light-dark(#e1e5e8, rgb(58, 55, 64));
-  --chat-hover-background: light-dark(#f6f6f6, rgb(38, 36, 43));
-  --chat-text-strong: light-dark(#0a0a0a, rgb(232, 230, 236));
-  --chat-text-muted: light-dark(#9ca6af, rgb(140, 133, 152));
-  --chat-text-subtle: light-dark(#757e85, rgb(160, 153, 172));
-  --chat-deleted-background: light-dark(#dadfe2, rgb(48, 46, 54));
+  --chat-accent-contrast: light-dark(var(--color-neutral-100), var(--color-neutral-0));
+  --chat-border-color: light-dark(var(--color-neutral-80), var(--color-neutral-15));
+  --chat-search-border-color: light-dark(var(--color-neutral-80), var(--color-neutral-15));
+  --chat-hover-background: light-dark(var(--color-neutral-90), var(--color-neutral-10));
+  --chat-text-strong: light-dark(#0a0a0a, var(--color-neutral-80));
+  --chat-text-muted: light-dark(#9ca6af, var(--color-neutral-47));
+  --chat-text-subtle: light-dark(#757e85, var(--color-neutral-53));
+  --chat-deleted-background: light-dark(var(--color-neutral-80), var(--color-neutral-12));
   --chat-selected-background: light-dark(#c2dcf2, rgb(40, 60, 90));
   --chat-notice-background: light-dark(#e5effa, rgb(38, 44, 58));
-  --chat-notice-color: light-dark(#505a62, rgb(178, 172, 188));
+  --chat-notice-color: light-dark(#505a62, var(--color-neutral-60));
   --chat-shade-strong: light-dark(rgba(0, 0, 0, 0.15), rgba(255, 255, 255, 0.15));
   --chat-shade: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08));
-  --chat-reply-color: light-dark(#6e6e6e, rgb(178, 172, 188));
+  --chat-reply-color: light-dark(#6e6e6e, var(--color-neutral-60));
   --chat-tag-color: light-dark(#0d579c, rgb(110, 170, 235));
-  --chat-image-background: light-dark(#ddd, rgb(48, 46, 54));
-  --chat-reaction-background: light-dark(#eee, rgb(48, 46, 54));
-  --chat-reaction-border-hover: light-dark(#ddd, rgb(75, 71, 83));
+  --chat-image-background: light-dark(var(--color-neutral-80), var(--color-neutral-12));
+  --chat-reaction-background: light-dark(var(--color-neutral-85), var(--color-neutral-12));
+  --chat-reaction-border-hover: light-dark(var(--color-neutral-80), var(--color-neutral-20));
   --chat-reaction-me-background: light-dark(#cfecf5, rgb(30, 60, 75));
   --chat-reaction-me-border: light-dark(#3b98b8, rgb(59, 152, 184));
   --chat-reaction-me-color: light-dark(#0b59b3, rgb(140, 190, 240));
   --chat-record-color: #eb4034;
-  --chat-audio-color: light-dark(#455247, rgb(178, 172, 188));
+  --chat-audio-color: light-dark(#455247, var(--color-neutral-60));
   --chat-code-background: light-dark(rgba(239, 239, 239, 0.7), rgba(255, 255, 255, 0.08));
   --chat-code-border: light-dark(rgba(212, 212, 212, 0.9), rgba(255, 255, 255, 0.15));
   --chat-code-color: light-dark(#e01e5a, rgb(240, 110, 150));
-  --chat-room-message-color: light-dark(#67717a, rgb(178, 172, 188));
-  --chat-room-timestamp-color: light-dark(#a2aeb8, rgb(140, 133, 152));
+  --chat-room-message-color: light-dark(#67717a, var(--color-neutral-60));
+  --chat-room-timestamp-color: light-dark(#a2aeb8, var(--color-neutral-47));
   --chat-online-color: #4caf50;
   --chat-on-media-color: #fff;
-  --chat-icon-strong: light-dark(#000, rgb(232, 230, 236));
-  --chat-icon-soft: light-dark(#9e9e9e, rgb(140, 133, 152));
+  --chat-icon-strong: light-dark(#000, var(--color-neutral-80));
+  --chat-icon-soft: light-dark(#9e9e9e, var(--color-neutral-47));
   --chat-icon-faint: light-dark(rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.35));
   --chat-icon-backdrop: light-dark(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
   --chat-confirm-color: #1ba65b;
@@ -562,7 +568,7 @@
   /* Under the tiles while they load, and the controls drawn over the map (mapbox-gl's own and ours). */
   /* mapbox-gl ships its control icons as dark SVG data URIs — only a filter can lighten them. */
   /* Read by packages/ui OsLocationMap, which ships its own literal fallbacks. */
-  --map-background: light-dark(rgb(229, 229, 229), rgb(38, 36, 43));
+  --map-background: light-dark(var(--color-neutral-80), var(--color-neutral-10));
   --map-control-background: var(--background-color-base);
   --map-control-icon-filter: none;
   /**
