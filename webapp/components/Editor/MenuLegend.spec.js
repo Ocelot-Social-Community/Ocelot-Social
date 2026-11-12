@@ -11,14 +11,6 @@ const Dropdown = {
 describe('MenuLegend.vue', () => {
   let wrapper
 
-  beforeEach(() => {
-    wrapper = mount(MenuLegend, {
-      mocks: { $t: (key) => key },
-      localVue,
-      stubs: { Dropdown },
-    })
-  })
-
   const shortcutFor = (name) =>
     wrapper
       .findAll('.legend-table')
@@ -28,23 +20,24 @@ describe('MenuLegend.vue', () => {
       .text()
 
   it.each([
-    ['Win32', 'ctrl + k'],
-    ['MacIntel', 'cmd + k'],
-  ])('shows %s link shortcut as %s', (platform, shortcut) => {
+    ['Win32', 'ctrl'],
+    ['MacIntel', 'cmd'],
+  ])('shows correct shortcuts on %s', (platform, modifier) => {
     const platformSpy = jest.spyOn(window.navigator, 'platform', 'get').mockReturnValue(platform)
+
     try {
       wrapper = mount(MenuLegend, {
         mocks: { $t: (key) => key },
         localVue,
         stubs: { Dropdown },
       })
-      expect(shortcutFor('editor.legend.link')).toBe(shortcut)
+
+      expect(shortcutFor('editor.legend.bold')).toBe(`${modifier} + b`)
+      expect(shortcutFor('editor.legend.italic')).toBe(`${modifier} + i`)
+      expect(shortcutFor('editor.legend.underline')).toBe(`${modifier} + u`)
+      expect(shortcutFor('editor.legend.link')).toBe(`${modifier} + k`)
     } finally {
       platformSpy.mockRestore()
     }
-  })
-
-  it('still shows the bold shortcut', () => {
-    expect(shortcutFor('editor.legend.bold')).toBe('ctrl + b')
   })
 })
