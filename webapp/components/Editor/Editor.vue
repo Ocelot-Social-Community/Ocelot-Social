@@ -109,7 +109,7 @@ export default {
             items: () => [],
             onEnter: (props) => this.openSuggestionList(props, MENTION),
             onChange: (props) => this.updateSuggestionList(props, MENTION),
-            onExit: this.closeSuggestionList,
+            onExit: this.exitSuggestionList,
             onKeyDown: this.navigateSuggestionList,
             onFilter: () => [],
           }),
@@ -123,7 +123,7 @@ export default {
             items: () => [],
             onEnter: (props) => this.openSuggestionList(props, HASHTAG),
             onChange: (props) => this.updateSuggestionList(props, HASHTAG),
-            onExit: this.closeSuggestionList,
+            onExit: this.exitSuggestionList,
             onKeyDown: this.navigateSuggestionList,
             onFilter: () => [],
           }),
@@ -275,8 +275,10 @@ export default {
       if (from < range.from || from > range.to) return false
       return !view.state.doc.resolve(range.from).parent.isInline
     },
-    openSuggestionList({ query, range, command, view }, suggestionType) {
+    openSuggestionList(props, suggestionType) {
+      const { query, range, command, view } = props
       if (!this.isBeingTyped({ range, view })) return
+      this._activeSuggestion = { props, suggestionType }
       // Every list starts from scratch — nothing of a previous one, of whichever kind, carries
       // over (the cache is keyed by the typed query alone).
       clearTimeout(this._suggestionTimer)
@@ -294,6 +296,9 @@ export default {
     },
     updateSuggestionList(props, suggestionType) {
       const { query, range, view } = props
+      if (this.isBeingTyped({ range, view })) {
+        this._activeSuggestion = { props, suggestionType }
+      }
       // Closing the link popup returns focus to the same active mention/hashtag match.
       // The plugin emits onChange (not onEnter) when typing resumes, so reopen the Vue list.
       if (!this.suggestionType) {
@@ -306,6 +311,13 @@ export default {
       this.navigatedItemIndex = 0
       this.loadSuggestions()
       this.showSuggestionMenu(view)
+    },
+    // The plugin's match is over (the "@"/"#" was deleted, the cursor left it): nothing to bring
+    // back after the link input either.
+    exitSuggestionList() {
+      this._activeSuggestion = null
+      this._resumeSuggestion = null
+      this.closeSuggestionList()
     },
     closeSuggestionList() {
       clearTimeout(this._suggestionTimer)
@@ -467,6 +479,7 @@ export default {
         this.$refs.contextMenu.hideContextMenu()
         this.isLinkInputActive = false
         this.editor.focus()
+        this.resumeSuggestionList()
       } else if (attrs && element) {
         this.linkUrl = attrs.href
         this.isLinkInputActive = true
@@ -476,11 +489,22 @@ export default {
       } else {
         this.isLinkInputActive = false
         this.editor.focus()
+        this.resumeSuggestionList()
       }
+    },
+    // Ctrl+K closed the list of a mention or hashtag that is still being typed. The plugin's match
+    // lives on and reports no change when the focus returns to it, so without Enter, Esc or a
+    // typed letter nothing would open the list again: do it here.
+    resumeSuggestionList() {
+      const resume = this._resumeSuggestion
+      this._resumeSuggestion = null
+      if (!resume || this.suggestionType) return
+      this.openSuggestionList(resume.props, resume.suggestionType)
     },
     // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored to that button.
     toggleLinkInputByShortcut() {
       if (this.suggestionType) {
+        this._resumeSuggestion = this._activeSuggestion
         this.closeSuggestionList()
       }
       this.toggleLinkInput(

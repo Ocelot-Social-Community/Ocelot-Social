@@ -819,12 +819,66 @@ describe('Editor.vue', () => {
       await settle()
       view.dispatch(view.state.tr.insertText('p'))
       await settle()
+      // The list is open again after Esc, so the letter typed now is asked for after the debounce.
+      await new Promise((resolve) => setTimeout(resolve, 200))
       await flushPromises()
 
       expect(wrapper.vm.isLinkInputActive).toBe(false)
       expect(wrapper.vm.suggestionType).toBe('mention')
       expect(wrapper.vm.filteredItems).toEqual([peter])
       expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('p')
+    })
+
+    describe.each([
+      ['Esc', (input) => pressKey(input, 'Escape', {})],
+      ['Ctrl+K again', (input) => pressKey(input, 'k', { ctrlKey: true })],
+    ])('closing the link input with %s after Ctrl+K in a mention', (_name, close) => {
+      it('brings the suggestions back without typing another letter', async () => {
+        propsData.value = ''
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+        wrapper = Wrapper()
+        await Vue.nextTick()
+
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.insertText('@p'))
+        await settle()
+        await flushPromises()
+        expect(wrapper.vm.suggestionType).toBe('mention')
+
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        expect(wrapper.vm.suggestionType).toBe('')
+
+        close(linkInput())
+        await settle()
+        await flushPromises()
+
+        expect(wrapper.vm.isLinkInputActive).toBe(false)
+        expect(wrapper.vm.suggestionType).toBe('mention')
+        expect(wrapper.vm.filteredItems).toEqual([peter])
+      })
+    })
+
+    it('does not bring back a list whose "@" was deleted while the link input was open', async () => {
+      propsData.value = ''
+      propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+      wrapper = Wrapper()
+      await Vue.nextTick()
+
+      const { view } = wrapper.vm.editor
+      view.dispatch(view.state.tr.insertText('@'))
+      await settle()
+      await flushPromises()
+      pressKey(editorElement(), 'k', { ctrlKey: true })
+      await settle()
+
+      view.dispatch(view.state.tr.delete(1, 2))
+      await settle()
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      await flushPromises()
+
+      expect(wrapper.vm.suggestionType).toBe('')
     })
 
     it('still opens the link input from the toolbar link button', async () => {
