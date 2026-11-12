@@ -35,7 +35,7 @@ There are [several ways to install Docker](https://docs.docker.com/get-docker/) 
 Check the correct Docker installation by checking the version before proceeding. E.g. we have the following versions:
 
 ```bash
-# use Docker version 24.0.6 or newer
+# use Docker Engine 28.0.0 or newer (see "Published Ports Bind to Loopback" below)
 # includes Docker Compose
 $ docker --version
 ```
@@ -75,14 +75,30 @@ In development, make sure your database is running on `http://localhost:7474/bro
 
 All ports the compose files publish (`docker-compose.yml`, `docker-compose.override.yml`, `docker-compose.test.yml`) bind to `127.0.0.1`, so the stack is reachable from your own machine only. This is deliberate: Neo4j runs with `NEO4J_AUTH=none` and MinIO's root credentials are in the repository, so on a shared network — café or conference Wi-Fi — anyone could otherwise read and write the database and the uploads.
 
+This needs **Docker Engine 28.0.0 or newer**. Before 28.0.0, hosts on the same local network segment (layer 2, e.g. the same Wi-Fi or switch) could still reach ports published to `127.0.0.1` ([Docker documentation](https://docs.docker.com/engine/network/port-publishing/)). On an older engine, upgrade or block the ports with a firewall.
+
 To reach the stack from another machine, for example when it runs on a VM or server and the browser does not, set `DEV_BIND_ADDRESS` to the address to bind to:
 
 ```bash
-# in main folder — all interfaces, or a single one such as 192.168.1.5; IPv6 in brackets, e.g. [::]
+# in main folder — all interfaces (IPv6: [::])
 $ DEV_BIND_ADDRESS=0.0.0.0 docker compose up
 ```
 
-Compose also reads it from a `.env` file in the main folder (which is gitignored). Only do this on a network you trust, or put a firewall in front of it: the services are no better protected than before. An SSH tunnel (`ssh -L 3000:localhost:3000 <host>`) gets you there without exposing anything. Containers reach each other by service name, which this does not affect.
+Compose also reads it from a `.env` file in the main folder (which is gitignored). Only do this on a network you trust, or put a firewall in front of it: the services are no better protected than before. Containers reach each other by service name, which this does not affect.
+
+Prefer `0.0.0.0` over a single address such as `192.168.1.5`: a single address replaces loopback instead of adding to it, so everything on the host that uses `localhost` — the backend tests, Cypress, `bolt://localhost:7687`, `localhost:9000` — no longer reaches the stack.
+
+The browser on the other machine also needs the addresses the stack hands it to point at the host instead of at `localhost`, which there is the browser's own machine:
+
+- `WEBSOCKETS_URI` (`webapp/.env`) for live updates, e.g. `ws://<host>:3000/api/graphql`
+- `IMAGOR_PUBLIC_URL` (backend, `docker-compose.override.yml`) for images, e.g. `http://<host>:8000`
+- `AWS_ENDPOINT` (backend, `docker-compose.override.yml`) for uploaded files, e.g. `http://<host>:9000`
+
+An SSH tunnel avoids all of this and exposes nothing. Forward the webapp, the image server and the file storage, and every `localhost` address stays right:
+
+```bash
+$ ssh -L 3000:localhost:3000 -L 8000:localhost:8000 -L 9000:localhost:9000 <host>
+```
 
 Prepare database once before you start by running the following command in a second terminal:
 

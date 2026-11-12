@@ -122,7 +122,7 @@ New here? The [documentation](https://docs.ocelot.social) covers the backend, th
 
 ### Quick Start
 
-With Docker (24.0.6 or newer):
+With Docker (Engine 28.0.0 or newer, see [why](./installation.md#published-ports-bind-to-loopback)):
 
 ```bash
 $ git clone https://github.com/Ocelot-Social-Community/Ocelot-Social.git
