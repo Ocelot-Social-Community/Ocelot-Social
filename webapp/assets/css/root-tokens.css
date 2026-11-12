@@ -72,7 +72,7 @@
   --text-color-base: light-dark(var(--color-neutral-20), var(--color-neutral-73));
   --text-color-soft: light-dark(var(--color-neutral-40), var(--color-neutral-60));
   --text-color-softer: light-dark(var(--color-neutral-60), var(--color-neutral-47));
-  --text-color-disabled: light-dark(var(--color-neutral-60), rgb(110, 104, 120));
+  --text-color-disabled: light-dark(var(--color-neutral-60), var(--color-neutral-40));
   --text-color-inverse: light-dark(var(--color-neutral-95), var(--color-neutral-0));
   --text-color-link: var(--color-primary);
   --text-color-link-active: var(--color-primary-highlight);
@@ -119,7 +119,7 @@
  * @presenter Color
  */
 
-  --border-color-base: light-dark(var(--color-neutral-60), rgb(95, 90, 104));
+  --border-color-base: light-dark(var(--color-neutral-60), var(--color-neutral-30));
   --border-color-soft: light-dark(var(--color-neutral-70), var(--color-neutral-20));
   --border-color-softer: light-dark(var(--color-neutral-80), var(--color-neutral-15));
   --border-color-softest: light-dark(var(--color-neutral-85), var(--color-neutral-12));
