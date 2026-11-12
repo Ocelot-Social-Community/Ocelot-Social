@@ -1,6 +1,6 @@
 <template>
   <editor-menu-bar :editor="editor" v-slot="{ commands, isActive, getMarkAttrs }">
-    <div>
+    <div ref="bar" class="editor-menubar" :class="{ 'is-stuck': isStuck }">
       <os-button
         size="sm"
         circle
@@ -163,13 +163,70 @@ export default {
     editor: { type: Object, default: null },
     toggleLinkInput: { type: Function, required: true },
   },
+  data() {
+    return { isStuck: false }
+  },
   created() {
     this.icons = iconRegistry
+  },
+  mounted() {
+    // The bar is the first thing in the editor, so it sits level with the editor's top until it
+    // sticks; once it is lower than that, it is stuck. Asked of the DOM on every scroll, of any
+    // scroll container (scroll does not bubble, hence capture), so no header height or scroll
+    // container has to be assumed.
+    this._checkStuck = () => {
+      this._stuckFrame = null
+      const bar = this.$refs.bar
+      if (!bar || !bar.parentElement) return
+      this.isStuck =
+        bar.getBoundingClientRect().top - bar.parentElement.getBoundingClientRect().top > 0.5
+    }
+    this._onScroll = () => {
+      if (!this._stuckFrame) this._stuckFrame = requestAnimationFrame(this._checkStuck)
+    }
+    window.addEventListener('scroll', this._onScroll, { capture: true, passive: true })
+    window.addEventListener('resize', this._onScroll, { passive: true })
+    this._checkStuck()
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this._onScroll, { capture: true })
+    window.removeEventListener('resize', this._onScroll)
+    if (this._stuckFrame) cancelAnimationFrame(this._stuckFrame)
   },
 }
 </script>
 
 <style>
+/* Stays in view below the page header while a long text scrolls past, so the link input, which
+   opens at the link button, never opens out of sight (#4666). */
+.editor-menubar {
+  position: sticky;
+  top: var(--header-height);
+  z-index: var(--z-index-sticky);
+  background-color: var(--background-color-base);
+  /* The page header slides away and back in 0.3s (HeaderMenu) and --header-height follows it; the
+     bar follows at the same pace, or it would jump. */
+  transition:
+    top 0.3s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Lifts off the text running past underneath only while it sticks; in its place it would only
+   add noise above the text field. */
+.editor-menubar.is-stuck {
+  /* Black on the dark surface hardly shows, so in the dark theme the shadow is full black, with a
+     faint light edge to mark where the bar ends. */
+  box-shadow:
+    0 6px 8px -6px light-dark(var(--shadow-color-strong), rgb(0, 0, 0)),
+    0 1px 0 light-dark(transparent, rgba(255, 255, 255, 0.1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editor-menubar {
+    transition: none;
+  }
+}
+
 .legend-button {
   display: inline;
   position: relative;
