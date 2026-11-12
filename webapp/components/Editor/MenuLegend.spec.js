@@ -22,6 +22,10 @@ describe('MenuLegend.vue', () => {
   it.each([
     ['Win32', 'ctrl'],
     ['MacIntel', 'cmd'],
+    ['iPhone', 'cmd'],
+    ['iPad', 'cmd'],
+    ['iPod', 'cmd'],
+    ['Linux x86_64', 'ctrl'],
   ])('shows correct shortcuts on %s', (platform, modifier) => {
     const platformSpy = jest.spyOn(window.navigator, 'platform', 'get').mockReturnValue(platform)
 
