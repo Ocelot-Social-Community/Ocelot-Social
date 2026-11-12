@@ -898,7 +898,11 @@
         "participant": "Uczestnicy wpisu"
       }
     },
-    "placeholder": "Napisz coś inspirującego..."
+    "placeholder": "Napisz coś inspirującego...",
+    "unfinished": {
+      "hashtag": "Nie wybrano hashtagu: w ten sposób hashtag nie zostanie powiązany. Wybierz go z listy.",
+      "mention": "Nie wybrano użytkownika: w ten sposób nikt nie zostanie powiadomiony. Wybierz nazwę z listy."
+    }
   },
   "error-pages": {
     "403-default": "Brak uprawnień do tej strony!",

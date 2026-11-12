@@ -45,7 +45,7 @@
         size="sm"
         circle
         variant="primary"
-        :appearance="isActive.link() ? 'outline' : 'ghost'"
+        :appearance="isActive.link() || linkInputActive ? 'outline' : 'ghost'"
         :aria-label="$t('editor.legend.link')"
         @click="(event) => toggleLinkInput(getMarkAttrs('link'), event.target.closest('button'))"
       >
@@ -162,6 +162,8 @@ export default {
   props: {
     editor: { type: Object, default: null },
     toggleLinkInput: { type: Function, required: true },
+    // The link input is open: its button looks pressed, as for text that already is a link.
+    linkInputActive: { type: Boolean, default: false },
   },
   data() {
     return { isStuck: false }

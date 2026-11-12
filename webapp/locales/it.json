@@ -898,7 +898,11 @@
         "participant": "Partecipano al post"
       }
     },
-    "placeholder": "Lascia i tuoi pensieri ispiranti …"
+    "placeholder": "Lascia i tuoi pensieri ispiranti …",
+    "unfinished": {
+      "hashtag": "Nessun hashtag è selezionato: così l’hashtag non viene collegato. Scegli l’hashtag dalla lista.",
+      "mention": "Nessun utente è selezionato: così non viene avvisato nessuno. Scegli il nome dalla lista."
+    }
   },
   "error-pages": {
     "403-default": "Non autorizzato ad accedere a questa pagina!",

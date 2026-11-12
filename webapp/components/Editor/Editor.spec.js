@@ -697,6 +697,153 @@ describe('Editor.vue', () => {
     })
   })
 
+  describe('unfinished mentions and hashtags', () => {
+    const framed = () =>
+      Array.from(wrapper.vm.editor.view.dom.querySelectorAll('.unfinished-suggestion')).map(
+        (element) => element.textContent,
+      )
+    const placeCursor = async (position) => {
+      const { state, dispatch } = wrapper.vm.editor.view
+      dispatch(state.tr.setSelection(TextSelection.create(state.doc, position)))
+      await Vue.nextTick()
+    }
+    const focus = async () => {
+      wrapper.vm.editor.view.dom.dispatchEvent(new FocusEvent('focus'))
+      await Vue.nextTick()
+    }
+
+    beforeEach(async () => {
+      mocks.$t = (key) => key
+      propsData.value = '<p>Hi @pet and #hall now</p>'
+      propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+      propsData.hashtagSuggestions = jest.fn().mockResolvedValue([])
+      wrapper = Wrapper()
+      await Vue.nextTick()
+    })
+
+    it('frames a typed mention and a typed hashtag that were not chosen from a list', () => {
+      expect(framed()).toEqual(['@pet', '#hall'])
+    })
+
+    it('leaves the one being typed alone, with the cursor inside it or at its end', async () => {
+      await focus()
+      await placeCursor(6) // "Hi @pe|t"
+      expect(framed()).toEqual(['#hall'])
+      await placeCursor(8) // "Hi @pet|"
+      expect(framed()).toEqual(['#hall'])
+    })
+
+    it('frames it again once the cursor is elsewhere', async () => {
+      await focus()
+      await placeCursor(8)
+      await placeCursor(12) // in "and", outside both
+      expect(framed()).toEqual(['@pet', '#hall'])
+    })
+
+    it('frames it while the editor has no focus, wherever the cursor was left', async () => {
+      await focus()
+      await placeCursor(8)
+      expect(framed()).toEqual(['#hall'])
+      wrapper.vm.editor.view.dom.dispatchEvent(new FocusEvent('blur'))
+      await Vue.nextTick()
+      expect(framed()).toEqual(['@pet', '#hall'])
+    })
+
+    it('leaves a mention alone that comes back from the database as a link', async () => {
+      propsData.value =
+        '<p>Hi <a href="/profile/u1" data-mention-id="u1">@peter-lustig</a> and @pet</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual(['@pet'])
+    })
+
+    describe('tooltip of a frame', () => {
+      const anchor = () => wrapper.vm.$refs.unfinishedAnchor
+      const frames = () => wrapper.vm.editor.view.dom.querySelectorAll('.unfinished-suggestion')
+      const hover = (element, type = 'mouseover') =>
+        element.dispatchEvent(new MouseEvent(type, { bubbles: true }))
+
+      beforeEach(() => {
+        jest.useFakeTimers()
+      })
+
+      afterEach(() => {
+        jest.useRealTimers()
+      })
+
+      it("shows the app's tooltip, after the usual delay, on an anchor and not on the frame", () => {
+        const [mention, hashtag] = frames()
+        mention.getBoundingClientRect = () => ({ left: 10, top: 20, width: 30, height: 15 })
+        hover(mention)
+        jest.advanceTimersByTime(700)
+        expect(anchor()._tooltip).toBeUndefined()
+        jest.advanceTimersByTime(100)
+        expect(anchor()._tooltip.options.title).toBe('editor.unfinished.mention')
+        expect(anchor().style.left).toBe('10px')
+        expect(anchor().style.top).toBe('20px')
+        expect(anchor().style.width).toBe('30px')
+        expect(anchor().style.height).toBe('15px')
+        // ProseMirror must find nothing changed on its frame.
+        expect(mention._tooltip).toBeUndefined()
+        expect(mention.className).toBe('unfinished-suggestion')
+
+        hover(mention, 'mouseout')
+        expect(anchor()._tooltip).toBeUndefined()
+        hover(hashtag)
+        jest.advanceTimersByTime(800)
+        expect(anchor()._tooltip.options.title).toBe('editor.unfinished.hashtag')
+      })
+
+      it('shows nothing when the pointer leaves before the delay is over', () => {
+        const [mention] = frames()
+        hover(mention)
+        jest.advanceTimersByTime(300)
+        hover(mention, 'mouseout')
+        jest.advanceTimersByTime(1000)
+        expect(anchor()._tooltip).toBeUndefined()
+      })
+
+      it('takes the tooltip off a word that is no longer framed', async () => {
+        const [mention] = frames()
+        hover(mention)
+        jest.advanceTimersByTime(800)
+        expect(anchor()._tooltip).toBeDefined()
+
+        await focus()
+        await placeCursor(8) // "Hi @pet|": the mention is being typed, its frame is gone
+        expect(anchor()._tooltip).toBeUndefined()
+      })
+    })
+
+    it('finds a word that is split between differently marked texts', async () => {
+      propsData.value = '<p><strong>@</strong>pet and <em>#ha</em>ll</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual(['@', 'pet', '#ha', 'll'])
+    })
+
+    it('does not take the "@" of an email address for a mention, whatever marks it', async () => {
+      propsData.value = '<p>mail name<strong>@domain</strong>.de or <strong>x</strong>@domain</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual([])
+    })
+
+    it('starts a word after a hard line break, for mentions and for hashtags', async () => {
+      propsData.value = '<p>Text<br>@pet<br>#hall</p>'
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual(['@pet', '#hall'])
+    })
+
+    it('frames no hashtag when the editor offers none', async () => {
+      propsData.hashtagSuggestions = undefined
+      wrapper = Wrapper()
+      await Vue.nextTick()
+      expect(framed()).toEqual(['@pet'])
+    })
+  })
+
   // Ctrl+K opens the same link input as the toolbar's link button (#4666). jsdom reports no
   // platform, so `Mod` means Ctrl here; Editor.mac.spec.js covers Cmd+K.
   describe('link shortcut', () => {
@@ -819,12 +966,107 @@ describe('Editor.vue', () => {
       await settle()
       view.dispatch(view.state.tr.insertText('p'))
       await settle()
+      // The list is open again after Esc, so the letter typed now is asked for after the debounce.
+      await new Promise((resolve) => setTimeout(resolve, 200))
       await flushPromises()
 
       expect(wrapper.vm.isLinkInputActive).toBe(false)
       expect(wrapper.vm.suggestionType).toBe('mention')
       expect(wrapper.vm.filteredItems).toEqual([peter])
       expect(propsData.mentionSuggestions).toHaveBeenLastCalledWith('p')
+    })
+
+    describe.each([
+      ['Esc', (input) => pressKey(input, 'Escape', {})],
+      ['Ctrl+K again', (input) => pressKey(input, 'k', { ctrlKey: true })],
+    ])('closing the link input with %s after Ctrl+K in a mention', (_name, close) => {
+      it('brings the suggestions back without typing another letter', async () => {
+        propsData.value = ''
+        propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+        wrapper = Wrapper()
+        await Vue.nextTick()
+
+        const { view } = wrapper.vm.editor
+        view.dispatch(view.state.tr.insertText('@p'))
+        await settle()
+        await flushPromises()
+        expect(wrapper.vm.suggestionType).toBe('mention')
+
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        expect(wrapper.vm.suggestionType).toBe('')
+
+        close(linkInput())
+        await settle()
+        await flushPromises()
+
+        expect(wrapper.vm.isLinkInputActive).toBe(false)
+        expect(wrapper.vm.suggestionType).toBe('mention')
+        expect(wrapper.vm.filteredItems).toEqual([peter])
+      })
+    })
+
+    it('brings the list back after the toolbar link button was clicked and the input closed with Esc', async () => {
+      propsData.value = ''
+      propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+      wrapper = Wrapper()
+      await Vue.nextTick()
+
+      const { view } = wrapper.vm.editor
+      view.dispatch(view.state.tr.insertText('@p'))
+      await settle()
+      await flushPromises()
+      expect(wrapper.vm.suggestionType).toBe('mention')
+
+      await wrapper.find('button[aria-label="editor.legend.link"]').trigger('click')
+      await settle()
+      expect(wrapper.vm.isLinkInputActive).toBe(true)
+      expect(wrapper.vm.suggestionType).toBe('')
+
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      await flushPromises()
+
+      expect(wrapper.vm.isLinkInputActive).toBe(false)
+      expect(wrapper.vm.suggestionType).toBe('mention')
+      expect(wrapper.vm.filteredItems).toEqual([peter])
+    })
+
+    it('shows the toolbar link button as pressed while the link input is open', async () => {
+      const pressed = () =>
+        wrapper.find('button[aria-label="editor.legend.link"]').attributes('data-appearance') ||
+        wrapper.find('button[aria-label="editor.legend.link"]').classes().join(' ')
+      const before = pressed()
+      pressKey(editorElement(), 'k', { ctrlKey: true })
+      await settle()
+      expect(wrapper.vm.isLinkInputActive).toBe(true)
+      expect(pressed()).not.toEqual(before)
+
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      expect(pressed()).toEqual(before)
+    })
+
+    it('does not bring back a list whose "@" was deleted while the link input was open', async () => {
+      propsData.value = ''
+      propsData.mentionSuggestions = jest.fn().mockResolvedValue([peter])
+      wrapper = Wrapper()
+      await Vue.nextTick()
+
+      const { view } = wrapper.vm.editor
+      view.dispatch(view.state.tr.insertText('@'))
+      await settle()
+      await flushPromises()
+      pressKey(editorElement(), 'k', { ctrlKey: true })
+      await settle()
+
+      view.dispatch(view.state.tr.delete(1, 2))
+      await settle()
+      pressKey(linkInput(), 'Escape', {})
+      await settle()
+      await flushPromises()
+
+      expect(wrapper.vm.suggestionType).toBe('')
     })
 
     it('still opens the link input from the toolbar link button', async () => {

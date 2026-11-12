@@ -898,7 +898,11 @@
         "participant": "Involved in this post"
       }
     },
-    "placeholder": "Leave your inspirational thoughts …"
+    "placeholder": "Leave your inspirational thoughts …",
+    "unfinished": {
+      "hashtag": "No hashtag is chosen: the hashtag is not linked this way. Choose it from the list.",
+      "mention": "No user is chosen: nobody is notified this way. Choose the name from the list."
+    }
   },
   "error-pages": {
     "403-default": "Not authorized to this page!",
