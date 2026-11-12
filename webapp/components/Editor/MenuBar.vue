@@ -214,11 +214,7 @@ export default {
 /* Lifts off the text running past underneath only while it sticks; in its place it would only
    add noise above the text field. */
 .editor-menubar.is-stuck {
-  /* Black on the dark surface hardly shows, so in the dark theme the shadow is full black, with a
-     faint light edge to mark where the bar ends. */
-  box-shadow:
-    0 6px 8px -6px light-dark(var(--shadow-color-strong), rgb(0, 0, 0)),
-    0 1px 0 light-dark(transparent, rgba(255, 255, 255, 0.1));
+  box-shadow: var(--box-shadow-sticky);
 }
 
 @media (prefers-reduced-motion: reduce) {
