@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit" class="comment-form" novalidate>
     <os-card>
-      <hc-editor
+      <editor
         ref="editor"
         :mention-suggestions="mentionSuggestions"
         :value="form.content"
@@ -37,7 +37,7 @@
 <script>
 import { OsButton, OsCard, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import HcEditor from '~/components/Editor/Editor'
+import Editor from '~/components/Editor/Editor'
 import { branding } from '@ocelot-social/branding'
 import { fetchMentionSuggestions } from '~/components/Editor/mentionSuggestions'
 import CommentMutations from '~/graphql/CommentMutations'
@@ -47,7 +47,7 @@ export default {
     OsButton,
     OsCard,
     OsIcon,
-    HcEditor,
+    Editor,
   },
   props: {
     update: { type: Boolean, default: () => false },

@@ -46,6 +46,8 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'box-shadow-card': '0px 12px 26px -4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3))',
   'box-shadow-large':
     '0 10px 20px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)), 0 3px 10px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4))',
+  'box-shadow-sticky':
+    '0 6px 8px -6px light-dark(rgba(0, 0, 0, 0.3), rgb(0, 0, 0)), 0 1px 0 light-dark(transparent, rgba(255, 255, 255, 0.1))',
   'box-shadow-x-large':
     '0 15px 30px 0 light-dark(rgba(0, 0, 0, 0.11), rgba(0, 0, 0, 0.5)), 0 5px 15px 0 light-dark(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.4))',
   'chat-accent': 'light-dark(#1976d2, rgb(100, 170, 240))',
