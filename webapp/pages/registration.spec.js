@@ -215,6 +215,47 @@ describe('Registration', () => {
           expect(form.vm.formData.inviteCode).toEqual('ABCDEF')
         })
       })
+
+      // A group invitation's mail link carries the code, the e-mail and the nonce
+      // at once (#10889) — the recipient has no slide to walk through before the
+      // nonce, so the slider must open directly on the nonce slide.
+      describe('"method=invite-code" with "inviteCode" and "email" and "nonce" in URI show "RegistrationSlideNonce"', () => {
+        it('shows the nonce slide', async () => {
+          mocks.$route.query = {
+            method: 'invite-code',
+            inviteCode: 'ABCDEF',
+            email: 'user@example.org',
+            nonce: '64835',
+          }
+          wrapper = await Wrapper()
+          expect(wrapper.find('.enter-nonce').exists()).toBe(true)
+          expect(wrapper.find('.enter-invite').exists()).toBe(false)
+        })
+
+        it('have email displayed', async () => {
+          mocks.$route.query = {
+            method: 'invite-code',
+            inviteCode: 'ABCDEF',
+            email: 'user@example.org',
+            nonce: '64835',
+          }
+          wrapper = await Wrapper()
+          expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
+        })
+
+        it('"nonce=64835" query in URI have nonce in input', async () => {
+          mocks.$route.query = {
+            method: 'invite-code',
+            inviteCode: 'ABCDEF',
+            email: 'user@example.org',
+            nonce: '64835',
+          }
+          wrapper = await Wrapper()
+          await Vue.nextTick()
+          const form = wrapper.find('.enter-nonce')
+          expect(form.vm.formData.nonce).toEqual('64835')
+        })
+      })
     })
 
     describe('"publicRegistration" but no "inviteRegistration"', () => {
@@ -324,6 +365,47 @@ describe('Registration', () => {
           await Vue.nextTick()
           const form = wrapper.find('.enter-invite')
           expect(form.vm.formData.inviteCode).toEqual('ABCDEF')
+        })
+      })
+
+      // A group invitation's mail link carries the code, the e-mail and the nonce
+      // at once (#10889) — the recipient has no slide to walk through before the
+      // nonce, so the slider must open directly on the nonce slide.
+      describe('"method=invite-code" with "inviteCode" and "email" and "nonce" in URI show "RegistrationSlideNonce"', () => {
+        it('shows the nonce slide', async () => {
+          mocks.$route.query = {
+            method: 'invite-code',
+            inviteCode: 'ABCDEF',
+            email: 'user@example.org',
+            nonce: '64835',
+          }
+          wrapper = await Wrapper()
+          expect(wrapper.find('.enter-nonce').exists()).toBe(true)
+          expect(wrapper.find('.enter-invite').exists()).toBe(false)
+        })
+
+        it('have email displayed', async () => {
+          mocks.$route.query = {
+            method: 'invite-code',
+            inviteCode: 'ABCDEF',
+            email: 'user@example.org',
+            nonce: '64835',
+          }
+          wrapper = await Wrapper()
+          expect(wrapper.find('.enter-nonce').text()).toContain('user@example.org')
+        })
+
+        it('"nonce=64835" query in URI have nonce in input', async () => {
+          mocks.$route.query = {
+            method: 'invite-code',
+            inviteCode: 'ABCDEF',
+            email: 'user@example.org',
+            nonce: '64835',
+          }
+          wrapper = await Wrapper()
+          await Vue.nextTick()
+          const form = wrapper.find('.enter-nonce')
+          expect(form.vm.formData.nonce).toEqual('64835')
         })
       })
     })
