@@ -36,6 +36,10 @@
           <os-icon :icon="icons.plus" />
         </os-button>
         <span v-else class="role-tab role-tab--input" data-test="role-create">
+          <!-- An inline editor in the tab bar: its ✓/✕ and the tab it replaces say what it is for,
+               and the aria-label is its label for a screen reader. A visible label would not fit
+               the bar; the placeholder only names what goes in (html.md, #10625). Same for the
+               rename input below. -->
           <input
             ref="newRoleInput"
             v-model="newRole.name"

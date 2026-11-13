@@ -1293,6 +1293,7 @@
   },
   "login": {
     "email": "E-maili yt",
+    "emailPlaceholder": "femanon@example.org",
     "failure": "Adresë e-maili ose fjalëkalim i pasaktë.",
     "forgotPassword": "Harrove fjalëkalimin?",
     "hello": "Përshëndetje",

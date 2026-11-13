@@ -1293,6 +1293,7 @@
   },
   "login": {
     "email": "Twój adres e-mail",
+    "emailPlaceholder": "femanon@example.org",
     "failure": "Nieprawidłowy adres e-mail lub hasło.",
     "forgotPassword": "Zapomniałeś hasła?",
     "hello": "Cześć",
