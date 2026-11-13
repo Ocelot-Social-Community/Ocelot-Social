@@ -510,7 +510,9 @@ jobs:
       # which the features never use (they build what each scenario needs and wipe it after).
       - name: README screenshots | seed the demo network
         if: matrix.feature == 'readme-screenshots'
-        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T backend npm run db:seed
+        # picsum: the seed's own post images are uploads, served through imagor, which this stack
+        # does not run — the screenshots would show empty frames.
+        run: docker compose -f docker-compose.yml -f docker-compose.test.yml exec -T -e SEED_IMAGES=picsum backend npm run db:seed
 
       - name: README screenshots | capture
         if: matrix.feature == 'readme-screenshots'
