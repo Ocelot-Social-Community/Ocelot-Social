@@ -16,7 +16,7 @@ import type { Context } from '@src/context'
 // The content of a closed or hidden group stays inside it — on every way to it, not only the
 // Post query. The Comment query listed every comment of every group to anyone, visitors
 // included, with the title of its post; a profile's contributions, comments and shouts, a
-// tag's and a category's posts did the same. Each is asked here as a visitor, as a stranger
+// tag's and a category's posts, and the posts recommended beside a public one, did the same. Each is asked here as a visitor, as a stranger
 // and as a member, next to a public group whose content everybody reads.
 
 let authenticatedUser: Context['user']
@@ -174,6 +174,16 @@ const categoryPostIds = async (viewer: string | null) =>
     ).Category[0].posts,
   )
 
+const relatedToPublicPostIds = async (viewer: string | null) =>
+  sorted(
+    (
+      await ask<{ Post: { relatedContributions: { id: string }[] }[] }>(
+        viewer,
+        '{ Post(id: "post-public") { relatedContributions { id } } }',
+      )
+    ).Post[0].relatedContributions,
+  )
+
 interface Profile {
   User: {
     contributions: { id: string }[]
@@ -214,6 +224,10 @@ describe.each([null, 'stranger'])('asked by %s', (viewer) => {
   it("lists only the public group's post in a category", async () => {
     await expect(categoryPostIds(viewer)).resolves.toEqual(publicPost)
   })
+
+  it('recommends no post of a closed or hidden group beside the public one', async () => {
+    await expect(relatedToPublicPostIds(viewer)).resolves.toEqual([])
+  })
 })
 
 describe('asked by a stranger, on a profile', () => {
@@ -239,6 +253,10 @@ describe('asked by a member of every group', () => {
   it('lists every post under a tag and in a category', async () => {
     await expect(taggedPostIds('member')).resolves.toEqual(everyPost)
     await expect(categoryPostIds('member')).resolves.toEqual(everyPost)
+  })
+
+  it('is recommended the posts of every group beside the public one', async () => {
+    await expect(relatedToPublicPostIds('member')).resolves.toEqual(['post-closed', 'post-hidden'])
   })
 
   it('shows everything on a profile', async () => {

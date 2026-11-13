@@ -18,7 +18,11 @@ import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
-import { groupContentWithheld, nonMemberReadsContent } from './helpers/groupAccessCypher'
+import {
+  groupContentWithheld,
+  nonMemberReadsContent,
+  postReadableBy,
+} from './helpers/groupAccessCypher'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
@@ -1061,14 +1065,17 @@ export default {
       const session = context.driver.session()
 
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        // Only what the viewer reads: a tag or a category is shared across groups, so a public
+        // post would otherwise recommend the posts of a closed or hidden group to anyone.
         const relatedContributionsTransactionResponse = await transaction.run(
           `
             MATCH (p:Post {id: $id})-[:TAGGED|CATEGORIZED]->(categoryOrTag)<-[:TAGGED|CATEGORIZED]-(post:Post)
             WHERE NOT post.deleted AND NOT post.disabled
+              AND ${postReadableBy('post', '$currentUserId')}
             RETURN DISTINCT post
             LIMIT 10
           `,
-          { id },
+          { id, currentUserId: context.user?.id ?? null },
         )
         return relatedContributionsTransactionResponse.records.map(
           (record) => record.get('post').properties,
