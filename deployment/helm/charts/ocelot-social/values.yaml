@@ -112,6 +112,9 @@ maintenance:
   #     # Unset it follows backend.env.SUPPORT_EMAIL, so the two cannot disagree — state it here only
   #     # to show a DIFFERENT address than the backend uses.
   #     SUPPORT_EMAIL: "hello@ocelot.social"
+  #     # Which brand's page to serve, for an image built from a brand repo with several brands (one
+  #     # page per brand). Unset it follows backend.env.OCELOT_ACTIVE_BRANDING, like SUPPORT_EMAIL.
+  #     OCELOT_ACTIVE_BRANDING: "my-brand"
   env: {}
 
 imagor:

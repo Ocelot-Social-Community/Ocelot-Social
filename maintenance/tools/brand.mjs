@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 // Brand this maintenance page from a brand's typed config — WITHOUT Docker.
 //
-//   npm run brand -- yunite.me                     a directory under deployment/configurations/
+//   npm run brand -- yunite.me                     a brand repo under deployment/configurations/
+//                                                  with a single brand
+//   OCELOT_ACTIVE_BRANDING=classic \
+//   npm run brand -- acme                          one brand of a repo that holds several (brand
+//                                                  id or directory name, as the deployment names it)
+//   npm run brand -- acme/brandings/classic        the same, as a path
 //   npm run brand -- ../some/other/brand/branding  any brand dir (must hold a brand.config.*)
 //   npm run brand:reset                            back to exactly how it was
 //
@@ -20,7 +25,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const maintenanceDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = resolve(maintenanceDir, "..");
@@ -58,22 +63,40 @@ function reset() {
   );
 }
 
-/** A brand argument as a directory: a bare name resolves under deployment/configurations. */
-function resolveBrandDir(arg) {
+/**
+ * A brand argument as a directory. A path to a brand dir is taken as is; a bare name is a brand repo
+ * under deployment/configurations and resolves to the brand $OCELOT_ACTIVE_BRANDING names, else to
+ * its only brand under brandings/<name>/ — the brand the running maintenance image would serve.
+ */
+async function resolveBrandDir(arg) {
   const hasConfig = (dir) =>
     existsSync(join(dir, "brand.config.ts")) ||
     existsSync(join(dir, "brand.config.mjs"));
   const asPath = resolve(maintenanceDir, arg);
   if (hasConfig(asPath)) return asPath;
-  const asName = join(
-    repoRoot,
-    "deployment",
-    "configurations",
-    arg,
-    "branding",
+  const configurations = join(repoRoot, "deployment", "configurations");
+  const asBrand = join(configurations, arg);
+  if (hasConfig(asBrand)) return asBrand;
+  const { resolveBrandRepo, selectBrand } = await import(
+    pathToFileURL(join(packageDir, "scripts", "lib", "brand-repo.ts")).href
   );
-  if (hasConfig(asName)) return asName;
-  return null;
+  let brandRepo, brand;
+  try {
+    brandRepo = resolveBrandRepo(asBrand);
+    brand = selectBrand(brandRepo, process.env.OCELOT_ACTIVE_BRANDING);
+  } catch (error) {
+    // A layout rule the brand repo breaks is the author's to fix: its message, not a stack trace.
+    if (!String(error?.message).startsWith("[brand-repo]")) throw error;
+    fail(error.message);
+  }
+  for (const warning of brandRepo.warnings) console.error(warning);
+  if (!brand && brandRepo.brands.length > 1) {
+    fail(
+      `"${arg}" holds several brands (${brandRepo.brands.map((b) => b.id).join(", ")}) — ` +
+        `name one: OCELOT_ACTIVE_BRANDING=<id> npm run brand -- ${arg}`,
+    );
+  }
+  return brand?.dir ?? null;
 }
 
 const arg = process.argv[2];
@@ -96,11 +119,11 @@ if (!existsSync(join(packageDir, "dist"))) {
   );
 }
 
-const brandDir = resolveBrandDir(arg);
+const brandDir = await resolveBrandDir(arg);
 if (!brandDir) {
   fail(
     `no brand.config.(ts|mjs) for "${arg}" — expected a directory under ` +
-      `deployment/configurations/<name>/branding, or a path to one`,
+      `deployment/configurations/<name>/brandings/<brand>, or a path to one`,
   );
 }
 

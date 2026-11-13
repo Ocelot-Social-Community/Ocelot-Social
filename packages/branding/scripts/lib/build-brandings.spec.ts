@@ -105,6 +105,12 @@ test('findConfig locates brand.config.mjs, or null when there is none', () => {
   assert.equal(findConfig(brandDir({})), null)
 })
 
+test('findConfig ignores a brand.config.js: ESM or CommonJS would depend on the brand repo', () => {
+  const dir = brandDir({})
+  writeFileSync(join(dir, 'brand.config.js'), ACME_CONFIG)
+  assert.equal(findConfig(dir), null)
+})
+
 test('buildBrandArchive: a brand that names no network is labelled by its id, not as ocelot.social', async () => {
   const built = await buildBrandArchive(
     brandDir({
