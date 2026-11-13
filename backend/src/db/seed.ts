@@ -22,6 +22,7 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { NONE_ROLE, seedGroupRoleTemplates, writeGroupRole } from '@src/groupRole'
 import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
+import { assertWipeAllowed } from './assertWipeAllowed'
 import Factory from './factories'
 import { nudgeCacheResync } from './resync-caches'
 import { trophies, verification } from './seed/badges'
@@ -50,9 +51,7 @@ const imageTypeOf = (url: string): string => {
   return 'image/jpeg'
 }
 
-if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
-  throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
-}
+assertWipeAllowed(CONFIG, 'db:seed')
 
 CONFIG.SEND_MAIL = true
 

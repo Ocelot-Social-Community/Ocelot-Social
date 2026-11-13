@@ -18,7 +18,7 @@ export const TEST_CONFIG = {
   DEBUG: undefined,
   TEST: true,
   PRODUCTION: false,
-  PRODUCTION_DB_CLEAN_ALLOW: false,
+  DB_WIPE_ALLOWED: false,
   DISABLED_MIDDLEWARES: [],
   SEND_MAIL: false,
   PROXY_S3: 'http://localhost:9000',
