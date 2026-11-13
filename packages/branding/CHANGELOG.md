@@ -1,5 +1,56 @@
 # Changelog
 
+## [0.2.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.4...branding-v0.2.5) (2026-11-13)
+
+
+### Features
+
+* **other:** conference chat shared only by the participants of a video call ([#10494](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10494)) ([61c7907](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/61c79079ad44d3aa5a2ae41cd4da56b085c9130b))
+* **other:** video call shall have much more space ([#10540](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10540)) ([d2dd10d](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d2dd10d4f1774f47888e247d1951c59d3dceedb6))
+* **package/branding:** a brand declares its colour schemes, existing brands stay light ([#10854](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10854)) ([7ca8aca](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7ca8aca758c9e51bb52bc5a84baffff46cf3460e))
+* **package/branding:** a brand repo can hold several brands under brandings/ ([#10912](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10912)) ([4712286](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4712286830faefa1843928b987401579a0b4b52a))
+* **package/branding:** a framework token is taken away on purpose, or not at all ([#10839](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10839)) ([727e9d6](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/727e9d6055631ae5372b64f81c10ffc2cfe0ec72))
+* **package/branding:** post title length limits configurable per brand ([#10611](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10611)) ([aa6b288](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/aa6b288e4955f7f357eff20e2512fb1c7e2eb075))
+* **webapp:** a brand sets the default map style for the light and the dark theme, vanilla opens on outdoors in both ([#10909](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10909)) ([32abc83](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/32abc8314dc89af872c57d948bb5586c7d7c7aac))
+* **webapp:** a browser without light-dark() gets the dark theme too, from generated fallback blocks ([#10884](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10884)) ([8871993](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/88719939ae5cf40f7b96131ccd87351ef8e523d9))
+* **webapp:** dark mode — chat, video call and maps ([#10856](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10856)) ([e269837](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/e269837c845325b025901141f1782cc7a304395e))
+* **webapp:** dark mode — theme tokens, theme switch, components and pages ([#10855](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10855)) ([d992289](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/d992289abf6ab7689330be1237bbd87c90e4207c))
+* **webapp:** the editor's menu bar stays in view while a long text scrolls ([#10915](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10915)) ([7691263](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7691263ccbd4ba2f0d96b33d6ccd16d999ef60bd))
+
+
+### Bug Fixes
+
+* **backend:** a group's name keeps to the brand's length bounds ([#10866](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10866)) ([3e84885](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/3e84885aa4e04be1e6b909a1f4862c66691b1791))
+* **package/branding:** a brand that names no network is listed by its id, not as ocelot.social ([#10911](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10911)) ([14df2c1](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/14df2c1d8435bb9f80592e97ccf6fa266b906a94))
+* **webapp:** a brand's colour reaches the headers of the chat and of the call through a token of its own ([#10863](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10863)) ([0b88573](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0b88573568e9fcd34cfc6120692419e745d2ee03))
+* **webapp:** a maximized video call stacks above the page's floating elements ([#10691](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10691)) ([2bd6811](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/2bd6811d37e127b2f5c6162bda0e2184bcf9c5ef))
+* **webapp:** filled surfaces and ribbons are darker in the dark mode, by what wcag aa asks ([#10906](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10906)) ([4085928](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4085928525b7bf28ff7bb9786ba2170da3b3b8c8))
+* **webapp:** the video call's see-through bars let less of the picture through ([#10846](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10846)) ([1fa5f2b](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/1fa5f2bed2136d62fd471a26f8790b4cc2e0a0f9))
+
+
+### Code Refactoring
+
+* **other:** one light-dark() parser, and small leftovers of the dark mode ([#10882](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10882)) ([ef82273](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ef82273303724c647adcbeee404e9013676d81f3))
+* **webapp:** the dark chat bubbles are the brand's primary over the dark ground, and the readme tells brands what the dark mode asks of them ([#10910](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10910)) ([5803815](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/5803815dd156b318fd00ec651d7905ca089213d9))
+* **webapp:** the grey halves of the theme pairs are steps of the neutral scale, which has six finer steps for it ([#10926](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10926)) ([a4c8b99](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a4c8b991c3d2987bafec336ec7529b753d92c9f9))
+
+
+### Documentation
+
+* **other:** replace the references to a missing branding concept document ([#10925](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10925)) ([3d58f5e](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/3d58f5e148e304b5ccf4460d86b90db99b73c283))
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.5 to 26.6.6 in /packages/branding ([#10851](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10851)) ([c792558](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/c792558734977a8d1ddb84133c9b3be9b44e1635))
+* **deps-dev:** bump eslint from 10.12.0 to 10.13.0 in /packages/branding ([#10703](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10703)) ([f972a88](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/f972a88a2b37813e7dee16325881ed375f335122))
+* **deps-dev:** bump eslint from 10.13.0 to 10.14.0 in /packages/branding ([#10821](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10821)) ([0c0f838](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/0c0f8380746ba9c92e814abd2a8b4312de3eb969))
+* **deps-dev:** bump typescript-eslint from 8.71.2 to 8.72.0 in /packages/branding ([#10710](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10710)) ([6c31927](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/6c319275024e27f47469e02d8b2172d2f00b8102))
+* **deps-dev:** bump typescript-eslint from 8.72.0 to 8.72.1 in /packages/branding ([#10768](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10768)) ([b318f31](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/b318f314adc1dd22ec66a4b6989fe174123c74a8))
+* **deps:** bump postcss from 8.5.30 to 8.5.31 in /packages/branding ([#10704](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10704)) ([ac0735f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ac0735f462fddf4b8e05fe3e480880685097b517))
+* **deps:** bump postcss from 8.5.31 to 8.5.32 in /packages/branding ([#10765](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10765)) ([4055eae](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4055eaeae416309500998f49ff060c0c4d624b5a))
+* **deps:** bump tslib from 2.8.1 to 2.9.1 in /packages/branding ([#10809](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/10809)) ([1c2f9f8](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/1c2f9f8b5317075a785b9878f594e89d49d7e908))
+
 ## [0.2.4](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.3...branding-v0.2.4) (2026-10-20)
 
 
