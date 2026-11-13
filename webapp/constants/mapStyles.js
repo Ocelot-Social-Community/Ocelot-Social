@@ -1,3 +1,5 @@
+import { branding } from '@ocelot-social/branding'
+
 // Mapbox tile styles offered by every map (pages/map.vue, LocationPickerMap).
 // https://docs.mapbox.com/api/maps/styles/ — the label is map.styles.<id>.
 export const MAP_STYLES = [
@@ -10,8 +12,10 @@ export const MAP_STYLES = [
 
 const urlOf = (id) => MAP_STYLES.find((style) => style.id === id).url
 
-// A dark page opens on the night tiles, a light one on outdoors.
-export const defaultMapStyleUrl = (dark) => urlOf(dark ? 'navigation-night' : 'outdoors')
+// The style a map opens on: the brand's choice for a page in the dark or in the light theme
+// (branding map.defaultStyle; vanilla: outdoors for both).
+export const defaultMapStyleUrl = (dark) =>
+  urlOf(branding.map.defaultStyle[dark ? 'dark' : 'light'])
 
 // Spelled out so the i18n lint sees every label key in use.
 export const mapStyleLabel = ($t, id) =>

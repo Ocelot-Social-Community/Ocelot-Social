@@ -68,6 +68,21 @@ describe('admin/roles.vue', () => {
     expect(locked('badge-setter')).toBe(false)
   })
 
+  // The fixed roles read translated — owner as "Inhaber", like a group's owner; a custom role as
+  // the name it was given.
+  it('names the fixed roles translated and every other role by its name', async () => {
+    const wrapper = Wrapper()
+
+    expect(wrapper.find('[data-test="role-tab-owner"]').text()).toContain('networkRoles.owner')
+    expect(wrapper.find('[data-test="role-tab-user"]').text()).toContain('networkRoles.user')
+    expect(wrapper.find('[data-test="role-tab-badge-setter"]').text()).toContain('badge-setter')
+
+    wrapper.vm.setActive('owner')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.role__name').text()).toContain('networkRoles.owner')
+  })
+
   it('renders a switcher tab for every role', () => {
     const wrapper = Wrapper()
     expect(wrapper.find('[data-test="role-tab-owner"]').exists()).toBe(true)
@@ -208,8 +223,8 @@ describe('admin/roles.vue', () => {
     expect(wrapper.vm.conflicts['badge-setter']).toBeFalsy()
   })
 
-  // #10485: the page offers what the backend accepts — a role the viewer may change (their own,
-  // or one they outrank), and in another role only rights they hold themselves.
+  // `role.manage` shapes every role but the protected owner freely: rights removed and added,
+  // whoever the role ranks above — the backend accepts exactly that.
   describe('what the viewer may change', () => {
     const mountAs = (ownRoleName, extraRoles = []) => {
       const wrapper = mount(Roles, {
@@ -226,66 +241,51 @@ describe('admin/roles.vue', () => {
       wrapper.vm.buildForms()
       return wrapper
     }
-    const outranked = { name: 'helper', protected: false, permissions: [], memberCount: 0 }
-    const above = {
-      name: 'admin',
-      protected: false,
-      permissions: ['badge.manage'],
-      memberCount: 1,
-      editableByCurrentUser: false,
-    }
-    const held = { key: 'badge.manage', available: true, grantableByCurrentUser: true }
-    const notHeld = { key: 'policy.manage', available: true, grantableByCurrentUser: false }
+    const above = { name: 'admin', protected: false, permissions: ['badge.manage'], memberCount: 1 }
+    const right = { key: 'policy.manage', available: true }
 
-    it('leaves a role above the viewer untouched: no save, rename or delete, with a reason', () => {
+    it('lets the viewer change and rename a role above their own, and switch any right in it', () => {
       const { vm } = mountAs('moderator')
 
-      expect(vm.mayChange(above)).toBe(false)
-      expect(vm.canRename(above)).toBe(false)
-      expect(vm.canDelete({ ...above, memberCount: 0 })).toBe(false)
-      expect(vm.saveDisabled(above)).toBe(true)
-      expect(vm.saveHint(above)).toBe('admin.roles.notEditableHint')
-      expect(vm.mayToggle(above, held)).toBe(false)
-      expect(vm.permissionHint(above, notHeld)).toBeNull()
+      expect(vm.mayChange(above)).toBe(true)
+      expect(vm.canRename(above)).toBe(true)
+      expect(vm.saveHint(above)).toBe('')
+      expect(vm.mayToggle(above, right)).toBe(true)
+      expect(vm.permissionHint(above, right)).toBeNull()
     })
 
-    // Not changeable by this viewer is not the same as fixed: the lock would claim nobody may
-    // change the role, while somebody above the viewer may.
-    it('does not lock the tab of a role the viewer may not change', () => {
+    // Ranked above the viewer is not the same as fixed: the lock says nobody may rename or delete
+    // the role, and only owner and user are like that.
+    it('does not lock the tab of a role above the viewer', () => {
       const wrapper = mountAs('moderator', [above])
 
       expect(wrapper.find('[data-test="role-tab-admin"]').exists()).toBe(true)
       expect(wrapper.find('[data-test="role-tab-admin"] .role-tab__badge').exists()).toBe(false)
     })
 
-    it('lets the viewer grant in a role they outrank only what they hold', () => {
+    // Deleting takes nobody's rights: an empty role goes, whoever it ranks above.
+    it('lets the viewer delete a role above them once it is empty', () => {
       const { vm } = mountAs('moderator')
 
-      expect(vm.mayToggle(outranked, held)).toBe(true)
-      expect(vm.mayToggle(outranked, notHeld)).toBe(false)
-      expect(vm.permissionHint(outranked, notHeld)).toBe('admin.roles.permNotHeld')
-      expect(vm.permissionHint(outranked, held)).toBeNull()
-    })
-
-    it('lets the viewer shape their own role freely', () => {
-      const { vm } = mountAs('moderator')
-      const own = { ...outranked, name: 'moderator' }
-
-      expect(vm.mayToggle(own, notHeld)).toBe(true)
-      expect(vm.permissionHint(own, notHeld)).toBeNull()
+      expect(vm.canDelete({ ...above, memberCount: 0 })).toBe(true)
+      expect(vm.deleteHint({ ...above, memberCount: 0 })).toBe('')
+      expect(vm.canDelete(above)).toBe(false)
+      expect(vm.deleteHint(above)).toBe('admin.roles.cannotDeleteHasMembers')
     })
 
     it('still switches off a right whose feature is not there, with that reason', () => {
       const { vm } = mountAs('moderator')
-      const unavailable = { ...held, available: false }
+      const unavailable = { ...right, available: false }
 
-      expect(vm.mayToggle(outranked, unavailable)).toBe(false)
-      expect(vm.permissionHint(outranked, unavailable)).toBe('admin.roles.permUnavailable')
+      expect(vm.mayToggle(above, unavailable)).toBe(false)
+      expect(vm.permissionHint(above, unavailable)).toBe('admin.roles.permUnavailable')
     })
 
-    it('keeps the protected hint for the owner role', () => {
+    it('leaves the owner role read-only, with the protected hint', () => {
       const { vm } = mountAs('moderator')
 
+      expect(vm.mayChange(roles[0])).toBe(false)
+      expect(vm.mayToggle(roles[0], right)).toBe(false)
       expect(vm.saveHint(roles[0])).toBe('admin.roles.protectedHint')
     })
   })
@@ -666,6 +666,77 @@ describe('admin/roles.vue', () => {
       const { wrapper } = LockoutWrapper({ canManage: false })
       wrapper.vm.forms.admin.permissions['role.manage'] = false
       expect(wrapper.vm.wouldLockSelfOut(adminRole)).toBe(false)
+    })
+
+    // Giving a role role.manage hands its holders every role but owner to shape: a soft confirm
+    // that names the risks.
+    describe('when a role gets role.manage', () => {
+      const helper = { name: 'helper', protected: false, permissions: [], memberCount: 0 }
+      const GrantWrapper = () => {
+        const localMutate = jest.fn().mockResolvedValue({})
+        const wrapper = mount(Roles, {
+          localVue,
+          mocks: {
+            $t: jest.fn((key, args) => (args ? `${key}:${JSON.stringify(args)}` : key)),
+            $toast: { error: jest.fn(), success: jest.fn() },
+            $apollo: {
+              mutate: localMutate,
+              queries: { roles: { refetch: jest.fn().mockResolvedValue() } },
+            },
+            $store: { getters: { 'auth/user': { roleName: 'admin' } } },
+            $can: (permission) => permission === 'role.manage',
+          },
+          stubs: { ...stubs, ConfirmModal: true },
+          data: () => ({ roles: [adminRole, helper], permissionCatalog: catalog }),
+        })
+        wrapper.vm.buildForms()
+        return { wrapper, localMutate }
+      }
+
+      it('warns about the risks and defers the save until confirmed', async () => {
+        const { wrapper, localMutate } = GrantWrapper()
+        wrapper.vm.forms.helper.permissions['role.manage'] = true
+
+        expect(wrapper.vm.saveRole(helper)).toBeUndefined()
+        expect(wrapper.vm.showConfirmModal).toBe(true)
+        expect(wrapper.vm.confirmModalData.titleIdent).toBe('admin.roles.grantRoleManage.title')
+        expect(wrapper.vm.confirmModalData.messageParams).toEqual({ role: 'helper' })
+        expect(localMutate).not.toHaveBeenCalled()
+
+        await wrapper.vm.confirmModalData.buttons.confirm.callback()
+
+        expect(localMutate).toHaveBeenCalledWith(
+          expect.objectContaining({
+            variables: expect.objectContaining({ name: 'helper', permissions: ['role.manage'] }),
+          }),
+        )
+      })
+
+      it('cancels without saving', () => {
+        const { wrapper, localMutate } = GrantWrapper()
+        wrapper.vm.forms.helper.permissions['role.manage'] = true
+        wrapper.vm.saveRole(helper)
+        wrapper.vm.confirmModalData.buttons.cancel.callback()
+
+        expect(localMutate).not.toHaveBeenCalled()
+      })
+
+      it('does not warn for a role that holds role.manage already', async () => {
+        const { wrapper, localMutate } = GrantWrapper()
+        await wrapper.vm.saveRole(adminRole)
+
+        expect(wrapper.vm.showConfirmModal).toBe(false)
+        expect(localMutate).toHaveBeenCalled()
+      })
+
+      it('does not warn for a save that leaves role.manage out', async () => {
+        const { wrapper, localMutate } = GrantWrapper()
+        wrapper.vm.forms.helper.permissions['badge.manage'] = true
+        await wrapper.vm.saveRole(helper)
+
+        expect(wrapper.vm.showConfirmModal).toBe(false)
+        expect(localMutate).toHaveBeenCalled()
+      })
     })
 
     it('does not warn (no auth context) in plain mounts', () => {

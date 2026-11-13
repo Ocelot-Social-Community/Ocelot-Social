@@ -27,10 +27,14 @@
           // navigation. This is a purely decorative type badge, not a region.
           'div',
           {
+            // `ribbon`, `--pinned` and `eventBg` are what the webapp's own Ribbon carried before this
+            // component replaced it. A brand stylesheet written against them (`.ribbon.--pinned`,
+            // `.ribbon.eventBg`) keeps working; new styling belongs in the --color-ribbon-* tokens.
             class: [
               'os-ribbon',
-              props.type === 'Event' && 'os-ribbon--event',
-              props.pinned && 'os-ribbon--pinned',
+              'ribbon',
+              props.type === 'Event' && 'os-ribbon--event eventBg',
+              props.pinned && 'os-ribbon--pinned --pinned',
             ],
           },
           [
@@ -99,22 +103,31 @@
       var(--os-ribbon-event-bg-shadow, var(--color-ribbon-event-shadow, #6001ff));
   }
 
-  /* Derived from --color-warning (not a fixed literal like article/event above) so a brand
-     overriding the shared warning color re-themes the pinned ribbon too, matching the source
-     app's --color-ribbon-announcement/-shadow, which were themselves derived from it. */
+  /* The pinned ribbon reads --color-ribbon-announcement and its shadow, as the source app's did;
+     both default to the shared warning color, so a brand overriding that re-themes this ribbon
+     too. The warning color itself is the fallback for an app that defines none of these. */
   .os-ribbon--pinned {
-    background-color: var(--os-ribbon-pinned-bg, var(--color-warning, rgb(230, 121, 25)));
+    background-color: var(
+      --os-ribbon-pinned-bg,
+      var(--color-ribbon-announcement, var(--color-warning, rgb(230, 121, 25)))
+    );
   }
 
   .os-ribbon--pinned::before {
     border-color: var(
         --os-ribbon-pinned-bg-shadow,
-        color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+        var(
+          --color-ribbon-announcement-shadow,
+          color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+        )
       )
       transparent transparent
       var(
         --os-ribbon-pinned-bg-shadow,
-        color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+        var(
+          --color-ribbon-announcement-shadow,
+          color-mix(in srgb, var(--color-warning, rgb(230, 121, 25)), black 20%)
+        )
       );
   }
 </style>

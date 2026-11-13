@@ -7,7 +7,7 @@ import {
   coversInNetwork,
   dominatesInNetwork,
   mayAssignNetworkRole,
-  mayChangeNetworkRole,
+  outranksInNetwork,
 } from './authority'
 import { DEFAULT_ROLES } from './defaults'
 import { dominates } from './dominance'
@@ -57,24 +57,19 @@ describe('dominatesInNetwork (act-on hierarchy over authority)', () => {
     expect(dominatesInNetwork(set('user.disable'), set(...PARTICIPATION_PERMISSIONS))).toBe(true)
   })
 
-  it('keeps the default chain owner ⊋ admin ⊋ moderator ⊋ user', () => {
-    const owner = new Set(allPermissionKeys())
-
-    expect(dominatesInNetwork(owner, role(ADMIN_ROLE))).toBe(true)
+  it('keeps the default chain admin ⊋ moderator ⊋ user', () => {
     expect(dominatesInNetwork(role(ADMIN_ROLE), role(MODERATOR_ROLE))).toBe(true)
     expect(dominatesInNetwork(role(MODERATOR_ROLE), role(USER_ROLE))).toBe(true)
-    expect(dominatesInNetwork(owner, owner)).toBe(false)
   })
 
-  it('lets the full catalog (owner) outrank a role holding every authority right', () => {
-    const owner = new Set(allPermissionKeys())
-    const allAuthority = new Set(
-      allPermissionKeys().filter((key) => !PARTICIPATION_PERMISSIONS.includes(key)),
-    )
+  // The owner's rank is its name (outranksInNetwork), not its full catalog. A custom role reaches
+  // the full catalog by adding participation rights, which anybody may hand out — ranked by the
+  // catalog, an admin could create one, take it and outrank their fellow admins.
+  it('ranks the full catalog by its authority only, which the default admin holds all of', () => {
+    const fullCatalog = new Set(allPermissionKeys())
 
-    // Equal authority — without the owner rule these would be peers.
-    expect(dominatesInNetwork(owner, allAuthority)).toBe(true)
-    expect(dominatesInNetwork(allAuthority, owner)).toBe(false)
+    expect(dominatesInNetwork(fullCatalog, role(ADMIN_ROLE))).toBe(false)
+    expect(dominatesInNetwork(role(ADMIN_ROLE), fullCatalog)).toBe(false)
   })
 
   it('leaves the plain user role without any authority', () => {
@@ -84,6 +79,39 @@ describe('dominatesInNetwork (act-on hierarchy over authority)', () => {
     for (const key of role(USER_ROLE)) {
       expect(PARTICIPATION_PERMISSIONS).toContain(key)
     }
+  })
+})
+
+// A custom role holding every right there is, as an owner may build it ("superadmin").
+const fullCatalog = (): Set<PermissionKey> => new Set(allPermissionKeys())
+
+describe(outranksInNetwork, () => {
+  const holder = (roleName: string, permissions = role(roleName)) => ({ roleName, permissions })
+  const owner = holder(OWNER_ROLE, fullCatalog())
+  const superadmin = holder('superadmin', fullCatalog())
+
+  it('lets an owner outrank a role holding the full catalog, which the sets alone call a peer', () => {
+    expect(dominatesInNetwork(owner.permissions, superadmin.permissions)).toBe(false)
+    expect(outranksInNetwork(owner, superadmin)).toBe(true)
+  })
+
+  it('lets nobody outrank an owner, not even with the full catalog', () => {
+    expect(outranksInNetwork(superadmin, owner)).toBe(false)
+  })
+
+  it('keeps owners peers', () => {
+    expect(outranksInNetwork(owner, owner)).toBe(false)
+  })
+
+  it('lets an owner outrank the default admin, whose authority equals theirs', () => {
+    expect(outranksInNetwork(owner, holder(ADMIN_ROLE))).toBe(true)
+  })
+
+  it('ranks everybody below the owner by their authority', () => {
+    // The full catalog adds only participation to the default admin: peers.
+    expect(outranksInNetwork(superadmin, holder(ADMIN_ROLE))).toBe(false)
+    expect(outranksInNetwork(holder(ADMIN_ROLE), superadmin)).toBe(false)
+    expect(outranksInNetwork(holder(MODERATOR_ROLE), holder(USER_ROLE))).toBe(true)
   })
 })
 
@@ -150,61 +178,5 @@ describe('mayAssignNetworkRole (#10485)', () => {
     const owner = { permissions: set(...allPermissionKeys()), roleName: OWNER_ROLE }
 
     expect(assign(owner, OWNER_ROLE, USER_ROLE)).toBeNull()
-  })
-})
-
-describe('mayChangeNetworkRole (#10485)', () => {
-  const others = [ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE].map((name) => ({
-    name,
-    permissions: role(name),
-  }))
-  const change = (
-    actorRole: string,
-    roleName: string,
-    newPermissions?: PermissionKey[],
-    actorPermissions = role(actorRole),
-  ) =>
-    mayChangeNetworkRole({
-      actor: { permissions: actorPermissions, roleName: actorRole },
-      roleName,
-      rolePermissions: role(roleName),
-      newPermissions,
-      otherRoles: others,
-    })
-
-  it('refuses a role the actor neither holds nor outranks', () => {
-    expect(change(MODERATOR_ROLE, ADMIN_ROLE)).toBe('notOutranked')
-  })
-
-  it('lets the actor shape their own role, giving it a right they lacked', () => {
-    expect(change(ADMIN_ROLE, ADMIN_ROLE, [...role(ADMIN_ROLE)])).toBeNull()
-    expect(change(MODERATOR_ROLE, MODERATOR_ROLE, [...role(MODERATOR_ROLE), 'post.pin'])).toBeNull()
-  })
-
-  it('renames or deletes their own role without a rights check', () => {
-    expect(change(MODERATOR_ROLE, MODERATOR_ROLE)).toBeNull()
-  })
-
-  it('refuses raising their own role above a role it does not outrank today', () => {
-    // An admin role short of one right is outranked by every admin right plus that one.
-    const shortAdmin = new Set([...role(ADMIN_ROLE)].filter((key) => key !== 'branding.manage'))
-    const result = mayChangeNetworkRole({
-      actor: { permissions: role(MODERATOR_ROLE), roleName: MODERATOR_ROLE },
-      roleName: MODERATOR_ROLE,
-      rolePermissions: role(MODERATOR_ROLE),
-      newPermissions: [...shortAdmin, 'branding.manage'],
-      otherRoles: [{ name: ADMIN_ROLE, permissions: shortAdmin }],
-    })
-
-    expect(result).toBe('wouldOutrank')
-  })
-
-  it('ignores roles it outranks already when raising their own', () => {
-    expect(change(ADMIN_ROLE, ADMIN_ROLE, [...role(ADMIN_ROLE)])).toBeNull()
-  })
-
-  it('fills a role the actor outranks only with rights they hold', () => {
-    expect(change(MODERATOR_ROLE, USER_ROLE, [...role(USER_ROLE), 'badge.manage'])).toBeNull()
-    expect(change(MODERATOR_ROLE, USER_ROLE, ['policy.manage'])).toBe('notCovered')
   })
 })

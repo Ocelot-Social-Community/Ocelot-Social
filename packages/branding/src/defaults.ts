@@ -92,6 +92,11 @@ export const brandingDefaults: BrandingConfig = {
   donation: {
     progressBarColorType: 'gradient',
   },
+  map: {
+    // "outdoors" in both themes: it draws the most detail (the night styles are quiet, in the dark theme
+    // the details of a zoomed-in map were hard to see).
+    defaultStyle: { light: 'outdoors', dark: 'outdoors' },
+  },
   badges: {
     trophyBadgesSelectedMax: 9,
   },

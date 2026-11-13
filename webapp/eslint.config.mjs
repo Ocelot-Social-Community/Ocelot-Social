@@ -135,6 +135,8 @@ export default [
             // the dock registry (components/Dock/modules.js) names each module's flag label
             '/^dock\\.[^.]+\\.flag$/',
             // enums: one key per value
+            // the fixed network roles (utils/networkRoles.js), looked up by role name
+            '/^networkRoles\\.(owner|user)$/',
             '/^notifications\\.reason\\./',
             '/^report\\.reason\\.category\\.options\\./',
             '/^settings\\.notifications\\./',
@@ -158,6 +160,7 @@ export default [
             '/^(admin|settings)\\.api-keys\\.revoke/',
             '/^admin\\.groupRoles\\.saved$/',
             '/^admin\\.roles\\.selfLockout\\./',
+            '/^admin\\.roles\\.grantRoleManage\\./',
             '/^admin\\.users\\.delete\\.(message|submit)$/',
             '/^components\\.registration\\.[^.]+\\.(title|buttonTitle)/',
             '/^delete\\.((comment|contribution)\\.(title|message)|cancel|submit)$/',

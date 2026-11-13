@@ -186,7 +186,7 @@ export default {
         typeof this.location.lng === 'number'
       )
     },
-    // A dark page opens on the dark tiles.
+    // A page opens on the brand's default style for its theme (vanilla: outdoors in both).
     defaultStyleUrl() {
       return defaultMapStyleUrl(this.dark)
     },

@@ -330,10 +330,14 @@
       "deleteSuccess": "Rola usunięta.",
       "description": "Kto co może w całej sieci. Twórz role i przypisuj uprawnienia — zmiany działają natychmiast.",
       "discard": "Odrzuć",
+      "grantRoleManage": {
+        "confirm": "Nadaj mimo to",
+        "message": "Rola <strong>{role}</strong> otrzymuje „zarządzanie rolami”: kto ją ma, może dowolnie kształtować każdą rolę oprócz owner, odbierać prawa także wyższym rolom, a potem zmieniać rolę, blokować lub usuwać ich posiadaczy. Usuniętych kont i treści nie przywróci nawet owner. Przypisuj tę rolę tylko osobom, którym powierzyłbyś uprawnienia administratora.",
+        "title": "Nadać „zarządzanie rolami”?"
+      },
       "members": "{count} członków",
       "name": "Role i uprawnienia",
       "nameLabel": "Nazwa",
-      "notEditableHint": "Możesz zmieniać tylko własną rolę i role o mniejszych uprawnieniach niż twoja.",
       "perm": {
         "apiKey_administer": "Zarządzanie kluczami API innych użytkowników.",
         "apiKey_create": "Tworzenie osobistych kluczy API.",
@@ -367,7 +371,6 @@
         "videoCall_create_open": "Rozpoczęcie rozmowy wideo w grupie, do której każdy może wejść — widocznej i dostępnej bez zatwierdzenia.",
         "videoCall_create_restricted": "Rozpoczęcie rozmowy wideo w grupie, do której nie można po prostu wejść: dołączenie wymaga zatwierdzenia lub zaproszenia, albo grupa jest ukryta."
       },
-      "permNotHeld": "Sam nie masz tego uprawnienia, więc nie możesz go nadać.",
       "permUnavailable": "Funkcja nieskonfigurowana — przyznanie tego uprawnienia nie ma efektu.",
       "permUnavailableLink": "Zobacz konfigurację",
       "protected": "chroniona",
@@ -528,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "Nie możesz nadać roli z uprawnieniami, których sam nie masz.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Tylko właściciel może nadawać lub zmieniać rolę właściciela.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "Możesz zmieniać rolę tylko użytkownikom, których rola ma mniejsze uprawnienia niż twoja.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "Możesz zmieniać tylko własną rolę lub role o mniejszych uprawnieniach niż twoja.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "Rola „{name}” jest nadal przypisana do {count} użytkowników i nie można jej usunąć.",
     "ROLE_DELETE_SYSTEM_ROLE": "Rola „{name}” jest rolą systemową i nie można jej usunąć.",
     "ROLE_DOES_NOT_EXIST": "Rola „{name}” nie istnieje.",
@@ -536,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "Rola „{name}” jest rolą systemową i nie można zmienić jej nazwy.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Rola „{name}” już istnieje.",
     "ROLE_SAVE_NAME_INVALID": "Nazwa roli musi mieć od 2 do 50 znaków i może zawierać tylko litery, cyfry, „_” i „-”; pierwszy znak musi być literą lub cyfrą.",
-    "ROLE_SAVE_NOT_COVERED": "Rola może zawierać tylko uprawnienia, które sam masz.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Nie można utworzyć ani oznaczyć roli jako chronionej.",
-    "ROLE_SAVE_WOULD_OUTRANK": "Twojej roli nie można wynieść ponad rolę, której dziś nie przewyższa.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Możesz to zrobić tylko wobec użytkowników, których rola daje mniej uprawnień niż twoja.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Nie możesz przeszukiwać administracji użytkowników.",
     "USER_DOES_NOT_EXIST": "Nie znaleziono użytkownika.",
@@ -898,7 +898,11 @@
         "participant": "Uczestnicy wpisu"
       }
     },
-    "placeholder": "Napisz coś inspirującego..."
+    "placeholder": "Napisz coś inspirującego...",
+    "unfinished": {
+      "hashtag": "Nie wybrano hashtagu: w ten sposób hashtag nie zostanie powiązany. Wybierz go z listy.",
+      "mention": "Nie wybrano użytkownika: w ten sposób nikt nie zostanie powiadomiony. Wybierz nazwę z listy."
+    }
   },
   "error-pages": {
     "403-default": "Brak uprawnień do tej strony!",
@@ -975,7 +979,7 @@
     },
     "actionRadius": "Zasięg działania grupy",
     "addMember": "Dodaj członka",
-    "addMemberToGroupSuccess": "„{name}” został/a dodany/a do grupy z rolą „{role}”!",
+    "addMemberToGroupSuccess": "„<b>{name}</b>” (<b>@{slug}</b>) został/a dodany/a do grupy z rolą „<b>{role}</b>”!",
     "addUser": "Dodaj użytkownika",
     "addUserNoOptions": "Nie znaleziono użytkowników!",
     "addUserPlaceholder": "Nazwa użytkownika",
@@ -1058,7 +1062,7 @@
       "title": "Czy na pewno chcesz opuścić grupę?"
     },
     "memberOutranked": "Nie możesz zmienić roli tej osoby — ma co najmniej tyle, co ty.",
-    "memberRemoved": "Użytkownik „{name}” został usunięty z grupy!",
+    "memberRemoved": "Użytkownik „<b>{name}</b>” (<b>@{slug}</b>) został usunięty z grupy!",
     "members": "Członkowie",
     "membersAdministrationList": {
       "avatar": "Awatar",
@@ -1405,6 +1409,10 @@
     "users": {
       "name": "Użytkownicy"
     }
+  },
+  "networkRoles": {
+    "owner": "Właściciel",
+    "user": "Użytkownik"
   },
   "notifications": {
     "comment": "Komentarz",

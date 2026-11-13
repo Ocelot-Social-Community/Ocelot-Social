@@ -15,9 +15,9 @@ export {
   coversInNetwork,
   dominatesInNetwork,
   mayAssignNetworkRole,
-  mayChangeNetworkRole,
+  outranksInNetwork,
 } from './authority'
-export type { NetworkRoleRefusal } from './authority'
+export type { NetworkHolder, NetworkRoleRefusal } from './authority'
 export { OWNER_ROLE, ADMIN_ROLE, MODERATOR_ROLE, USER_ROLE } from './types'
 export type { RoleDefinition, RoleChangeEvent, RolePubSub } from './types'
 export type { RoleBearer } from './effectiveRoleNames'
