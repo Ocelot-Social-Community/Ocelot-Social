@@ -54,7 +54,12 @@ if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
   throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
 }
 
-CONFIG.SEND_MAIL = true
+// The seed sends no mail. Its users mostly carry made-up addresses on real domains
+// (`faker.internet.email`: gmail.com, yahoo.com, …) with every notification switched on, so a seed
+// run against a staging network with real SMTP would mail its posts and comments to whoever owns
+// those addresses — and it needed a reachable mail server just to finish, as a notification mail
+// that cannot be delivered rejects outside of any request and ends the process.
+CONFIG.SEND_MAIL = false
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
