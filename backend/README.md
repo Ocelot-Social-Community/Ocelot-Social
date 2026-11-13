@@ -199,6 +199,19 @@ npm run db:seed
 docker exec ocelot-social-backend-1 npm run db:seed
 ```
 
+The post images are cropped from the CC0 photos in `src/db/seed/images/` and uploaded to the S3
+bucket, so they are served through imagor like any upload. `SEED_IMAGES` picks the source:
+
+| `SEED_IMAGES`  | Post images                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------ |
+| unset, `local` | the seed's own photos, uploaded under `seed/` in the bucket                                      |
+| `picsum`       | picsum.photos URLs, which every visitor's browser loads from picsum — for a stack without imagor |
+
+```sh
+SEED_IMAGES=picsum npm run db:seed
+docker exec -e SEED_IMAGES=picsum ocelot-social-backend-1 npm run db:seed
+```
+
 ### Reset Data
 
 In order to reset the database you can run:

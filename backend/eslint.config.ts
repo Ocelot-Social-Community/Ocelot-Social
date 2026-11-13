@@ -180,6 +180,14 @@ export default [
     },
   },
   {
+    // The seed's helpers run from the build stage only, which has the devDependencies (sharp
+    // crops its post images); the runtime image never imports them.
+    files: ['src/db/seed/**/*.ts'],
+    rules: {
+      'n/no-unpublished-import': 'off',
+    },
+  },
+  {
     // Config files: allow require() of devDependencies
     files: ['*.config.{js,mjs,cjs,ts,mts,cts}'],
     rules: {
