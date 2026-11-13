@@ -125,7 +125,7 @@
     "subscriptions-transport-ws": "^0.9.19",
     "vue-loader": "^15.11.1",
     "vue-svg-loader": "~0.16.0",
-    "webpack": "4.47.0"
+    "webpack": "5.112.2"
   },
   "overrides": {
     "graphql": "$graphql",
