@@ -19,7 +19,7 @@
 import { cpSync, existsSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
-import { brandId, findConfig } from './build-brandings.ts'
+import { archiveFileNames, brandId, brandVersion, findConfig } from './build-brandings.ts'
 
 export const LEGACY_DIR = 'branding'
 export const BRANDINGS_DIR = 'brandings'
@@ -103,15 +103,29 @@ export function resolveBrandRepo(root: string): BrandRepo {
     )
   }
 
-  const seen = new Map<string, string>()
+  // The brands are baked one after the other into one directory, and a later archive overwrites an
+  // earlier one of the same name without a word — so every file name a brand will write is checked,
+  // not just its id: `acme` at 1.0.0 writes acme-1.0.0.tar.gz, which is the latest archive of a
+  // brand with the id `acme-1.0.0`. Equal ids collide on their latest name, so they are caught too.
+  const writtenBy = new Map<string, RepoBrand>()
   for (const brand of brands) {
-    const other = seen.get(brand.id)
-    if (other) {
-      throw new Error(
-        `[brand-repo] ${BRANDINGS_DIR}/${other}/ and ${BRANDINGS_DIR}/${brand.name}/ share the brand id "${brand.id}" — one archive would overwrite the other`,
-      )
+    const { latest, versioned } = archiveFileNames(brand.id, brandVersion(brand.dir))
+    for (const file of [latest, versioned]) {
+      if (!file) {
+        continue
+      }
+      const other = writtenBy.get(file)
+      if (other) {
+        const why =
+          other.id === brand.id
+            ? `share the brand id "${brand.id}"`
+            : `would both write ${file} (brand ids "${other.id}" and "${brand.id}")`
+        throw new Error(
+          `[brand-repo] ${BRANDINGS_DIR}/${other.name}/ and ${BRANDINGS_DIR}/${brand.name}/ ${why} — one archive would overwrite the other`,
+        )
+      }
+      writtenBy.set(file, brand)
     }
-    seen.set(brand.id, brand.name)
   }
   if (names.length && !brands.length) {
     warnings.push(`[brand-repo] ${BRANDINGS_DIR}/ holds no brand with a brand.config — vanilla`)

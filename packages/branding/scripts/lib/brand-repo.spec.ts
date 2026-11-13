@@ -116,6 +116,23 @@ describe('resolveBrandRepo', () => {
     assert.throws(() => resolveBrandRepo(root), /share the brand id "same"/)
   })
 
+  test("a brand whose id is another brand's versioned archive name fails", () => {
+    // `acme` at 1.0.0 writes acme-1.0.0.tar.gz — the latest archive of the brand `acme-1.0.0`.
+    const root = repo({ ...brand('brandings/a', 'acme'), ...brand('brandings/b', 'acme-1.0.0') })
+    assert.throws(
+      () => resolveBrandRepo(root),
+      /brandings\/a\/ and brandings\/b\/ would both write acme-1\.0\.0\.tar\.gz \(brand ids "acme" and "acme-1\.0\.0"\)/,
+    )
+  })
+
+  test('ids that only look alike pass when no file name is shared', () => {
+    const root = repo({ ...brand('brandings/a', 'acme'), ...brand('brandings/b', 'acme-2.0.0') })
+    assert.deepEqual(
+      resolveBrandRepo(root).brands.map(({ id }) => id),
+      ['acme', 'acme-2.0.0'],
+    )
+  })
+
   test('a directory without brand.config is skipped with a warning; no brand at all is vanilla', () => {
     const root = repo({ 'brandings/draft/README.md': '' })
     const r = resolveBrandRepo(root)

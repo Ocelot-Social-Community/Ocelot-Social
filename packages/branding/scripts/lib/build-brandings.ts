@@ -947,6 +947,18 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
 }
 
 /**
+ * The file names a brand is published under: `<id>.tar.gz` (latest) and, with a version,
+ * `<id>-<version>.tar.gz`. The one place that spells them, so a check for collisions between the
+ * brands of a repo (brand-repo.ts) sees exactly what will be written.
+ */
+export function archiveFileNames(
+  id: string,
+  version: string | null,
+): { latest: string; versioned: string | null } {
+  return { latest: `${id}.tar.gz`, versioned: version ? `${id}-${version}.tar.gz` : null }
+}
+
+/**
  * Build ONE brand and PUBLISH it into a dist directory as `<id>.tar.gz` (latest — the name consumers
  * mount) plus, when the package.json version is set, `<id>-<version>.tar.gz` (immutable history).
  * `outDir` defaults to `<brandDir>/dist`. `markDefault` additionally writes a `DEFAULT` marker (the
@@ -959,11 +971,12 @@ export async function publishBrandArchive(
   const built = await buildBrandArchive(brandDir)
   const dir = outDir ? resolve(outDir) : join(resolve(brandDir), 'dist')
   mkdirSync(dir, { recursive: true })
-  const latest = join(dir, `${built.id}.tar.gz`)
+  const names = archiveFileNames(built.id, built.version)
+  const latest = join(dir, names.latest)
   writeFileSync(latest, built.gz)
   let versioned: string | null = null
-  if (built.version) {
-    versioned = join(dir, `${built.id}-${built.version}.tar.gz`)
+  if (names.versioned) {
+    versioned = join(dir, names.versioned)
     writeFileSync(versioned, built.gz)
   }
   if (markDefault) {
