@@ -125,6 +125,19 @@ describe('resolveBrandRepo', () => {
     )
   })
 
+  test('a brand without a version writes only its latest archive and resolves', () => {
+    // No version, no acme-1.0.0.tar.gz: the brand `acme-1.0.0` next to it shares no file name.
+    const root = repo({
+      ...brand('brandings/a', 'acme'),
+      'brandings/a/package.json': JSON.stringify({ name: 'acme-branding', brandId: 'acme' }),
+      ...brand('brandings/b', 'acme-1.0.0'),
+    })
+    assert.deepEqual(
+      resolveBrandRepo(root).brands.map(({ id }) => id),
+      ['acme', 'acme-1.0.0'],
+    )
+  })
+
   test('ids that only look alike pass when no file name is shared', () => {
     const root = repo({ ...brand('brandings/a', 'acme'), ...brand('brandings/b', 'acme-2.0.0') })
     assert.deepEqual(
