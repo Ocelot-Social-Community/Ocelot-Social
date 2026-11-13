@@ -10,6 +10,11 @@ on:
       - 'gh-readonly-queue/**'
     tags:
       - '**'
+  # Pull requests from forks only (see the `if` on the first job): a fork's push happens in the fork
+  # and starts nothing here, so without this its required checks never report and the pull request
+  # stays blocked. A pull_request run is sandboxed: read-only token, no secrets. A branch of this
+  # repository is already covered by its push run, so its pull_request run skips at once.
+  pull_request:
   # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
   merge_group:
 
@@ -52,6 +57,8 @@ jobs:
   # then skipped (which counts as passed), the matrix with them, and the status job accepts it.
   queue:
     name: Already verified by the merge queue?
+    # Only the push run of a branch of this repository, or the pull_request run of a fork (see `on:`).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -650,7 +657,10 @@ jobs:
 
   e2e_status:
     name: E2E | Status
-    if: always()
+    # always(), so a failed matrix still reports — but not in the pull_request run of a branch of
+    # this repository, where every job above is skipped on purpose and this one would report a
+    # failure for tests that run in the push run instead.
+    if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
     needs: [queue, fullstack_tests]
     runs-on: ubuntu-latest
     timeout-minutes: 5

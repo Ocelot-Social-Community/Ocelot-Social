@@ -11,6 +11,11 @@ on:
       - 'gh-readonly-queue/**'
     tags:
       - '**'
+  # Pull requests from forks only (see the `if` on the first job): a fork's push happens in the fork
+  # and starts nothing here, so without this its required checks never report and the pull request
+  # stays blocked. A pull_request run is sandboxed: read-only token, no secrets. A branch of this
+  # repository is already covered by its push run, so its pull_request run skips at once.
+  pull_request:
   # The merge queue runs the required checks on its temporary gh-readonly-queue/master/* branch.
   merge_group:
 
@@ -48,6 +53,8 @@ defaults:
 jobs:
   files-changed:
     name: Detect File Changes - Webapp
+    # Only the push run of a branch of this repository, or the pull_request run of a fork (see `on:`).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     # actions: read for the merge-queue lookup below; a job-level block replaces the workflow's,
     # so the rest is restated.
