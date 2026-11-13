@@ -11,6 +11,7 @@ import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 
 import { createLoaders } from '@context/loaders'
 import Factory, { cleanDatabase } from '@db/factories'
+import { createReadScopes } from '@graphql/resolvers/helpers/viewerGroups'
 import {
   directiveInventory,
   fieldMetadata,
@@ -474,6 +475,7 @@ describe('@cypher / @relation field resolution', () => {
           config: TEST_CONFIG,
           effectivePermissions: new Set<string>(),
           loaders: createLoaders(setup.database.driver, ids.user),
+          readScopes: createReadScopes(),
         }
 
         const viaResolver = await resolver(parentFor()[typeName], {}, context, {})
