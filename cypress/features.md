@@ -251,13 +251,3 @@ Shows automatically related actions for existing post.
 
 * Frontend UI
 * Backend Error Messages
-
-### Federation
-
-* Provide Server-Server ActivityPub-API
-* Provide User-Server Activitypub-API
-* Receiving public addressed Article and Note Objects
-* Receiving Like and Follow Activities
-* Receiving Undo and Delete Activities for Articles and Notes
-* Serving Webfinger records and Actor Objects
-* Serving Followers, Following and Outbox collections
