@@ -124,6 +124,18 @@ services:
     volumes:
       - ./backend/test/mapbox-stub:/stub:ro
 
+  # Only the README screenshots start it (test-e2e.yml): the seed's post images are uploads, which
+  # the browser gets through imagor. No feature needs it — they build what they show, without images.
+  # Configured as in development (docker-compose.override.yml), on the version production runs.
+  imagor:
+    image: shumc/imagor:1.9.12
+    ports:
+      - 8000:8000
+    environment:
+      PORT: 8000
+      IMAGOR_SECRET: mysecret
+      HTTP_LOADER_BASE_URL: http://minio:9000
+
   mailserver:
     image: maildev/maildev:3.0.0
     ports:
