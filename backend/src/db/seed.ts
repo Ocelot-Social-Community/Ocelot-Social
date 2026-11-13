@@ -22,9 +22,10 @@ import { createApolloTestSetup } from '@root/test/helpers'
 import { NONE_ROLE, seedGroupRoleTemplates, writeGroupRole } from '@src/groupRole'
 import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
 
-import Factory from './factories'
+import Factory, { setImageUrlSource } from './factories'
 import { nudgeCacheResync } from './resync-caches'
 import { trophies, verification } from './seed/badges'
+import { resolveSeedImages, seedImageUploader } from './seed/images'
 
 import type { TestNode } from './testing/node'
 
@@ -63,6 +64,11 @@ CONFIG.SEND_MAIL = false
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
 
+// Resolved before anything is written, so a wrong SEED_IMAGES fails an empty database, not a
+// half-seeded one. See seed/images.ts for the sources.
+// eslint-disable-next-line n/no-process-env
+const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
+
 ;(async function () {
   /* eslint-disable-next-line no-console */
   console.log('Seeded Data...')
@@ -89,6 +95,12 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // Same reasoning for the group role templates: this CLI never runs the boot path, and the
     // groups created below copy their roles from the template for their type.
     await seedGroupRoleTemplates(database)
+
+    // eslint-disable-next-line no-console
+    console.log('seed', `post images from ${seedImages}`)
+    if (seedImages === 'local') {
+      setImageUrlSource(await seedImageUploader(CONFIG))
+    }
 
     // eslint-disable-next-line no-console
     console.log('seed', 'locations')
