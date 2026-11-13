@@ -1081,9 +1081,14 @@ export default {
        flex column's own default) gives it the full width to actually do
        that with; the badge-only case still ends up flush right either
        way, since its own inner justify-end doesn't need the full width to
-       do that. */
+       do that.
+
+       margin-bottom: the hint sits in the gap to the next field instead of
+       adding its own height to it — its 4px lead-in, the ~19px hint and
+       this come to about the --space-base a field without a hint is
+       followed by. Same as the settings page (pages/settings/index.vue). */
     > .os-validation-hint {
-      margin-bottom: var(--space-base);
+      margin-bottom: var(--space-xx-small);
       cursor: default;
     }
 
