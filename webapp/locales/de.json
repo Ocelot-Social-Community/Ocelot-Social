@@ -898,7 +898,11 @@
         "participant": "Am Beitrag beteiligt"
       }
     },
-    "placeholder": "Schreib etwas Inspirierendes …"
+    "placeholder": "Schreib etwas Inspirierendes …",
+    "unfinished": {
+      "hashtag": "Kein Hashtag ist ausgewählt: So wird der Hashtag nicht verknüpft. Wähle ihn aus der Liste.",
+      "mention": "Kein Nutzer ist ausgewählt: So wird niemand benachrichtigt. Wähle den Namen aus der Liste."
+    }
   },
   "error-pages": {
     "403-default": "Kein Zugang zu dieser Seite!",

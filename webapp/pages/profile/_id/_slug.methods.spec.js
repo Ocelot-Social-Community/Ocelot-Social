@@ -119,7 +119,7 @@ describe('pages/profile/_id/_slug.vue — methods', () => {
     })
 
     it('advances offset and triggers fetchMore on the profilePagePosts query', () => {
-      const fetchMore = jest.fn()
+      const fetchMore = jest.fn().mockResolvedValue({})
       const ctx = {
         $apollo: { queries: { profilePagePosts: { fetchMore } } },
         offset: 0,

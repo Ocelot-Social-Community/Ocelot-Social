@@ -341,7 +341,7 @@ import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
-import UpdateQuery from '~/components/utils/UpdateQuery'
+import { fetchMorePage } from '~/components/utils/UpdateQuery'
 import SocialMedia from '~/components/SocialMedia/SocialMedia'
 import DateTime from '~/components/DateTime'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
@@ -533,14 +533,15 @@ export default {
       if (!PostQuery) return // seems this can be undefined on subpages
       this.offset += this.pageSize
 
-      PostQuery.fetchMore({
+      fetchMorePage(this, PostQuery, {
         variables: {
           offset: this.offset,
           filter: this.filter,
           first: this.pageSize,
           orderBy: 'sortDate_desc',
         },
-        updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
+        $state,
+        pageKey: 'profilePagePosts',
       })
     },
     resetPostList() {

@@ -33,7 +33,7 @@ Build it into a distributable archive with the bundled CLI (needs **Node ≥ 23*
 npx ocelot-brand-archive .        # → dist/<id>.tar.gz (+ versioned) + a DEFAULT marker with --default
 ```
 
-The archive is a **library of bucket instances** (`manifest.json` + sparse `fragments/<type>.<name>.json` + `assets/` + `html/`), not a merged config — consumers compose the effective config at load time. See [`docu/branding-buckets-konzept.md`](../../docu/branding-buckets-konzept.md).
+The archive is a **library of bucket instances** (`manifest.json` + sparse `fragments/<type>.<name>.json` + `assets/` + `html/`), not a merged config — consumers compose the effective config at load time. The six bucket types are described in [Buckets](#buckets); how to read the resolved config in [Consuming the resolved config](#consuming-the-resolved-config-backend--webapp), the version check in [Schema compatibility](#schema-compatibility).
 
 **i18n overrides** can be authored inline (`locales: { de: { … } }` in the config) or, more conveniently, as conventional JSON files in the brand dir: `locales/<code>.json` (whole locale) and/or `locales/<code>/<feature>.json` (modular — a locale split into per‑feature namespace files so a feature owns its slice). The build deep‑merges them all into `locales` (file wins per leaf). Either way the runtime is identical — the modular split is authoring‑only, not runtime tree‑shaking.
 
@@ -50,6 +50,27 @@ backend overlays (`middlewares/`, `data/`) are compiled in, so they belong to th
 brand: they live in `overlays/`, and a brand folder that ships them fails the build. The former
 single `branding/` folder is no longer built; a repo that still has it fails with the migration
 steps. The rules: `scripts/lib/brand-repo.ts`.
+
+## Buckets
+
+The branding config is split into six **buckets**. Every leaf of the config except `locales` belongs to exactly one of them, so a brand can take one slice from another brand and the rest from itself — for example the colours of brand B with the identity of brand A.
+
+| Bucket       | Owns                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `theme`      | The look: `theme` (colours, fonts), `donation`, `map`, the login and registration layouts, `assets.css`                         |
+| `identity`   | Who the instance is: `metadata` (names, organisation, jurisdiction), `about`                                                    |
+| `logos`      | The marks: `logos`, `assets.favicon`, `assets.icon`, `assets.iconSizes` (the sizes stay with their icon)                        |
+| `legal`      | Static and legal content: `termsAndConditions`, `assets.html`, `links.pages`                                                    |
+| `navigation` | `headerMenu`, `links.landingPage`, `links.footerOrder`                                                                          |
+| `behavior`   | Framework rules and limits: `group`, `user`, `post`, `comment`, `dateTime`, `badges`, `category`, the registration code lengths |
+
+Some domains are split by sub-path (`assets.css` belongs to `theme`, `assets.favicon` to `logos`, `assets.html` to `legal`); the longest matching path wins. `locales` belongs to no bucket: it rides along with every bucket instance of a brand and accumulates from every source. A brand that changes only `locales` provides no instance, so its `locales` are not composed.
+
+An archive holds **instances** of these buckets, one sparse file per instance (`fragments/<type>.<name>.json`), listed in `manifest.json`. It may hold several instances of one type (a `dark` and a `light` theme) and need not provide every type. A bucket is only written if the brand actually changes it; everything else is inherited from the framework defaults at load time. A classic full brand yields one instance per type, named `default`.
+
+Which instance fills which slot is chosen per type with a source string `<id>[@<version>][/<name>]`, for example `acme` (its `default` instance) or `acme@1.2.0/dark`. An empty source means the framework default.
+
+Archives may become uploadable, so unpacking is capped at 128 MiB (`MAX_ARCHIVE_BYTES`); a larger archive throws instead of exhausting memory. Brand ids must match `BRAND_ID_PATTERN` before they are used as a lookup, so a `../` can never reach the file system.
 
 ## Consuming the resolved config (backend / webapp)
 
@@ -101,6 +122,13 @@ Every custom property the framework declares (`webapp/assets/css/root-tokens.css
 `ocelot-ui-variables.css`) is something a brand may set — the admin lists them. Taking one away turns
 every brand's value for it into a silent no-op, so it is a decision, never a side effect of a refactor.
 
+The greys are the **neutral scale**, `--color-neutral-0` (almost black) to `--color-neutral-100`
+(white), in steps of 5 to 10 with finer ones between (`-5`, `-12`, `-15`, `-47`, `-53`, `-73`).
+They are fixed values and not for a brand to change: the semantic tokens (`--background-color-*`,
+`--text-color-*`, `--border-color-*`, the chat and tooltip tokens) point at them, in the light half
+and in the dark one of a pair, and it is those a brand sets. A grey that has no step yet gets a step
+of its own rather than a literal.
+
 - **Adding** a token needs no step of its own: `npm run tokens:snapshot` adds it to
   `scripts/public-tokens.snapshot.json`, the list of names that have been public.
 - **Renaming or removing** one breaks the brands that set it, so it is a deliberate step. The
@@ -114,6 +142,46 @@ every brand's value for it into a silent no-op, so it is a decision, never a sid
 - **An alias does not count as a rename.** With `--old: var(--new)` left in the stylesheet `--old` is
   still declared, so the test stays green, yet a value a brand sets for `--old` reaches nobody. To
   break on purpose, remove the old name from the stylesheets and from the snapshot.
+
+## The dark mode: what a brand sets
+
+The dark mode is carried by the tokens themselves: most colours in `root-tokens.css` and
+`ocelot-ui-variables.css` are a pair, `--x: light-dark(<light>, <dark>)`. Whether a brand has the dark
+theme at all is `theme.colorScheme`: `'light'` (the default of every brand, the theme it always had),
+`'dark'`, or `'light dark'` (the person chooses; vanilla has both).
+
+- **A token a brand sets as one value applies to both themes.** `--color-primary: rgb(0, 122, 255)` is
+  that colour in light and in dark. To give a theme its own colour, set the token as a pair, and derive
+  the dark half from the light one in the brand's own CSS if you want to:
+
+  ```css
+  :root {
+    --brand-ribbon: rgb(0, 168, 181);
+    --color-ribbon-article: light-dark(
+      var(--brand-ribbon),
+      color-mix(in srgb, var(--brand-ribbon), black 18%)
+    );
+  }
+  ```
+
+  A variable of the brand's own (`--brand-ribbon`) that the brand's CSS reads is fine; it is not looked
+  at as a token of the framework.
+
+- **A surface that carries text has its own token.** `--color-primary-fill`, `-secondary-fill`,
+  `-success-fill`, `-info-fill`, `-danger-fill` and `-warning-fill` are what badges, filled buttons,
+  counters and toasts are painted with: the brand's colour in light, in dark darkened so that the text
+  on it reads (about 4.5:1) and the surface still stands off the dark ground. They follow the colour
+  a brand sets (`--color-primary`), so a brand needs no dark step of its own; it can set the `-fill`
+  token as a pair when it wants one. The colour itself (`--color-primary`) stays what text, links and
+  borders use, bright on the dark ground.
+- **Surfaces of their own** (the ribbons, the donation bar, the chat bubbles) are tokens of their own and
+  carry the dark half in the token: set it as one value or as a pair, as above. The own chat bubble
+  and the active room are the primary colour mixed into the dark ground, so they follow a brand's primary.
+- **Tokens that fewer places read than before the dark mode.** A brand that set one of them reaches
+  fewer places now: `--text-color-inverse` is read in 3 places instead of 14 (text over video reads
+  `--video-on-media-color`), `--background-color-primary` is read in none.
+- **Browsers without `light-dark()`** (before Chrome 123, Firefox 120, Safari 17.5) get both themes from
+  generated fallback blocks; `color-mix()` (Chrome 111) is taken out there, leaving the first colour.
 
 ## Changing the schema
 

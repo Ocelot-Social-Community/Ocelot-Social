@@ -898,7 +898,11 @@
         "participant": "Betrokken bij dit bericht"
       }
     },
-    "placeholder": "Laat je inspirerende gedachten achter …"
+    "placeholder": "Laat je inspirerende gedachten achter …",
+    "unfinished": {
+      "hashtag": "Er is geen hashtag gekozen: zo wordt de hashtag niet gekoppeld. Kies de hashtag uit de lijst.",
+      "mention": "Er is geen gebruiker gekozen: zo wordt niemand op de hoogte gebracht. Kies de naam uit de lijst."
+    }
   },
   "error-pages": {
     "403-default": "Niet geautoriseerd voor deze pagina!",

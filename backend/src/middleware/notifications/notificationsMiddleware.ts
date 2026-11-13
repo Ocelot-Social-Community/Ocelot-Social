@@ -567,6 +567,9 @@ const notifyUsersOfMention = async (label, id, idsOfUsers, reason, context) => {
  * request: told once already, so `silent` — no edge, no bell — but still a candidate for the mail
  * (see `handleContentDataOfComment`). Their mention edge is new, which is why the guard cannot
  * tell them apart from an old one by itself.
+ *
+ * In a group, only observers who may still read the post are told; the others keep their
+ * `OBSERVES` edge, so the bell answers again should they regain access.
  */
 const notifyUsersOfComment = async (label, commentId, reason, idsJustMentioned, context) => {
   await validateNotifyUsers(label, reason)
@@ -585,6 +588,12 @@ const notifyUsersOfComment = async (label, commentId, reason, idsJustMentioned, 
             observingUser.id IN $idsJustMentioned
             OR NOT EXISTS { MATCH (comment)-[:NOTIFIED]->(observingUser) }
           )
+        // Observing outlives access: whoever commented in a group observes the post, and keeps
+        // observing after leaving it, being removed, or the group closing. In a group, the comment
+        // reaches only those who may still read the post — the rule the mentions ask (#10629).
+        OPTIONAL MATCH (post)-[:IN]->(group:Group)
+        WITH observingUser, post, comment, commenter, group
+          WHERE group IS NULL OR ${readsGroupContent('group', 'observingUser')}
         OPTIONAL MATCH (observingUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
         WITH observingUser, emailAddress, post, comment, commenter,
           observingUser.id IN $idsJustMentioned AS silent

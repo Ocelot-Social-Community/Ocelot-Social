@@ -3,7 +3,7 @@
 // Bundles a brand into ONE `<id>.tar.gz` as a LIBRARY of bucket instances: manifest.json +
 // fragments/<type>.<name>.json (one sparse fragment per instance) + assets/ + html/. Consumers (webapp
 // serverMiddleware, branding plugin, backend bootstrap, maintenance) read the manifest and COMPOSE the
-// effective config (discover.composeArchive). See docu/branding-buckets-konzept.md.
+// effective config (discover.composeArchive).
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
@@ -863,9 +863,15 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   // would drop a top-level `id` anyway (it is not a bucket-owned path), and injecting version into
   // metadata would make the identity bucket always look "customised", breaking partial-package
   // detection. Consumers read id/version from the manifest (see src/discover.ts).
-  const label = config.metadata.applicationName // always set (merged default)
+  // The name the admin's brand list shows. A brand that names no network of its own (a style-only
+  // brand, composed with another brand's identity) would otherwise inherit the framework default and
+  // be listed as "ocelot.social" — show its id instead.
+  const label =
+    config.metadata.applicationName === brandingDefaults.metadata.applicationName
+      ? id
+      : config.metadata.applicationName
 
-  // Archive = a LIBRARY of bucket instances (docu/branding-buckets-konzept.md §11): each bucket type's
+  // Archive = a LIBRARY of bucket instances: each bucket type's
   // fragment is its own file `fragments/<type>.<name>.json`, indexed by manifest.json. A bucket is
   // emitted ONLY when the brand actually customises it (its owned slice differs from the framework
   // default) — so a package that defines only some buckets is genuinely PARTIAL. Unprovided buckets
