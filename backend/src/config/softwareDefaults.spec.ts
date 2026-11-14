@@ -84,10 +84,10 @@ describe('SOFTWARE_DEFAULTS ↔ config runtime default (logic-gated defaults)', 
     expect(tls.rejectUnauthorized).toBe(SOFTWARE_DEFAULTS.SMTP_REJECT_UNAUTHORIZED)
   })
 
-  it('defaults PRODUCTION_DB_CLEAN_ALLOW to the map value', async () => {
+  it('defaults DB_WIPE_ALLOWED to the map value', async () => {
     const { default: CONFIG } = await loadConfigWithFlagsUnset()
 
-    expect(CONFIG.PRODUCTION_DB_CLEAN_ALLOW).toBe(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW)
+    expect(CONFIG.DB_WIPE_ALLOWED).toBe(SOFTWARE_DEFAULTS.DB_WIPE_ALLOWED)
   })
 
   it('defaults DEBUG to falsy (off)', async () => {

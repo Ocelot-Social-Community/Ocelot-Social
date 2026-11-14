@@ -55,10 +55,18 @@ FROM base AS development
 ARG BRAND=""
 # Bind-mount the brand configs only for THIS step (BuildKit) so no brand data — least of all the
 # other, non-selected brands — is baked into the dev image layer. Read-only: the generator only reads.
+# The dev server shows ONE brand: the repo's sole brand, or the one OCELOT_ACTIVE_BRANDING names among
+# several (brand id or directory name) — copied into a scratch dir that is removed in the same step.
+ARG OCELOT_ACTIVE_BRANDING=""
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
-    if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
-      node /brand-tools/scripts/build-maintenance-branding.ts "/brands/$BRAND/branding" /app && \
-      echo "[maintenance] baked brand: $BRAND"; \
+    if [ -n "$BRAND" ] && [ -d "/brands/$BRAND" ]; then \
+      node /brand-tools/scripts/bake-brand-repo.ts "/brands/$BRAND" \
+        --brand-to /tmp/brand --select "$OCELOT_ACTIVE_BRANDING" && \
+      if [ -d /tmp/brand ]; then \
+        node /brand-tools/scripts/build-maintenance-branding.ts /tmp/brand /app && \
+        echo "[maintenance] baked brand: $BRAND"; \
+      fi; \
+      rm -rf /tmp/brand; \
     fi
 # The support address shown on the page. Deployment config, not branding (the backend/webapp read
 # $SUPPORT_EMAIL at runtime; a static page has to bake it in) — pass it with
@@ -73,41 +81,52 @@ CMD ["npx", "nuxt", "dev"]
 # Stage 4: Generate static site
 # ==============================================================================
 FROM base AS build
-# Branding is baked at build time from a brand's TYPED config under deployment/configurations/<BRAND>
-# — the generator derives the maintenance colours, web fonts, logo, metadata and `maintenance` strings
-# from it, so a brand defines each ONCE and both the live app and the maintenance page follow. It
-# writes only NEW files (app/constants/stylesheets.brand.json + metadata.brand.json, app/locales/,
-# public/brand/), each loaded as an optional overlay — no committed source is edited, here
-# or in a working copy. Pick the brand with `--build-arg BRAND=<name>` (a directory name under
-# deployment/configurations/); empty = vanilla ocelot.social.
-# Path 1 — MONOREPO build (docker compose, ocelot's own branded images).
+# Branding is baked at build time from a brand's TYPED config — the generator derives the maintenance
+# colours, web fonts, logo, metadata and `maintenance` strings from it, so a brand defines each ONCE and
+# both the live app and the maintenance page follow. It writes only NEW files
+# (app/constants/stylesheets.brand.json + metadata.brand.json, app/locales/, public/brand/), each loaded
+# as an optional overlay — no committed source is edited, here or in a working copy.
+#
+# Unlike webapp there is no runtime fallback — the output is static files served by nginx, and the page
+# is shown precisely when the backend is unreachable, so its branding cannot be fetched at runtime. A
+# brand repo with SEVERAL brands therefore gets one complete page per brand under _brands/<id>/ (plus a
+# vanilla root), and nginx/30-active-branding.sh serves the one $OCELOT_ACTIVE_BRANDING names when the
+# container starts; a single brand is simply the root page. See
+# packages/branding/scripts/lib/maintenance-sites.ts.
+#
+# Both paths land in /brand-repo, and the ONBUILD trigger below generates from there.
+#
+# Path 1 — MONOREPO build (docker compose, ocelot's own branded images): pick a brand repo under
+# deployment/configurations/ with `--build-arg BRAND=<name>`; empty = vanilla. Bind-mounted, and only
+# its brand folders are copied. Never set for the published `maintenance-build` image, so a downstream
+# brand build starts from an empty /brand-repo.
 ARG BRAND=""
-# Bind-mount the brand configs only for THIS step (BuildKit) so no brand data lands in a build-stage
-# layer/cache — the generator writes the chosen brand into /app and reads nothing else afterwards.
 RUN --mount=type=bind,source=deployment/configurations,target=/brands \
-    if [ -n "$BRAND" ] && { [ -f "/brands/$BRAND/branding/brand.config.ts" ] || [ -f "/brands/$BRAND/branding/brand.config.mjs" ]; }; then \
-      node /brand-tools/scripts/build-maintenance-branding.ts "/brands/$BRAND/branding" /app && \
-      echo "[maintenance] baked brand: $BRAND"; \
+    mkdir -p /brand-repo && \
+    if [ -n "$BRAND" ] && [ -d "/brands/$BRAND" ]; then \
+      for d in branding brandings; do \
+        if [ -d "/brands/$BRAND/$d" ]; then cp -r "/brands/$BRAND/$d" /brand-repo/; fi; \
+      done; \
+      echo "[maintenance] brand repo: $BRAND"; \
     else \
       echo "[maintenance] BRAND unset/unknown ('$BRAND') — vanilla ocelot.social"; \
     fi
 
-# Path 2 — TWO-REPO build (a brand repo doing `FROM maintenance-build`, context = brand repo root, the
-# brand in ./branding/, no BRAND arg). Only ONBUILD triggers re-run downstream, so both the bake and
-# `nuxt generate` must be ONBUILD: nuxt.config.ts decides at BUILD time which overlays exist, so
-# generating before the bake would freeze the vanilla theme into the static output. Unlike
-# webapp there is no runtime fallback — the output is static files served by nginx, and the page is
-# shown precisely when the backend is unreachable, so its branding cannot be fetched at runtime.
-ONBUILD COPY brandin[g]/ /brand/
-ONBUILD RUN if [ -f /brand/brand.config.ts ] || [ -f /brand/brand.config.mjs ]; then \
-      node /brand-tools/scripts/build-maintenance-branding.ts /brand /app; \
-    else echo "[maintenance] no typed brand.config — vanilla ocelot.social"; fi
+# Path 2 — TWO-REPO build (a brand repo doing `FROM maintenance-build`, context = brand repo root, no
+# BRAND arg). Only ONBUILD triggers re-run downstream, so the generation must be ONBUILD:
+# nuxt.config.ts decides at BUILD time which overlays exist, so generating before the bake would freeze
+# the vanilla theme into the static output. The `[g]`/`[s]` globs make both folders optional, so
+# ocelot's own build (Path 1, context = monorepo root, neither folder) adds nothing. A former single
+# branding/ is copied only so the generation fails with the migration steps.
+ONBUILD COPY brandin[g]/ /brand-repo/branding/
+ONBUILD COPY branding[s]/ /brand-repo/brandings/
 # The support address shown on the page: deployment config, not branding (backend and webapp read
 # $SUPPORT_EMAIL at runtime, a static page has to bake it in). ONBUILD, because the value belongs to
 # the DOWNSTREAM build — `--build-arg SUPPORT_EMAIL=support@example.org`; unset keeps the vanilla
-# ocelot address. No ENV needed: a build ARG is already in the environment of the RUN below.
+# ocelot address. No ENV needed: a build ARG is already in the environment of the RUN below (and of the
+# `nuxt generate` runs it starts).
 ONBUILD ARG SUPPORT_EMAIL=""
-ONBUILD RUN npx nuxt generate
+ONBUILD RUN node /brand-tools/scripts/build-maintenance-sites.ts /brand-repo /app
 
 # ==============================================================================
 # Stage 4b: Fire the ONBUILD triggers for ocelot's OWN build. They only run when `build` is used as a
@@ -134,6 +153,8 @@ COPY maintenance/nginx/custom.conf /etc/nginx/conf.d/default.conf
 # purpose: this stage is published as `maintenance-base`, which every brand image builds `FROM` (see
 # deployment/configurations/*/docker/maintenance.Dockerfile) — so the address stays deployment config
 # (helm chart) and not one build arg per brand repo's CI.
+# Same reason: picks the page of the brand $OCELOT_ACTIVE_BRANDING names, when the image holds several.
+COPY --chmod=755 maintenance/nginx/30-active-branding.sh /docker-entrypoint.d/30-active-branding.sh
 COPY --chmod=755 maintenance/nginx/40-support-email.sh /docker-entrypoint.d/40-support-email.sh
 # Same reason: puts $CLIENT_URI in front of og:image, which link previews need absolute.
 COPY --chmod=755 maintenance/nginx/41-client-uri.sh /docker-entrypoint.d/41-client-uri.sh

@@ -10,10 +10,16 @@ metadata:
 # Deliberately no default in values.yaml: with neither side set, both fall back to the same software
 # default (backend/src/config/softwareDefaults.ts SUPPORT_EMAIL, mirrored in the maintenance app) —
 # a chart-level default would add a second place to state it and a second place to forget.
+#
+# OCELOT_ACTIVE_BRANDING follows the backend the same way: an image built from a brand repo with
+# several brands holds one page per brand, and the entrypoint (maintenance/nginx/30-active-branding.sh)
+# serves the one this names — the brand the backend is pinned to.
 {{- $env := deepCopy (.Values.maintenance.env | default dict) }}
-{{- if not (hasKey $env "SUPPORT_EMAIL") }}
-{{- with (.Values.backend.env).SUPPORT_EMAIL }}
-{{- $_ := set $env "SUPPORT_EMAIL" . }}
+{{- range $key := list "SUPPORT_EMAIL" "OCELOT_ACTIVE_BRANDING" }}
+{{- if not (hasKey $env $key) }}
+{{- with (index ($.Values.backend.env | default dict) $key) }}
+{{- $_ := set $env $key . }}
+{{- end }}
 {{- end }}
 {{- end }}
 data:

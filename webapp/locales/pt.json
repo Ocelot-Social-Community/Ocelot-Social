@@ -330,10 +330,14 @@
       "deleteSuccess": "Função excluída.",
       "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações são aplicadas de imediato.",
       "discard": "Descartar",
+      "grantRoleManage": {
+        "confirm": "Conceder mesmo assim",
+        "message": "<strong>{role}</strong> recebe “gerenciar funções”: quem tem a função pode moldar livremente qualquer função, exceto owner, tirar direitos também de funções superiores e depois trocar a função, bloquear ou excluir quem as tem. Contas e conteúdos excluídos não podem ser restaurados, nem por um owner. Atribua a função apenas a pessoas a quem você confiaria poderes de administração.",
+        "title": "Conceder “gerenciar funções”?"
+      },
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",
-      "notEditableHint": "Só podes alterar o teu próprio papel e papéis com menos autoridade do que o teu.",
       "perm": {
         "apiKey_administer": "Administrar as chaves de API de outros usuários.",
         "apiKey_create": "Criar chaves API pessoais.",
@@ -367,7 +371,6 @@
         "videoCall_create_open": "Iniciar uma videochamada num grupo em que qualquer pessoa pode entrar — localizável e acessível sem aprovação.",
         "videoCall_create_restricted": "Iniciar uma videochamada num grupo em que não se pode simplesmente entrar: entrar exige aprovação ou convite, ou o grupo está oculto."
       },
-      "permNotHeld": "Não tens este direito, por isso não o podes atribuir.",
       "permUnavailable": "Recurso não configurado — conceder esta permissão não tem efeito.",
       "permUnavailableLink": "Ver configuração",
       "protected": "protegida",
@@ -528,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "Não podes atribuir um papel com direitos que tu próprio não tens.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Somente um proprietário pode atribuir ou alterar a função de proprietário.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "Só podes alterar o papel de utilizadores cujo papel tem menos autoridade do que o teu.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "Só podes alterar o teu próprio papel ou papéis com menos autoridade do que o teu.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "A função “{name}” ainda está atribuída a {count} usuários e não pode ser excluída.",
     "ROLE_DELETE_SYSTEM_ROLE": "A função “{name}” é uma função do sistema e não pode ser excluída.",
     "ROLE_DOES_NOT_EXIST": "A função “{name}” não existe.",
@@ -536,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "A função “{name}” é uma função do sistema e não pode ser renomeada.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "A função “{name}” já existe.",
     "ROLE_SAVE_NAME_INVALID": "O nome da função deve ter de 2 a 50 caracteres e só pode conter letras, dígitos, “_” e “-”; o primeiro caractere deve ser uma letra ou um dígito.",
-    "ROLE_SAVE_NOT_COVERED": "Um papel só pode conter direitos que tu próprio tens.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Uma função não pode ser criada ou marcada como protegida.",
-    "ROLE_SAVE_WOULD_OUTRANK": "O teu próprio papel não pode ser elevado acima de um papel que hoje não supera.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Você só pode fazer isso com usuários cuja função concede menos poderes do que a sua.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Você não pode pesquisar na administração de usuários.",
     "USER_DOES_NOT_EXIST": "O usuário não foi encontrado.",
@@ -898,7 +898,11 @@
         "participant": "Participam da publicação"
       }
     },
-    "placeholder": " Escreva algo inspirador…"
+    "placeholder": " Escreva algo inspirador…",
+    "unfinished": {
+      "hashtag": "Nenhuma hashtag foi escolhida: assim a hashtag não é vinculada. Escolha-a na lista.",
+      "mention": "Nenhum usuário foi escolhido: assim ninguém é notificado. Escolha o nome na lista."
+    }
   },
   "error-pages": {
     "403-default": "Não autorizado a acessar esta página!",
@@ -975,7 +979,7 @@
     },
     "actionRadius": "Raio de ação do grupo",
     "addMember": "Adicionar membro",
-    "addMemberToGroupSuccess": "“{name}” foi adicionado ao grupo com o papel “{role}”!",
+    "addMemberToGroupSuccess": "“<b>{name}</b>” (<b>@{slug}</b>) foi adicionado ao grupo com o papel “<b>{role}</b>”!",
     "addUser": "Adicionar usuário",
     "addUserNoOptions": "Nenhum usuário encontrado!",
     "addUserPlaceholder": "Nome de usuário",
@@ -1058,7 +1062,7 @@
       "title": "Você realmente quer sair do grupo?"
     },
     "memberOutranked": "Não podes alterar a função desta pessoa: tem pelo menos tanto quanto tu.",
-    "memberRemoved": "O usuário “{name}” foi removido do grupo!",
+    "memberRemoved": "O usuário “<b>{name}</b>” (<b>@{slug}</b>) foi removido do grupo!",
     "members": "Membros",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -1405,6 +1409,10 @@
     "users": {
       "name": "Usuários"
     }
+  },
+  "networkRoles": {
+    "owner": "Proprietário",
+    "user": "Usuário"
   },
   "notifications": {
     "comment": "Comentário",

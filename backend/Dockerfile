@@ -45,7 +45,7 @@ RUN apk --no-cache add bash
 RUN mkdir -p /app
 WORKDIR /app
 COPY --from=branding-runtime ./app/ /packages/branding/
-# Brand archives (`<id>.tar.gz`) + the default marker (DEFAULT) live in ./deployment/configurations —
+# Brand archives (`<id>.tar.gz`) + the default marker (DEFAULT, sole brand only) live in ./deployment/configurations —
 # the SAME path they have in a repo checkout, which is why no env var is needed: the code default
 # covers both (see @ocelot-social/branding discover.DEFAULT_ROOTS). A branding build bakes them there
 # (see ONBUILD); vanilla leaves the directory absent (→ framework defaults). Ops override the search
@@ -97,29 +97,37 @@ RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     prune-native-build-artifacts
 # Repo-root build context now (for /packages/branding): copy only the backend subtree to /app.
 COPY backend/ .
-# Optional per-brand overlays (code/seed data not yet ported to the runtime archive). The `[g]` glob
-# makes them optional so the SAME image serves two contexts: a downstream brand build (`FROM
-# backend-build`, context = brand repo root → `./branding/` present → copied) and ocelot's own
-# vanilla self-build (`FROM build AS test`, context = repo root → no `./branding/` → skipped; the
-# committed src/ defaults stay). Same idiom as `brandin[g]/` below and the e-mail overlays on master.
-ONBUILD COPY brandin[g]/middlewares/ src/middleware/branding/
-ONBUILD COPY brandin[g]/data/ src/db/data
-# Runtime branding: copy the brand UNFLATTENED into /brand and bake its archive (+ DEFAULT marker) into
-# ./deployment/configurations — the discovery root, named exactly as in a repo checkout so the running
-# code finds it without being told where to look. At startup src/branding/bootstrap.ts injects this
-# brand's config AND overlays the archive's e-mail templates/locales onto the defaults — no per-brand
-# rebuild. Served brand files (logos, fonts, css, badge SVGs) are NOT copied anywhere: the webapp
-# reads them straight from the archive at /branding/<id>/…. The overlay copies above still bring in
-# not-yet-ported content (brand middlewares + seed data — code/data, not config). A vanilla build (no
-# brand.config) skips this and stays vanilla.
+# Branding from a brand repo (`FROM backend-build`, context = brand repo root). The `[g]`/`[s]` globs
+# make every folder optional, so the SAME image serves ocelot's own vanilla self-build too (`FROM build
+# AS test`, context = repo root → no such folder → the committed src/ defaults stay). Layout:
+# packages/branding/scripts/lib/brand-repo.ts.
+#   • brandings/<name>/  one folder per brand, several allowed
+#   • overlays/          middlewares/ + data/, compiled into this image — the repo's, not a brand's
+#   • branding/          the former single-brand layout: copied only so the bake can fail with the
+#                        migration steps instead of silently building a vanilla image
 #
-# Flat inside the root (`<id>.tar.gz` + `<id>-<version>.tar.gz` + DEFAULT), not nested per brand: an
-# image holds exactly ONE brand, discovery is recursive either way, and the DEFAULT marker is read from
-# the root itself. A checkout nests (`<brand>/branding/dist/`) because it holds many.
-ONBUILD COPY brandin[g]/ /brand/
-ONBUILD RUN if ls /brand/brand.config.* >/dev/null 2>&1; then \
-      node /brand-tools/scripts/build-brand-archive.ts /brand ./deployment/configurations --default; \
-    else echo "[branding] no typed brand.config — runtime archive skipped (vanilla)"; fi
+# Runtime branding: EVERY brand of the repo is baked as an archive into ./deployment/configurations —
+# the discovery root, named exactly as in a repo checkout so the running code finds it without being
+# told where to look. The image does not choose among them: the deployment does, with
+# $OCELOT_ACTIVE_BRANDING (or an admin, via the activeBranding policy / brandingComposition). Only a
+# repo's SOLE brand gets the DEFAULT marker, so a single-brand image still needs no configuration. At
+# startup src/branding/bootstrap.ts injects the active brand's config AND overlays its e-mail
+# templates/locales onto the defaults. Served brand files (logos, fonts, css, badge SVGs) are NOT
+# copied anywhere: the webapp reads them straight from the archive at /branding/<id>/….
+#
+# Flat inside the root (`<id>.tar.gz` + `<id>-<version>.tar.gz` [+ DEFAULT]), not nested per brand:
+# discovery is recursive either way, and the DEFAULT marker is read from the root itself.
+#
+# Overlays (code/seed data not yet ported to the runtime archive) are compiled into the image, so they
+# cannot follow the active brand: they live in the repo's overlays/, next to the brands, and a brand
+# folder that ships them fails the bake. It copies overlays/middlewares/ + data/ to /brand.
+ONBUILD COPY brandin[g]/ /brand-repo/branding/
+ONBUILD COPY branding[s]/ /brand-repo/brandings/
+ONBUILD COPY overlay[s]/ /brand-repo/overlays/
+ONBUILD RUN node /brand-tools/scripts/bake-brand-repo.ts /brand-repo \
+      --archives ./deployment/configurations --overlays-to /brand && \
+    if [ -d /brand/middlewares ]; then cp -r /brand/middlewares/. src/middleware/branding/; fi && \
+    if [ -d /brand/data ]; then cp -r /brand/data/. src/db/data/; fi
 # No dev install here any more — the `build` stage above already did it, before the sources landed.
 # Nothing an ONBUILD trigger copies can change the dependency set: the overlays go to
 # src/middleware/branding/, src/db/data and /brand, never to /app/package.json or package-lock.json.

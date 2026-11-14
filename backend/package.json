@@ -11,7 +11,7 @@
   "scripts": {
     "start": "node build/src/",
     "build": "tsc && tsc-alias -f && ./scripts/build.copy.files.sh",
-    "dev": "nodemon --exec tsx src/index.ts -e js,ts,gql",
+    "dev": "nodemon --exec \"node --import tsx\" src/index.ts -e js,ts,gql",
     "dev:debug": "nodemon --exec node --inspect=0.0.0.0:9229 build/src/index.js -e js,ts,gql",
     "schema:print": "tsx src/graphql/print-schema.ts",
     "docs:api": "npm run schema:print && spectaql spectaql.yml",
@@ -131,6 +131,7 @@
     "nodemon": "~3.1.14",
     "prettier": "^3.9.10",
     "rosie": "^2.1.1",
+    "sharp": "^0.35.5",
     "spectaql": "^3.0.9",
     "tsc-alias": "^1.9.10",
     "tsx": "^4.23.15",

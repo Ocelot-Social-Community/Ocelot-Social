@@ -88,6 +88,12 @@ export interface LinkPageOverride {
 /** A CSS `color-scheme` value the webapp supports — see `theme.colorScheme`. */
 export type ColorScheme = 'light' | 'dark' | 'light dark'
 
+/**
+ * A map style the webapp's maps offer (the ids of `MAP_STYLES` in `webapp/constants/mapStyles.js`; the
+ * label of each is the translation `map.styles.<id>`). `map.defaultStyle` is chosen from them.
+ */
+export type MapStyleId = 'outdoors' | 'navigation-night' | 'streets' | 'satellite' | 'dark'
+
 export interface BrandingConfig {
   /**
    * Metadata ABOUT this branding itself (not the app identity) — shown in the admin Branding
@@ -245,9 +251,8 @@ export interface BrandingConfig {
     applicationDescription: string
     organizationName: string
     organizationJurisdiction: string
-    // NOTE: no `cookieName` — the auth cookie name is INFRA, not branding (see
-    // docu/branding-buckets-konzept.md). It was unreachable here in the first place: @nuxtjs/apollo
-    // bakes its token name into the generated plugin at BUILD time, so the cookie was always written
+    // NOTE: no `cookieName` — the auth cookie name is INFRA, not branding. It was unreachable here in the first
+    // place: @nuxtjs/apollo bakes its token name into the generated plugin at BUILD time, so the cookie was always written
     // under the framework default while the auth store checked for the branded name — a login that
     // worked but reported "no cookie". It is the webapp's `COOKIE_NAME` deployment variable now
     // (webapp/utils/authCookie.js), settable per instance without a rebuild but NOT switchable while
@@ -284,6 +289,14 @@ export interface BrandingConfig {
   }
   donation: {
     progressBarColorType: 'gradient' | 'uni'
+  }
+  map: {
+    /**
+     * The style a map opens on, for a page in the light and for one in the dark theme. The person can
+     * still switch in the style switcher. Only styles the maps already offer (`MapStyleId`): an own
+     * style URL would need a label and its translations in the switcher.
+     */
+    defaultStyle: { light: MapStyleId; dark: MapStyleId }
   }
   badges: {
     /** Maximum number of trophy badges a user may select for display. */

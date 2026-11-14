@@ -129,13 +129,13 @@ useHead({
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.1;
-  color: var(--color-text-base);
+  color: var(--text-color-base);
   margin: 0 0 1em;
 }
 
 .text {
   font-family: LatoWeb, sans-serif;
-  color: var(--color-text-base);
+  color: var(--text-color-base);
   line-height: 1.3;
   margin: 0 0 1em;
 }

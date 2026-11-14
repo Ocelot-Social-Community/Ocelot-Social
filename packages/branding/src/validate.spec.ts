@@ -134,3 +134,22 @@ test('theme.colorScheme must be a supported color-scheme value', () => {
     /theme\.colorScheme must be one of 'light', 'dark', 'light dark' \(got 'both'\)/,
   )
 })
+
+test('map.defaultStyle must be a map style the maps offer, for the light and the dark theme', () => {
+  for (const id of ['outdoors', 'navigation-night', 'streets', 'satellite', 'dark']) {
+    assert.doesNotThrow(() => defineBranding({ map: { defaultStyle: { light: id, dark: id } } }))
+  }
+  assert.throws(
+    () => defineBranding({ map: { defaultStyle: { light: 'outdoors', dark: 'night' } } }),
+    /map\.defaultStyle\.dark must be one of 'outdoors', 'navigation-night', 'streets', 'satellite', 'dark' \(got 'night'\)/,
+  )
+  assert.throws(
+    () =>
+      defineBranding({ map: { defaultStyle: { light: 'mapbox://styles/me/x', dark: 'dark' } } }),
+    /map\.defaultStyle\.light must be one of/,
+  )
+})
+
+test('vanilla opens every map on outdoors, in the light and the dark theme', () => {
+  assert.deepEqual(defineBranding({}).map.defaultStyle, { light: 'outdoors', dark: 'outdoors' })
+})

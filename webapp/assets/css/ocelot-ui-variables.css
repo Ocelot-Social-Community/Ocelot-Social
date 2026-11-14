@@ -11,13 +11,10 @@
 
 :root {
   /*  Default (grau) - entspricht ds-button ohne Modifier */
-  --color-default: light-dark(var(--background-color-softer), var(--background-color-softer));
-  --color-default-hover: light-dark(var(--color-neutral-70), rgb(60, 57, 66));
-  --color-default-active: light-dark(var(--color-neutral-60), rgb(75, 71, 83));
+  --color-default: var(--background-color-softer);
+  --color-default-hover: light-dark(var(--color-neutral-70), var(--color-neutral-15));
+  --color-default-active: light-dark(var(--color-neutral-60), var(--color-neutral-20));
   --color-default-contrast: var(--text-color-base);
-  /*  The ui library's own name for the soft background (styles/index.css: the active menu item). */
-  /*  Never declared, so its literal fallback #faf9fa stayed light in the dark theme. */
-  --color-background-soft: var(--background-color-soft);
   --color-default-contrast-inverse: var(--color-neutral-100); /*  weiß für dunkle Hintergründe */
 
   /*  Primary (grün) - verwendet var(--text-color-primary-inverse) wie ds-button. */
@@ -34,6 +31,18 @@
   --color-primary-hover: var(--color-primary-dark);
   --color-primary-active: color-mix(in srgb, var(--color-primary-dark), black 20%);
   --color-primary-contrast: var(--text-color-primary-inverse);
+  /*  The colour of a FILLED primary surface (badge, button) that carries --color-primary-contrast. */
+  /*  Light: the brand's primary. Dark: 30% darker — the bright brand colour put white text at 2.7:1 and */
+  /*  glowed on the dark ground; 30% reads at 5.1:1 (text) and still stands off the ground at 3.5:1. Text and */
+  /*  borders in a colour stay --color-<name>, bright on dark is what reads there. The same for the other */
+  /*  colours below, each by what WCAG AA asks of white-ish text on it (4.5:1) and of the surface on the */
+  /*  ground (3:1): secondary and info 17%, danger 4%, warning 24%, success 30%. */
+  --color-primary-fill: light-dark(var(--color-primary), color-mix(in srgb, var(--color-primary), black 30%));
+  --color-secondary-fill: light-dark(var(--color-secondary), color-mix(in srgb, var(--color-secondary), black 17%));
+  --color-danger-fill: light-dark(var(--color-danger), color-mix(in srgb, var(--color-danger), black 4%));
+  --color-warning-fill: light-dark(var(--color-warning), color-mix(in srgb, var(--color-warning), black 24%));
+  --color-success-fill: light-dark(var(--color-success), color-mix(in srgb, var(--color-success), black 30%));
+  --color-info-fill: light-dark(var(--color-info), color-mix(in srgb, var(--color-info), black 17%));
   --font-family-heading: 'LatoWeb', sans-serif;
   --font-family-text: 'LatoWeb', sans-serif;
 
@@ -74,7 +83,6 @@
   --color-disabled-contrast: var(--color-neutral-100); /*  weiß */
 
   /*  Text */
-  --color-text-base: var(--text-color-base); /*  rgb(75, 69, 84) — OsMenuItem links; undeclared, they fell back to a literal and stayed dark in dark */
   --color-text-soft: var(--text-color-soft); /*  rgb(112, 103, 126) */
 
   /*  Ocelot ActionButton badge */

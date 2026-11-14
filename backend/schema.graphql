@@ -1574,11 +1574,6 @@ type Permission {
   The runtime feature gate this permission depends on (e.g. videoCall, apiKeys), or null when it is always effective.
   """
   gatedBy: String
-
-  """
-  Whether the requesting viewer may put this right into a role they did not hold it in: they hold it themselves, or it is a participation right that gives no power over others. Their own role is exempt — role.manage lets them shape it freely.
-  """
-  grantableByCurrentUser: Boolean!
   group: String!
   key: String!
 }
@@ -2281,11 +2276,6 @@ type Role {
   Whether the requesting viewer may give this role to somebody they outrank: they hold its rights themselves, and the owner role only to an owner.
   """
   assignableByCurrentUser: Boolean!
-
-  """
-  Whether the requesting viewer may change this role (its rights, its name, whether it exists): it is their own role, or their role outranks it.
-  """
-  editableByCurrentUser: Boolean!
 
   """Number of users currently assigned this role."""
   memberCount: Int

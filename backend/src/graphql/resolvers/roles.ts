@@ -10,11 +10,7 @@ import {
 import { OWNER_ROLE, PERMISSIONS_CHANGED_CHANNEL, RoleValidationError } from '@src/role'
 
 import { viewerOutranksUser } from './helpers/actOnHierarchy'
-import {
-  mayGrantPermission,
-  roleChangeRefusal,
-  roleOfferRefusal,
-} from './helpers/networkRoleAuthority'
+import { roleOfferRefusal } from './helpers/networkRoleAuthority'
 
 import type { Context } from '@src/context'
 import type { RoleDefinition } from '@src/role'
@@ -95,7 +91,6 @@ export default {
         // actionable policy. Null when the permission is effective (available).
         gatedBy: blockingGateFor(entry.key, context),
         available: isPermissionAvailable(entry.key, context),
-        grantableByCurrentUser: mayGrantPermission(context, entry.key),
       })),
 
     roles: async (_parent: unknown, _args: unknown, context: Context) => {
@@ -299,12 +294,6 @@ export default {
 
   // What the admin pages offer, decided by the same functions the shield asks (#10485).
   Role: {
-    // A protected role (`owner`) nobody changes; the shield leaves that refusal to RoleService.
-    editableByCurrentUser: (
-      role: { name: string; protected: boolean },
-      _args: unknown,
-      context: Context,
-    ) => !role.protected && roleChangeRefusal(context, role.name) === null,
     assignableByCurrentUser: (role: { name: string }, _args: unknown, context: Context) =>
       roleOfferRefusal(context, role.name) === null,
   },

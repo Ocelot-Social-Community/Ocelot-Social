@@ -56,34 +56,56 @@ const from = { name: CONFIG.APPLICATION_NAME, address: CONFIG.EMAIL_DEFAULT_SEND
 
 const transport = createTransport(nodemailerTransportOptions)
 
-const email = new Email({
-  message: {
-    from,
-  },
-  transport,
-  i18n: {
-    locales: [...SUPPORTED_LOCALES],
-    defaultLocale: CONFIG.LANGUAGE_DEFAULT,
-    retryInDefaultLocale: false,
-    directory: path.join(import.meta.dirname, 'locales'),
-    updateFiles: false,
-    objectNotation: true,
-    mustacheConfig: {
-      tags: ['{', '}'],
-      disable: false,
+/**
+ * The renderer, built for the CURRENT `CONFIG.SEND_MAIL` rather than the value it had when this
+ * module was imported.
+ *
+ * `email-templates` copies `send` into its config when it is constructed, so a single instance built
+ * here would freeze whatever `CONFIG.SEND_MAIL` held at import time. Under ESM every static import is
+ * evaluated before the importing module's body runs, so a script that turns mail off after its
+ * imports — `db:seed` does, see db/seed.ts — would never reach it: its setting would be silently
+ * ignored and the mails would go out anyway. One instance per value, built on first use, keeps the
+ * i18n setup once per process while the decision is taken at send time.
+ */
+const renderers = new Map<boolean, Email>()
+
+const email = (): Email => {
+  const send = CONFIG.SEND_MAIL
+  const existing = renderers.get(send)
+  if (existing) {
+    return existing
+  }
+  const renderer = new Email({
+    message: {
+      from,
     },
-  },
-  send: CONFIG.SEND_MAIL,
-  preview: false,
-  // This is very useful to see the emails sent by the unit tests
-  /*
-  preview: {
-    open: {
-      app: 'brave-browser',
+    transport,
+    i18n: {
+      locales: [...SUPPORTED_LOCALES],
+      defaultLocale: CONFIG.LANGUAGE_DEFAULT,
+      retryInDefaultLocale: false,
+      directory: path.join(import.meta.dirname, 'locales'),
+      updateFiles: false,
+      objectNotation: true,
+      mustacheConfig: {
+        tags: ['{', '}'],
+        disable: false,
+      },
     },
-  },
-  */
-})
+    send,
+    preview: false,
+    // This is very useful to see the emails sent by the unit tests
+    /*
+    preview: {
+      open: {
+        app: 'brave-browser',
+      },
+    },
+    */
+  })
+  renderers.set(send, renderer)
+  return renderer
+}
 
 interface OriginalMessage {
   to: string
@@ -101,7 +123,7 @@ export const sendNotificationMail = async (notification: any): Promise<OriginalM
   const to = { name, address: notification?.email }
   const template = notification?.reason
 
-  const { originalMessage } = await email.send({
+  const { originalMessage } = await email().send({
     template: path.join(import.meta.dirname, 'templates', template),
     message: {
       to,
@@ -180,7 +202,7 @@ export const sendChatMessageMail = async (
 ): Promise<OriginalMessage> => {
   const { senderUser, recipientUser } = data
   const to = { name: recipientUser.name, address: data.email }
-  const { originalMessage } = await email.send({
+  const { originalMessage } = await email().send({
     template: path.join(import.meta.dirname, 'templates', 'chat_message'),
     message: {
       to,
@@ -226,7 +248,7 @@ export const sendRegistrationMail = async (
     actionUrl.searchParams.set('method', 'invite-mail')
   }
 
-  const { originalMessage } = await email.send({
+  const { originalMessage } = await email().send({
     template: path.join(import.meta.dirname, 'templates', 'registration'),
     message: {
       to,
@@ -255,7 +277,7 @@ export const sendEmailVerification = async (
   actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
 
-  const { originalMessage } = await email.send({
+  const { originalMessage } = await email().send({
     template: path.join(import.meta.dirname, 'templates', 'emailVerification'),
     message: {
       to,
@@ -280,7 +302,7 @@ export const sendResetPasswordMail = async (
   const actionUrl = new URL('/password-reset/change-password', CONFIG.CLIENT_URI)
   actionUrl.searchParams.set('email', to.address)
   actionUrl.searchParams.set('nonce', nonce)
-  const { originalMessage } = await email.send({
+  const { originalMessage } = await email().send({
     template: path.join(import.meta.dirname, 'templates', 'resetPassword'),
     message: {
       to,
@@ -305,7 +327,7 @@ export const sendWrongEmail = async (data: {
   const { locale, name } = data
   const to = { name, address: data.email }
   const actionUrl = new URL('/password-reset/request', CONFIG.CLIENT_URI)
-  const { originalMessage } = await email.send({
+  const { originalMessage } = await email().send({
     template: path.join(import.meta.dirname, 'templates', 'wrongEmail'),
     message: {
       to,

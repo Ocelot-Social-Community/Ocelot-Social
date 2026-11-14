@@ -4,35 +4,27 @@
     <div class="ds-mb-small"></div>
     <div class="ds-mb-large">
       <select-user-search :id="id" ref="selectUserSearch" @select-user="selectUser" />
-      <os-modal
+      <os-confirm-dialog
         v-if="isOpen"
+        :open="isOpen"
         :title="$t('group.addMember')"
+        :message="$t('group.modal.confirmAddGroupMemberText', { name: user.name })"
+        :confirm-label="$t('group.modal.confirm')"
+        :cancel-label="$t('group.modal.cancel')"
         :close-label="$t('actions.close')"
-        :open.sync="isOpen"
-        @close="closeModal"
+        :confirm-icon="icons.check"
+        :cancel-icon="icons.close"
+        :loading="loading"
         @confirm="confirmModal"
         @cancel="cancelModal"
-      >
-        <p class="ds-text ds-text-size-large">
-          {{ $t('group.modal.confirmAddGroupMemberText', { name: user.name }) }}
-        </p>
-        <template #footer="{ confirm, cancel }">
-          <os-button appearance="outline" @click="cancel">
-            <template #icon><os-icon :icon="icons.close" /></template>
-            {{ $t('group.modal.cancel') }}
-          </os-button>
-          <os-button variant="primary" @click="confirm">
-            <template #icon><os-icon :icon="icons.check" /></template>
-            {{ $t('group.modal.confirm') }}
-          </os-button>
-        </template>
-      </os-modal>
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { OsButton, OsIcon, OsModal } from '@ocelot-social/ui'
+import { escape } from 'lodash'
+import { OsConfirmDialog } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import { setGroupMemberRoleMutation } from '~/graphql/groupRoles.js'
 import SelectUserSearch from '~/components/generic/SelectUserSearch/SelectUserSearch'
@@ -43,9 +35,7 @@ export default {
   mixins: [groupRights],
   name: 'AddGroupMember',
   components: {
-    OsButton,
-    OsIcon,
-    OsModal,
+    OsConfirmDialog,
     SelectUserSearch,
   },
   props: {
@@ -73,6 +63,7 @@ export default {
       id: 'search-user-to-add-to-group',
       user: {},
       isOpen: false,
+      loading: false,
     }
   },
   methods: {
@@ -80,14 +71,18 @@ export default {
       this.$refs.selectUserSearch.clear()
       this.isOpen = false
     },
-    closeModal() {
-      this.$refs.selectUserSearch.clear()
-      this.isOpen = false
-    },
-    confirmModal() {
-      this.addMemberToGroup()
-      this.isOpen = false
-      this.$refs.selectUserSearch.clear()
+    // The dialog stays open, its confirm button spinning and cancel blocked, until the mutation
+    // is through: no second click, no closing under a running request. addMemberToGroup reports
+    // success and failure itself (toasts); after a failure the dialog stays for another try.
+    async confirmModal() {
+      this.loading = true
+      const added = await this.addMemberToGroup().finally(() => {
+        this.loading = false
+      })
+      if (added) {
+        this.isOpen = false
+        this.$refs.selectUserSearch.clear()
+      }
     },
     selectUser(user) {
       this.user = user
@@ -103,7 +98,7 @@ export default {
       // a system role: a group may relabel it, never rename or delete it — which is also why
       // the label comes from the definition when the page could read one.
       const newRole = USUAL_GROUP_ROLE
-      const username = this.user.name
+      const { name, slug } = this.user
       try {
         await this.$apollo.mutate({
           mutation: setGroupMemberRoleMutation(),
@@ -111,15 +106,22 @@ export default {
         })
         this.$toast.success(
           this.$t('group.addMemberToGroupSuccess', {
-            role: this.roleLabel(
-              this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
+            // The toast renders its text as HTML; the role's label, the name and the slug are
+            // user content (a group names its roles itself): escape them.
+            role: escape(
+              this.roleLabel(
+                this.groupRoles.find((role) => role.name === newRole) ?? { name: newRole },
+              ),
             ),
-            name: username,
+            name: escape(name),
+            slug: escape(slug),
           }),
         )
         this.$emit('loadGroupMembers')
+        return true
       } catch (error) {
         this.$toastBackendError(error)
+        return false
       }
     },
   },

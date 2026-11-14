@@ -2,6 +2,69 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## `PRODUCTION_DB_CLEAN_ALLOW` is `DB_WIPE_ALLOWED`, and it is off unless set — **action required** on staging
+
+`db:reset`, `db:reset:withmigrations` and `db:seed` wipe the database only where
+`DB_WIPE_ALLOWED=true`. `NODE_ENV` no longer decides: the old guard only looked at
+`NODE_ENV=production`, so a seed run with `NODE_ENV=test` (the way a staging reseed job turns mail
+off) wiped any database, production included.
+
+- **Staging** that reseeds: rename `PRODUCTION_DB_CLEAN_ALLOW: "true"` to `DB_WIPE_ALLOWED: "true"`
+  in its values. `PRODUCTION_DB_CLEAN_ALLOW` is no longer read; a reseed still on it fails and says
+  so.
+- **Production**: drop `PRODUCTION_DB_CLEAN_ALLOW`, set nothing. Unset is protected.
+- A reseed **job** must not set the switch itself. It belongs to the instance (the backend's config
+  map), so a job applied to the wrong namespace finds it off there.
+
+## Branding: `branding/` becomes `brandings/<name>/` + `overlays/` — **action required**
+
+A brand repo (the build context of `FROM backend-build` / `webapp-build` / `maintenance-build`) now
+keeps its brands under `brandings/`, one folder each, and may hold several. Every one of them is
+baked into the images as its own archive, so the network can switch between them (`activeBranding`)
+or compose them per bucket (`brandingComposition`, e.g. the theme of one brand with the identity of
+another) without a rebuild. Code and seed data compiled into the backend image move out of the
+brand into `overlays/`, because they cannot follow the active brand.
+
+```
+brandings/
+  acme/          ← brand.config.ts, package.json (brandId), assets/, …
+  acme-classic/
+overlays/        ← optional
+  middlewares/   → backend src/middleware/branding/
+  data/          → backend src/db/data/
+```
+
+**Action** — the former single `branding/` folder is **no longer built**: a repo that still has it
+fails the image build with these steps.
+
+```bash
+mkdir -p brandings overlays
+git mv branding/middlewares branding/data overlays/   # only if the brand ships them
+git mv branding brandings/<name>
+```
+
+Only `brand.config.ts` and `brand.config.mjs` are read. A brand folder with only a
+`brand.config.js` fails the build: rename it to `.mjs` (plain ESM) or port it to `.ts`.
+
+**Which brand a network renders is deployment configuration**, not part of the images: the
+`activeBranding` policy (admin), else `OCELOT_ACTIVE_BRANDING=<brandId>` on backend, webapp and
+maintenance. With a single brand nothing else changes: it is still marked as the images' default and
+needs no configuration. **With several, set `OCELOT_ACTIVE_BRANDING`**, otherwise the network
+renders unbranded until an admin picks one (the build log says so).
+
+The maintenance page is static, so with several brands the image holds one complete page per brand
+(under `_brands/<brandId>/`, plus a vanilla root) and its entrypoint serves the one
+`OCELOT_ACTIVE_BRANDING` names. The chart takes the value from `backend.env` unless
+`maintenance.env` states its own, like `SUPPORT_EMAIL`. An admin's choice does not reach this page:
+it is served exactly when the database is out of reach.
+
+The build fails when a repo still has `branding/`, when a folder under `brandings/` ships
+`middlewares/` or `data/` or has only a `brand.config.js`, and when two brands share a `brandId`.
+
+The same layout works for a config dir under `deployment/configurations/<name>/` in a monorepo
+build (`--build-arg BRAND=<name>`). The maintenance dev server and `npm run brand -- <name>` in
+`maintenance/` show one brand: the only one, or the one `OCELOT_ACTIVE_BRANDING` names.
+
 ## imagor 1.5.4 → 1.9.12
 
 The chart's image proxy moves from `shumc/imagor:1.5.4` to `1.9.12` — the version the development

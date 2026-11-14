@@ -46,8 +46,42 @@ const threadQuery = parse(`
   }
 `)
 
+const searchQuery = parse(`
+  query {
+    searchPosts(query: "group", firstPosts: 10, postsOffset: 0) {
+      posts {
+        id
+        commentsCount
+      }
+    }
+  }
+`)
+
+const unreadQuery = parse(`
+  query {
+    Post(id: "post") {
+      unreadCommentNotificationsByCurrentUser {
+        from {
+          ... on Comment {
+            id
+            content
+          }
+        }
+      }
+    }
+  }
+`)
+
+interface Unread {
+  Post: { unreadCommentNotificationsByCurrentUser: { from: { id: string } }[] }[]
+}
+
 interface Thread {
   Post: { id: string; commentsCount: number; comments: { id: string }[] }[]
+}
+
+interface Search {
+  searchPosts: { posts: { id: string; commentsCount: number }[] }
 }
 
 interface Export {
@@ -83,6 +117,17 @@ const buildUser = async (id: string): Promise<Viewer> => {
 
 const as = async (viewer: Viewer) => {
   authenticatedUser = await viewer.toJson()
+}
+
+const unreadCommentIds = async (viewer: Viewer) => {
+  await as(viewer)
+  const result = await query({ query: unreadQuery })
+
+  expect(result.errors).toBeUndefined()
+
+  return (result.data as Unread).Post[0].unreadCommentNotificationsByCurrentUser
+    .map(({ from }) => from.id)
+    .sort()
 }
 
 const join = async (viewer: Viewer, template: string) => {
@@ -178,8 +223,29 @@ describe.each(['public', 'closed', 'hidden'])('a post in a %s group', (template)
       await cleanDatabase()
     })
 
+    // The search used to project its own unfiltered count, which bypassed Post.commentsCount.
+    it('counts in the search what the thread counts', async () => {
+      await as(author)
+      const result = await query({ query: searchQuery })
+
+      expect(result.errors).toBeUndefined()
+      expect((result.data as Search).searchPosts.posts).toEqual([
+        { id: 'post', commentsCount: template === 'public' ? 3 : 1 },
+      ])
+    })
+
     it('still shows the author their post', async () => {
       await expect(thread(author)).resolves.toMatchObject([{ id: 'post' }])
+    })
+
+    // `deleted` and `disabled` are optional on Comment, so older data may lack them — such a
+    // comment is neither, and is counted like the list shows it.
+    it('counts a comment that lacks deleted and disabled', async () => {
+      await database.write({
+        query: `MATCH (comment:Comment { id: 'by-member' }) REMOVE comment.deleted, comment.disabled`,
+      })
+
+      await expect(thread(member)).resolves.toMatchObject([{ id: 'post', commentsCount: 3 }])
     })
 
     it('still shows a member every comment', async () => {
@@ -193,6 +259,10 @@ describe.each(['public', 'closed', 'hidden'])('a post in a %s group', (template)
     })
 
     if (template === 'public') {
+      it("still hands the author the unread notifications of the members' comments", async () => {
+        await expect(unreadCommentIds(author)).resolves.toEqual(['after-departure', 'by-member'])
+      })
+
       it('shows the author every comment, as anyone may read them', async () => {
         await expect(thread(author)).resolves.toEqual([
           {
@@ -207,6 +277,12 @@ describe.each(['public', 'closed', 'hidden'])('a post in a %s group', (template)
         await expect(thread(author)).resolves.toEqual([
           { id: 'post', commentsCount: 1, comments: [{ id: 'by-author' }] },
         ])
+      })
+
+      // The author observes their post, so the member's comment from before the departure was
+      // notified to them. The notification carries the comment: it must not outlive the access.
+      it("hands the author no unread notification of the members' comments", async () => {
+        await expect(unreadCommentIds(author)).resolves.toEqual([])
       })
 
       it("exports the author's own comment but not the members'", async () => {

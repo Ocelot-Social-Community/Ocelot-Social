@@ -26,7 +26,7 @@ describe('osButton', () => {
         props: { variant: 'primary' },
       })
 
-      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary-fill,var(--color-primary))]')
     })
 
     it('applies danger variant classes', () => {
@@ -34,7 +34,7 @@ describe('osButton', () => {
         props: { variant: 'danger' },
       })
 
-      expect(wrapper.classes()).toContain('bg-[var(--color-danger)]')
+      expect(wrapper.classes()).toContain('bg-[var(--color-danger-fill,var(--color-danger))]')
     })
   })
 
@@ -525,7 +525,7 @@ describe('osButton', () => {
       })
 
       expect(wrapper.classes()).toContain('rounded-full')
-      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary-fill,var(--color-primary))]')
     })
 
     it('is combinable with ghost appearance', () => {
@@ -786,7 +786,7 @@ describe('osButton', () => {
       })
 
       expect(wrapper.classes()).toContain('os-button')
-      expect(wrapper.classes()).toContain('bg-[var(--color-primary)]')
+      expect(wrapper.classes()).toContain('bg-[var(--color-primary-fill,var(--color-primary))]')
     })
   })
 

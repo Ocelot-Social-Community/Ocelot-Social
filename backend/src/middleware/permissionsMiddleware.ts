@@ -10,7 +10,7 @@ import { createRequire } from 'node:module'
 import CONFIG from '@config/index'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
-import { viewerOutranksUser } from '@graphql/resolvers/helpers/actOnHierarchy'
+import { viewerOutranksRole, viewerOutranksUser } from '@graphql/resolvers/helpers/actOnHierarchy'
 import {
   elevatedIn,
   memberRoleHolds,
@@ -20,10 +20,7 @@ import {
 } from '@graphql/resolvers/helpers/groupAccessCypher'
 import {
   assignmentError,
-  changeError,
   roleAssignmentRefusal,
-  roleChangeRefusal,
-  roleCreateRefusal,
 } from '@graphql/resolvers/helpers/networkRoleAuthority'
 import { inviteCodeAllowsRegistration } from '@graphql/resolvers/inviteCodes'
 import {
@@ -36,7 +33,6 @@ import {
   templateVisibility,
 } from '@src/groupRole'
 import { isPermissionAvailable } from '@src/permission'
-import { dominatesInNetwork } from '@src/role'
 
 import type { Context } from '@src/context'
 import type { GroupPermissionKey } from '@src/groupPermission'
@@ -245,7 +241,7 @@ const isDeletingOwnAccount = rule({
 })
 
 // Act-on hierarchy guard for per-user destructive actions (delete, disable): the actor may only
-// act on a target whose role grants strictly less AUTHORITY than theirs (dominatesInNetwork() —
+// act on a target whose role grants strictly less AUTHORITY than theirs (outranksInNetwork() —
 // see role/authority.ts). Closes the privilege-escalation hole where a holder of
 // user.delete.any / user.disable could act on a peer or a higher-privileged user (admin/owner).
 //
@@ -288,26 +284,12 @@ const canSetUserRole = rule({ cache: 'no_cache' })(async (_parent, args, context
   return refusal ? assignmentError(refusal) : true
 })
 
-const canCreateRole = rule({ cache: 'no_cache' })((_parent, args, context: Context) => {
-  if (!hasPermissionEffective(context, 'role.manage')) {
-    return false
-  }
-  const refusal = roleCreateRefusal(context, args.permissions as string[])
-  return refusal ? changeError(refusal) : true
-})
-
-// updateRole carries the new rights; renameRole and deleteRole only name the role.
-const canChangeRole = rule({ cache: 'no_cache' })((_parent, args, context: Context) => {
-  if (!hasPermissionEffective(context, 'role.manage')) {
-    return false
-  }
-  const refusal = roleChangeRefusal(
-    context,
-    args.name as string,
-    args.permissions as string[] | undefined,
-  )
-  return refusal ? changeError(refusal) : true
-})
+// Shaping roles — creating, changing, renaming, deleting — needs `role.manage` and nothing else:
+// that right is for shaping every role but `owner` freely, removing rights included, and adding
+// any right there is. RoleService keeps the anchors: `owner` cannot be changed, renamed or
+// deleted, `user` cannot be renamed or deleted, and a role with members cannot be deleted.
+// Whom a role is given to stays ranked (canSetUserRole).
+const canShapeRoles = hasPermission('role.manage')
 
 // Same hierarchy guard for the report `review` mutation, which can disable the
 // reported resource. Only Users carry a role, so Posts/Comments pass through; a
@@ -349,8 +331,7 @@ const canModerateTargetUser = rule({ cache: 'no_cache' })(async (
   }
   // coalesce() in the statement above already guarantees a name, same as in
   // viewerOutranksUser.
-  const targetPermissions = context.role.permissionsForRole(row.get('roleName') as string)
-  if (dominatesInNetwork(context.effectivePermissions, targetPermissions)) {
+  if (viewerOutranksRole(context, row.get('roleName') as string)) {
     return true
   }
   // Explained to a moderator only, for the reason given at canActOnTargetUser.
@@ -948,10 +929,10 @@ export default shield(
       adminRevokeApiKey: hasPermission('apiKey.administer'),
       adminRevokeUserApiKeys: hasPermission('apiKey.administer'),
 
-      createRole: canCreateRole,
-      updateRole: canChangeRole,
-      renameRole: canChangeRole,
-      deleteRole: canChangeRole,
+      createRole: canShapeRoles,
+      updateRole: canShapeRoles,
+      renameRole: canShapeRoles,
+      deleteRole: canShapeRoles,
       setUserRole: canSetUserRole,
 
       // Group roles: editing a group's own role definitions is the group's meta right, and

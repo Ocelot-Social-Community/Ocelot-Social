@@ -3,12 +3,11 @@
 
 import CONFIG from '@config/index'
 
+import { assertWipeAllowed } from './assertWipeAllowed'
 import { cleanDatabase } from './factories'
 import { nudgeCacheResync } from './resync-caches'
 
-if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
-  throw new Error(`You cannot clean the database in a non-staging and real production environment!`)
-}
+assertWipeAllowed(CONFIG, 'db:reset')
 
 ;(async function () {
   try {

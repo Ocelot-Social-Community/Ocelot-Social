@@ -21,6 +21,7 @@ import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import {
   nonMemberReadsContent,
   optionalWithholdingGroupMatch,
+  postReadableBy,
   readsWithholdingGroupContent,
 } from './helpers/groupAccessCypher'
 import { orderClause } from './helpers/ordering'
@@ -66,13 +67,6 @@ const NOTIFIED_FOR_RESOURCE_CYPHER = `
   MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
   WHERE resource.id IN $resourceIds
     AND NOT coalesce(resource.deleted, false)
-    AND NOT coalesce(resource.disabled, false)
-  ${NOTIFICATION_PROJECTION_SUFFIX}
-`
-
-const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
-  MATCH (:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
-  WHERE NOT coalesce(resource.deleted, false)
     AND NOT coalesce(resource.disabled, false)
   ${NOTIFICATION_PROJECTION_SUFFIX}
 `
@@ -187,9 +181,9 @@ const commentScope = async (
  * lookup of their own — which named only the post, and ran once per comment of every post in a
  * feed.
  */
-const bindReadsGroup = (post: string, carried: string): string => `
+const bindReadsGroup = (post: string, ...carried: string[]): string => `
   ${optionalWithholdingGroupMatch(post, 'contentGroupIds', 'elevatedGroupIds')}
-  WITH ${carried}, ${post}, ${readsWithholdingGroupContent} AS readsGroup`
+  WITH ${[...carried, post].join(', ')}, ${readsWithholdingGroupContent} AS readsGroup`
 
 /**
  * A comment under a visible post that the viewer may read: they read the group — the case of
@@ -200,6 +194,19 @@ const commentReadable = (comment: string): string => `(
   readsGroup
   OR EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
 )`
+
+// Only for comments the reader may read (commentReadable, above). A notification carries its
+// comment, so one written while the reader was in the group must not outlive their access to it:
+// a post stays visible to its author after they leave, its members' comments do not.
+const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
+  MATCH (post:Post {id: $postId})
+  ${bindReadsGroup('post')}
+  MATCH (post)<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+    AND ${commentReadable('resource')}
+  ${NOTIFICATION_PROJECTION_SUFFIX}
+`
 
 // ORDER BY from `_CommentOrdering`. Oldest first by default — how a thread reads, and what
 // the webapp asks for.
@@ -993,7 +1000,7 @@ export default {
               MATCH (post:Post { id: __id })
               ${bindReadsGroup('post', '__id')}
               OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
-                WHERE NOT comment.deleted = true AND NOT comment.disabled = true
+                WHERE NOT coalesce(comment.deleted, false) AND NOT coalesce(comment.disabled, false)
                 AND ${commentReadable('comment')}
               RETURN __id AS __id, count(comment) AS __value
             `,
@@ -1050,12 +1057,15 @@ export default {
       if (!currentUserId || !parent?.id) {
         return []
       }
+      const scope = await commentScope(context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction((transaction) =>
           transaction.run(NOTIFIED_COMMENTS_FOR_POST_CYPHER, {
             userId: currentUserId,
             postId: parent.id,
+            cypherParams: { currentUserId },
+            ...scope,
           }),
         )
         return result.records.map((record) => record.get('notification'))
@@ -1071,14 +1081,17 @@ export default {
       const session = context.driver.session()
 
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        // Only what the viewer reads: a tag or a category is shared across groups, so a public
+        // post would otherwise recommend the posts of a closed or hidden group to anyone.
         const relatedContributionsTransactionResponse = await transaction.run(
           `
             MATCH (p:Post {id: $id})-[:TAGGED|CATEGORIZED]->(categoryOrTag)<-[:TAGGED|CATEGORIZED]-(post:Post)
             WHERE NOT post.deleted AND NOT post.disabled
+              AND ${postReadableBy('post', '$currentUserId')}
             RETURN DISTINCT post
             LIMIT 10
           `,
-          { id },
+          { id, currentUserId: context.user?.id ?? null },
         )
         return relatedContributionsTransactionResponse.records.map(
           (record) => record.get('post').properties,

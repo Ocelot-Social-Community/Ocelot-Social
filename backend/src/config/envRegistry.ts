@@ -203,10 +203,10 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     softwareDefault: String(SOFTWARE_DEFAULTS.DEBUG),
   },
   {
-    name: 'PRODUCTION_DB_CLEAN_ALLOW',
+    name: 'DB_WIPE_ALLOWED',
     secret: false,
     category: 'general',
-    softwareDefault: String(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW),
+    softwareDefault: String(SOFTWARE_DEFAULTS.DB_WIPE_ALLOWED),
   },
   // A comma-separated list; shown as a JSON array so the empty default reads as [] and a set
   // value as ["m_a","m_b"] rather than a bare/blank string.

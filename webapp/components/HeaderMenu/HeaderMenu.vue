@@ -259,7 +259,7 @@
               <div class="mobile-user-details">
                 <b>{{ userName }}</b>
                 <span v-if="user.roleName && user.roleName !== 'user'" class="mobile-user-role">
-                  {{ user.roleName | camelCase }}
+                  {{ networkRoleTitle(user.roleName) }}
                 </span>
               </div>
               <os-button
@@ -583,6 +583,7 @@ import throttle from 'lodash/throttle'
 import locales from '~/locales'
 import { branding, colorSchemeOf, getBranding } from '@ocelot-social/branding'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import networkRoleLabel from '~/mixins/networkRoleLabel'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
@@ -602,7 +603,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import localeUpdate from '~/mixins/localeUpdate.js'
 
 export default {
-  mixins: [GetCategories, localeUpdate],
+  mixins: [GetCategories, localeUpdate, networkRoleLabel],
   components: {
     OsButton,
     OsIcon,

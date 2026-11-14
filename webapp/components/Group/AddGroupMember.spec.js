@@ -1,19 +1,10 @@
 import { mount, createLocalVue } from '@vue/test-utils'
 import AddGroupMember from './AddGroupMember.vue'
 
-// Drain the microtask queue so we can deterministically await fire-and-forget
-// async chains like the one inside confirmModal() (which calls
-// addMemberToGroup() without awaiting it).
+// Drain the microtask queue so the awaited mutation chain inside confirmModal() settles.
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
 
 const localVue = createLocalVue()
-
-const Stub = (name, opts = {}) => ({
-  name,
-  props: opts.props || [],
-  template: opts.template || `<div class="stub-${name.toLowerCase()}"><slot /></div>`,
-  methods: opts.methods || {},
-})
 
 const SelectUserSearchStub = {
   name: 'SelectUserSearch',
@@ -24,24 +15,19 @@ const SelectUserSearchStub = {
   template: '<div class="stub-search" />',
 }
 
-const OsModalStub = {
-  name: 'OsModal',
-  props: ['title', 'open'],
+const OsConfirmDialogStub = {
+  name: 'OsConfirmDialog',
+  props: ['title', 'message', 'open', 'loading', 'confirmLabel', 'cancelLabel'],
   template: `
     <div class="stub-modal">
-      <slot />
-      <slot name="footer" :confirm="() => $emit('confirm')" :cancel="() => $emit('cancel')" />
+      <button class="stub-confirm" @click="$emit('confirm')" />
+      <button class="stub-cancel" @click="$emit('cancel')" />
     </div>
   `,
 }
 
 const baseStubs = {
-  OsButton: Stub('OsButton', {
-    template:
-      '<button class="stub-button" @click="$emit(\'click\')"><slot name="icon" /><slot /></button>',
-  }),
-  OsIcon: Stub('OsIcon'),
-  OsModal: OsModalStub,
+  OsConfirmDialog: OsConfirmDialogStub,
   SelectUserSearch: SelectUserSearchStub,
 }
 
@@ -104,37 +90,72 @@ describe('AddGroupMember', () => {
     })
   })
 
-  describe('closeModal', () => {
-    it('closes the modal and clears the search', async () => {
-      const { wrapper } = factory()
-      wrapper.vm.user = { id: 'u1', name: 'Alice' }
-      wrapper.vm.isOpen = true
-      await wrapper.vm.$nextTick()
-      wrapper.vm.closeModal()
-      expect(wrapper.vm.isOpen).toBe(false)
-      expect(wrapper.vm.$refs.selectUserSearch.clear).toHaveBeenCalled()
-    })
-  })
-
   describe('confirmModal', () => {
     it('calls the mutation, shows success, emits loadGroupMembers, and closes', async () => {
       const mutate = jest.fn().mockResolvedValue()
       const { wrapper, $toast } = factory({}, mutate)
-      wrapper.vm.user = { id: 'u1', name: 'Alice' }
+      wrapper.vm.user = { id: 'u1', name: '<i>Alice</i>', slug: 'alice' }
       wrapper.vm.isOpen = true
       await wrapper.vm.$nextTick()
       wrapper.vm.confirmModal()
-      // confirmModal kicks off addMemberToGroup() without awaiting it;
-      // drain the queue so the mutation, toast, and emit all settle.
       await flushPromises()
       expect(mutate).toHaveBeenCalledWith(
         expect.objectContaining({
           variables: { groupId: 'g1', userId: 'u1', roleName: 'usual' },
         }),
       )
-      expect($toast.success).toHaveBeenCalled()
+      // The text names the user twice, by name and by @slug — both must reach it, as plain text:
+      // a toast renders HTML, so a name with markup in it is escaped.
+      expect($toast.success).toHaveBeenCalledWith(
+        expect.stringContaining('"name":"&lt;i&gt;Alice&lt;/i&gt;","slug":"alice"'),
+      )
       expect(wrapper.emitted('loadGroupMembers')).toBeTruthy()
       expect(wrapper.vm.isOpen).toBe(false)
+    })
+
+    it('escapes the label a group gave the role, as it does the name', async () => {
+      const mutate = jest.fn().mockResolvedValue()
+      const { wrapper, $toast } = factory(
+        { groupRoles: [{ name: 'usual', label: '<u>Member</u>' }] },
+        mutate,
+      )
+      wrapper.vm.user = { id: 'u1', name: 'Alice', slug: 'alice' }
+      wrapper.vm.isOpen = true
+      await wrapper.vm.$nextTick()
+      wrapper.vm.confirmModal()
+      await flushPromises()
+      expect($toast.success).toHaveBeenCalledWith(
+        expect.stringContaining('&lt;u&gt;Member&lt;/u&gt;'),
+      )
+    })
+
+    it('keeps the dialog open and loading until the mutation is through', async () => {
+      let resolveMutation
+      const mutate = jest.fn(() => new Promise((resolve) => (resolveMutation = resolve)))
+      const { wrapper } = factory({}, mutate)
+      wrapper.vm.user = { id: 'u1', name: 'Alice' }
+      wrapper.vm.isOpen = true
+      await wrapper.vm.$nextTick()
+      wrapper.find('.stub-confirm').trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findComponent({ name: 'OsConfirmDialog' }).props('loading')).toBe(true)
+      expect(wrapper.vm.isOpen).toBe(true)
+      resolveMutation()
+      await flushPromises()
+      expect(wrapper.vm.isOpen).toBe(false)
+      expect(wrapper.vm.loading).toBe(false)
+    })
+
+    it('keeps the dialog open for another try when the mutation fails', async () => {
+      const mutate = jest.fn().mockRejectedValue(new Error('boom'))
+      const { wrapper } = factory({}, mutate)
+      wrapper.vm.user = { id: 'u1', name: 'Alice' }
+      wrapper.vm.isOpen = true
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.confirmModal()
+      expect(wrapper.vm.isOpen).toBe(true)
+      expect(wrapper.vm.loading).toBe(false)
+      expect(wrapper.vm.$refs.selectUserSearch.clear).not.toHaveBeenCalled()
     })
 
     it('surfaces mutation errors via toast', async () => {
