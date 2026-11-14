@@ -19,9 +19,10 @@ import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
 import {
-  groupContentWithheld,
   nonMemberReadsContent,
+  optionalWithholdingGroupMatch,
   postReadableBy,
+  readsWithholdingGroupContent,
 } from './helpers/groupAccessCypher'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
@@ -160,7 +161,7 @@ const filterEventDates = (params) => {
 }
 
 /**
- * The groups whose comments the viewer reads, for `groupContentWithheld`.
+ * The groups whose comments the viewer reads, for `optionalWithholdingGroupMatch`.
  *
  * A post can be visible while what was written under it is not: its author keeps the post after
  * leaving the group, but the members' comments stay the group's (#10629). Every elevation counts
@@ -175,22 +176,35 @@ const commentScope = async (
 }
 
 /**
- * A comment under a visible post that the viewer may read: they wrote it — what one writes stays
- * one's own, as the post does — or they read the group.
+ * Binds `readsGroup` once per post: whether the viewer reads the group the post sits in (or the
+ * post sits in none). The comments below it are then filtered on that value, not on a group
+ * lookup of their own — which named only the post, and ran once per comment of every post in a
+ * feed.
  */
-const commentReadable = (comment: string, post: string): string => `(
-  EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
-  OR NOT ${groupContentWithheld(post, 'contentGroupIds', 'elevatedGroupIds')}
+const bindReadsGroup = (post: string, ...carried: string[]): string => `
+  ${optionalWithholdingGroupMatch(post, 'contentGroupIds', 'elevatedGroupIds')}
+  WITH ${[...carried, post].join(', ')}, ${readsWithholdingGroupContent} AS readsGroup`
+
+/**
+ * A comment under a visible post that the viewer may read: they read the group — the case of
+ * nearly every post anyone sees, which leaves the author lookup unasked — or they wrote it: what
+ * one writes stays one's own, as the post does.
+ */
+const commentReadable = (comment: string): string => `(
+  readsGroup
+  OR EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
 )`
 
 // Only for comments the reader may read (commentReadable, above). A notification carries its
 // comment, so one written while the reader was in the group must not outlive their access to it:
 // a post stays visible to its author after they leave, its members' comments do not.
 const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
-  MATCH (post:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  MATCH (post:Post {id: $postId})
+  ${bindReadsGroup('post')}
+  MATCH (post)<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
   WHERE NOT coalesce(resource.deleted, false)
     AND NOT coalesce(resource.disabled, false)
-    AND ${commentReadable('resource', 'post')}
+    AND ${commentReadable('resource')}
   ${NOTIFICATION_PROJECTION_SUFFIX}
 `
 
@@ -955,8 +969,9 @@ export default {
               cypher: `
                 UNWIND $ids AS __id
                 MATCH (post:Post { id: __id })
+                ${bindReadsGroup('post', '__id')}
                 OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
-                  WHERE ${commentReadable('comment', 'post')}
+                  WHERE ${commentReadable('comment')}
                 WITH __id, comment ORDER BY ${order}
                 RETURN __id AS __id, collect(comment { .* }) AS __value
               `,
@@ -983,9 +998,10 @@ export default {
             cypher: `
               UNWIND $ids AS __id
               MATCH (post:Post { id: __id })
+              ${bindReadsGroup('post', '__id')}
               OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
                 WHERE NOT coalesce(comment.deleted, false) AND NOT coalesce(comment.disabled, false)
-                AND ${commentReadable('comment', 'post')}
+                AND ${commentReadable('comment')}
               RETURN __id AS __id, count(comment) AS __value
             `,
             params: await commentScope(context),
