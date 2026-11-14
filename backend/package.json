@@ -78,7 +78,7 @@
     "linkifyjs": "^4.3.3",
     "livekit-server-sdk": "^2.19.2",
     "lodash": "~4.18.1",
-    "metascraper": "^5.58.5",
+    "metascraper": "^5.58.6",
     "metascraper-author": "^5.58.5",
     "metascraper-date": "^5.58.4",
     "metascraper-description": "^5.58.4",
