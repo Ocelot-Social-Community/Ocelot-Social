@@ -2,6 +2,20 @@
 
 When you introduce a new version and branding and deploy it on your network, you need to consider the following changes and actions:
 
+## `PRODUCTION_DB_CLEAN_ALLOW` is `DB_WIPE_ALLOWED`, and it is off unless set — **action required** on staging
+
+`db:reset`, `db:reset:withmigrations` and `db:seed` wipe the database only where
+`DB_WIPE_ALLOWED=true`. `NODE_ENV` no longer decides: the old guard only looked at
+`NODE_ENV=production`, so a seed run with `NODE_ENV=test` (the way a staging reseed job turns mail
+off) wiped any database, production included.
+
+- **Staging** that reseeds: rename `PRODUCTION_DB_CLEAN_ALLOW: "true"` to `DB_WIPE_ALLOWED: "true"`
+  in its values. `PRODUCTION_DB_CLEAN_ALLOW` is no longer read; a reseed still on it fails and says
+  so.
+- **Production**: drop `PRODUCTION_DB_CLEAN_ALLOW`, set nothing. Unset is protected.
+- A reseed **job** must not set the switch itself. It belongs to the instance (the backend's config
+  map), so a job applied to the wrong namespace finds it off there.
+
 ## Branding: `branding/` becomes `brandings/<name>/` + `overlays/` — **action required**
 
 A brand repo (the build context of `FROM backend-build` / `webapp-build` / `maintenance-build`) now

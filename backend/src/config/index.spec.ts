@@ -150,20 +150,38 @@ describe('environment flags', () => {
     expect(development.DEBUG).toBe('true')
   })
 
-  // The flag that allows wiping a database flagged as production (staging environments run with
-  // PRODUCTION=true). Anything but the exact string must NOT arm it.
-  it('arms PRODUCTION_DB_CLEAN_ALLOW only for the literal "true"', async () => {
-    const { default: armed } = await loadConfig({ PRODUCTION_DB_CLEAN_ALLOW: 'true' })
+  // The switch that lets db:reset and db:seed wipe the database. Anything but the exact string must
+  // NOT arm it, and neither does NODE_ENV: a test or development NODE_ENV allows nothing by itself.
+  it('arms DB_WIPE_ALLOWED only for the literal "true"', async () => {
+    const { default: armed } = await loadConfig({ DB_WIPE_ALLOWED: 'true' })
 
-    expect(armed.PRODUCTION_DB_CLEAN_ALLOW).toBe(true)
+    expect(armed.DB_WIPE_ALLOWED).toBe(true)
 
-    const { default: notArmed } = await loadConfig({ PRODUCTION_DB_CLEAN_ALLOW: 'yes' })
+    const { default: notArmed } = await loadConfig({ DB_WIPE_ALLOWED: 'yes' })
 
-    expect(notArmed.PRODUCTION_DB_CLEAN_ALLOW).toBe(false)
+    expect(notArmed.DB_WIPE_ALLOWED).toBe(false)
 
-    const { default: unset } = await loadConfig({ PRODUCTION_DB_CLEAN_ALLOW: undefined })
+    const { default: unset } = await loadConfig({ DB_WIPE_ALLOWED: undefined })
 
-    expect(unset.PRODUCTION_DB_CLEAN_ALLOW).toBe(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW)
+    expect(unset.DB_WIPE_ALLOWED).toBe(SOFTWARE_DEFAULTS.DB_WIPE_ALLOWED)
+  })
+
+  it.each(['test', 'development', 'production'])(
+    'leaves DB_WIPE_ALLOWED off with NODE_ENV=%s alone',
+    async (NODE_ENV) => {
+      const { default: CONFIG } = await loadConfig({ NODE_ENV, DB_WIPE_ALLOWED: undefined })
+
+      expect(CONFIG.DB_WIPE_ALLOWED).toBe(false)
+    },
+  )
+
+  it('no longer reads PRODUCTION_DB_CLEAN_ALLOW', async () => {
+    const { default: CONFIG } = await loadConfig({
+      PRODUCTION_DB_CLEAN_ALLOW: 'true',
+      DB_WIPE_ALLOWED: undefined,
+    })
+
+    expect(CONFIG.DB_WIPE_ALLOWED).toBe(false)
   })
 
   // Under Cypress the env map replaces process.env wholesale, so a variable the runner does not

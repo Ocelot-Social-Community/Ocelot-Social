@@ -9,7 +9,7 @@
 // Values are typed as they are consumed by config/index.ts (string / number / boolean /
 // list); envRegistry stringifies them for display (String([]) === '' — the natural empty
 // display for the comma-list vars). Vars whose default lives in comparison / NODE_ENV logic
-// rather than a `?? const` fallback (the SMTP flags, PRODUCTION_DB_CLEAN_ALLOW, DEBUG,
+// rather than a `?? const` fallback (the SMTP flags, DB_WIPE_ALLOWED, DEBUG,
 // DISABLED_MIDDLEWARES) still record their DEFAULT here so it is single-sourced for display;
 // softwareDefaults.spec.ts guards each against drift with config's actual unset default.
 // DEBUG is special: its unset value is NODE_ENV-gated (undefined in non-production, false in
@@ -35,7 +35,7 @@ export const SOFTWARE_DEFAULTS = {
   SMTP_MAX_MESSAGES: 100,
   SMTP_REJECT_UNAUTHORIZED: true,
   // --- General ---
-  PRODUCTION_DB_CLEAN_ALLOW: false,
+  DB_WIPE_ALLOWED: false,
   // Off by default (and forced off in production); NODE_ENV-gated, so its unset value is
   // falsy rather than strictly false.
   DEBUG: false,

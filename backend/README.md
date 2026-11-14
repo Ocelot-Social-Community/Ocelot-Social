@@ -185,6 +185,10 @@ docker exec ocelot-social-backend-1 npm run db:data:branding
 
 ### Seed Data
 
+Seeding and resetting wipe the database, which an instance has to allow with
+`DB_WIPE_ALLOWED=true`. `.env.template` and the development and test stacks set it; production never
+does, and `NODE_ENV` does not stand in for it.
+
 For a predefined set of test data you can seed the database with:
 
 ```sh

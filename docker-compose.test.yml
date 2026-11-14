@@ -32,6 +32,8 @@ services:
       target: test
     environment:
       - NODE_ENV=test
+      # The e2e stack seeds and wipes its database (backend/src/db/assertWipeAllowed.ts).
+      - DB_WIPE_ALLOWED=true
       # Tested on what production runs on, not on the process-local fallback development uses.
       - REDIS_DOMAIN=redis
       - REDIS_PORT=6379

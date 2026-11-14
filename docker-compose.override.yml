@@ -35,6 +35,8 @@ services:
       target: development
     environment:
       - NODE_ENV=development
+      # db:reset and db:seed may wipe the development database (backend/src/db/assertWipeAllowed.ts).
+      - DB_WIPE_ALLOWED=true
       - SMTP_PORT=1025
       - SMTP_HOST=mailserver
       - AWS_ACCESS_KEY_ID=minio
