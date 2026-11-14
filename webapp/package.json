@@ -51,7 +51,7 @@
     "nuxt-dropzone": "^1.0.4",
     "nuxt-env": "~0.1.0",
     "nuxt-start": "^2.18.1",
-    "prosemirror-model": "^1.25.12",
+    "prosemirror-model": "^1.25.13",
     "prosemirror-state": "^1.4.4",
     "prosemirror-view": "^1.42.3",
     "tippy.js": "^4.3.5",
