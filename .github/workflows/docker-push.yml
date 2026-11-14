@@ -263,3 +263,60 @@ jobs:
           fi
           # Registry paths are lowercase; metadata-action lowercased BRANCH_TAG already.
           docker buildx imagetools create --tag "${BRANCH_TAG}" "$(echo "${SOURCE}" | tr '[:upper:]' '[:lower:]')"
+
+  ##############################################################################
+  # JOB: HAND THE RELEASE BRANCH'S IMAGES TO stage.ocelot.social ###############
+  ##############################################################################
+  # stage.ocelot.social runs what the next release will be: the branch release-please keeps for it
+  # follows master, so every merge moves it. stage builds its branded images on top of these, so
+  # it is told once all of them are in the registry — its publish workflow builds and rolls out.
+  # It gets the commit's `sha-<40 hex>` tag, not the moving branch tag: stage then builds exactly the
+  # commit that triggered it, and its images say which one that was.
+  #
+  # stage is part of this project's own pipeline; no other instance is. They pull a version
+  # themselves, and this workflow knows nothing of them.
+  dispatch-stage:
+    name: Dispatch stage.ocelot.social
+    needs: [images, build-and-push-images]
+    if: >-
+      github.event_name == 'push'
+      && github.ref == 'refs/heads/release-please--branches--master--components--ocelot-social'
+      && needs.images.outputs.superseded != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      # The app token reaches stage.ocelot.social, which GITHUB_TOKEN cannot, and only for
+      # starting its workflows: no contents, no packages.
+      - name: Generate it4c-release-bot token
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: stage.ocelot.social
+          permission-actions: write
+      # The images were built while the branch may have moved on (release-please rewrites it on
+      # every merge). An older build finishing last would hand stage an older commit after a newer
+      # one, so only the build of the branch's head dispatches. The build of the newer head does it
+      # once its images are in.
+      - name: Dispatch, if this is still the branch's head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          if ! head="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${GITHUB_REF_NAME}" --jq .object.sha 2> "${RUNNER_TEMP}/api-error.txt")"; then
+            if grep -q 'HTTP 404' "${RUNNER_TEMP}/api-error.txt"; then
+              echo "::notice::${GITHUB_REF_NAME} is gone (released) — nothing to dispatch"
+              exit 0
+            fi
+            cat "${RUNNER_TEMP}/api-error.txt" >&2
+            exit 1
+          fi
+          if [ "${head}" != "${GITHUB_SHA}" ]; then
+            echo "::notice::${GITHUB_REF_NAME} is at ${head} now — its own build dispatches stage"
+            exit 0
+          fi
+          GH_TOKEN="${APP_TOKEN}" gh workflow run publish.yml \
+            --repo "${GITHUB_REPOSITORY_OWNER}/stage.ocelot.social" --ref master \
+            -f ocelot-version="sha-${GITHUB_SHA}"
+          echo "::notice::stage.ocelot.social builds sha-${GITHUB_SHA}"
