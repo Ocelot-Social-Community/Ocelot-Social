@@ -35,6 +35,15 @@ export const nonMemberReadsGroup = (group: string): string =>
 export const nonMemberReadsContent = (group: string): string =>
   `coalesce(${group}.nonMemberContentRead, false) = true`
 
+/** The group keeps its content from a viewer whose groups are handed in as id lists. */
+const withholds = (
+  group: string,
+  contentGroupsParameter: string,
+  elevatedGroupsParameter: string,
+): string => `NOT (${nonMemberReadsContent(group)})
+        AND NOT ${group}.id IN $${contentGroupsParameter}
+        AND NOT ${group}.id IN $${elevatedGroupsParameter}`
+
 /**
  * Whether the post bound as `post` sits in a group whose content the viewer may NOT read: the
  * group keeps it from non-members, the viewer's own role there does not open it (the group ids
@@ -50,10 +59,30 @@ export const groupContentWithheld = (
   elevatedGroupsParameter: string,
 ): string => `EXISTS {
       MATCH (${post})-[:IN]->(withholdingGroup:Group)
-      WHERE NOT (${nonMemberReadsContent('withholdingGroup')})
-        AND NOT withholdingGroup.id IN $${contentGroupsParameter}
-        AND NOT withholdingGroup.id IN $${elevatedGroupsParameter}
+      WHERE ${withholds('withholdingGroup', contentGroupsParameter, elevatedGroupsParameter)}
     }`
+
+/**
+ * {@link groupContentWithheld} as a value, for a statement that asks it once per post and then
+ * reads it on every row below that post — its comments, above all. Asked as a condition on each
+ * comment instead, the same group lookup runs once per comment, though it names only the post.
+ *
+ * Two clauses, used together, as {@link optionalMemberRoleMatch} and {@link memberRoleHolds}
+ * are: the OPTIONAL MATCH binds the group that withholds the post (null when none does), and
+ * {@link readsWithholdingGroupContent}, an aggregate for the `WITH` that follows, turns it
+ * into a boolean. An OPTIONAL MATCH because Neo4j 4.4 takes no EXISTS subquery in a WITH;
+ * counted rather than compared against null because the count folds the rows back to one per
+ * post, whatever the pattern matched.
+ */
+export const optionalWithholdingGroupMatch = (
+  post: string,
+  contentGroupsParameter: string,
+  elevatedGroupsParameter: string,
+): string => `OPTIONAL MATCH (${post})-[:IN]->(withholdingGroup:Group)
+      WHERE ${withholds('withholdingGroup', contentGroupsParameter, elevatedGroupsParameter)}`
+
+/** Whether no group withholds the post {@link optionalWithholdingGroupMatch} looked at. */
+export const readsWithholdingGroupContent = 'count(withholdingGroup) = 0'
 
 /** The group opened its member list to people who are not in it (`group.members.read`). */
 export const nonMemberReadsMembers = (group: string): string =>

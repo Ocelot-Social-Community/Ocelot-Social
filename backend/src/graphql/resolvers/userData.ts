@@ -3,7 +3,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { groupContentWithheld } from './helpers/groupAccessCypher'
+import {
+  optionalWithholdingGroupMatch,
+  readsWithholdingGroupContent,
+} from './helpers/groupAccessCypher'
 import { groupReadScope } from './helpers/viewerGroups'
 
 import type { Context } from '@src/context'
@@ -24,10 +27,9 @@ export default {
         WHERE (user)-[:WROTE]->(posts)
         AND posts.deleted = FALSE
         AND posts.disabled = FALSE
-        // Asked here, in a WHERE: Neo4j 4.4 takes no EXISTS subquery inside the projection below.
-        OPTIONAL MATCH (withheld:Post { id: posts.id })
-          WHERE ${groupContentWithheld('withheld', 'contentGroupIds', 'elevatedGroupIds')}
-        WITH user, posts, withheld IS NULL AS readsGroup
+        // Bound here: Neo4j 4.4 takes no EXISTS subquery inside the projection below.
+        ${optionalWithholdingGroupMatch('posts', 'contentGroupIds', 'elevatedGroupIds')}
+        WITH user, posts, ${readsWithholdingGroupContent} AS readsGroup
         RETURN { user: properties(user),
           posts: collect( 
             posts {
