@@ -53,7 +53,7 @@
     "nuxt-start": "^2.18.1",
     "prosemirror-model": "^1.25.12",
     "prosemirror-state": "^1.4.4",
-    "prosemirror-view": "^1.42.3",
+    "prosemirror-view": "^1.42.9",
     "tippy.js": "^4.3.5",
     "tiptap": "~1.32.2",
     "tiptap-extensions": "~1.35.2",
