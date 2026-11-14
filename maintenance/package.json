@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.17.0",
-    "@nuxt/test-utils": "^4.3.4",
+    "@nuxt/test-utils": "^4.4.0",
     "@tailwindcss/vite": "^4.2.2",
     "@vitest/coverage-v8": "^4.1.2",
     "@vue/test-utils": "^2.4.6",
