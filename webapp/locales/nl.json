@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Toont het inhoudsfilter in het masonry-raster (nieuwsoverzicht).",
         "showGroupButtonInHeader": "Toont de groepenknop in de koptekst.",
         "socialMediaEnabled": "Schakelt de functie voor social-mediakoppelingen in: koppelingen worden op profielen getoond en beheerd in de gebruikersinstellingen.",
+        "videoCallDtx": "Standaard voor video-oproepen: zolang iemand zwijgt, verstuurt zijn microfoon nauwelijks gegevens. Bespaart bandbreedte, maar kan afzonderlijke deelnemers onhoorbaar maken voor afzonderlijke luisteraars. Elke gebruiker kan dit voor de eigen microfoon wijzigen in de apparaatinstellingen van een gesprek.",
         "videoConference": "Schakelt videovergaderen in (LiveKit). De runtime-schakelaar voor de video-oproeprechten. Vereist de LiveKit-omgevingsvariabelen; zonder deze blijft het uitgeschakeld en grijs."
       },
       "envLink": "Omgeving bekijken",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Inhoudsfilter in raster",
         "showGroupButtonInHeader": "Groepenknop in koptekst",
         "socialMediaEnabled": "Sociale media",
+        "videoCallDtx": "Stilteonderdrukking in gesprekken",
         "videoConference": "Videovergaderen"
       },
       "lastUpdated": "Laatst gewijzigd: {timestamp} door {actor}",
@@ -327,10 +329,15 @@
       "deleteError": "Kon rol niet verwijderen: {message}",
       "deleteSuccess": "Rol verwijderd.",
       "description": "Wie wat mag in het hele netwerk. Maak rollen aan en wijs rechten toe — wijzigingen gelden meteen.",
+      "discard": "Verwerpen",
+      "grantRoleManage": {
+        "confirm": "Toch toekennen",
+        "message": "<strong>{role}</strong> krijgt “rollen beheren”: wie de rol heeft, kan elke rol behalve owner vrij inrichten, ook hogere rollen rechten afnemen, en daarna hun houders een andere rol geven, blokkeren of verwijderen. Verwijderde accounts en inhoud zijn niet te herstellen, ook niet door een owner. Wijs de rol alleen toe aan mensen aan wie je beheerdersbevoegdheden zou toevertrouwen.",
+        "title": "“Rollen beheren” toekennen?"
+      },
       "members": "{count} leden",
       "name": "Rollen & rechten",
       "nameLabel": "Naam",
-      "notEditableHint": "Je kunt alleen je eigen rol wijzigen en rollen met minder bevoegdheden dan de jouwe.",
       "perm": {
         "apiKey_administer": "API-sleutels van andere gebruikers beheren.",
         "apiKey_create": "Persoonlijke API-sleutels aanmaken.",
@@ -364,7 +371,6 @@
         "videoCall_create_open": "Een videogesprek starten in een groep waar iedereen binnen kan lopen — vindbaar en zonder goedkeuring te betreden.",
         "videoCall_create_restricted": "Een videogesprek starten in een groep waar je niet zomaar binnen kunt: lid worden vraagt goedkeuring of een uitnodiging, of de groep is verborgen."
       },
-      "permNotHeld": "Je hebt dit recht zelf niet, dus je kunt het niet toekennen.",
       "permUnavailable": "Functie niet geconfigureerd — dit recht heeft geen effect.",
       "permUnavailableLink": "Configuratie bekijken",
       "protected": "beschermd",
@@ -468,6 +474,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Ten minste één van de onderwerpen bestaat niet.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "De beschrijving moet minimaal {min} tekens lang zijn.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Een groep die buitenstaanders niet kunnen vinden, kan hun ook haar leden niet laten zien.",
+    "GROUP_SAVE_NAME_TOO_LONG": "De groepsnaam mag maximaal {max} tekens lang zijn.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "De groepsnaam moet minimaal {min} tekens lang zijn.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Deze unieke groepsnaam is al in gebruik.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Te weinig onderwerpen geselecteerd (minimaal {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Te veel onderwerpen geselecteerd (maximaal {max}).",
@@ -523,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "Je kunt geen rol toekennen met rechten die je zelf niet hebt.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Alleen een eigenaar mag de eigenaarsrol toewijzen of wijzigen.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "Je kunt alleen de rol wijzigen van gebruikers wier rol minder bevoegdheden heeft dan de jouwe.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "Je kunt alleen je eigen rol wijzigen of rollen met minder bevoegdheden dan de jouwe.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "De rol “{name}” is nog aan {count} gebruikers toegewezen en kan niet worden verwijderd.",
     "ROLE_DELETE_SYSTEM_ROLE": "De rol “{name}” is een systeemrol en kan niet worden verwijderd.",
     "ROLE_DOES_NOT_EXIST": "De rol “{name}” bestaat niet.",
@@ -531,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "De rol “{name}” is een systeemrol en kan niet worden hernoemd.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "De rol “{name}” bestaat al.",
     "ROLE_SAVE_NAME_INVALID": "De rolnaam moet 2 tot 50 tekens lang zijn en mag alleen letters, cijfers, “_” en “-” bevatten; het eerste teken moet een letter of cijfer zijn.",
-    "ROLE_SAVE_NOT_COVERED": "Een rol kan alleen rechten bevatten die je zelf hebt.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Een rol kan niet als beschermd worden aangemaakt of gemarkeerd.",
-    "ROLE_SAVE_WOULD_OUTRANK": "Je eigen rol kan niet boven een rol worden geplaatst die hij nu niet overtreft.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Dit kun je alleen doen bij gebruikers van wie de rol minder bevoegdheden geeft dan de jouwe.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Je mag niet zoeken in het gebruikersbeheer.",
     "USER_DOES_NOT_EXIST": "De gebruiker is niet gevonden.",
@@ -899,7 +904,11 @@
         "participant": "Betrokken bij dit bericht"
       }
     },
-    "placeholder": "Laat je inspirerende gedachten achter …"
+    "placeholder": "Laat je inspirerende gedachten achter …",
+    "unfinished": {
+      "hashtag": "Er is geen hashtag gekozen: zo wordt de hashtag niet gekoppeld. Kies de hashtag uit de lijst.",
+      "mention": "Er is geen gebruiker gekozen: zo wordt niemand op de hoogte gebracht. Kies de naam uit de lijst."
+    }
   },
   "error-pages": {
     "403-default": "Niet geautoriseerd voor deze pagina!",
@@ -976,7 +985,7 @@
     },
     "actionRadius": "Actieradius van de groep",
     "addMember": "Lid toevoegen",
-    "addMemberToGroupSuccess": "“{name}” is toegevoegd aan de groep met de rol “{role}”!",
+    "addMemberToGroupSuccess": "“<b>{name}</b>” (<b>@{slug}</b>) is toegevoegd aan de groep met de rol “<b>{role}</b>”!",
     "addUser": "Gebruiker toevoegen",
     "addUserNoOptions": "Geen gebruikers gevonden!",
     "addUserPlaceholder": "Gebruikersnaam",
@@ -1059,7 +1068,7 @@
       "title": "Wil je de groep echt verlaten?"
     },
     "memberOutranked": "Je kunt de rol van deze persoon niet wijzigen — die heeft minstens evenveel als jij.",
-    "memberRemoved": "Gebruiker “{name}” is uit de groep verwijderd!",
+    "memberRemoved": "Gebruiker “<b>{name}</b>” (<b>@{slug}</b>) is uit de groep verwijderd!",
     "members": "Leden",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -1131,6 +1140,13 @@
         "group_videoCall_moderate": "De moderatie van een videogesprek van de groep overnemen."
       },
       "resultingType": "Met deze rechten is de groep:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> mag daarna de rollen van de groep bewerken: wie deze rol heeft, kan elke rol behalve die van de eigenaar inrichten, andere rollen rechten afnemen en wijzigen wat niet-leden zien. Geef de rol alleen aan leden aan wie je het beheer van de groep zou toevertrouwen. <strong>{own}</strong>, je eigen rol, mag daarna de rollen van de groep niet meer bewerken. Alleen een eigenaar kan dat terugdraaien.",
+        "confirm": "Toch opslaan",
+        "grant": "<strong>{roles}</strong> mag daarna de rollen van de groep bewerken: wie deze rol heeft, kan elke rol behalve die van de eigenaar inrichten, andere rollen rechten afnemen en wijzigen wat niet-leden zien. Geef de rol alleen aan leden aan wie je het beheer van de groep zou toevertrouwen.",
+        "lockout": "<strong>{own}</strong>, je eigen rol, mag daarna de rollen van de groep niet meer bewerken. Alleen een eigenaar kan dat terugdraaien.",
+        "title": "Wijzigen wie de rollen beheert?"
+      },
       "saved": "Rechten opgeslagen",
       "saveFirst": "Eerst opslaan of verwerpen — er zijn niet-opgeslagen wijzigingen.",
       "simple": {
@@ -1320,6 +1336,7 @@
     "pageTitle": "Kaart",
     "styles": {
       "dark": "Donker",
+      "navigation-night": "Nacht",
       "outdoors": "Buiten",
       "satellite": "Satelliet",
       "streets": "Straten",
@@ -1399,6 +1416,10 @@
     "users": {
       "name": "Gebruikers"
     }
+  },
+  "networkRoles": {
+    "owner": "Eigenaar",
+    "user": "Gebruiker"
   },
   "notifications": {
     "comment": "Reactie",
@@ -1923,6 +1944,11 @@
     "termsAndConditionsNewConfirm": "Ik heb de nieuwe algemene voorwaarden gelezen en ga ermee akkoord.",
     "termsAndConditionsNewConfirmText": "Lees nu de nieuwe gebruiksvoorwaarden!"
   },
+  "themeSwitch": {
+    "dark": "Thema: donker",
+    "light": "Thema: licht",
+    "system": "Thema: zoals het systeem"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Profiel openen",
@@ -1965,12 +1991,27 @@
       "turnOff": "{device}: uitschakelen",
       "turnOn": "{device}: inschakelen"
     },
+    "cpuRelief": "Je apparaat is overbelast – de camera's draaien op lagere kwaliteit zodat het geluid helder blijft.",
+    "cpuStrained": "Je apparaat kan de video's niet bijhouden. Een lagere kwaliteit houdt het geluid helder.",
     "deviceSettings": {
       "button": "Apparaten",
+      "dtx": "Spreekpauzes niet verzenden",
+      "dtxFailed": "De instelling voor spreekpauzes kon niet worden gewijzigd – je microfoon werkt verder zoals voorheen.",
+      "dtxHint": "Bespaart gegevens zolang je zwijgt. Horen anderen je soms niet, zet het dan uit.",
+      "quality": {
+        "audio": "Geen camera's (schermdelingen blijven)",
+        "auto": "Automatisch",
+        "high": "Hoog",
+        "low": "Laag",
+        "medium": "Gemiddeld"
+      },
+      "receiveQuality": "Kwaliteit van ontvangen video's",
+      "sendQuality": "Kwaliteit van mijn video",
       "speakerError": "De luidspreker kon niet worden gewisseld.",
       "title": "Apparaatinstellingen"
     },
     "dialogLabel": "Groepsvideogesprek",
+    "dismissNotice": "Verbergen",
     "enableAudio": "Geluid inschakelen",
     "enterFullscreen": "Volledig scherm",
     "errorBackToPrejoin": "Instellingen wijzigen",
@@ -2009,7 +2050,9 @@
       "title": "Wie modereert er voortaan?"
     },
     "hideBars": "Balken verbergen",
+    "hideNotices": "Meldingen verbergen",
     "leave": "Gesprek verlaten",
+    "lowerQuality": "Kwaliteit verlagen",
     "maximize": "Maximaliseren",
     "micMuted": "Microfoon uit",
     "micNoSignal": "Je microfoon levert geen geluid — anderen horen je niet.",
@@ -2112,13 +2155,25 @@
       "unnamedSpeaker": "Luidspreker",
       "unsupportedBrowser": "Je browser ondersteunt geen audio/video."
     },
+    "qualityLimit": {
+      "cameraHidden": "Camera verborgen",
+      "ownBandwidth": "Je video wordt in lagere kwaliteit verzonden: je verbinding laat niet meer toe.",
+      "ownChoice": "Je video wordt in lagere kwaliteit verzonden, zoals gekozen in de apparaatinstellingen.",
+      "ownCpu": "Je video wordt in lagere kwaliteit verzonden: je apparaat is overbelast.",
+      "remoteChoice": "De video van {name} komt in lagere kwaliteit binnen, zoals gekozen in de apparaatinstellingen.",
+      "remoteCpu": "De video van {name} komt in lagere kwaliteit binnen: je apparaat is overbelast.",
+      "remoteHiddenBandwidth": "De camera van {name} is verborgen: je verbinding is te zwak.",
+      "remoteHiddenChoice": "De camera van {name} is verborgen, zoals gekozen in de apparaatinstellingen."
+    },
     "reconnecting": "Verbinding verbroken — opnieuw verbinden…",
     "reloadPending": "Het platform heeft een nieuw ontwerp. Het wordt toegepast zodra je het gesprek verlaat.",
     "resizeSidebar": "Grootte van de zijbalk aanpassen",
     "restartMic": "Microfoon opnieuw starten",
+    "restoreQuality": "Kwaliteit herstellen",
     "screenShare": "Scherm",
     "screenShareEnded": "Schermdelen beëindigd",
     "showBars": "Balken tonen",
+    "showNotices": "Meldingen tonen",
     "showVideos": "Video's tonen",
     "spotlightExit": "Spotlight verlaten",
     "title": "Groepsvideogesprek",

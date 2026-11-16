@@ -127,6 +127,15 @@ describe('UserList', () => {
         wrapper = Wrapper()
       })
 
+      it('names the fixed roles translated in the role choice, the others by name', () => {
+        const options = wrapper
+          .findAll('[data-test="user-role-select-user"] option')
+          .wrappers.map((option) => [option.attributes('value'), option.text()])
+
+        expect(options).toContainEqual(['user', 'networkRoles.user'])
+        expect(options).toContainEqual(['moderator', 'moderator'])
+      })
+
       it('shows the email, role, badge, disable and delete columns', () => {
         expect(wrapper.find('[data-test="user-role-select-user"]').exists()).toBe(true)
         expect(wrapper.text()).toContain('user@example.org')

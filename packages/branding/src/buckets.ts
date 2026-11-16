@@ -1,6 +1,6 @@
 // The bucket taxonomy — a TOTAL partition of BrandingConfig into named, independently composable
 // slices. This is what lets a brand reuse another brand's content per slice (e.g. the colour THEME
-// of brand B with the IDENTITY of brand A). See docu/branding-buckets-konzept.md §4.
+// of brand B with the IDENTITY of brand A).
 //
 // Each bucket owns a set of dot-paths into BrandingConfig. Split domains are owned at the SUB-PATH
 // level by different buckets (e.g. `assets.css`→theme, `assets.favicon`→logos, `assets.html`→legal;
@@ -41,7 +41,7 @@ export interface ArchiveManifest {
   label: string
   /**
    * Version of the `@ocelot-social/branding` package the archive was BUILT with — the schema / API
-   * compatibility axis (see docu/branding-buckets-konzept.md §11), distinct from `version` (the
+   * compatibility axis, distinct from `version` (the
    * brand's own iteration). Injected by the build; null when unknown.
    */
   schemaVersion: string | null
@@ -134,8 +134,8 @@ export const BUCKET_NAMES: BucketName[] = [
 /** Which config paths each bucket owns. Longest matching path wins (see file header). */
 export const BUCKET_PATHS: Record<BucketName, string[]> = {
   // The reusable LOOK: colours (incl. the browser-chrome/PWA theme_color, = the color-primary token),
-  // fonts, brand stylesheet, layouts, donation-bar colour style. The headline unit a brand pulls.
-  theme: ['theme', 'donation', 'login.layout', 'registration.layout', 'assets.css'],
+  // fonts, brand stylesheet, layouts, donation-bar colour style, the default map styles. The headline unit a brand pulls.
+  theme: ['theme', 'donation', 'map', 'login.layout', 'registration.layout', 'assets.css'],
   // WHO the instance is: names, organisation, jurisdiction, OG image, cookie name, version, the
   // brand's self-description. (locales is CROSS-CUTTING — see below — not owned by a bucket.)
   identity: ['metadata', 'about'],

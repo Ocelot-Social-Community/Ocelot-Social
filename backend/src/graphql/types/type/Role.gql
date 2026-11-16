@@ -11,8 +11,6 @@ type Permission {
   gatedBy: String
   "Whether the permission is effective right now for the requesting viewer's config/policy. False ⇒ the feature is not configured/enabled; the admin UI disables granting it."
   available: Boolean!
-  "Whether the requesting viewer may put this right into a role they did not hold it in: they hold it themselves, or it is a participation right that gives no power over others. Their own role is exempt — role.manage lets them shape it freely."
-  grantableByCurrentUser: Boolean!
 }
 
 "A permission the current viewer effectively holds, carrying its catalog group so the webapp can gate UI areas by group (e.g. show the admin area for ANY administration-group permission) without a hard-coded key list."
@@ -30,8 +28,6 @@ type Role {
   permissions: [String!]!
   "Number of users currently assigned this role."
   memberCount: Int
-  "Whether the requesting viewer may change this role (its rights, its name, whether it exists): it is their own role, or their role outranks it."
-  editableByCurrentUser: Boolean!
   "Whether the requesting viewer may give this role to somebody they outrank: they hold its rights themselves, and the owner role only to an owner."
   assignableByCurrentUser: Boolean!
 }

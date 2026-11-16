@@ -35,6 +35,55 @@ export const nonMemberReadsGroup = (group: string): string =>
 export const nonMemberReadsContent = (group: string): string =>
   `coalesce(${group}.nonMemberContentRead, false) = true`
 
+/** The group keeps its content from a viewer whose groups are handed in as id lists. */
+const withholds = (
+  group: string,
+  contentGroupsParameter: string,
+  elevatedGroupsParameter: string,
+): string => `NOT (${nonMemberReadsContent(group)})
+        AND NOT ${group}.id IN $${contentGroupsParameter}
+        AND NOT ${group}.id IN $${elevatedGroupsParameter}`
+
+/**
+ * Whether the post bound as `post` sits in a group whose content the viewer may NOT read: the
+ * group keeps it from non-members, the viewer's own role there does not open it (the group ids
+ * in `contentGroupsParameter`), and no elevation reads into it (`elevatedGroupsParameter`).
+ *
+ * The group half of the post visibility rule (`invisibleTo` in postFilter.ts), without that
+ * rule's exception for the author. A post stays its author's; what members wrote under it is
+ * the group's, and reaches only who reads the group (#10629).
+ */
+export const groupContentWithheld = (
+  post: string,
+  contentGroupsParameter: string,
+  elevatedGroupsParameter: string,
+): string => `EXISTS {
+      MATCH (${post})-[:IN]->(withholdingGroup:Group)
+      WHERE ${withholds('withholdingGroup', contentGroupsParameter, elevatedGroupsParameter)}
+    }`
+
+/**
+ * {@link groupContentWithheld} as a value, for a statement that asks it once per post and then
+ * reads it on every row below that post — its comments, above all. Asked as a condition on each
+ * comment instead, the same group lookup runs once per comment, though it names only the post.
+ *
+ * Two clauses, used together, as {@link optionalMemberRoleMatch} and {@link memberRoleHolds}
+ * are: the OPTIONAL MATCH binds the group that withholds the post (null when none does), and
+ * {@link readsWithholdingGroupContent}, an aggregate for the `WITH` that follows, turns it
+ * into a boolean. An OPTIONAL MATCH because Neo4j 4.4 takes no EXISTS subquery in a WITH;
+ * counted rather than compared against null because the count folds the rows back to one per
+ * post, whatever the pattern matched.
+ */
+export const optionalWithholdingGroupMatch = (
+  post: string,
+  contentGroupsParameter: string,
+  elevatedGroupsParameter: string,
+): string => `OPTIONAL MATCH (${post})-[:IN]->(withholdingGroup:Group)
+      WHERE ${withholds('withholdingGroup', contentGroupsParameter, elevatedGroupsParameter)}`
+
+/** Whether no group withholds the post {@link optionalWithholdingGroupMatch} looked at. */
+export const readsWithholdingGroupContent = 'count(withholdingGroup) = 0'
+
 /** The group opened its member list to people who are not in it (`group.members.read`). */
 export const nonMemberReadsMembers = (group: string): string =>
   `coalesce(${group}.showMembers, false) = true`
@@ -107,6 +156,46 @@ export const memberHoldsInGroup = (
       WHERE roleForRight.name = membershipForRight.role
         AND ${roleHoldsPermission('roleForRight', permission)}
     }`
+
+/**
+ * Whether the post bound as `post` sits in a group that keeps its content from the viewer
+ * whose id is `viewerIdExpression`: closed to non-members, and the viewer's role there does
+ * not open it.
+ *
+ * {@link groupContentWithheld} asks the same with the viewer's groups handed in as a list, as
+ * the post query computes them once per request. This form asks the membership in place, for
+ * the field resolvers, whose statements see only `$cypherParams`. Neither counts an
+ * elevation: a list reached through a user, a tag or a category is not a look into one group
+ * (#10506).
+ */
+export const groupContentWithheldFrom = (post: string, viewerIdExpression: string): string =>
+  `EXISTS {
+      MATCH (${post})-[:IN]->(withholdingGroup:Group)
+      WHERE NOT (${nonMemberReadsContent('withholdingGroup')})
+        AND NOT ${memberHoldsInGroup('withholdingGroup', 'group.content.read', viewerIdExpression)}
+    }`
+
+/**
+ * Whether the viewer may read the post bound as `post`: its group lets them, or they wrote it.
+ * The post visibility rule (`invisibleTo` in postFilter.ts), for a statement of its own.
+ */
+export const postReadableBy = (post: string, viewerIdExpression: string): string => `(
+    NOT ${groupContentWithheldFrom(post, viewerIdExpression)}
+    OR EXISTS { MATCH (${post})<-[:WROTE]-(:User { id: ${viewerIdExpression} }) }
+  )`
+
+/**
+ * Whether the viewer may read the comment bound as `comment`: its post's group lets them, or
+ * they wrote it. Not the post's author — a post stays its author's, the members' comments
+ * under it stay the group's (#10629).
+ */
+export const commentReadableBy = (comment: string, viewerIdExpression: string): string => `(
+    EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: ${viewerIdExpression} }) }
+    OR NOT EXISTS {
+      MATCH (${comment})-[:COMMENTS]->(commentedPost:Post)
+      WHERE ${groupContentWithheldFrom('commentedPost', viewerIdExpression)}
+    }
+  )`
 
 /**
  * The same question where an EXISTS subquery cannot go: as a value in a WITH or RETURN.

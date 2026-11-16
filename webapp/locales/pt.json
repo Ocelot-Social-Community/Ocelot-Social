@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Mostra o filtro de conteúdo na grade masonry (notícias).",
         "showGroupButtonInHeader": "Mostra o botão de grupos no cabeçalho.",
         "socialMediaEnabled": "Ativa a funcionalidade de links de redes sociais: os links são exibidos nos perfis e gerenciados nas configurações do usuário.",
+        "videoCallDtx": "Padrão para chamadas de vídeo: enquanto alguém está em silêncio, o seu microfone quase não envia dados. Poupa largura de banda, mas pode tornar participantes individuais inaudíveis para ouvintes individuais. Cada utilizador pode alterá-lo para o seu próprio microfone nas configurações dos dispositivos de uma chamada.",
         "videoConference": "Ativa a videoconferência (LiveKit). O interruptor de tempo de execução para as permissões de chamada de vídeo. Requer as variáveis de ambiente do LiveKit; sem elas permanece desativada e esmaecida."
       },
       "envLink": "Ver ambiente",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Filtro de conteúdo na grade",
         "showGroupButtonInHeader": "Botão de grupos no cabeçalho",
         "socialMediaEnabled": "Redes sociais",
+        "videoCallDtx": "Supressão de silêncio nas chamadas",
         "videoConference": "Videoconferência"
       },
       "lastUpdated": "Última alteração: {timestamp} por {actor}",
@@ -327,10 +329,15 @@
       "deleteError": "Não foi possível excluir a função: {message}",
       "deleteSuccess": "Função excluída.",
       "description": "Quem pode fazer o quê em toda a rede. Crie funções e atribua permissões — as alterações são aplicadas de imediato.",
+      "discard": "Descartar",
+      "grantRoleManage": {
+        "confirm": "Conceder mesmo assim",
+        "message": "<strong>{role}</strong> recebe “gerenciar funções”: quem tem a função pode moldar livremente qualquer função, exceto owner, tirar direitos também de funções superiores e depois trocar a função, bloquear ou excluir quem as tem. Contas e conteúdos excluídos não podem ser restaurados, nem por um owner. Atribua a função apenas a pessoas a quem você confiaria poderes de administração.",
+        "title": "Conceder “gerenciar funções”?"
+      },
       "members": "{count} membros",
       "name": "Funções e permissões",
       "nameLabel": "Nome",
-      "notEditableHint": "Só podes alterar o teu próprio papel e papéis com menos autoridade do que o teu.",
       "perm": {
         "apiKey_administer": "Administrar as chaves de API de outros usuários.",
         "apiKey_create": "Criar chaves API pessoais.",
@@ -364,7 +371,6 @@
         "videoCall_create_open": "Iniciar uma videochamada num grupo em que qualquer pessoa pode entrar — localizável e acessível sem aprovação.",
         "videoCall_create_restricted": "Iniciar uma videochamada num grupo em que não se pode simplesmente entrar: entrar exige aprovação ou convite, ou o grupo está oculto."
       },
-      "permNotHeld": "Não tens este direito, por isso não o podes atribuir.",
       "permUnavailable": "Recurso não configurado — conceder esta permissão não tem efeito.",
       "permUnavailableLink": "Ver configuração",
       "protected": "protegida",
@@ -468,6 +474,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Pelo menos um dos tópicos não existe.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "A descrição deve ter pelo menos {min} caracteres.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Um grupo que pessoas de fora não conseguem encontrar também não pode mostrar seus membros a elas.",
+    "GROUP_SAVE_NAME_TOO_LONG": "O nome do grupo deve ter no máximo {max} caracteres.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "O nome do grupo deve ter pelo menos {min} caracteres.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Este nome único de grupo já está em uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Poucos tópicos selecionados (pelo menos {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Tópicos demais selecionados (no máximo {max}).",
@@ -523,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "Não podes atribuir um papel com direitos que tu próprio não tens.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Somente um proprietário pode atribuir ou alterar a função de proprietário.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "Só podes alterar o papel de utilizadores cujo papel tem menos autoridade do que o teu.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "Só podes alterar o teu próprio papel ou papéis com menos autoridade do que o teu.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "A função “{name}” ainda está atribuída a {count} usuários e não pode ser excluída.",
     "ROLE_DELETE_SYSTEM_ROLE": "A função “{name}” é uma função do sistema e não pode ser excluída.",
     "ROLE_DOES_NOT_EXIST": "A função “{name}” não existe.",
@@ -531,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "A função “{name}” é uma função do sistema e não pode ser renomeada.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "A função “{name}” já existe.",
     "ROLE_SAVE_NAME_INVALID": "O nome da função deve ter de 2 a 50 caracteres e só pode conter letras, dígitos, “_” e “-”; o primeiro caractere deve ser uma letra ou um dígito.",
-    "ROLE_SAVE_NOT_COVERED": "Um papel só pode conter direitos que tu próprio tens.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Uma função não pode ser criada ou marcada como protegida.",
-    "ROLE_SAVE_WOULD_OUTRANK": "O teu próprio papel não pode ser elevado acima de um papel que hoje não supera.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Você só pode fazer isso com usuários cuja função concede menos poderes do que a sua.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Você não pode pesquisar na administração de usuários.",
     "USER_DOES_NOT_EXIST": "O usuário não foi encontrado.",
@@ -899,7 +904,11 @@
         "participant": "Participam da publicação"
       }
     },
-    "placeholder": " Escreva algo inspirador…"
+    "placeholder": " Escreva algo inspirador…",
+    "unfinished": {
+      "hashtag": "Nenhuma hashtag foi escolhida: assim a hashtag não é vinculada. Escolha-a na lista.",
+      "mention": "Nenhum usuário foi escolhido: assim ninguém é notificado. Escolha o nome na lista."
+    }
   },
   "error-pages": {
     "403-default": "Não autorizado a acessar esta página!",
@@ -976,7 +985,7 @@
     },
     "actionRadius": "Raio de ação do grupo",
     "addMember": "Adicionar membro",
-    "addMemberToGroupSuccess": "“{name}” foi adicionado ao grupo com o papel “{role}”!",
+    "addMemberToGroupSuccess": "“<b>{name}</b>” (<b>@{slug}</b>) foi adicionado ao grupo com o papel “<b>{role}</b>”!",
     "addUser": "Adicionar usuário",
     "addUserNoOptions": "Nenhum usuário encontrado!",
     "addUserPlaceholder": "Nome de usuário",
@@ -1059,7 +1068,7 @@
       "title": "Você realmente quer sair do grupo?"
     },
     "memberOutranked": "Não podes alterar a função desta pessoa: tem pelo menos tanto quanto tu.",
-    "memberRemoved": "O usuário “{name}” foi removido do grupo!",
+    "memberRemoved": "O usuário “<b>{name}</b>” (<b>@{slug}</b>) foi removido do grupo!",
     "members": "Membros",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -1131,6 +1140,13 @@
         "group_videoCall_moderate": "Assumir a moderação de uma videochamada do grupo."
       },
       "resultingType": "Com estas permissões o grupo é:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> poderá então editar as funções do grupo: quem tem esta função pode moldar qualquer função, exceto a do proprietário, tirar direitos de outras funções e mudar o que não membros veem. Dê a função apenas a membros a quem você confiaria a gestão do grupo. <strong>{own}</strong>, a sua própria função, não poderá mais editar as funções do grupo. Só um proprietário pode desfazer isso.",
+        "confirm": "Salvar mesmo assim",
+        "grant": "<strong>{roles}</strong> poderá então editar as funções do grupo: quem tem esta função pode moldar qualquer função, exceto a do proprietário, tirar direitos de outras funções e mudar o que não membros veem. Dê a função apenas a membros a quem você confiaria a gestão do grupo.",
+        "lockout": "<strong>{own}</strong>, a sua própria função, não poderá mais editar as funções do grupo. Só um proprietário pode desfazer isso.",
+        "title": "Mudar quem gerencia as funções?"
+      },
       "saved": "Permissões guardadas",
       "saveFirst": "Guarde ou descarte primeiro: há alterações não guardadas.",
       "simple": {
@@ -1320,6 +1336,7 @@
     "pageTitle": "Mapa",
     "styles": {
       "dark": "Escuro",
+      "navigation-night": "Noite",
       "outdoors": "Ao ar livre",
       "satellite": "Satélite",
       "streets": "Ruas",
@@ -1399,6 +1416,10 @@
     "users": {
       "name": "Usuários"
     }
+  },
+  "networkRoles": {
+    "owner": "Proprietário",
+    "user": "Usuário"
   },
   "notifications": {
     "comment": "Comentário",
@@ -1923,6 +1944,11 @@
     "termsAndConditionsNewConfirm": "Li e concordo com os novos termos e condições.",
     "termsAndConditionsNewConfirmText": "Por favor, leia os novos termos de uso agora!"
   },
+  "themeSwitch": {
+    "dark": "Tema: escuro",
+    "light": "Tema: claro",
+    "system": "Tema: como o sistema"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Abrir perfil",
@@ -1965,12 +1991,27 @@
       "turnOff": "{device}: desligar",
       "turnOn": "{device}: ligar"
     },
+    "cpuRelief": "Seu dispositivo está sobrecarregado — as câmeras funcionam com qualidade reduzida para o som continuar claro.",
+    "cpuStrained": "Seu dispositivo não está dando conta dos vídeos. Uma qualidade mais baixa mantém o som claro.",
     "deviceSettings": {
       "button": "Dispositivos",
+      "dtx": "Não transmitir as pausas na fala",
+      "dtxFailed": "Não foi possível mudar a definição das pausas na fala – o teu microfone continua como antes.",
+      "dtxHint": "Poupa dados enquanto estás em silêncio. Se às vezes os outros não te ouvem, desativa-o.",
+      "quality": {
+        "audio": "Sem câmeras (o compartilhamento de tela continua)",
+        "auto": "Automática",
+        "high": "Alta",
+        "low": "Baixa",
+        "medium": "Média"
+      },
+      "receiveQuality": "Qualidade dos vídeos recebidos",
+      "sendQuality": "Qualidade do meu vídeo",
       "speakerError": "Não foi possível trocar o alto-falante.",
       "title": "Configurações dos dispositivos"
     },
     "dialogLabel": "Videochamada de grupo",
+    "dismissNotice": "Ocultar",
     "enableAudio": "Ativar som",
     "enterFullscreen": "Tela cheia",
     "errorBackToPrejoin": "Alterar configurações",
@@ -2009,7 +2050,9 @@
       "title": "Quem modera a partir de agora?"
     },
     "hideBars": "Ocultar as barras",
+    "hideNotices": "Ocultar avisos",
     "leave": "Sair da chamada",
+    "lowerQuality": "Baixar qualidade",
     "maximize": "Maximizar",
     "micMuted": "Microfone desligado",
     "micNoSignal": "Seu microfone não está transmitindo som — os outros não ouvem você.",
@@ -2112,13 +2155,25 @@
       "unnamedSpeaker": "Alto-falante",
       "unsupportedBrowser": "Seu navegador não suporta áudio/vídeo."
     },
+    "qualityLimit": {
+      "cameraHidden": "Câmera oculta",
+      "ownBandwidth": "Seu vídeo é enviado com qualidade reduzida: sua conexão não permite mais.",
+      "ownChoice": "Seu vídeo é enviado com qualidade reduzida, como escolhido nas configurações de dispositivos.",
+      "ownCpu": "Seu vídeo é enviado com qualidade reduzida: seu dispositivo está sobrecarregado.",
+      "remoteChoice": "O vídeo de {name} chega com qualidade reduzida, como escolhido nas configurações de dispositivos.",
+      "remoteCpu": "O vídeo de {name} chega com qualidade reduzida: seu dispositivo está sobrecarregado.",
+      "remoteHiddenBandwidth": "A câmera de {name} está oculta: sua conexão está fraca demais.",
+      "remoteHiddenChoice": "A câmera de {name} está oculta, como você escolheu nas configurações dos dispositivos."
+    },
     "reconnecting": "Conexão perdida — reconectando…",
     "reloadPending": "A plataforma tem um novo design. Ele será aplicado assim que você sair da chamada.",
     "resizeSidebar": "Redimensionar a barra lateral",
     "restartMic": "Reiniciar microfone",
+    "restoreQuality": "Restaurar qualidade",
     "screenShare": "Tela",
     "screenShareEnded": "Compartilhamento de tela encerrado",
     "showBars": "Mostrar as barras",
+    "showNotices": "Mostrar avisos",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Sair do destaque",
     "title": "Videochamada de grupo",

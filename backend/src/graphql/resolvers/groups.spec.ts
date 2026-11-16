@@ -32,6 +32,7 @@ import UserGroups from '@graphql/queries/groups/UserGroups.gql'
 import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import Post from '@graphql/queries/posts/Post.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
+import { getBranding, setBranding } from '@src/branding'
 import { createInMemoryPolicyService } from '@src/policy'
 
 import groupsResolver from './groups'
@@ -396,6 +397,71 @@ describe('in mode', () => {
           })
         })
 
+        describe('name', () => {
+          const createGroup = async (name: string) =>
+            mutate({ mutation: CreateGroup, variables: { ...variables, name } })
+
+          it('refuses a name shorter than the minimum, counted without surrounding spaces', async () => {
+            await expect(createGroup('  ab  ')).resolves.toMatchObject({
+              data: { CreateGroup: null },
+              errors: [{ message: 'The group name must be at least 3 characters long.' }],
+            })
+          })
+
+          it('refuses a name longer than the maximum', async () => {
+            await expect(createGroup('a'.repeat(51))).resolves.toMatchObject({
+              data: { CreateGroup: null },
+              errors: [{ message: 'The group name must be at most 50 characters long.' }],
+            })
+          })
+
+          it('accepts a name exactly as long as the maximum', async () => {
+            await expect(createGroup('a'.repeat(50))).resolves.toMatchObject({
+              data: { CreateGroup: { name: 'a'.repeat(50) } },
+              errors: undefined,
+            })
+          })
+
+          // Checked trimmed and stored untrimmed, this name would pass with 50 characters and be
+          // saved with 52, over the brand's maximum.
+          it('stores the name without the surrounding spaces it was checked without', async () => {
+            await expect(createGroup(` ${'a'.repeat(50)} `)).resolves.toMatchObject({
+              data: { CreateGroup: { name: 'a'.repeat(50) } },
+              errors: undefined,
+            })
+          })
+
+          describe('with the name bounds of a brand', () => {
+            let original: ReturnType<typeof getBranding>
+
+            beforeEach(() => {
+              original = getBranding()
+              setBranding({
+                ...original,
+                group: { ...original.group, nameLengthMin: 2, nameLengthMax: 10 },
+              })
+            })
+
+            afterEach(() => {
+              setBranding(original)
+            })
+
+            it('accepts a name the default minimum would refuse', async () => {
+              await expect(createGroup('Go')).resolves.toMatchObject({
+                data: { CreateGroup: { name: 'Go' } },
+                errors: undefined,
+              })
+            })
+
+            it('refuses a name the default maximum would accept', async () => {
+              await expect(createGroup('The Best Group')).resolves.toMatchObject({
+                data: { CreateGroup: null },
+                errors: [{ message: 'The group name must be at most 10 characters long.' }],
+              })
+            })
+          })
+        })
+
         describe('categories', () => {
           describe('with matching amount of categories', () => {
             it('has new categories', async () => {
@@ -557,9 +623,10 @@ describe('in mode', () => {
             )
           })
 
-          // Against the real geocoder, like the cases around it. The name is the German one the
-          // form shows to a German user; Mapbox's multi-language answer calls the district
-          // "Havelland District", so matching by name refused the group (LOCATION_NAME_NO_EXACT_MATCH).
+          // Against the Mapbox stub, like the cases around it (test/mapbox-stub/places.json holds
+          // Friesack the way Mapbox has it). The name is the German one the form shows to a German
+          // user; Mapbox's multi-language answer calls the district "Havelland District", so
+          // matching by name refused the group (LOCATION_NAME_NO_EXACT_MATCH).
           describe('picked by its Mapbox id', () => {
             const friesack = {
               locationName: 'Friesack, Kreis Havelland, Brandenburg, Deutschland',
@@ -3805,6 +3872,69 @@ describe('in mode', () => {
                       'message',
                       'Description too short (at least 3 characters).',
                     )
+                  })
+                })
+              })
+            })
+
+            describe('name', () => {
+              const updateGroup = async (name: string) =>
+                mutate({ mutation: UpdateGroup, variables: { id: 'my-group', name } })
+
+              it('refuses a name shorter than the minimum, counted without surrounding spaces', async () => {
+                await expect(updateGroup('  ab  ')).resolves.toMatchObject({
+                  data: { UpdateGroup: null },
+                  errors: [{ message: 'The group name must be at least 3 characters long.' }],
+                })
+              })
+
+              it('refuses a name longer than the maximum', async () => {
+                await expect(updateGroup('a'.repeat(51))).resolves.toMatchObject({
+                  data: { UpdateGroup: null },
+                  errors: [{ message: 'The group name must be at most 50 characters long.' }],
+                })
+              })
+
+              it('stores the name without surrounding spaces', async () => {
+                await expect(updateGroup('  The Best Group  ')).resolves.toMatchObject({
+                  data: { UpdateGroup: { name: 'The Best Group' } },
+                  errors: undefined,
+                })
+              })
+
+              describe('with the name bounds of a brand', () => {
+                let original: ReturnType<typeof getBranding>
+
+                beforeEach(() => {
+                  original = getBranding()
+                  setBranding({
+                    ...original,
+                    group: { ...original.group, nameLengthMin: 2, nameLengthMax: 10 },
+                  })
+                })
+
+                afterEach(() => {
+                  setBranding(original)
+                })
+
+                it('refuses a name the default maximum would accept', async () => {
+                  await expect(updateGroup('The Best Group')).resolves.toMatchObject({
+                    data: { UpdateGroup: null },
+                    errors: [{ message: 'The group name must be at most 10 characters long.' }],
+                  })
+                })
+
+                // The stored name is longer than this brand's maximum. A save without a name leaves
+                // it alone, so other settings can still be changed.
+                it('does not hold up a save without a name', async () => {
+                  await expect(
+                    mutate({
+                      mutation: UpdateGroup,
+                      variables: { id: 'my-group', about: 'We will change the world!' },
+                    }),
+                  ).resolves.toMatchObject({
+                    data: { UpdateGroup: { about: 'We will change the world!' } },
+                    errors: undefined,
                   })
                 })
               })

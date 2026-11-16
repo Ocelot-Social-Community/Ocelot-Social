@@ -265,11 +265,17 @@
       </div>
     </div>
 
-    <os-modal
+    <os-confirm-dialog
       v-if="deleteUserData"
       :open="showDeleteModal"
       :title="$t('settings.deleteUserAccount.accountWarningIsAdmin')"
+      :confirm-label="$t('settings.deleteUserAccount.name')"
+      :cancel-label="$t('actions.cancel')"
       :close-label="$t('actions.close')"
+      :confirm-icon="icons.exclamationCircle"
+      variant="danger"
+      :loading="deleteLoading"
+      @confirm="confirmDeleteUser"
       @cancel="cancelDeleteUser"
     >
       <p>{{ $t('settings.deleteUserAccount.infoAdmin') }}</p>
@@ -299,22 +305,7 @@
           </p>
         </div>
       </div>
-
-      <template #footer="{ cancel }">
-        <os-button variant="primary" appearance="outline" @click="cancel">
-          {{ $t('actions.cancel') }}
-        </os-button>
-        <os-button
-          variant="danger"
-          appearance="filled"
-          :loading="deleteLoading"
-          @click="confirmDeleteUser"
-        >
-          <template #icon><os-icon :icon="icons.exclamationCircle" /></template>
-          {{ $t('settings.deleteUserAccount.name') }}
-        </os-button>
-      </template>
-    </os-modal>
+    </os-confirm-dialog>
   </div>
 </template>
 
@@ -324,7 +315,7 @@ import {
   OsCard,
   OsCounterIcon,
   OsIcon,
-  OsModal,
+  OsConfirmDialog,
   OsNumber,
   OsSpinner,
 } from '@ocelot-social/ui'
@@ -350,7 +341,7 @@ import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import { profileUserQuery, updateUserMutation } from '~/graphql/User'
 import { muteUser, unmuteUser } from '~/graphql/settings/MutedUsers'
 import { blockUser, unblockUser } from '~/graphql/settings/BlockedUsers'
-import UpdateQuery from '~/components/utils/UpdateQuery'
+import { fetchMorePage } from '~/components/utils/UpdateQuery'
 import SocialMedia from '~/components/SocialMedia/SocialMedia'
 import DateTime from '~/components/DateTime'
 import UserAvatar from '~/components/UserAvatar/UserAvatar'
@@ -371,7 +362,7 @@ export default {
     OsButton,
     OsCounterIcon,
     OsIcon,
-    OsModal,
+    OsConfirmDialog,
     OsNumber,
     OsSpinner,
     SocialMedia,
@@ -542,14 +533,15 @@ export default {
       if (!PostQuery) return // seems this can be undefined on subpages
       this.offset += this.pageSize
 
-      PostQuery.fetchMore({
+      fetchMorePage(this, PostQuery, {
         variables: {
           offset: this.offset,
           filter: this.filter,
           first: this.pageSize,
           orderBy: 'sortDate_desc',
         },
-        updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
+        $state,
+        pageKey: 'profilePagePosts',
       })
     },
     resetPostList() {
@@ -637,8 +629,8 @@ export default {
         this.showDeleteModal = false
         this.$router.replace('/')
       } catch (err) {
+        // The dialog stays for another try; cancel closes it.
         this.$toastBackendError(err)
-        this.showDeleteModal = false
       } finally {
         this.deleteLoading = false
       }

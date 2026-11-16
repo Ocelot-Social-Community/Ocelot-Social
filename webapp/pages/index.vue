@@ -195,7 +195,7 @@ import LayoutToggle from '~/components/LayoutToggle/LayoutToggle'
 import { mapGetters, mapMutations } from 'vuex'
 import { DonationsQuery } from '~/graphql/Donations'
 import { filterPosts } from '~/graphql/PostQuery.js'
-import UpdateQuery from '~/components/utils/UpdateQuery'
+import { fetchMorePage } from '~/components/utils/UpdateQuery'
 import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import GetCategories from '~/mixins/getCategoriesMixin.js'
 
@@ -348,14 +348,15 @@ export default {
       if (!PostQuery) return // seems this can be undefined on subpages
 
       this.offset += this.pageSize
-      PostQuery.fetchMore({
+      fetchMorePage(this, PostQuery, {
         variables: {
           offset: this.offset,
           filter: this.finalFilters,
           first: this.pageSize,
           orderBy: ['pinned_asc', this.orderBy],
         },
-        updateQuery: UpdateQuery(this, { $state, pageKey: 'Post' }),
+        $state,
+        pageKey: 'Post',
       })
     },
     resetPostList() {
@@ -478,8 +479,8 @@ export default {
 
 #my-filter {
   max-width: 1028px;
-  background-color: var(--color-neutral-100);
-  box-shadow: rgb(189 189 189) 1px 9px 15px 1px;
+  background-color: var(--background-color-base);
+  box-shadow: var(--shadow-color-raised) 1px 9px 15px 1px;
   max-height: 950px;
   overflow: auto;
   padding-bottom: 0px;

@@ -119,6 +119,18 @@
       >
         {{ uniqueParticipantCount }}
       </span>
+      <!--
+        Folded notices wait in the corner below on the right, where the control bar's button
+        to unfold them is while it shows.
+      -->
+      <span
+        v-if="parked && hasNotices && !noticesOpen"
+        class="video-call__parked-notices"
+        data-test="video-call-parked-notices"
+        aria-hidden="true"
+      >
+        <os-icon :icon="icons.warning" />
+      </span>
 
       <pre-join v-if="phase === 'prejoin'" @join="onPreJoinReady" @cancel="leave" />
 
@@ -144,74 +156,6 @@
           {{ $t('videoCall.connecting') }}
         </div>
         <template v-else>
-          <!--
-            Problems the call cannot fix on its own. They show in the parked
-            window too: a blocked speaker or a silent microphone matters there
-            just as much.
-          -->
-          <div
-            v-if="audioBlocked || micProblem || reconnecting || audioOnly || reloadPending"
-            class="video-call__notices"
-            role="status"
-          >
-            <!--
-              An admin switched the branding; applying it takes a reload, which waits for this
-              call to end (#10353). Said here for as long as it waits, so that the reload after
-              hanging up comes as no surprise.
-            -->
-            <div
-              v-if="reloadPending"
-              class="video-call__notice"
-              data-test="video-call-reload-pending"
-            >
-              {{ $t('videoCall.reloadPending') }}
-            </div>
-            <div v-if="reconnecting" class="video-call__notice" data-test="video-call-reconnecting">
-              {{ $t('videoCall.reconnecting') }}
-            </div>
-            <div
-              v-if="audioBlocked"
-              class="video-call__notice video-call__notice--warning"
-              data-test="video-call-audio-blocked"
-            >
-              <span>{{ $t('videoCall.audioBlocked') }}</span>
-              <os-button
-                data-test="video-call-enable-audio"
-                variant="primary"
-                size="sm"
-                @click="enableAudio"
-              >
-                {{ $t('videoCall.enableAudio') }}
-              </os-button>
-            </div>
-            <div
-              v-if="micProblem"
-              class="video-call__notice video-call__notice--warning"
-              data-test="video-call-mic-problem"
-            >
-              <span>{{ $t('videoCall.micNoSignal') }}</span>
-              <os-button
-                data-test="video-call-restart-mic"
-                variant="primary"
-                size="sm"
-                @click="restartMic"
-              >
-                {{ $t('videoCall.restartMic') }}
-              </os-button>
-            </div>
-            <div v-if="audioOnly" class="video-call__notice" data-test="video-call-audio-only">
-              <span>{{ $t('videoCall.audioOnly') }}</span>
-              <os-button
-                data-test="video-call-show-videos"
-                variant="primary"
-                appearance="outline"
-                size="sm"
-                @click="showVideos"
-              >
-                {{ $t('videoCall.showVideos') }}
-              </os-button>
-            </div>
-          </div>
           <div
             v-if="isMaximized && !mobileChatOpen && activeSpeakers.length"
             class="video-call__speakers"
@@ -256,6 +200,133 @@
               </os-button>
             </div>
             <!--
+              Problems the call cannot fix on its own. Inside the stage, which anchors
+              them: placed from the body instead, which gives up its box in the maximized
+              layouts, they went by the whole call — over the control bar, centred across
+              the chat as well, their buttons behind the page's footer. In the parked window
+              they are folded behind a button in the header (noticesCollapsed), but still
+              announced: folded means out of sight, not out of the accessibility tree.
+
+              Announced from two live regions that are there before they have anything to
+              say: a region inserted along with its message is passed over by some screen
+              readers. One for what stands in the user's way, said at once (role="alert"),
+              on top; one for what only informs, waiting its turn (role="status").
+            -->
+            <div
+              id="video-call-notices"
+              :class="[
+                'video-call__notices',
+                { 'video-call__notices--collapsed': noticesCollapsed },
+              ]"
+              data-test="video-call-notices"
+            >
+              <div
+                class="video-call__notices-region"
+                role="alert"
+                data-test="video-call-notices-alert"
+              >
+                <call-notice
+                  v-if="audioBlocked"
+                  data-test="video-call-audio-blocked"
+                  tone="warning"
+                  :message="$t('videoCall.audioBlocked')"
+                  :actions="[
+                    {
+                      key: 'enable',
+                      label: $t('videoCall.enableAudio'),
+                      dataTest: 'video-call-enable-audio',
+                    },
+                  ]"
+                  @action="enableAudio"
+                />
+                <call-notice
+                  v-if="micProblem"
+                  data-test="video-call-mic-problem"
+                  tone="warning"
+                  :message="$t('videoCall.micNoSignal')"
+                  :actions="[
+                    {
+                      key: 'restart',
+                      label: $t('videoCall.restartMic'),
+                      dataTest: 'video-call-restart-mic',
+                    },
+                  ]"
+                  @action="restartMic"
+                />
+              </div>
+              <div
+                class="video-call__notices-region"
+                role="status"
+                data-test="video-call-notices-status"
+              >
+                <!--
+                  An admin switched the branding; applying it takes a reload, which waits for
+                  this call to end (#10353). Said here for as long as it waits, so that the
+                  reload after hanging up comes as no surprise.
+                -->
+                <call-notice
+                  v-if="reloadPending"
+                  data-test="video-call-reload-pending"
+                  :message="$t('videoCall.reloadPending')"
+                />
+                <call-notice
+                  v-if="reconnecting"
+                  data-test="video-call-reconnecting"
+                  :message="$t('videoCall.reconnecting')"
+                />
+                <call-notice
+                  v-if="audioOnly"
+                  data-test="video-call-audio-only"
+                  :message="$t('videoCall.audioOnly')"
+                  :actions="[
+                    {
+                      key: 'show',
+                      label: $t('videoCall.showVideos'),
+                      dataTest: 'video-call-show-videos',
+                    },
+                  ]"
+                  @action="showVideos"
+                />
+                <!--
+                  Why the cameras got coarse, and the way back. Nothing tells us when the CPU has
+                  room again — the relief itself takes away the load it was measured by — so taking
+                  it back is the user's call, not a guess of ours that could flip back and forth.
+                -->
+                <call-notice
+                  v-if="cpuConstrained"
+                  data-test="video-call-cpu-relief"
+                  :message="$t('videoCall.cpuRelief')"
+                  :actions="[
+                    {
+                      key: 'restore',
+                      label: $t('videoCall.restoreQuality'),
+                      dataTest: 'video-call-restore-quality',
+                      disabled: renewingCamera,
+                    },
+                  ]"
+                  @action="restoreVideoQuality"
+                />
+                <call-notice
+                  v-else-if="cpuStrained"
+                  data-test="video-call-cpu-strained"
+                  :message="$t('videoCall.cpuStrained')"
+                  :actions="[
+                    {
+                      key: 'lower',
+                      label: $t('videoCall.lowerQuality'),
+                      dataTest: 'video-call-lower-quality',
+                    },
+                    {
+                      key: 'dismiss',
+                      label: $t('videoCall.dismissNotice'),
+                      dataTest: 'video-call-dismiss-cpu',
+                    },
+                  ]"
+                  @action="onCpuStrainedAction"
+                />
+              </div>
+            </div>
+            <!--
             All tiles are always mounted so every participant's audio track stays
             attached to a DOM <audio> element. CSS Grid (in spotlight mode)
             places the spotlight tile into the wide left cell and lets the
@@ -272,6 +343,7 @@
               :camera-starting="isOwnCameraTile(tile) && devicesStarting.videoinput > 0"
               :mic-starting="isOwnCameraTile(tile) && devicesStarting.audioinput > 0"
               :avatar-size="tileAvatarSize(tile)"
+              :quality-limit="qualityLimitOf(tile)"
               :clickable="isMaximized && !mobileChatOpen"
               :class="{
                 'video-tile--hidden': singleTile && soloTile && tile.key !== soloTile.key,
@@ -462,7 +534,15 @@
             :meter-stream="micMeterStream"
             :camera-starting="devicesStarting.videoinput > 0"
             :mic-starting="devicesStarting.audioinput > 0"
+            :dtx="dtx"
+            :dtx-applying="dtxApplying"
+            :send-quality="sendQuality"
+            :receive-quality="receiveQuality"
+            :camera-renewing="renewingCamera"
             @switch="switchDevice"
+            @dtx-change="setDtx"
+            @send-quality-change="setSendQuality"
+            @receive-quality-change="setReceiveQuality"
             @close="closeDeviceSettings({ restoreFocus: true })"
           />
         </div>
@@ -516,6 +596,31 @@
             {{ leaveLabel }}
           </template>
         </os-button>
+        <!--
+          In the parked window the notices would cover its small picture: they wait behind
+          this button, in the bar's corner below on the right. A warning sign in the warning
+          colour, whatever they say: a bell or the like did not tell that something is to be
+          read. In a wrapper of its own: OsButton's root carries no scoped-style attribute,
+          so a position set on it would not apply.
+        -->
+        <div v-if="parked && hasNotices" class="video-call__notices-toggle">
+          <os-button
+            v-tooltip="noticesToggleLabel"
+            data-test="video-call-notices-toggle"
+            variant="warning"
+            appearance="filled"
+            size="sm"
+            circle
+            :aria-label="noticesToggleLabel"
+            :aria-expanded="noticesOpen ? 'true' : 'false'"
+            aria-controls="video-call-notices"
+            @click="noticesOpen = !noticesOpen"
+          >
+            <template #icon>
+              <os-icon :icon="icons.warning" />
+            </template>
+          </os-button>
+        </div>
       </div>
 
       <!--
@@ -609,6 +714,7 @@ import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
+import CallNotice from './CallNotice.vue'
 
 // The narrowest the sidebar beside the videos may be pulled: its three tabs still fit.
 const SIDEBAR_MIN_WIDTH = 280
@@ -631,12 +737,43 @@ const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
 const CALL_CHAT_JOIN_ATTEMPTS = 3
 const CALL_CHAT_JOIN_RETRY_MS = 2000
 
+// Stops a local capture for good. Some LiveKit versions keep the underlying
+// MediaStreamTrack around even after track.stop(), so that one is stopped too.
+function stopCapture(track) {
+  if (!track) return
+  try {
+    track.stop()
+  } catch (_e) {
+    /* noop */
+  }
+  const mediaTrack = track.mediaStreamTrack
+  if (mediaTrack && typeof mediaTrack.stop === 'function') {
+    try {
+      mediaTrack.stop()
+    } catch (_e) {
+      /* noop */
+    }
+  }
+}
+
 // LiveKit rates every participant's connection several times a minute. Videos
 // are paused once ours stays weak this long, and come back only after it has
 // been fine for clearly longer, so a flaky line doesn't make them flicker.
 const WEAK_CONNECTION_MS = 5000
 const RECOVERED_CONNECTION_MS = 20000
 const WEAK_QUALITIES = ['poor', 'lost']
+// What our camera captures for each send quality the user can choose. 'auto' and
+// 'high' capture alike, LiveKit's default; 'high' only keeps the CPU relief off.
+// The capture, not a cap on the layers: dynacast sets those anew whenever the
+// server reports who watches which, and a smaller picture eases the encoder too.
+// How often what our camera actually sends is read, for the badge on our own tile. One call
+// on one track — little next to the encoding itself.
+const SENDER_STATS_MS = 3000
+const SEND_RESOLUTIONS = {
+  high: { width: 1280, height: 720 },
+  medium: { width: 640, height: 360 },
+  low: { width: 320, height: 180 },
+}
 // A capture that was just opened may deliver nothing but silence for a moment
 // — Firefox takes noticeably longer than LiveKit's single check 200 ms after
 // the start allows for. Only silence that lasts through this many further
@@ -689,6 +826,7 @@ export default {
     VideoTile,
     PreJoin,
     DeviceSettings,
+    CallNotice,
     OsButton,
     OsCounterIcon,
     OsIcon,
@@ -713,6 +851,7 @@ export default {
       micDeviceId: null,
       speakerDeviceId: null,
       Track: null,
+      VideoQuality: null,
       activeSpeakerIds: [],
       spotlightKey: null,
       stageWidth: 0,
@@ -723,15 +862,45 @@ export default {
       // Our microphone is published but delivers nothing: the OS took the device
       // away (LiveKit then pauses the upstream) or it only yields digital silence.
       micProblem: false,
+      // The user's own choice on leaving out pauses in speech (Opus DTX) for
+      // this call, or null to follow the network's default. Never stored: every
+      // call starts on the network's default, so an admin's change reaches
+      // everyone and a choice made against one bad connection does not linger.
+      dtxPreference: null,
+      // The network's default as the call started with it. Read once per call: the microphone
+      // was published with it, and a policy changed meanwhile reaches the next call — shown
+      // here at once, it would claim a setting the microphone does not have.
+      dtxDefault: false,
+      dtxApplying: false,
       reconnecting: false,
       // Remote cameras are unsubscribed because our connection is weak — the
       // sound gets the bandwidth. audioOnlyDismissed: the user asked for the
       // videos back, so we stop deciding for them until the next call.
       audioOnly: false,
       audioOnlyDismissed: false,
-      // Our machine cannot keep up with encoding and decoding video. Holds for
-      // the rest of the call, like in LiveKit's own app.
+      // Our machine cannot keep up with encoding and decoding video, and the
+      // cameras give way. Holds until the user takes it back.
       cpuConstrained: false,
+      // The user took the relief back: for the rest of the call a CPU limit
+      // only offers it again (cpuStrained), it does not decide for them.
+      cpuReliefDeclined: false,
+      cpuStrained: false,
+      // The user accepted our offer to lower the quality, past a choice of their own — per
+      // direction, as a new choice for one of them lets that one off again.
+      sendReliefForced: false,
+      receiveReliefForced: false,
+      // A cap was put on the remote cameras in this call; until then there is none to lift.
+      receiveCapped: false,
+      // The video quality the user asked for, sent and received ('auto' or one of
+      // devicePreferences' SEND_QUALITIES / RECEIVE_QUALITIES). For this call only: the next
+      // one judges anew what the line and the device allow (see cleanup).
+      sendQuality: 'auto',
+      receiveQuality: 'auto',
+      // Our camera is being started anew — with its full quality, or another capture.
+      renewingCamera: false,
+      // What our camera sends, as WebRTC reports it: { height, fps, limitedBy } — limitedBy
+      // being 'cpu', 'bandwidth' or null. Null while it sends nothing.
+      sentVideo: null,
       showDeviceSettings: false,
       // What the browser lists, to put a name to the devices in use.
       knownDevices: [],
@@ -757,6 +926,8 @@ export default {
       // The mouse is on the call's window: in the parked one that shows its bars. Not
       // :hover, which Safari does not set on it.
       pointerOnParked: false,
+      // The notices are unfolded in the parked window (see noticesCollapsed).
+      noticesOpen: false,
       // Only Chromium-based browsers (Chrome, Edge, Opera, …) know navigator.userAgentData.
       // Set once mounted: the server renders no browser.
       isChromium: false,
@@ -783,6 +954,26 @@ export default {
     }
   },
   computed: {
+    // Opus DTX: while we are silent, our microphone sends hardly any packets.
+    // Off unless the network or the user turns it on — a nearly idle audio
+    // path leaves more room for one listener losing us (#10787), and LiveKit's
+    // own meet app keeps it off as well.
+    // The CPU relief reaches what the user left to the call — or everything, once they
+    // asked for it themselves.
+    sendRelieved() {
+      return this.cpuConstrained && (this.sendReliefForced || this.sendQuality === 'auto')
+    },
+    receiveRelieved() {
+      return this.cpuConstrained && (this.receiveReliefForced || this.receiveQuality === 'auto')
+    },
+    // The remote cameras are off: our connection is weak, or the user wants sound only.
+    videosOff() {
+      return this.audioOnly || this.receiveQuality === 'audio'
+    },
+    dtx() {
+      if (this.dtxPreference !== null) return this.dtxPreference
+      return this.dtxDefault
+    },
     ...mapGetters({
       show: 'videoCall/showVideoCall',
       minimized: 'videoCall/minimized',
@@ -1113,6 +1304,23 @@ export default {
       // always maximized.
       return this.phase === 'in-call' && this.minimized && !this.isMobile
     },
+    hasNotices() {
+      return !!(
+        this.audioBlocked ||
+        this.micProblem ||
+        this.reconnecting ||
+        this.audioOnly ||
+        this.cpuConstrained ||
+        this.cpuStrained ||
+        this.reloadPending
+      )
+    },
+    noticesCollapsed() {
+      return this.parked && !this.noticesOpen
+    },
+    noticesToggleLabel() {
+      return this.noticesOpen ? this.$t('videoCall.hideNotices') : this.$t('videoCall.showNotices')
+    },
     iconOnly() {
       // Buttons without their label where there is no room for it: in the parked
       // window, on a phone, where six spelled-out controls fill half the
@@ -1242,6 +1450,20 @@ export default {
       },
       immediate: true,
     },
+    // A warning unfolds the notices, each time one comes up: without sound or with a silent
+    // microphone, the call does not work, and the user is to learn that without looking for
+    // it. Each warning for itself — one the user folded away does not hide the next. What
+    // only informs waits behind the button.
+    audioBlocked(blocked) {
+      if (blocked) this.noticesOpen = true
+    },
+    micProblem(problem) {
+      if (problem) this.noticesOpen = true
+    },
+    // Once there is nothing to say, the next notice starts folded again.
+    hasNotices(any) {
+      if (!any) this.noticesOpen = false
+    },
     // Once, when it arrives; the notice above stays for as long as it waits.
     reloadPending(pending) {
       if (pending) this.$toast.info(this.$t('videoCall.reloadPending'))
@@ -1356,7 +1578,12 @@ export default {
     this.speakerSeenAt = new Map()
     this.speakerHoldTimer = null
     this.micRestart = null
+    // A reading of our camera's sender stats is under way (readSenderStats).
+    this.senderStatsReading = false
     this.micSilenceProbe = null
+    // Tracks whose events we listen to — publishing a track anew must not
+    // double the listeners.
+    this.watchedMicTracks = new WeakSet()
     this.stageObserver = null
     this.observedStage = null
     this.qualityTimer = null
@@ -1364,6 +1591,17 @@ export default {
     this.audioWatchdog = null
     this.leaving = false
     this.unmounting = false
+    // The room cleanup() is taking down: this.room stays it until the disconnect is through.
+    this.closingRoom = null
+    // Settles once a renewal of our camera (renewOwnCamera) is through.
+    this.cameraRenewal = null
+    this.senderStatsTimer = null
+    // The user switched the camera off, and LiveKit has yet to say it is done — until then
+    // cameraEnabled still says on. Taking long while a reconnect holds a publish back.
+    this.cameraOffPending = false
+    // Counts the ways into and out of a call; a connect() whose number is no longer the
+    // current one was given up while it waited — for its token, say.
+    this.connectAttempt = 0
     this.deviceSwitches = this.newDeviceSwitches()
     this.callChatsSub = null
     this.groupChatRoomId = null
@@ -1489,7 +1727,8 @@ export default {
     },
     // On a touch screen a tap on the videos switches the bars: back when they are gone —
     // without spotlighting the tile it landed on — and away when they are there, unless
-    // the tap is on a tile, which spotlights it as ever. Other taps keep them a while.
+    // the tap is on a tile, which spotlights it as ever, or on a notice lying on the
+    // videos, whose buttons are to act alone. Other taps keep them a while.
     onBarTouch(event) {
       this.lastTouchAt = Date.now()
       this.swallowTileSelect = false
@@ -1498,7 +1737,7 @@ export default {
         this.barsHidden = false
         this.swallowTileSelect = !!onStage
         this.scheduleBarsHide()
-      } else if (onStage && !event.target.closest('.video-tile')) {
+      } else if (onStage && !event.target.closest('.video-tile, .video-call__notices')) {
         clearTimeout(this.barsTimer)
         this.barsHidden = true
       } else {
@@ -2242,7 +2481,13 @@ export default {
       this.micRestart = null
       this.micSilenceProbe = null
       this.stopAudioWatchdog()
+      this.dtxApplying = false
+      this.dtxPreference = null
+      this.dtxDefault = !!(this.$policy && this.$policy.get('videoCallDtx'))
+      this.dtxSwitch = null
       this.resetAudioOnly()
+      const attempt = ++this.connectAttempt
+      let room = null
       try {
         if (!this.groupId) throw new Error('Missing group id')
         const payload = await this.takeJoinPayload(this.groupId)
@@ -2258,13 +2503,24 @@ export default {
           DisconnectReason,
         } = livekit
         this.DisconnectReason = DisconnectReason
+        // Closed while the token or the client library was on its way: cleanup() found no
+        // room to take down then, so nothing may join one now. Nor while hanging up still
+        // navigates away, before its cleanup() has begun.
+        if (attempt !== this.connectAttempt || this.leaving) return
         this.Track = Track
+        this.VideoQuality = VideoQuality
 
-        const room = new Room({
+        room = new Room({
           adaptiveStream: true,
           dynacast: true,
-          videoCaptureDefaults: this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {},
+          videoCaptureDefaults: {
+            ...(this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : {}),
+            ...(SEND_RESOLUTIONS[this.sendQuality]
+              ? { resolution: SEND_RESOLUTIONS[this.sendQuality] }
+              : {}),
+          },
           audioCaptureDefaults: this.micDeviceId ? { deviceId: this.micDeviceId } : {},
+          publishDefaults: { dtx: this.dtx },
           // LiveKit picks the speaker anew whenever a device comes or goes.
           // Unless it knows ours, that puts everyone back on the system
           // default without a word.
@@ -2273,6 +2529,12 @@ export default {
         // Reset only now: until the line below, this.room is still the previous
         // room, and its late CPU event would pass the room check in the listener.
         this.cpuConstrained = false
+        this.cpuReliefDeclined = false
+        this.cpuStrained = false
+        this.sendReliefForced = false
+        this.receiveReliefForced = false
+        this.receiveCapped = false
+        this.renewingCamera = false
         this.room = room
 
         const onAny = () => this.refreshTiles()
@@ -2280,8 +2542,9 @@ export default {
         room.on(RoomEvent.ParticipantDisconnected, onAny)
         room.on(RoomEvent.TrackSubscribed, (_track, pub) => {
           // Subscribed before the unsubscribe of audio-only mode took hold.
-          if (this.audioOnly) this.applyAudioOnly()
-          if (this.cpuConstrained) this.lowerCameraQuality(pub, VideoQuality)
+          if (this.videosOff) this.applyAudioOnly()
+          // Also one whose cap changed while audio-only mode had it unsubscribed, out of reach.
+          this.applyReceiveCap(pub)
           onAny()
         })
         // Encoding and decoding video can eat the CPU to the point where the
@@ -2293,21 +2556,25 @@ export default {
         room.localParticipant.on(ParticipantEvent.LocalTrackCpuConstrained, () => {
           // A late event of a room already replaced must not throttle the new call.
           if (this.room !== room || this.cpuConstrained) return
+          // Taken back before, or nothing left to the call that the relief could lower:
+          // the user decides.
+          const offer =
+            this.cpuReliefDeclined ||
+            (this.sendQuality !== 'auto' && this.receiveQuality !== 'auto')
           // A deliberate diagnosis: the only trace of why the videos got coarse.
           // eslint-disable-next-line no-console
-          console.warn('[video-call] CPU constrained, lowering the video quality of the cameras')
-          this.cpuConstrained = true
-          this.relieveOwnCamera()
-          for (const participant of room.remoteParticipants.values()) {
-            for (const pub of participant.videoTrackPublications.values()) {
-              this.lowerCameraQuality(pub, VideoQuality)
-            }
-          }
+          console.warn(
+            offer
+              ? '[video-call] CPU constrained, offering to lower the video quality'
+              : '[video-call] CPU constrained, lowering the video quality of the cameras',
+          )
+          if (offer) this.cpuStrained = true
+          else this.relieveCpu()
         })
         // A camera published while we are in audio-only mode would otherwise
         // be auto-subscribed and eat the bandwidth we just freed.
         room.on(RoomEvent.TrackPublished, () => {
-          if (this.audioOnly) this.applyAudioOnly()
+          if (this.videosOff) this.applyAudioOnly()
         })
         // Every tile shows a warning while its owner's connection is weak, our
         // own included — which tells at a glance whose line is the problem.
@@ -2341,7 +2608,7 @@ export default {
         room.on(RoomEvent.LocalTrackPublished, (pub) => {
           this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
           // A camera switched on only now gets the same relief.
-          if (this.cpuConstrained && pub && pub.source === Track.Source.Camera) {
+          if (this.sendRelieved && pub && pub.source === Track.Source.Camera) {
             this.relieveOwnCamera()
           }
           if (pub && pub.source === Track.Source.Microphone && pub.track) {
@@ -2428,15 +2695,20 @@ export default {
           peerConnectionTimeout: 5000,
           maxRetries: 0,
         })
+        // Hung up while connecting: no microphone, no camera — cleanup() takes the room down.
+        if (!this.isLive(room)) return
         // Joining a call that runs already, or coming back to it: nothing may change after
         // this, so what the room says now is all there is to go by.
         this.applyRoomMetadata(room.metadata)
         if (this.micEnabled) {
           await room.localParticipant.setMicrophoneEnabled(true)
         }
+        if (!this.isLive(room)) return
         if (this.cameraEnabled) {
           await room.localParticipant.setCameraEnabled(true)
         }
+        // Hung up while the devices were coming up: there is no call left to be in.
+        if (!this.isLive(room)) return
         this.refreshTiles()
         this.audioBlocked = !room.canPlaybackAudio
         this.phase = 'in-call'
@@ -2449,12 +2721,15 @@ export default {
           isPaused: () => this.reconnecting,
         })
         this.audioWatchdog.start()
+        this.startSenderStats()
         this.joinCallChat(room)
         this.loadModerationPermission()
         this.watchCallChats(true)
         this.loadGroupChatUnread()
         this.refreshKnownDevices()
       } catch (err) {
+        // Hung up meanwhile, or given up for a new attempt: not this call's to report.
+        if (this.leaving || attempt !== this.connectAttempt || (room && !this.isLive(room))) return
         const message = this.$backendError(err)
         // The user navigated away while the handshake was still running, so
         // the window is parked in the corner. Since isMaximized treats every
@@ -2558,6 +2833,9 @@ export default {
           Track && participant.isCameraEnabled
             ? findVideoPub(participant, Track.Source.Camera)
             : null
+        // Unsubscribed by us (see applyAudioOnly): LiveKit keeps the track until the server
+        // confirms, which on a weak line takes long — the tile would stay black meanwhile.
+        const cameraShown = !!cameraPub && cameraPub.isDesired !== false
         const screenPub =
           Track && participant.isScreenShareEnabled
             ? findVideoPub(participant, Track.Source.ScreenShare)
@@ -2573,12 +2851,14 @@ export default {
           identity: participant.identity,
           name: participant.name || participant.identity,
           profile,
-          videoTrack: cameraPub ? cameraPub.track : null,
+          videoTrack: cameraShown ? cameraPub.track : null,
           audioTrack,
           isLocal,
           isScreen: false,
           micEnabled,
           connectionQuality: participant.connectionQuality || 'unknown',
+          // On at the other end, but not received here: unsubscribed by us (see applyAudioOnly).
+          cameraHidden: !isLocal && !!participant.isCameraEnabled && !cameraShown,
         })
         if (screenPub) {
           tiles.push({
@@ -2678,6 +2958,9 @@ export default {
       // not the selection as it is right now, which may be an earlier pick
       // that has yet to prove itself.
       const switching = this.deviceSwitches[kind]
+      // A renewal of our camera begun before this pick goes first (see below). Taken now:
+      // a renewal begun later waits for this switch instead, and neither for the other.
+      const renewal = kind === 'videoinput' ? this.cameraRenewal : null
       const ticket = ++switching.latest
       if (switching.inFlight === 0) switching.settled = this[field]
       switching.inFlight++
@@ -2699,13 +2982,24 @@ export default {
         await turn
         // The call ended, or a newer pick came in, while this one was waiting
         // its turn: there is nothing left for it to start.
-        if (this.room !== room || ticket !== switching.latest) return
-        // false: the capture was restarted, but not on the device asked for.
-        if ((await room.switchActiveDevice(kind, deviceId)) === false) {
-          throw new Error('Device not switched')
+        if (!this.isLive(room) || ticket !== switching.latest) return
+        if (kind === 'audioinput' && this.dtxSwitch) {
+          await this.dtxSwitch
+          if (!this.isLive(room) || ticket !== switching.latest) return
         }
+        // A camera being started anew could be published after the switch, on the device
+        // it was started with: the switch waits for it and then moves the fresh one.
+        if (renewal) {
+          await renewal
+          if (!this.isLive(room) || ticket !== switching.latest) return
+        }
+        const captures = this.capturesOf(room, kind)
+        // false: the capture was restarted, but not on the device asked for.
+        const switched = await room.switchActiveDevice(kind, deviceId)
+        if (this.releaseIfLeft(room, captures)) return
+        if (switched === false) throw new Error('Device not switched')
       } catch (err) {
-        if (this.room !== room) return
+        if (!this.isLive(room)) return
         this.showSwitchErrorToast(kind, err)
         // Overtaken by a newer pick: the selection and LiveKit are that one's
         // business now. Taking them back here would undo it.
@@ -2715,8 +3009,10 @@ export default {
         // LiveKit stops the running capture before it opens the new one, so a
         // refused switch leaves none — go back to the one that worked.
         if (settled) {
+          const captures = this.capturesOf(room, kind)
           try {
             await room.switchActiveDevice(kind, settled)
+            this.releaseIfLeft(room, captures)
           } catch (_e) {
             /* the toast above already says the device is in trouble */
           }
@@ -2727,7 +3023,6 @@ export default {
         this.deviceStarted(kind)
         done()
       }
-      if (this.room !== room) return
       switching.settled = deviceId
       saveDevicePreference(kind, { deviceId, label })
       if (kind === 'videoinput') this.refreshTiles()
@@ -2747,6 +3042,28 @@ export default {
       // Not below zero: the call may have ended, and been cleaned up, while
       // the device was still on its way.
       this.devicesStarting[kind] = Math.max(0, this.devicesStarting[kind] - 1)
+    },
+    // The call's room, and not on its way out: cleanup() keeps this.room until the
+    // disconnect is through, and a device started meanwhile would outlive the call.
+    // leave() navigates away before its cleanup() begins.
+    isLive(room) {
+      return !!room && this.room === room && this.closingRoom !== room && !this.leaving
+    },
+    // The tracks a device switch of this kind restarts.
+    capturesOf(room, kind) {
+      const source = { audioinput: 'Microphone', videoinput: 'Camera' }[kind]
+      if (!source) return []
+      const pub = room.localParticipant.getTrackPublication(this.Track.Source[source])
+      const tracks = [pub && pub.track]
+      if (kind === 'audioinput' && this.dtxSwitch) tracks.push(this.dtxTrack)
+      return tracks
+    },
+    // LiveKit opens a fresh capture on restarting a track, also one cleanup() has
+    // stopped — and once the room is gone nobody stops that one but us.
+    releaseIfLeft(room, tracks) {
+      if (this.isLive(room)) return false
+      tracks.forEach(stopCapture)
+      return true
     },
     isOwnCameraTile(tile) {
       return tile.isLocal && !tile.isScreen
@@ -2866,7 +3183,8 @@ export default {
       if (qualityClass === this.qualityClass) return
       this.qualityClass = qualityClass
       this.clearQualityTimer()
-      if (WEAK_QUALITIES.includes(quality) && !this.audioOnly && !this.audioOnlyDismissed) {
+      // The user's own choice of sound only leaves nothing for a weak line to switch off.
+      if (WEAK_QUALITIES.includes(quality) && !this.videosOff && !this.audioOnlyDismissed) {
         this.qualityTimer = setTimeout(() => this.setAudioOnly(true), WEAK_CONNECTION_MS)
       } else if (STRONG_QUALITIES.includes(quality) && this.audioOnly) {
         this.qualityTimer = setTimeout(() => this.setAudioOnly(false), RECOVERED_CONNECTION_MS)
@@ -2893,7 +3211,7 @@ export default {
       // setSubscribed() signals the server on every call, changed or not, and
       // this runs on each published/subscribed track — so only touch the ones
       // whose wish actually differs, sparing a weak line the chatter.
-      const wanted = !this.audioOnly
+      const wanted = !this.videosOff
       for (const participant of room.remoteParticipants.values()) {
         for (const pub of participant.videoTrackPublications.values()) {
           if (pub.source === Track.Source.Camera && pub.isDesired !== wanted) {
@@ -2912,6 +3230,154 @@ export default {
       if (this.audioWatchdog) this.audioWatchdog.stop()
       this.audioWatchdog = null
     },
+    // forced: asked for by the user, so it lowers their own choices as well.
+    relieveCpu(forced = false) {
+      const room = this.room
+      if (!room) return
+      this.cpuConstrained = true
+      this.sendReliefForced = forced
+      this.receiveReliefForced = forced
+      this.cpuReliefDeclined = false
+      this.cpuStrained = false
+      if (this.sendRelieved) this.relieveOwnCamera()
+      this.applyReceiveCaps()
+    },
+    onCpuStrainedAction(key) {
+      if (key === 'lower') this.relieveCpu(true)
+      else this.cpuStrained = false
+    },
+    // The lowest of what the relief and the user's choice ask for, or null for none.
+    receiveCap() {
+      const { LOW, MEDIUM, HIGH } = this.VideoQuality
+      const caps = []
+      if (this.receiveRelieved) caps.push(LOW)
+      const chosen = { high: HIGH, medium: MEDIUM, low: LOW }[this.receiveQuality]
+      if (chosen !== undefined) caps.push(chosen)
+      return caps.length ? Math.min(...caps) : null
+    },
+    applyReceiveCap(pub) {
+      const cap = this.receiveCap()
+      if (cap === null) {
+        if (this.receiveCapped) this.uncapCameraQuality(pub)
+        return
+      }
+      this.receiveCapped = true
+      if (cap === this.VideoQuality.HIGH) this.uncapCameraQuality(pub)
+      else this.capCameraQuality(pub, cap)
+    },
+    applyReceiveCaps() {
+      for (const participant of this.room.remoteParticipants.values()) {
+        for (const pub of participant.videoTrackPublications.values()) {
+          this.applyReceiveCap(pub)
+        }
+      }
+    },
+    setReceiveQuality(quality) {
+      if (quality === this.receiveQuality) return
+      const wereOff = this.videosOff
+      this.receiveQuality = quality
+      // A choice made now outweighs the relief the user accepted before.
+      this.receiveReliefForced = false
+      this.settleRelief()
+      // The user's choice, not a weak line: the automatic mode and its notice give way. What
+      // the line is like stays known (qualityClass), for when the cameras come back.
+      if (quality === 'audio') {
+        this.clearQualityTimer()
+        this.audioOnly = false
+      }
+      if (!this.room || !this.Track) return
+      if (this.videosOff !== wereOff) this.applyAudioOnly()
+      // Back from sound only onto a line that is still weak: LiveKit reports only changes,
+      // so the grace period starts now, not with a report that may never come.
+      if (wereOff && !this.videosOff && this.qualityClass === 'weak' && !this.audioOnlyDismissed) {
+        this.qualityTimer = setTimeout(() => this.setAudioOnly(true), WEAK_CONNECTION_MS)
+      }
+      this.applyReceiveCaps()
+    },
+    // Both directions chosen anew past the relief: nothing is relieved any more, so its
+    // notice goes, and a later CPU limit offers it again.
+    settleRelief() {
+      if (this.cpuConstrained && !this.sendRelieved && !this.receiveRelieved) {
+        this.cpuConstrained = false
+      }
+    },
+    async setSendQuality(quality) {
+      if (quality === this.sendQuality || this.renewingCamera) return
+      this.sendQuality = quality
+      this.sendReliefForced = false
+      this.settleRelief()
+      const room = this.room
+      if (!room || !this.Track) return
+      const defaults = { ...room.options.videoCaptureDefaults }
+      if (SEND_RESOLUTIONS[quality]) defaults.resolution = SEND_RESOLUTIONS[quality]
+      else delete defaults.resolution
+      // Every camera started from now on captures so — the fresh one below included.
+      room.options.videoCaptureDefaults = defaults
+      // Captured anew: only a fresh track has the layers of its new size known to the
+      // server — and it is let off a relief the new choice no longer allows. One the relief
+      // still reaches gets it again once published (LocalTrackPublished).
+      await this.renewOwnCamera(room)
+    },
+    async restoreVideoQuality() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track || this.renewingCamera) return
+      const wasRelieved = this.sendRelieved
+      this.cpuConstrained = false
+      this.sendReliefForced = false
+      this.receiveReliefForced = false
+      this.cpuReliefDeclined = true
+      // Back to the user's own choice, if they made one.
+      this.applyReceiveCaps()
+      if (wasRelieved) await this.renewOwnCamera(room)
+    },
+    async renewOwnCamera(room) {
+      const Track = this.Track
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+      const track = pub && pub.track
+      if (!track) return
+      // LiveKit has no way back from prioritizePerformance(): the track keeps
+      // its performance mode for good, and with it dynacast and the encoder
+      // adjustments stay off — publishing the same track anew changes nothing.
+      // So the track goes, and a fresh one takes its place, captured by the
+      // room's defaults as they are now. A camera switched off right now gets
+      // its fresh track when it is switched on — and so does one being switched off.
+      const restart = this.cameraEnabled && !this.cameraOffPending
+      this.renewingCamera = true
+      if (restart) this.deviceStarts('videoinput')
+      let renewed
+      const renewal = new Promise((resolve) => {
+        renewed = resolve
+      })
+      this.cameraRenewal = renewal
+      // Camera switches asked for before go first: a second capture of a device still
+      // starting can lock the switch out of it. Later ones wait for this renewal.
+      const switched = this.deviceSwitches.videoinput.queue
+      try {
+        await switched
+        if (!this.isLive(room)) return
+        await room.localParticipant.unpublishTrack(track, true)
+        // Hung up meanwhile: a camera started now would come on after the call has ended.
+        // Switched off meanwhile — still on its way, or done already: it stays off.
+        if (restart && this.cameraEnabled && !this.cameraOffPending && this.isLive(room)) {
+          await room.localParticipant.setCameraEnabled(
+            true,
+            this.cameraDeviceId ? { deviceId: this.cameraDeviceId } : undefined,
+          )
+        }
+      } catch (err) {
+        if (this.isLive(room)) this.showDeviceErrorToast('camera', err)
+      } finally {
+        if (restart) this.deviceStarted('videoinput')
+        if (this.cameraRenewal === renewal) this.cameraRenewal = null
+        renewed()
+        if (this.isLive(room)) {
+          this.renewingCamera = false
+          this.cameraEnabled = !!room.localParticipant.isCameraEnabled
+          this.refreshTiles()
+        }
+      }
+    },
     relieveOwnCamera() {
       const pub = this.room.localParticipant.getTrackPublication(this.Track.Source.Camera)
       const track = pub && pub.track
@@ -2919,10 +3385,156 @@ export default {
       // Rejects when the track is not being sent (yet) — nothing to relieve then.
       track.prioritizePerformance().catch(() => {})
     },
-    lowerCameraQuality(pub, VideoQuality) {
-      if (pub && pub.source === this.Track.Source.Camera && pub.setVideoQuality) {
-        pub.setVideoQuality(VideoQuality.LOW)
+    capCameraQuality(pub, quality) {
+      // Not for a camera unsubscribed by audio-only mode: LiveKit refuses it,
+      // and TrackSubscribed applies the cap once it is back.
+      if (
+        pub &&
+        pub.source === this.Track.Source.Camera &&
+        pub.isDesired !== false &&
+        pub.setVideoQuality
+      ) {
+        pub.setVideoQuality(quality)
       }
+    },
+    startSenderStats() {
+      this.stopSenderStats()
+      this.senderStatsTimer = setInterval(() => this.readSenderStats(), SENDER_STATS_MS)
+    },
+    stopSenderStats() {
+      if (this.senderStatsTimer) clearInterval(this.senderStatsTimer)
+      this.senderStatsTimer = null
+      this.sentVideo = null
+    },
+    // One reading at a time: under the very load the badge is for, one can outlast the interval,
+    // and an older answer arriving last would undo a newer one.
+    async readSenderStats() {
+      if (this.senderStatsReading) return
+      this.senderStatsReading = true
+      try {
+        await this.measureSentVideo()
+      } finally {
+        this.senderStatsReading = false
+      }
+    },
+    async measureSentVideo() {
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      const ownCamera = () => {
+        const pub = room.localParticipant.getTrackPublication(Track.Source.Camera)
+        return pub && pub.track
+      }
+      const track = ownCamera()
+      if (!this.cameraEnabled || !track || typeof track.getSenderStats !== 'function') {
+        this.setSentVideo(null)
+        return
+      }
+      let stats
+      try {
+        stats = await track.getSenderStats()
+      } catch {
+        return
+      }
+      if (!this.isLive(room)) return
+      // A camera renewed meanwhile is a new track: the answer is about the one before.
+      if (ownCamera() !== track) return
+      // One entry per simulcast layer; the largest one going out is what the others get at best.
+      // A layer paused because nobody watches it (dynacast) is no limit, and its stats keep the
+      // size of its last frame — the sender's own settings tell whether it is still on.
+      const encodings = this.senderEncodings(track)
+      const encodingOf = (layer) =>
+        encodings.length === 1 ? encodings[0] : encodings.find((e) => e.rid && e.rid === layer.rid)
+      const sending = (stats || []).filter(
+        (layer) => layer.frameHeight > 0 && (encodingOf(layer) || {}).active !== false,
+      )
+      if (!sending.length) {
+        // Nothing goes out right now: what would, as the sender is set up.
+        this.setSentVideo(this.configuredVideo(track, encodings))
+        return
+      }
+      // The reason, too, of the layer whose size the badge shows — not of another one.
+      const top = sending.reduce((a, b) => (b.frameHeight > a.frameHeight ? b : a))
+      const reason = top.qualityLimitationReason
+      this.setSentVideo({
+        height: top.frameHeight,
+        fps: Math.round(top.framesPerSecond || 0),
+        limitedBy: reason === 'cpu' || reason === 'bandwidth' ? reason : null,
+      })
+    },
+    // Unchanged values keep the object: every new one renders the call and all its tiles anew,
+    // every 3 s for as long as the call lasts.
+    setSentVideo(next) {
+      const prev = this.sentVideo
+      const same =
+        prev === next ||
+        (!!prev &&
+          !!next &&
+          prev.height === next.height &&
+          prev.fps === next.fps &&
+          prev.limitedBy === next.limitedBy)
+      if (!same) this.sentVideo = next
+    },
+    senderEncodings(track) {
+      try {
+        const sender = track.sender
+        return (sender && sender.getParameters && sender.getParameters().encodings) || []
+      } catch {
+        return []
+      }
+    },
+    // What our camera sends once someone watches it: what it captures, scaled down and capped in
+    // frame rate by its largest layer. A layer switched off for good, like the ones the CPU
+    // relief leaves aside, has a frame rate of 0; one only paused keeps its own.
+    configuredVideo(track, encodings) {
+      const media = track.mediaStreamTrack
+      const settings = (media && media.getSettings && media.getSettings()) || {}
+      if (!settings.height) return null
+      const scaleOf = (encoding) => encoding.scaleResolutionDownBy || 1
+      const top = encodings
+        .filter((encoding) => encoding.maxFramerate !== 0)
+        .reduce((a, b) => (a && scaleOf(a) <= scaleOf(b) ? a : b), null)
+      const fps = Math.min(settings.frameRate || Infinity, (top && top.maxFramerate) || Infinity)
+      return {
+        height: Math.round(settings.height / (top ? scaleOf(top) : 1)),
+        fps: Number.isFinite(fps) ? Math.round(fps) : 0,
+        limitedBy: null,
+      }
+    },
+    // Why a camera's video is lower than it could be, for the badge on its tile — or null. Only
+    // what holds it back on purpose or for want: adaptive stream sizing a camera to its tile is
+    // no limit. Screen shares are never lowered.
+    qualityLimitOf(tile) {
+      if (tile.isScreen) return null
+      if (tile.isLocal) {
+        const chosen = this.sendQuality === 'medium' || this.sendQuality === 'low'
+        const reason =
+          (this.sendRelieved && 'cpu') ||
+          (this.sentVideo && this.sentVideo.limitedBy) ||
+          (chosen && 'choice') ||
+          null
+        if (!reason) return null
+        const sent = this.sentVideo
+        return { reason, height: sent ? sent.height : null, fps: sent ? sent.fps : null }
+      }
+      // A camera we do not receive at all, by choice or for a weak line, looks like one switched
+      // off at the other end — unless the tile says otherwise.
+      if (tile.cameraHidden && this.videosOff) {
+        return { reason: this.receiveQuality === 'audio' ? 'choice' : 'bandwidth', hidden: true }
+      }
+      const cap = this.VideoQuality ? this.receiveCap() : null
+      if (cap === null || cap === this.VideoQuality.HIGH) return null
+      return { reason: this.receiveRelieved ? 'cpu' : 'choice' }
+    },
+    uncapCameraQuality(pub) {
+      // LiveKit cannot drop a cap, only raise it — to the top layer the camera
+      // is sent in, so adaptiveStream keeps sizing it to its tile. That is HIGH
+      // only when there is a HIGH layer: an SVC camera sent in two layers has
+      // none, and a cap of HIGH would then ask for the largest layer outright.
+      const { LOW, HIGH } = this.VideoQuality
+      const layers = (pub && pub.trackInfo && pub.trackInfo.layers) || []
+      const sent = layers.map((layer) => layer.quality).filter((q) => q >= LOW && q <= HIGH)
+      this.capCameraQuality(pub, sent.length ? Math.max(...sent) : HIGH)
     },
     resetAudioOnly() {
       this.clearQualityTimer()
@@ -2931,6 +3543,8 @@ export default {
       this.audioOnlyDismissed = false
     },
     watchMicTrack(track, TrackEvent) {
+      if (this.watchedMicTracks.has(track)) return
+      this.watchedMicTracks.add(track)
       // When the OS takes the microphone away (another app, a Bluetooth profile
       // switch, macOS muting the capture) the MediaStreamTrack fires `mute`
       // and LiveKit stops sending after a few seconds — while the participant
@@ -2983,6 +3597,11 @@ export default {
     },
     async doRestartMic() {
       const room = this.room
+      if (this.dtxSwitch) {
+        await this.dtxSwitch
+        // Left, or left and joined anew, meanwhile: this was asked of that call.
+        if (!this.isLive(room)) return
+      }
       const Track = this.Track
       if (!room || !Track) return
       const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
@@ -2993,6 +3612,8 @@ export default {
         // same publication; LiveKit resumes a paused upstream on its own, keeps
         // a muted track disabled and stops a track that was stopped meanwhile.
         await track.restartTrack()
+        // A fresh capture of a call that ended meanwhile: nobody else would stop it.
+        if (this.releaseIfLeft(room, [track])) return
         // The new capture can be just as silent as the old one — only drop the
         // warning once it is shown to deliver a signal.
         const silent = await this.micStaysSilent(track)
@@ -3006,12 +3627,102 @@ export default {
         if (this.room === room) this.showDeviceErrorToast('mic', err)
       }
     },
+    // Called by the device settings' checkbox alone, which is disabled while a switch runs
+    // (dtxApplying): one switch at a time.
+    async setDtx(on) {
+      const before = this.dtx
+      this.dtxPreference = on
+      const room = this.room
+      const Track = this.Track
+      if (!room || !Track) return
+      // Every later publish of the microphone follows the room's defaults.
+      room.options.publishDefaults.dtx = on
+      const pub = room.localParticipant.getTrackPublication(Track.Source.Microphone)
+      const track = pub && pub.track
+      if (!track) return
+      // DTX is agreed on when a track is published, so the microphone has to be
+      // published anew. The same track, unstopped: capture, mute state and our
+      // listeners stay as they are.
+      this.dtxApplying = true
+      // Meanwhile the microphone has no publication. Switched on, restarted or moved to another
+      // device, LiveKit would find none — and open a second capture, or act on nothing: those
+      // wait for this. Muting acts on the track itself (see toggleMic).
+      let settle
+      const dtxSwitch = new Promise((resolve) => {
+        settle = resolve
+      })
+      this.dtxSwitch = dtxSwitch
+      this.dtxTrack = track
+      const publish = (dtx) =>
+        room.localParticipant.publishTrack(track, { source: Track.Source.Microphone, dtx })
+      try {
+        await room.localParticipant.unpublishTrack(track, false)
+        if (this.room !== room) return
+        try {
+          await publish(on)
+        } catch (err) {
+          if (this.room !== room) return
+          await this.restoreDtx(room, track, publish, before, err)
+        }
+      } catch (err) {
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
+      } finally {
+        if (this.dtxSwitch === dtxSwitch) this.dtxSwitch = null
+        settle()
+        if (this.room === room) {
+          this.dtxApplying = false
+          // A failed publish leaves the microphone off, and one muted meanwhile went out
+          // muted — say so on the button.
+          this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
+        }
+      }
+    },
+
+    // The microphone could not be published with the new choice. Asked for a setting, the user
+    // is not to lose their voice over it: the same track goes out again as it was, the choice
+    // back where it was. Failing that, the track is stopped rather than left captured and
+    // unheard — an open capture keeps a Bluetooth headset in its call mode, among others —
+    // and the microphone shows as off, to be switched on again.
+    async restoreDtx(room, track, publish, before, err) {
+      this.dtxPreference = before
+      room.options.publishDefaults.dtx = before
+      try {
+        await publish(before)
+        if (this.room !== room) return
+        if (this.$toast && typeof this.$toast.error === 'function') {
+          this.$toast.error(this.$t('videoCall.deviceSettings.dtxFailed'))
+        }
+      } catch {
+        track.stop()
+        if (this.room === room) this.showDeviceErrorToast('mic', err)
+      }
+    },
     async toggleMic() {
       if (!this.room) return
       const next = !this.micEnabled
+      // Muting while a dtx switch has the microphone unpublished: LiveKit would find nothing to
+      // mute and the track go out again open. Muted on the track itself, at once, it goes out
+      // muted.
+      if (!next && this.dtxSwitch) {
+        const room = this.room
+        await this.dtxTrack.mute()
+        if (this.room !== room) return
+        this.micEnabled = false
+        this.micProblem = false
+        this.refreshMicMeter()
+        return
+      }
+      const room = this.room
       if (next) this.deviceStarts('audioinput')
       try {
-        await this.room.localParticipant.setMicrophoneEnabled(next)
+        if (this.dtxSwitch) {
+          await this.dtxSwitch
+          // Left, or left and joined anew, meanwhile: this was asked of that call.
+          if (!this.isLive(room)) return
+        }
+        await room.localParticipant.setMicrophoneEnabled(next)
+        // Hung up meanwhile: LiveKit takes care of the capture, the state is the next call's.
+        if (!this.isLive(room)) return
         this.micEnabled = next
         // A muted microphone is silent on purpose.
         if (!next) this.micProblem = false
@@ -3023,7 +3734,8 @@ export default {
         // Re-sync from LiveKit — a partial failure (track published, then
         // permission revoked) can leave the real state out of sync with what
         // we'd otherwise leave in `this.micEnabled`.
-        this.micEnabled = !!this.room.localParticipant.isMicrophoneEnabled
+        if (!this.isLive(room)) return
+        this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
         this.showDeviceErrorToast('mic', err)
       } finally {
         if (next) this.deviceStarted('audioinput')
@@ -3031,35 +3743,43 @@ export default {
     },
     async toggleCamera() {
       if (!this.room) return
+      const room = this.room
       const next = !this.cameraEnabled
       if (next) this.deviceStarts('videoinput')
+      else this.cameraOffPending = true
       try {
-        await this.room.localParticipant.setCameraEnabled(next)
+        await room.localParticipant.setCameraEnabled(next)
+        if (!this.isLive(room)) return
         this.cameraEnabled = next
         this.refreshTiles()
         if (next) this.refreshKnownDevices()
       } catch (err) {
-        this.cameraEnabled = !!this.room.localParticipant.isCameraEnabled
+        if (!this.isLive(room)) return
+        this.cameraEnabled = !!room.localParticipant.isCameraEnabled
         this.refreshTiles()
         this.showDeviceErrorToast('camera', err)
       } finally {
         if (next) this.deviceStarted('videoinput')
+        else this.cameraOffPending = false
       }
     },
     async toggleScreenShare() {
       if (!this.room || !this.screenShareSupported) return
+      const room = this.room
       const next = !this.screenShareEnabled
       try {
-        const publication = await this.room.localParticipant.setScreenShareEnabled(next, {
+        const publication = await room.localParticipant.setScreenShareEnabled(next, {
           audio: true,
         })
+        if (!this.isLive(room)) return
         this.screenShareEnabled = next
         this.screenShareSurface = next
           ? publication?.track?.mediaStreamTrack?.getSettings?.().displaySurface || null
           : null
         this.refreshTiles()
       } catch (err) {
-        this.screenShareEnabled = !!this.room.localParticipant.isScreenShareEnabled
+        if (!this.isLive(room)) return
+        this.screenShareEnabled = !!room.localParticipant.isScreenShareEnabled
         this.refreshTiles()
         // NotAllowedError on screen-share usually means the user dismissed the
         // OS picker — that's not worth a toast. Surface anything else.
@@ -3115,11 +3835,18 @@ export default {
       }
     },
     async cleanup() {
+      // A quality chosen holds for this call only.
+      this.sendQuality = 'auto'
+      this.receiveQuality = 'auto'
       // Before the disconnect: a check must not resubscribe on a room going away.
       this.stopAudioWatchdog()
+      this.stopSenderStats()
       // First, before the disconnect below is awaited: nothing may ask for the call's chat
       // any more once the call is being left.
       this.cancelCallChatRetry()
+      // A connect() still waiting for its token must not join once this is through.
+      this.connectAttempt++
+      this.closingRoom = this.room
       if (this.room) {
         // Belt-and-braces: stop every local track ourselves before asking
         // LiveKit to disconnect. LiveKit's room.disconnect(stopTracks=true)
@@ -3134,25 +3861,11 @@ export default {
               ...(lp.audioTrackPublications?.values?.() ?? []),
               ...(lp.videoTrackPublications?.values?.() ?? []),
             ]
-            for (const pub of pubs) {
-              const track = pub && pub.track
-              if (!track) continue
-              try {
-                track.stop()
-              } catch (_e) {
-                /* noop */
-              }
-              // Some LiveKit versions keep the underlying MediaStreamTrack
-              // around even after track.stop(); stop it directly too.
-              const mediaTrack = track.mediaStreamTrack
-              if (mediaTrack && typeof mediaTrack.stop === 'function') {
-                try {
-                  mediaTrack.stop()
-                } catch (_e) {
-                  /* noop */
-                }
-              }
-            }
+            const tracks = pubs.map((pub) => pub && pub.track)
+            // A dtx switch holds the microphone unpublished for a moment: in no publication,
+            // and running.
+            if (this.dtxSwitch) tracks.push(this.dtxTrack)
+            tracks.forEach(stopCapture)
           }
         } catch (_e) {
           /* noop */
@@ -3164,6 +3877,7 @@ export default {
         }
         this.room = null
       }
+      this.closingRoom = null
       if (this.speakerHoldTimer) {
         clearTimeout(this.speakerHoldTimer)
         this.speakerHoldTimer = null
@@ -3293,8 +4007,6 @@ export default {
   }
 }
 
-/*  The header itself — avatar, title, where its buttons go — is RoomHeader's. What is */
-/*  the call's own are the things put into it. */
 .video-call__count {
   background: var(--color-primary);
   color: var(--color-primary-inverse);
@@ -3324,7 +4036,7 @@ export default {
   flex: 1;
   display: flex;
   overflow: hidden;
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
   position: relative;
   min-height: 0;
 }
@@ -3333,6 +4045,8 @@ export default {
   flex: 1;
   min-width: 0;
   min-height: 0;
+  /*  Anchors the notices and the button that brings the bars back. */
+  position: relative;
 }
 
 .video-call__grid {
@@ -3389,7 +4103,7 @@ export default {
 
 .video-call__speaker-chip {
   background: rgba(0, 0, 0, 0.65);
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
   padding: 2px var(--space-x-small);
   border-radius: var(--border-radius-rounded);
   font-size: var(--font-size-small);
@@ -3410,7 +4124,7 @@ export default {
   display: flex;
   flex-direction: column;
   background: var(--background-color-base);
-  border-left: 1px solid var(--color-neutral-85);
+  border-left: 1px solid var(--border-color-softest);
   overflow: hidden;
   /*  The resizer is placed on its edge. */
   position: relative;
@@ -3528,7 +4242,7 @@ export default {
   max-width: none;
   min-height: 0;
   border-left: 0;
-  border-top: 1px solid var(--color-neutral-85);
+  border-top: 1px solid var(--border-color-softest);
   /*  The strip along its top edge reaches over it. */
   overflow: visible;
 }
@@ -3559,7 +4273,8 @@ export default {
   /*  The tabs start at the sidebar's edge, as in the floating chat window; the close */
   /*  button at the row's end keeps its space to the edge. */
   padding: 0 var(--space-small) 0 0;
-  border-bottom: 1px solid var(--color-neutral-85);
+  background: var(--window-bar-background);
+  border-bottom: 1px solid var(--border-color-softest);
 }
 
 .video-call__chat-actions {
@@ -3577,7 +4292,7 @@ export default {
   justify-content: center;
   padding: var(--space-small);
   text-align: center;
-  color: var(--text-color-inverse);
+  color: var(--video-on-media-color);
 }
 
 /*  Overlay like the speaker chips, but at the bottom: the body is a row */
@@ -3587,29 +4302,20 @@ export default {
   bottom: var(--space-x-small);
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xx-small);
   max-width: calc(100% - var(--space-base));
   z-index: 3;
 }
 
-.video-call__notice {
+/*  Each region is there all the time, an empty one without a box of its own. The gap */
+/*  between them only where both have something to say. */
+.video-call__notices-region {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-x-small);
-  padding: var(--space-xx-small) var(--space-small);
-  border-radius: var(--border-radius-base);
-  text-align: center;
-  color: var(--text-color-inverse);
-  background: var(--color-neutral-10);
+  flex-direction: column;
+  gap: var(--space-xx-small);
 }
 
-.video-call__notice--warning {
-  color: var(--color-warning-inverse);
-  background: var(--color-warning);
+.video-call__notices-region:not(:empty) + .video-call__notices-region:not(:empty) {
+  margin-top: var(--space-xx-small);
 }
 
 .video-call__error {
@@ -3637,8 +4343,8 @@ export default {
   gap: var(--space-x-small);
   /*  Little space above and below the buttons: the height goes to the videos. */
   padding: var(--space-xx-small) var(--space-small);
-  background: var(--background-color-soft);
-  border-top: 1px solid var(--color-neutral-85);
+  background: var(--window-bar-background);
+  border-top: 1px solid var(--border-color-softest);
   flex-wrap: wrap;
   justify-content: center;
 }
@@ -3687,7 +4393,7 @@ export default {
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto minmax(0, 1fr) auto;
   /*  The body's dark ground, which it no longer paints itself. */
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
 }
 
 .video-call--bars-manual .video-call__body {
@@ -3743,10 +4449,6 @@ export default {
   margin-bottom: -45px;
 }
 
-.video-call--bars-collapsed .video-call__stage {
-  position: relative;
-}
-
 .video-call__show-bars {
   position: absolute;
   top: var(--space-x-small);
@@ -3775,7 +4477,7 @@ export default {
   grid-template-rows: minmax(0, 1fr);
   padding-top: 0;
   padding-bottom: 0;
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
   /*  How far the bars reach into the videos, for what is to stay clear of them: the page's */
   /*  header and footer, and the call's header (44px) and control bar (45px). */
   --video-call-bars-top: calc(var(--header-height) + 44px);
@@ -3887,7 +4589,7 @@ export default {
   grid-template-rows: minmax(0, 1fr);
   /*  The body's dark ground, which it no longer paints itself: no light corner shows */
   /*  around the rounded tiles. */
-  background: var(--color-neutral-10);
+  background: var(--video-surface);
 }
 
 .video-call--parked-bars .video-call__body {
@@ -3964,15 +4666,78 @@ export default {
   transition: opacity 0.3s ease;
 }
 
+/*  The control bar's button to unfold them, as it looks there (a small filled button: 26px, */
+/*  0.8px border, its icon 1.2em of 12px), at its distance from the right edge. A little */
+/*  higher than it, off the window's lower edge, where it would stick to the corner. */
+.video-call__parked-notices {
+  z-index: 3;
+  align-self: end;
+  justify-self: end;
+  margin: 0 var(--space-x-small) var(--space-x-small) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border: 0.8px solid var(--color-warning);
+  border-radius: var(--border-radius-rounded);
+  font-size: 12px;
+  color: var(--color-warning-contrast);
+  background: var(--color-warning);
+  transition: opacity 0.3s ease;
+}
+
+/*  The parked window's bar centres its buttons; this one keeps to its corner. */
+.video-call__notices-toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--space-x-small);
+  transform: translateY(-50%);
+  display: flex;
+}
+
 .video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held)
-  .video-call__parked-count {
+  :is(.video-call__parked-count, .video-call__parked-notices) {
   opacity: 0;
+}
+
+/*  The parked window's notices, unfolded: in the corner of the button that unfolds them, */
+/*  above the control bar while it shows (control bar of small buttons 31px, compact header */
+/*  44px). Scrolling rather than running under the bars when the picture cannot hold them. */
+.video-call--parked-bars .video-call__notices {
+  bottom: var(--space-x-small);
+  max-height: calc(100% - 2 * var(--space-x-small));
+  overflow-y: auto;
+  transition:
+    bottom 0.3s ease,
+    max-height 0.3s ease;
+}
+
+.video-call--parked-bars:is(:has(:focus-visible), .video-call--bars-held) .video-call__notices {
+  bottom: calc(31px + var(--space-x-small));
+  max-height: calc(100% - 44px - 31px - 2 * var(--space-x-small));
+}
+
+/*  Folded: out of sight, yet still in the accessibility tree, so that a warning is */
+/*  announced all the same. Reached by the keyboard, they unfold for as long as it is in */
+/*  them: an action is not to be focused unseen. */
+.video-call__notices--collapsed:not(:focus-within) {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .video-call--parked-bars .video-call__header,
   .video-call--parked-bars .video-call__controls,
-  .video-call__parked-count {
+  .video-call--parked-bars .video-call__notices,
+  .video-call__parked-count,
+  .video-call__parked-notices {
     transition: none;
   }
 }

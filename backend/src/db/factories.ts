@@ -115,6 +115,19 @@ const uniqueImageUrl = (imageUrl) => {
   return newUrl.toString()
 }
 
+// Where the image factory gets the URL of an image nobody gave one. picsum by default: the specs
+// never load the picture, so a URL costs nothing. The seed swaps in its uploader (db/seed/images),
+// whose pictures a browser actually loads.
+type PicsumOptions = NonNullable<Parameters<typeof faker.image.urlPicsumPhotos>[0]>
+type ImageUrlSource = (
+  size: Required<Pick<PicsumOptions, 'width' | 'height' | 'blur'>>,
+) => string | Promise<string>
+const picsumImageUrl: ImageUrlSource = (size) => uniqueImageUrl(faker.image.urlPicsumPhotos(size))
+let imageUrlSource = picsumImageUrl
+export const setImageUrlSource = (source: ImageUrlSource = picsumImageUrl) => {
+  imageUrlSource = source
+}
+
 const driver = getDriver()
 
 export const cleanDatabase = async ({ withMigrations } = { withMigrations: false }) => {
@@ -198,19 +211,14 @@ Factory.define('image')
   .attr('type', 'image/jpeg')
   .attr('url', null)
   .after(async (buildObject, _options) => {
-    if (!buildObject.url) {
-      buildObject.url = faker.image.urlPicsumPhotos({
-        width: buildObject.width,
-        height: buildObject.height,
-        blur: buildObject.blur,
-      })
-    }
-    const { width, height, blur: _blur, ...properties } = buildObject
-    // width/height/blur shape the generated URL; only their ratio is stored. They used to be
+    const { width, height, blur, ...properties } = buildObject
+    // width/height/blur shape the generated image; only their ratio is stored. They used to be
     // handed to neode and dropped there.
     return createNode(Image, {
       ...properties,
-      url: uniqueImageUrl(buildObject.url),
+      url: properties.url
+        ? uniqueImageUrl(properties.url)
+        : await imageUrlSource({ width, height, blur }),
       aspectRatio: width / height,
     })
   })

@@ -1005,6 +1005,122 @@ describe('rights.vue', () => {
     })
   })
 
+  // Whoever holds group.role.manage shapes every role but the owner's. A save that gives it to a
+  // role, or takes it from the viewer's own, says so before it is written.
+  describe('a save that changes who may edit the roles', () => {
+    const MANAGE = 'group.role.manage'
+    const usual = ROLES.find((role) => role.name === 'usual')
+
+    const Editor = async ({ ownRole = 'owner', usualHoldsManage = false } = {}) => {
+      const wrapper = mount(rights, {
+        localVue,
+        mocks,
+        propsData: {
+          group: {
+            id: 'group-1',
+            name: 'Group One',
+            template: 'public',
+            myGroupRole: { name: ownRole, label: null },
+          },
+        },
+        stubs: {
+          'os-card': { template: '<div><slot /></div>' },
+          'os-button': {
+            template: '<button :disabled="disabled" v-on="$listeners"><slot /></button>',
+            props: ['disabled'],
+          },
+          ConfirmModal: true,
+        },
+      })
+      wrapper.setData({
+        catalog: CATALOG,
+        templates: TEMPLATES,
+        roles: ROLES.map((role) =>
+          role.name === 'usual' && usualHoldsManage
+            ? { ...role, permissions: [...role.permissions, MANAGE] }
+            : role,
+        ),
+        myGroupPermissions: held,
+      })
+      await wrapper.vm.$nextTick()
+      return wrapper
+    }
+
+    it('asks before giving a role the right, and names the role', async () => {
+      const wrapper = await Editor()
+      wrapper.vm.setDraft('usual', { permissions: [...usual.permissions, MANAGE] })
+      await wrapper.vm.$nextTick()
+      await at(wrapper, 'save').trigger('click')
+
+      expect(wrapper.vm.showRoleManageWarning).toBe(true)
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+
+      const modal = wrapper.vm.roleManageWarningModalData
+
+      expect(modal.messageIdent).toBe('group.rights.roleManageWarning.grant')
+      expect(modal.messageParams.roles).toBe('group.roles.usual')
+
+      await modal.buttons.confirm.callback()
+
+      expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+    })
+
+    it('asks before the viewer`s own role loses the right', async () => {
+      const wrapper = await Editor({ ownRole: 'usual', usualHoldsManage: true })
+      wrapper.vm.setDraft('usual', { permissions: [...usual.permissions] })
+      await wrapper.vm.$nextTick()
+      await at(wrapper, 'save').trigger('click')
+
+      const modal = wrapper.vm.roleManageWarningModalData
+
+      expect(wrapper.vm.showRoleManageWarning).toBe(true)
+      expect(modal.messageIdent).toBe('group.rights.roleManageWarning.lockout')
+      expect(modal.messageParams.own).toBe('group.roles.usual')
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('says both in one dialog when one save does both', async () => {
+      const wrapper = await Editor({ ownRole: 'usual', usualHoldsManage: true })
+      wrapper.vm.setDraft('usual', { permissions: [...usual.permissions] })
+      wrapper.vm.setDraft('none', { permissions: [MANAGE] })
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.roleManageWarningModalData.messageIdent).toBe(
+        'group.rights.roleManageWarning.both',
+      )
+    })
+
+    it('does not ask when another role loses the right', async () => {
+      const wrapper = await Editor({ ownRole: 'owner', usualHoldsManage: true })
+      wrapper.vm.setDraft('usual', { permissions: [...usual.permissions] })
+      await wrapper.vm.$nextTick()
+      await at(wrapper, 'save').trigger('click')
+
+      expect(wrapper.vm.showRoleManageWarning).toBe(false)
+      expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not ask for a save that leaves the right where it was', async () => {
+      const wrapper = await Editor()
+      wrapper.vm.setDraft('usual', { permissions: ['group.post.create'] })
+      await wrapper.vm.$nextTick()
+      await at(wrapper, 'save').trigger('click')
+
+      expect(wrapper.vm.showRoleManageWarning).toBe(false)
+      expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+    })
+
+    it('cancels without saving', async () => {
+      const wrapper = await Editor()
+      wrapper.vm.setDraft('usual', { permissions: [...usual.permissions, MANAGE] })
+      await wrapper.vm.$nextTick()
+      await at(wrapper, 'save').trigger('click')
+      wrapper.vm.roleManageWarningModalData.buttons.cancel.callback()
+
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+  })
+
   // Leaving with an unsaved change asks first — in the app (the router guard) and when the tab is
   // closed or reloaded (the browser's own dialog).
   describe('leaving with unsaved changes', () => {

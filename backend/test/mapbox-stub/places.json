@@ -1,0 +1,381 @@
+{
+  "//": [
+    "The places the Mapbox stub (server.ts) knows. Hand-written, NOT recorded from Mapbox: results of the",
+    "temporary geocoding API may not be stored, so nothing here is Mapbox data. Names are the places' common",
+    "names, coordinates rounded public knowledge; ids are made up except where a spec pins a real one",
+    "(place.23259194, country.8738) or the seed builds the node itself (Hamburg, Berlin, Germany, France in",
+    "src/db/seed.ts): a lookup has to land on that node, not on a second one with the same name. Missing",
+    "translations fall back to `en`.",
+    "",
+    "  types     Mapbox place types (place_type); a city-state such as Hamburg or Berlin is both a region",
+    "            and a place, as Mapbox has it. Forward searches and reverse lookups filter on them",
+    "  center    [lng, lat], as Mapbox has it",
+    "  radiusKm  how far from `center` a reverse lookup still lands on the place",
+    "  rank      ordering of forward results, highest first (Mapbox's own prominence)",
+    "  context   ids of the places it lies in, innermost first",
+    "  address   house number, for type address"
+  ],
+  "places": [
+    {
+      "id": "country.10743216036480410",
+      "types": ["country"],
+      "names": {
+        "en": "Germany",
+        "de": "Deutschland",
+        "fr": "Allemagne",
+        "nl": "Duitsland",
+        "it": "Germania",
+        "es": "Alemania",
+        "pt": "Alemanha",
+        "pl": "Niemcy",
+        "ru": "Германия",
+        "sq": "Gjermania"
+      },
+      "center": [10.4515, 51.1657],
+      "radiusKm": 450,
+      "rank": 100,
+      "context": []
+    },
+    {
+      "id": "country.9759535382641660",
+      "types": ["country"],
+      "names": {
+        "en": "France",
+        "de": "Frankreich",
+        "fr": "France",
+        "nl": "Frankrijk",
+        "it": "Francia",
+        "es": "Francia",
+        "pt": "França",
+        "pl": "Francja",
+        "ru": "Франция",
+        "sq": "Franca"
+      },
+      "center": [2.2137, 46.2276],
+      "radiusKm": 550,
+      "rank": 100,
+      "context": []
+    },
+    {
+      "id": "country.10003",
+      "types": ["country"],
+      "names": {
+        "en": "United States",
+        "de": "Vereinigte Staaten",
+        "fr": "États-Unis",
+        "nl": "Verenigde Staten",
+        "it": "Stati Uniti",
+        "es": "Estados Unidos",
+        "pt": "Estados Unidos",
+        "pl": "Stany Zjednoczone",
+        "ru": "Соединённые Штаты Америки",
+        "sq": "Shtetet e Bashkuara"
+      },
+      "center": [-98.5795, 39.8283],
+      "radiusKm": 2500,
+      "rank": 100,
+      "context": []
+    },
+    {
+      "id": "country.8738",
+      "types": ["country"],
+      "names": {
+        "en": "Switzerland",
+        "de": "Schweiz",
+        "fr": "Suisse",
+        "nl": "Zwitserland",
+        "it": "Svizzera",
+        "es": "Suiza",
+        "pt": "Suíça",
+        "pl": "Szwajcaria",
+        "ru": "Швейцария",
+        "sq": "Zvicra"
+      },
+      "center": [8.2275, 46.8182],
+      "radiusKm": 180,
+      "rank": 100,
+      "context": []
+    },
+    {
+      "id": "region.20001",
+      "types": ["region"],
+      "names": {
+        "en": "Saxony-Anhalt",
+        "de": "Sachsen-Anhalt",
+        "fr": "Saxe-Anhalt",
+        "nl": "Saksen-Anhalt",
+        "it": "Sassonia-Anhalt",
+        "es": "Sajonia-Anhalt",
+        "pt": "Saxônia-Anhalt",
+        "pl": "Saksonia-Anhalt",
+        "ru": "Саксония-Анхальт",
+        "sq": "Saksoni-Anhalt"
+      },
+      "center": [11.6923, 51.9503],
+      "radiusKm": 120,
+      "rank": 50,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "region.20002",
+      "types": ["region"],
+      "names": {
+        "en": "Brandenburg",
+        "ru": "Бранденбург"
+      },
+      "center": [13.2, 52.13],
+      "radiusKm": 150,
+      "rank": 50,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "region.20004",
+      "types": ["region"],
+      "names": {
+        "en": "New Jersey",
+        "ru": "Нью-Джерси"
+      },
+      "center": [-74.4057, 40.0583],
+      "radiusKm": 150,
+      "rank": 50,
+      "context": ["country.10003"]
+    },
+    {
+      "id": "region.20005",
+      "types": ["region"],
+      "names": {
+        "en": "Texas",
+        "ru": "Техас"
+      },
+      "center": [-99.9018, 31.9686],
+      "radiusKm": 700,
+      "rank": 50,
+      "context": ["country.10003"]
+    },
+    {
+      "id": "district.30001",
+      "types": ["district"],
+      "names": {
+        "en": "Havelland District",
+        "de": "Kreis Havelland"
+      },
+      "center": [12.6, 52.6],
+      "radiusKm": 40,
+      "rank": 20,
+      "context": ["region.20002", "country.10743216036480410"]
+    },
+    {
+      "id": "place.23259194",
+      "types": ["place"],
+      "names": {
+        "en": "Friesack"
+      },
+      "center": [12.579309, 52.742332],
+      "radiusKm": 8,
+      "rank": 1,
+      "context": ["district.30001", "region.20002", "country.10743216036480410"]
+    },
+    {
+      "id": "place.5127278006398860",
+      "types": ["region", "place"],
+      "names": {
+        "en": "Hamburg",
+        "fr": "Hambourg",
+        "it": "Amburgo",
+        "es": "Hamburgo",
+        "pt": "Hamburgo",
+        "ru": "Гамбург"
+      },
+      "center": [9.99302, 53.55073],
+      "radiusKm": 20,
+      "rank": 9,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.14880313158564380",
+      "types": ["region", "place"],
+      "names": {
+        "en": "Berlin",
+        "it": "Berlino",
+        "es": "Berlín",
+        "pt": "Berlim",
+        "ru": "Берлин",
+        "sq": "Berlini"
+      },
+      "center": [13.40495, 52.52001],
+      "radiusKm": 25,
+      "rank": 9,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.40003",
+      "types": ["place"],
+      "names": {
+        "en": "Paris",
+        "it": "Parigi",
+        "es": "París",
+        "pl": "Paryż",
+        "ru": "Париж",
+        "sq": "Parisi"
+      },
+      "center": [2.35183, 48.85658],
+      "radiusKm": 12,
+      "rank": 10,
+      "context": ["country.9759535382641660"]
+    },
+    {
+      "id": "place.40004",
+      "types": ["place"],
+      "names": {
+        "en": "Paris"
+      },
+      "center": [-95.5555, 33.6609],
+      "radiusKm": 10,
+      "rank": 2,
+      "context": ["region.20005", "country.10003"]
+    },
+    {
+      "id": "place.40005",
+      "types": ["place"],
+      "names": {
+        "en": "Hamburg"
+      },
+      "center": [-74.5763, 41.1534],
+      "radiusKm": 3,
+      "rank": 1,
+      "context": ["region.20004", "country.10003"]
+    },
+    {
+      "id": "place.40006",
+      "types": ["place"],
+      "names": {
+        "en": "Stralsund",
+        "ru": "Штральзунд"
+      },
+      "center": [13.089, 54.3091],
+      "radiusKm": 8,
+      "rank": 3,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.40007",
+      "types": ["place"],
+      "names": {
+        "en": "Nisdorf"
+      },
+      "center": [12.9333, 54.3833],
+      "radiusKm": 3,
+      "rank": 1,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.40008",
+      "types": ["place"],
+      "names": {
+        "en": "Zingst",
+        "ru": "Цингст"
+      },
+      "center": [12.6886, 54.4357],
+      "radiusKm": 5,
+      "rank": 1,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.40009",
+      "types": ["place"],
+      "names": {
+        "en": "Dresden",
+        "fr": "Dresde",
+        "it": "Dresda",
+        "es": "Dresde",
+        "pl": "Drezno",
+        "ru": "Дрезден",
+        "sq": "Dresdeni"
+      },
+      "center": [13.7373, 51.0504],
+      "radiusKm": 15,
+      "rank": 8,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.40010",
+      "types": ["place"],
+      "names": {
+        "en": "Rullstorf"
+      },
+      "center": [10.5333, 53.2833],
+      "radiusKm": 3,
+      "rank": 1,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "region.20006",
+      "types": ["region"],
+      "names": {
+        "en": "North Cyprus",
+        "de": "Nordzypern",
+        "fr": "Chypre du Nord",
+        "nl": "Noord-Cyprus",
+        "it": "Cipro del Nord",
+        "es": "Chipre del Norte",
+        "pt": "Chipre do Norte",
+        "pl": "Cypr Północny",
+        "ru": "Северный Кипр",
+        "sq": "Qiproja e Veriut"
+      },
+      "center": [33.6, 35.25],
+      "radiusKm": 70,
+      "rank": 50,
+      "context": []
+    },
+    {
+      "id": "place.40011",
+      "types": ["place"],
+      "names": {
+        "en": "Niederdorla"
+      },
+      "center": [10.4486, 51.1607],
+      "radiusKm": 4,
+      "rank": 1,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.40012",
+      "types": ["place"],
+      "names": {
+        "en": "Bahretal"
+      },
+      "center": [13.89, 50.87],
+      "radiusKm": 6,
+      "rank": 1,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "place.40013",
+      "types": ["place"],
+      "names": {
+        "en": "Stuttgart",
+        "it": "Stoccarda",
+        "pl": "Stuttgart",
+        "ru": "Штутгарт",
+        "sq": "Shtutgarti"
+      },
+      "center": [9.1829, 48.7758],
+      "radiusKm": 12,
+      "rank": 8,
+      "context": ["country.10743216036480410"]
+    },
+    {
+      "id": "address.50001",
+      "types": ["address"],
+      "names": {
+        "en": "Plan"
+      },
+      "address": "6",
+      "center": [9.994072, 53.55144],
+      "radiusKm": 0.05,
+      "rank": 0,
+      "context": ["place.5127278006398860", "country.10743216036480410"]
+    }
+  ]
+}

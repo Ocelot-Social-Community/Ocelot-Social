@@ -107,6 +107,15 @@ test('defineBranding THROWS on a user name minimum of 0', () => {
   )
 })
 
+test('defineBranding THROWS on a group name minimum of 0', () => {
+  // The backend's DB schema holds Group.name to at least GROUP_NAME_LENGTH_FLOOR characters, so a
+  // brand allowing an empty name would let groups store what the audit then reports.
+  assert.throws(
+    () => defineBranding({ group: { nameLengthMin: 0 } }),
+    /invalid branding config[\s\S]*group\.nameLengthMin must be ≥ 1 \(got 0\)/,
+  )
+})
+
 test('defineBranding accepts valid overrides and the vanilla (empty) config', () => {
   assert.doesNotThrow(() => defineBranding({}))
   assert.doesNotThrow(() => defineBranding({ group: { nameLengthMax: 80 } }))
@@ -114,4 +123,33 @@ test('defineBranding accepts valid overrides and the vanilla (empty) config', ()
   assert.doesNotThrow(() => defineBranding({ user: { nameLengthMax: 80 } }))
   assert.doesNotThrow(() => defineBranding({ user: { slugLengthMin: 1, slugLengthMax: 8 } }))
   assert.doesNotThrow(() => defineBranding({ category: { min: 0, max: 0 } })) // min ≤ max, both ≥ 0
+})
+
+test('theme.colorScheme must be a supported color-scheme value', () => {
+  for (const colorScheme of ['light', 'dark', 'light dark']) {
+    assert.doesNotThrow(() => defineBranding({ theme: { colorScheme } }))
+  }
+  assert.throws(
+    () => defineBranding({ theme: { colorScheme: 'both' } }),
+    /theme\.colorScheme must be one of 'light', 'dark', 'light dark' \(got 'both'\)/,
+  )
+})
+
+test('map.defaultStyle must be a map style the maps offer, for the light and the dark theme', () => {
+  for (const id of ['outdoors', 'navigation-night', 'streets', 'satellite', 'dark']) {
+    assert.doesNotThrow(() => defineBranding({ map: { defaultStyle: { light: id, dark: id } } }))
+  }
+  assert.throws(
+    () => defineBranding({ map: { defaultStyle: { light: 'outdoors', dark: 'night' } } }),
+    /map\.defaultStyle\.dark must be one of 'outdoors', 'navigation-night', 'streets', 'satellite', 'dark' \(got 'night'\)/,
+  )
+  assert.throws(
+    () =>
+      defineBranding({ map: { defaultStyle: { light: 'mapbox://styles/me/x', dark: 'dark' } } }),
+    /map\.defaultStyle\.light must be one of/,
+  )
+})
+
+test('vanilla opens every map on outdoors, in the light and the dark theme', () => {
+  assert.deepEqual(defineBranding({}).map.defaultStyle, { light: 'outdoors', dark: 'outdoors' })
 })

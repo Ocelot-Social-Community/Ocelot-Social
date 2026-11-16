@@ -1,6 +1,3 @@
-/* eslint-disable import-x/no-named-as-default-member -- validator is CommonJS: the named exports
-   its types advertise do not exist for Node's ESM loader, so `import { normalizeEmail }` type-checks
-   and then throws at load. The default import is the whole module.exports. */
 // Default import, not named: the package is CommonJS and Node derives named exports
 // from it by static analysis, which misses these. `import { … }` type-checks and then
 // throws at load. The default import is the whole module.exports.

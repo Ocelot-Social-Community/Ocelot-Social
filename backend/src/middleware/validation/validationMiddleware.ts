@@ -232,12 +232,33 @@ const validateUpdateUser: IMiddlewareResolver = async (resolve, root, params, co
   return resolve(root, input, context, info)
 }
 
+// The group name's bounds are the brand's (branding.group), the same values GroupForm.vue checks
+// against. Measured trimmed and passed on trimmed, for the same reason as the user name above.
+// UpdateGroup checks a name only when it carries one, so saves of other settings are not held up
+// by a name that predates the brand's bounds.
+const validateGroupName: IMiddlewareResolver = async (resolve, root, args, context, info) => {
+  const input = withTrimmedName(args)
+  if (typeof input.name === 'string') {
+    const { nameLengthMin: min, nameLengthMax: max } = branding.group
+    const { length } = input.name
+    if (length < min) {
+      throw new AppError(Errors.GROUP_SAVE_NAME_TOO_SHORT, { min })
+    }
+    if (length > max) {
+      throw new AppError(Errors.GROUP_SAVE_NAME_TOO_LONG, { max })
+    }
+  }
+  return resolve(root, input, context, info)
+}
+
 export default {
   Mutation: {
     CreateComment: validateCreateComment,
     UpdateComment: validateUpdateComment,
     CreatePost: validatePostTitle,
     UpdatePost: validatePostTitle,
+    CreateGroup: validateGroupName,
+    UpdateGroup: validateGroupName,
     SignupVerification: validateSignupVerification,
     UpdateUser: validateUpdateUser,
     fileReport: validateReport,

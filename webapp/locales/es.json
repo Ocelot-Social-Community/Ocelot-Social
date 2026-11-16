@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Muestra el filtro de contenido en la cuadrícula masonry (noticias).",
         "showGroupButtonInHeader": "Muestra el botón de grupos en la cabecera.",
         "socialMediaEnabled": "Activa la función de enlaces a redes sociales: los enlaces se muestran en los perfiles y se gestionan en la configuración del usuario.",
+        "videoCallDtx": "Valor predeterminado para las videollamadas: mientras alguien calla, su micrófono apenas envía datos. Ahorra ancho de banda, pero puede hacer que algunos participantes no se oigan para algunos oyentes. Cada usuario puede cambiarlo para su propio micrófono en los ajustes de dispositivos de una llamada.",
         "videoConference": "Activa la videoconferencia (LiveKit). El interruptor en tiempo de ejecución para los permisos de videollamada. Requiere las variables de entorno de LiveKit; sin ellas permanece desactivada y atenuada."
       },
       "envLink": "Ver entorno",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Filtro de contenido en cuadrícula",
         "showGroupButtonInHeader": "Botón de grupos en cabecera",
         "socialMediaEnabled": "Redes sociales",
+        "videoCallDtx": "Supresión de silencios en llamadas",
         "videoConference": "Videoconferencia"
       },
       "lastUpdated": "Última modificación: {timestamp} por {actor}",
@@ -327,10 +329,15 @@
       "deleteError": "No se pudo eliminar el rol: {message}",
       "deleteSuccess": "Rol eliminado.",
       "description": "Quién puede hacer qué en toda la red. Crea roles y asigna permisos: los cambios se aplican de inmediato.",
+      "discard": "Descartar",
+      "grantRoleManage": {
+        "confirm": "Conceder de todos modos",
+        "message": "<strong>{role}</strong> recibe «gestionar roles»: quien tenga el rol puede configurar libremente cualquier rol excepto owner, también quitar derechos a roles superiores, y después cambiar el rol, bloquear o eliminar a quienes los tengan. Las cuentas y contenidos eliminados no se pueden recuperar, ni siquiera por un owner. Asigna el rol solo a personas a las que confiarías poderes de administración.",
+        "title": "¿Conceder «gestionar roles»?"
+      },
       "members": "{count} miembros",
       "name": "Roles y permisos",
       "nameLabel": "Nombre",
-      "notEditableHint": "Solo puedes cambiar tu propio rol y los roles con menos autoridad que el tuyo.",
       "perm": {
         "apiKey_administer": "Administrar las claves API de otros usuarios.",
         "apiKey_create": "Crear claves API personales.",
@@ -364,7 +371,6 @@
         "videoCall_create_open": "Iniciar una videollamada en un grupo al que cualquiera puede entrar: localizable y al que se puede unir sin aprobación.",
         "videoCall_create_restricted": "Iniciar una videollamada en un grupo al que no se puede entrar sin más: unirse requiere aprobación o invitación, o el grupo está oculto."
       },
-      "permNotHeld": "No tienes este permiso, así que no puedes concederlo.",
       "permUnavailable": "Función no configurada: conceder este permiso no tiene efecto.",
       "permUnavailableLink": "Ver configuración",
       "protected": "protegido",
@@ -468,6 +474,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Al menos uno de los temas no existe.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "La descripción debe tener al menos {min} caracteres.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Un grupo que los demás no pueden encontrar tampoco puede mostrarles sus miembros.",
+    "GROUP_SAVE_NAME_TOO_LONG": "El nombre del grupo puede tener como máximo {max} caracteres.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "El nombre del grupo debe tener al menos {min} caracteres.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Este nombre único del grupo ya está en uso.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Hay muy pocos temas seleccionados (al menos {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Hay demasiados temas seleccionados (como máximo {max}).",
@@ -523,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "No puedes asignar un rol con permisos que tú no tienes.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Solo un propietario puede asignar o cambiar el rol de propietario.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "Solo puedes cambiar el rol de usuarios cuyo rol tiene menos autoridad que el tuyo.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "Solo puedes cambiar tu propio rol o roles con menos autoridad que el tuyo.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "El rol «{name}» todavía está asignado a {count} usuarios y no se puede eliminar.",
     "ROLE_DELETE_SYSTEM_ROLE": "El rol «{name}» es un rol del sistema y no se puede eliminar.",
     "ROLE_DOES_NOT_EXIST": "El rol «{name}» no existe.",
@@ -531,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "El rol «{name}» es un rol del sistema y no se puede renombrar.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "El rol «{name}» ya existe.",
     "ROLE_SAVE_NAME_INVALID": "El nombre del rol debe tener entre 2 y 50 caracteres y solo puede contener letras, cifras, «_» y «-»; el primer carácter debe ser una letra o una cifra.",
-    "ROLE_SAVE_NOT_COVERED": "Un rol solo puede contener permisos que tú tienes.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "No se puede crear ni marcar un rol como protegido.",
-    "ROLE_SAVE_WOULD_OUTRANK": "Tu propio rol no puede elevarse por encima de un rol al que hoy no supera.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Solo puedes hacer esto con usuarios cuyo rol otorgue menos atribuciones que el tuyo.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "No puedes buscar en la administración de usuarios.",
     "USER_DOES_NOT_EXIST": "No se ha encontrado el usuario.",
@@ -899,7 +904,11 @@
         "participant": "Participan en la publicación"
       }
     },
-    "placeholder": "Deje sus pensamientos inspiradores...."
+    "placeholder": "Deje sus pensamientos inspiradores....",
+    "unfinished": {
+      "hashtag": "No se ha elegido ningún hashtag: así el hashtag no se vincula. Elíjalo de la lista.",
+      "mention": "No se ha elegido ningún usuario: así no se notifica a nadie. Elija el nombre de la lista."
+    }
   },
   "error-pages": {
     "403-default": "No autorizado a esta página",
@@ -976,7 +985,7 @@
     },
     "actionRadius": "Radio de acción del grupo",
     "addMember": "Añadir miembro",
-    "addMemberToGroupSuccess": "¡«{name}» fue añadido al grupo con el rol «{role}»!",
+    "addMemberToGroupSuccess": "¡«<b>{name}</b>» (<b>@{slug}</b>) fue añadido al grupo con el rol «<b>{role}</b>»!",
     "addUser": "Añadir usuario",
     "addUserNoOptions": "¡No se encontraron usuarios!",
     "addUserPlaceholder": "Nombre de usuario",
@@ -1059,7 +1068,7 @@
       "title": "¿Realmente quieres salir del grupo?"
     },
     "memberOutranked": "No puedes cambiar el rol de esta persona: tiene al menos tanto como tú.",
-    "memberRemoved": "¡El usuario «{name}» fue eliminado del grupo!",
+    "memberRemoved": "¡El usuario «<b>{name}</b>» (<b>@{slug}</b>) fue eliminado del grupo!",
     "members": "Miembros",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -1131,6 +1140,13 @@
         "group_videoCall_moderate": "Asumir la moderación de una videollamada del grupo."
       },
       "resultingType": "Con estos permisos el grupo es:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> podrá editar los roles del grupo: quien tenga este rol puede configurar cualquier rol excepto el del propietario, quitar derechos a otros roles y cambiar lo que ven quienes no son miembros. Da el rol solo a miembros a los que confiarías la gestión del grupo. <strong>{own}</strong>, tu propio rol, ya no podrá editar los roles del grupo. Solo un propietario puede deshacerlo.",
+        "confirm": "Guardar de todos modos",
+        "grant": "<strong>{roles}</strong> podrá editar los roles del grupo: quien tenga este rol puede configurar cualquier rol excepto el del propietario, quitar derechos a otros roles y cambiar lo que ven quienes no son miembros. Da el rol solo a miembros a los que confiarías la gestión del grupo.",
+        "lockout": "<strong>{own}</strong>, tu propio rol, ya no podrá editar los roles del grupo. Solo un propietario puede deshacerlo.",
+        "title": "¿Cambiar quién gestiona los roles?"
+      },
       "saved": "Permisos guardados",
       "saveFirst": "Guarda o descarta primero: hay cambios sin guardar.",
       "simple": {
@@ -1320,6 +1336,7 @@
     "pageTitle": "Mapa",
     "styles": {
       "dark": "Oscuro",
+      "navigation-night": "Noche",
       "outdoors": "Exterior",
       "satellite": "Satélite",
       "streets": "Calles",
@@ -1399,6 +1416,10 @@
     "users": {
       "name": "Usuarios"
     }
+  },
+  "networkRoles": {
+    "owner": "Propietario",
+    "user": "Usuario"
   },
   "notifications": {
     "comment": "Comentario",
@@ -1923,6 +1944,11 @@
     "termsAndConditionsNewConfirm": "He leído y acepto los nuevos términos de uso.",
     "termsAndConditionsNewConfirmText": "¡Por favor, lea los nuevos términos de uso ahora!"
   },
+  "themeSwitch": {
+    "dark": "Tema: oscuro",
+    "light": "Tema: claro",
+    "system": "Tema: como el sistema"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Abrir perfil",
@@ -1965,12 +1991,27 @@
       "turnOff": "{device}: apagar",
       "turnOn": "{device}: encender"
     },
+    "cpuRelief": "Tu dispositivo está sobrecargado: las cámaras funcionan con menor calidad para que el sonido siga claro.",
+    "cpuStrained": "Tu dispositivo no da abasto con los vídeos. Una calidad menor mantiene el sonido claro.",
     "deviceSettings": {
       "button": "Dispositivos",
+      "dtx": "No transmitir las pausas al hablar",
+      "dtxFailed": "No se pudo cambiar el ajuste de las pausas al hablar: tu micrófono sigue como antes.",
+      "dtxHint": "Ahorra datos mientras callas. Si a veces los demás no te oyen, desactívalo.",
+      "quality": {
+        "audio": "Sin cámaras (las pantallas compartidas siguen)",
+        "auto": "Automática",
+        "high": "Alta",
+        "low": "Baja",
+        "medium": "Media"
+      },
+      "receiveQuality": "Calidad de los vídeos recibidos",
+      "sendQuality": "Calidad de mi vídeo",
       "speakerError": "No se pudo cambiar el altavoz.",
       "title": "Ajustes de dispositivos"
     },
     "dialogLabel": "Videollamada de grupo",
+    "dismissNotice": "Ocultar",
     "enableAudio": "Activar sonido",
     "enterFullscreen": "Pantalla completa",
     "errorBackToPrejoin": "Cambiar ajustes",
@@ -2009,7 +2050,9 @@
       "title": "¿Quién modera a partir de ahora?"
     },
     "hideBars": "Ocultar las barras",
+    "hideNotices": "Ocultar avisos",
     "leave": "Salir de la llamada",
+    "lowerQuality": "Bajar calidad",
     "maximize": "Maximizar",
     "micMuted": "Micrófono apagado",
     "micNoSignal": "Tu micrófono no transmite sonido: los demás no te oyen.",
@@ -2112,13 +2155,25 @@
       "unnamedSpeaker": "Altavoz",
       "unsupportedBrowser": "Tu navegador no admite audio/vídeo."
     },
+    "qualityLimit": {
+      "cameraHidden": "Cámara oculta",
+      "ownBandwidth": "Tu vídeo se envía con menor calidad: tu conexión no da para más.",
+      "ownChoice": "Tu vídeo se envía con menor calidad, como elegiste en los ajustes de dispositivos.",
+      "ownCpu": "Tu vídeo se envía con menor calidad: tu dispositivo está sobrecargado.",
+      "remoteChoice": "El vídeo de {name} llega con menor calidad, como elegiste en los ajustes de dispositivos.",
+      "remoteCpu": "El vídeo de {name} llega con menor calidad: tu dispositivo está sobrecargado.",
+      "remoteHiddenBandwidth": "La cámara de {name} está oculta: tu conexión es demasiado débil.",
+      "remoteHiddenChoice": "La cámara de {name} está oculta, como elegiste en los ajustes de dispositivos."
+    },
     "reconnecting": "Conexión perdida: reconectando…",
     "reloadPending": "La plataforma tiene un nuevo diseño. Se aplicará en cuanto salgas de la llamada.",
     "resizeSidebar": "Cambiar el tamaño de la barra lateral",
     "restartMic": "Reiniciar micrófono",
+    "restoreQuality": "Restaurar calidad",
     "screenShare": "Pantalla",
     "screenShareEnded": "Uso compartido de pantalla finalizado",
     "showBars": "Mostrar las barras",
+    "showNotices": "Mostrar avisos",
     "showVideos": "Mostrar vídeos",
     "spotlightExit": "Salir del foco",
     "title": "Videollamada de grupo",

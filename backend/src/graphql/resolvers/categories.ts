@@ -1,4 +1,5 @@
 import cypherFields from './helpers/cypherField'
+import { postReadableBy } from './helpers/groupAccessCypher'
 import { nodeQuery } from './helpers/nodeQuery'
 import Resolver from './helpers/Resolver'
 
@@ -19,9 +20,9 @@ const categoryQuery = nodeQuery({
 // the query from schema augmentation, `posts` and `postCount` from @relation/@cypher
 // directives — and are hand-written since the migration.
 //
-// `posts` is deliberately unfiltered, matching the directive it replaced: it returns every
-// post of the category. Visibility filtering belongs to the queries that surface posts;
-// adding it here would have been a behaviour change smuggled into a mechanical migration.
+// `posts` was left unfiltered by the migration, matching the directive it replaced — and so
+// served the posts of closed and hidden groups to anyone who asked a category. It now keeps
+// to the post visibility rule; `postCount` stays a plain count, a number names no post.
 export default {
   Query: {
     // Category advertises no filter beyond its scalar arguments, so equality + ordering +
@@ -32,7 +33,8 @@ export default {
   Category: {
     ...Resolver('Category', {
       hasMany: {
-        posts: '<-[:CATEGORIZED]-(related:Post)',
+        // Only what the viewer reads: a category gathers posts from every group.
+        posts: `<-[:CATEGORIZED]-(related:Post) WHERE ${postReadableBy('related', '$cypherParams.currentUserId')}`,
       },
     }),
     ...cypherFields('Category', {

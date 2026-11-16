@@ -81,6 +81,17 @@ describe('RoleTabs', () => {
     expect(wrapper.find('[data-test="role-tab-user"] .role-tab__badge').exists()).toBe(false)
   })
 
+  // In the button's suffix, which keeps the button's gap to the label — the lock ran straight
+  // into the role's name before. A tab without a badge gets no suffix, so no gap either.
+  it('sets the badge apart from the label, and leaves an unbadged tab without a suffix', () => {
+    const wrapper = Wrapper()
+
+    expect(
+      wrapper.find('[data-test="role-tab-owner"] .os-button__suffix .role-tab__badge').exists(),
+    ).toBe(true)
+    expect(wrapper.find('[data-test="role-tab-user"] .os-button__suffix').exists()).toBe(false)
+  })
+
   it('names the row for assistive tech', () => {
     const wrapper = Wrapper({ label: 'Roles' })
 

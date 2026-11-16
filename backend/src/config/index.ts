@@ -31,8 +31,10 @@ const environment = {
   DEBUG: env.NODE_ENV !== 'production' && env.DEBUG,
   TEST: env.NODE_ENV === 'test',
   PRODUCTION: env.NODE_ENV === 'production',
-  // used for staging enviroments if 'PRODUCTION=true' and 'PRODUCTION_DB_CLEAN_ALLOW=true'
-  PRODUCTION_DB_CLEAN_ALLOW: env.PRODUCTION_DB_CLEAN_ALLOW === 'true', // default = SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW (false)
+  // Whether db:reset, db:reset:withmigrations and db:seed may wipe this instance's database
+  // (db/assertWipeAllowed.ts). Only the literal "true" allows it, whatever NODE_ENV says:
+  // development, test and staging set it, production never does.
+  DB_WIPE_ALLOWED: env.DB_WIPE_ALLOWED === 'true', // default = SOFTWARE_DEFAULTS.DB_WIPE_ALLOWED (false)
   // split→trim→filter so an empty DISABLED_MIDDLEWARES yields [] rather than [''] (which
   // matches no middleware but prints a spurious `Disabled "" middleware` warning); trim also
   // tolerates "a, b".
@@ -186,6 +188,9 @@ const options = {
   SUPPORT_URL: env.SUPPORT_LINK || SOFTWARE_DEFAULTS.SUPPORT_LINK,
   APPLICATION_NAME: branding.metadata.applicationName,
   ORGANIZATION_URL: env.ORGANIZATION_LINK || SOFTWARE_DEFAULTS.ORGANIZATION_LINK,
+  // `||`: an empty value would make every geocoding request a relative URL. Without a trailing
+  // slash, since the paths are appended to it: `…/` + `/geocoding` is a different route.
+  MAPBOX_API_URL: (env.MAPBOX_API_URL || SOFTWARE_DEFAULTS.MAPBOX_API_URL).replace(/\/+$/, ''),
   // publicRegistration, inviteRegistration, categoriesActive and apiKeysEnabled
   // are network-policy keys now — the backend reads them from the policy
   // (ENV-seeded), not from CONFIG. See backend/src/policy.

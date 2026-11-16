@@ -74,7 +74,7 @@ export default {
   flex-grow: 1;
 
   &:hover {
-    border-bottom: 2px solid var(--color-neutral-70);
+    border-bottom: 2px solid var(--border-color-soft);
   }
 
   &.--active {

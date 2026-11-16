@@ -209,11 +209,11 @@ export default {
 }
 .notification-grid-row {
   padding: 10px;
-  border-bottom: 1px dotted var(--color-neutral-80);
-  background-color: var(--color-neutral-100);
+  border-bottom: 1px dotted var(--border-color-softer);
+  background-color: var(--background-color-base);
 
   &:nth-child(odd) {
-    background-color: var(--color-neutral-90);
+    background-color: var(--background-color-softer);
   }
 
   > .ds-grid > div {
@@ -225,7 +225,7 @@ export default {
     grid-template-columns: 1fr !important;
   }
   .notification-grid .content-section {
-    border-top: 1px dotted var(--color-neutral-80);
+    border-top: 1px dotted var(--border-color-softer);
   }
 }
 

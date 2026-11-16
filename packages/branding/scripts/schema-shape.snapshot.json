@@ -55,6 +55,8 @@
     "logos.passwordResetPath: string",
     "logos.signupPath: string",
     "logos.welcomePath: string",
+    "map.defaultStyle.dark: string",
+    "map.defaultStyle.light: string",
     "metadata.applicationDescription: string",
     "metadata.applicationName: string",
     "metadata.applicationShortName: string",
@@ -71,6 +73,7 @@
     "registration.layout: string",
     "registration.nonceLength: number",
     "termsAndConditions.version: string",
+    "theme.colorScheme: string",
     "theme.tokens: object",
     "user.nameLengthMax: number",
     "user.nameLengthMin: number",
@@ -81,6 +84,7 @@
     "theme": [
       "theme",
       "donation",
+      "map",
       "login.layout",
       "registration.layout",
       "assets.css"

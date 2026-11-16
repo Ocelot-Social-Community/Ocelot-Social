@@ -23,6 +23,9 @@ describe('devicePreferences', () => {
       expect(loadDevicePreferences()).toEqual({})
       localStorage.setItem(STORAGE_KEY, 'null')
       expect(loadDevicePreferences()).toEqual({})
+      // An array would lose whatever is stored on it by name.
+      localStorage.setItem(STORAGE_KEY, '[]')
+      expect(loadDevicePreferences()).toEqual({})
     })
   })
 

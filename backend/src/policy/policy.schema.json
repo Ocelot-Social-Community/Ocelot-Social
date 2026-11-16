@@ -138,6 +138,13 @@
       "category": "video",
       "description": "Whether video conferencing (LiveKit) is enabled. The single runtime switch for the videoCall.* permissions. Requires the three LiveKit env vars (URL/key/secret): without them the feature is unavailable regardless of this flag (the toggle is forced off and greyed in the admin UI). Admin-only."
     },
+    "videoCallDtx": {
+      "type": "boolean",
+      "default": false,
+      "visibility": ["authenticated"],
+      "category": "video",
+      "description": "Network default for Opus DTX (discontinuous transmission) on the microphone in video calls: while someone is silent, their microphone sends almost no packets. Saves bandwidth, but a nearly idle audio path leaves more room for one listener losing one speaker (see #10787); off by default, as in LiveKit's own meet app. Each user can override it for their own microphone in the call's device settings, for that call only: nothing is stored, every call starts on this default. Read by the call client of every logged-in user, so visible to 'authenticated'."
+    },
     "apiKeysMaxPerUser": {
       "type": "integer",
       "minimum": 1,

@@ -92,7 +92,7 @@ export default {
   padding: 0;
   font-size: 1rem;
   text-align: inherit;
-  color: var(--color-neutral-100);
+  color: var(--text-color-on-primary);
 
   .tippy-backdrop {
     display: none;

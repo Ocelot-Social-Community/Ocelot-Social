@@ -94,7 +94,7 @@ export const buttonVariants = cva(
         variant: 'primary',
         appearance: 'filled',
         class: [
-          'bg-[var(--color-primary)] text-[var(--color-primary-contrast)] border-[var(--color-primary)]',
+          'bg-[var(--color-primary-fill,var(--color-primary))] text-[var(--color-primary-contrast)] border-[var(--color-primary-fill,var(--color-primary))]',
           'hover:bg-[var(--color-primary-hover)] hover:border-[var(--color-primary-hover)] hover:text-[var(--color-primary-contrast)]',
           'active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)]',
         ],
@@ -103,7 +103,7 @@ export const buttonVariants = cva(
         variant: 'secondary',
         appearance: 'filled',
         class: [
-          'bg-[var(--color-secondary)] text-[var(--color-secondary-contrast)] border-[var(--color-secondary)]',
+          'bg-[var(--color-secondary-fill,var(--color-secondary))] text-[var(--color-secondary-contrast)] border-[var(--color-secondary-fill,var(--color-secondary))]',
           'hover:bg-[var(--color-secondary-hover)] hover:border-[var(--color-secondary-hover)] hover:text-[var(--color-secondary-contrast)]',
           'active:bg-[var(--color-secondary-active)] active:border-[var(--color-secondary-active)] active:text-[var(--color-secondary-contrast)]',
         ],
@@ -112,7 +112,7 @@ export const buttonVariants = cva(
         variant: 'danger',
         appearance: 'filled',
         class: [
-          'bg-[var(--color-danger)] text-[var(--color-danger-contrast)] border-[var(--color-danger)]',
+          'bg-[var(--color-danger-fill,var(--color-danger))] text-[var(--color-danger-contrast)] border-[var(--color-danger-fill,var(--color-danger))]',
           'hover:bg-[var(--color-danger-hover)] hover:border-[var(--color-danger-hover)] hover:text-[var(--color-danger-contrast)]',
           'active:bg-[var(--color-danger-active)] active:border-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)]',
         ],
@@ -121,7 +121,7 @@ export const buttonVariants = cva(
         variant: 'warning',
         appearance: 'filled',
         class: [
-          'bg-[var(--color-warning)] text-[var(--color-warning-contrast)] border-[var(--color-warning)]',
+          'bg-[var(--color-warning-fill,var(--color-warning))] text-[var(--color-warning-contrast)] border-[var(--color-warning-fill,var(--color-warning))]',
           'hover:bg-[var(--color-warning-hover)] hover:border-[var(--color-warning-hover)] hover:text-[var(--color-warning-contrast)]',
           'active:bg-[var(--color-warning-active)] active:border-[var(--color-warning-active)] active:text-[var(--color-warning-contrast)]',
         ],
@@ -130,7 +130,7 @@ export const buttonVariants = cva(
         variant: 'success',
         appearance: 'filled',
         class: [
-          'bg-[var(--color-success)] text-[var(--color-success-contrast)] border-[var(--color-success)]',
+          'bg-[var(--color-success-fill,var(--color-success))] text-[var(--color-success-contrast)] border-[var(--color-success-fill,var(--color-success))]',
           'hover:bg-[var(--color-success-hover)] hover:border-[var(--color-success-hover)] hover:text-[var(--color-success-contrast)]',
           'active:bg-[var(--color-success-active)] active:border-[var(--color-success-active)] active:text-[var(--color-success-contrast)]',
         ],
@@ -139,7 +139,7 @@ export const buttonVariants = cva(
         variant: 'info',
         appearance: 'filled',
         class: [
-          'bg-[var(--color-info)] text-[var(--color-info-contrast)] border-[var(--color-info)]',
+          'bg-[var(--color-info-fill,var(--color-info))] text-[var(--color-info-contrast)] border-[var(--color-info-fill,var(--color-info))]',
           'hover:bg-[var(--color-info-hover)] hover:border-[var(--color-info-hover)] hover:text-[var(--color-info-contrast)]',
           'active:bg-[var(--color-info-active)] active:border-[var(--color-info-active)] active:text-[var(--color-info-contrast)]',
         ],
@@ -159,7 +159,7 @@ export const buttonVariants = cva(
         appearance: 'outline',
         class: [
           'border-[var(--color-primary)] text-[var(--color-primary)]',
-          'hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)]',
+          'hover:bg-[var(--color-primary-fill,var(--color-primary))] hover:text-[var(--color-primary-contrast)]',
           'active:bg-[var(--color-primary-active)] active:border-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)]',
         ],
       },
@@ -168,7 +168,7 @@ export const buttonVariants = cva(
         appearance: 'outline',
         class: [
           'border-[var(--color-secondary)] text-[var(--color-secondary)]',
-          'hover:bg-[var(--color-secondary)] hover:text-[var(--color-secondary-contrast)]',
+          'hover:bg-[var(--color-secondary-fill,var(--color-secondary))] hover:text-[var(--color-secondary-contrast)]',
           'active:bg-[var(--color-secondary-active)] active:border-[var(--color-secondary-active)] active:text-[var(--color-secondary-contrast)]',
         ],
       },
@@ -177,7 +177,7 @@ export const buttonVariants = cva(
         appearance: 'outline',
         class: [
           'border-[var(--color-danger)] text-[var(--color-danger)]',
-          'hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)]',
+          'hover:bg-[var(--color-danger-fill,var(--color-danger))] hover:text-[var(--color-danger-contrast)]',
           'active:bg-[var(--color-danger-active)] active:border-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)]',
         ],
       },
@@ -186,7 +186,7 @@ export const buttonVariants = cva(
         appearance: 'outline',
         class: [
           'border-[var(--color-warning)] text-[var(--color-warning)]',
-          'hover:bg-[var(--color-warning)] hover:text-[var(--color-warning-contrast)]',
+          'hover:bg-[var(--color-warning-fill,var(--color-warning))] hover:text-[var(--color-warning-contrast)]',
           'active:bg-[var(--color-warning-active)] active:border-[var(--color-warning-active)] active:text-[var(--color-warning-contrast)]',
         ],
       },
@@ -195,7 +195,7 @@ export const buttonVariants = cva(
         appearance: 'outline',
         class: [
           'border-[var(--color-success)] text-[var(--color-success)]',
-          'hover:bg-[var(--color-success)] hover:text-[var(--color-success-contrast)]',
+          'hover:bg-[var(--color-success-fill,var(--color-success))] hover:text-[var(--color-success-contrast)]',
           'active:bg-[var(--color-success-active)] active:border-[var(--color-success-active)] active:text-[var(--color-success-contrast)]',
         ],
       },
@@ -204,7 +204,7 @@ export const buttonVariants = cva(
         appearance: 'outline',
         class: [
           'border-[var(--color-info)] text-[var(--color-info)]',
-          'hover:bg-[var(--color-info)] hover:text-[var(--color-info-contrast)]',
+          'hover:bg-[var(--color-info-fill,var(--color-info))] hover:text-[var(--color-info-contrast)]',
           'active:bg-[var(--color-info-active)] active:border-[var(--color-info-active)] active:text-[var(--color-info-contrast)]',
         ],
       },
@@ -223,7 +223,7 @@ export const buttonVariants = cva(
         appearance: 'ghost',
         class: [
           'text-[var(--color-primary)]',
-          'hover:bg-[var(--color-primary)] hover:text-[var(--color-primary-contrast)]',
+          'hover:bg-[var(--color-primary-fill,var(--color-primary))] hover:text-[var(--color-primary-contrast)]',
           'active:bg-[var(--color-primary-active)] active:text-[var(--color-primary-contrast)]',
         ],
       },
@@ -232,7 +232,7 @@ export const buttonVariants = cva(
         appearance: 'ghost',
         class: [
           'text-[var(--color-secondary)]',
-          'hover:bg-[var(--color-secondary)] hover:text-[var(--color-secondary-contrast)]',
+          'hover:bg-[var(--color-secondary-fill,var(--color-secondary))] hover:text-[var(--color-secondary-contrast)]',
           'active:bg-[var(--color-secondary-active)] active:text-[var(--color-secondary-contrast)]',
         ],
       },
@@ -241,7 +241,7 @@ export const buttonVariants = cva(
         appearance: 'ghost',
         class: [
           'text-[var(--color-danger)]',
-          'hover:bg-[var(--color-danger)] hover:text-[var(--color-danger-contrast)]',
+          'hover:bg-[var(--color-danger-fill,var(--color-danger))] hover:text-[var(--color-danger-contrast)]',
           'active:bg-[var(--color-danger-active)] active:text-[var(--color-danger-contrast)]',
         ],
       },
@@ -250,7 +250,7 @@ export const buttonVariants = cva(
         appearance: 'ghost',
         class: [
           'text-[var(--color-warning)]',
-          'hover:bg-[var(--color-warning)] hover:text-[var(--color-warning-contrast)]',
+          'hover:bg-[var(--color-warning-fill,var(--color-warning))] hover:text-[var(--color-warning-contrast)]',
           'active:bg-[var(--color-warning-active)] active:text-[var(--color-warning-contrast)]',
         ],
       },
@@ -259,7 +259,7 @@ export const buttonVariants = cva(
         appearance: 'ghost',
         class: [
           'text-[var(--color-success)]',
-          'hover:bg-[var(--color-success)] hover:text-[var(--color-success-contrast)]',
+          'hover:bg-[var(--color-success-fill,var(--color-success))] hover:text-[var(--color-success-contrast)]',
           'active:bg-[var(--color-success-active)] active:text-[var(--color-success-contrast)]',
         ],
       },
@@ -268,7 +268,7 @@ export const buttonVariants = cva(
         appearance: 'ghost',
         class: [
           'text-[var(--color-info)]',
-          'hover:bg-[var(--color-info)] hover:text-[var(--color-info-contrast)]',
+          'hover:bg-[var(--color-info-fill,var(--color-info))] hover:text-[var(--color-info-contrast)]',
           'active:bg-[var(--color-info-active)] active:text-[var(--color-info-contrast)]',
         ],
       },

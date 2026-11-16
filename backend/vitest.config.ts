@@ -158,6 +158,8 @@ export default defineConfig({
       },
     },
     include: ['src/**/*.{spec,test}.ts'],
+    // Geocoding goes to a local stand-in for Mapbox — see the file.
+    globalSetup: ['test/mapboxStubSetup.ts'],
     reporters,
     // Inherited from `jest.setTimeout(10000)` in test/setup.ts (whose only content that was, so
     // the file is gone). The value has been raised because 10000 was not a limit any more, it was

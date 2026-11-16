@@ -433,7 +433,8 @@ export default {
 }
 
 .chat-modul {
-  background-color: rgb(233, 228, 228);
+  background-color: var(--chat-module-background);
+  box-shadow: var(--box-shadow-large);
   width: 355px;
   position: fixed;
   bottom: 45px;
@@ -443,17 +444,11 @@ export default {
   z-index: var(--z-index-overlay);
   .close {
     padding: 10px;
-    color: blue;
+    color: var(--chat-module-close-color);
     cursor: pointer;
   }
 }
 
-/*  When a minimized video call is anchored above the footer, lift the chat */
-/*  above the video so both fit without overlap. Minimized video sits at */
-/*  bottom: 45px (matching the chat's footer offset) and is 280px tall. */
-/*  The inner chat content keeps its own height; whatever extends above the */
-/*  viewport gets clipped by the browser, leaving the message input and the */
-/*  latest messages visible — which is what the user interacts with. */
 /*  The tabs between the two chats of a running call, below the room's header. Their */
 /*  height is fixed, as the chat below is told how much room the two take */
 /*  (CALL_CHAT_TABS_HEIGHT; the header's is RoomHeader's compact one, CALL_CHAT_HEADER_HEIGHT). */
@@ -464,8 +459,8 @@ export default {
   height: 36px;
   /*  The tabs reach from edge to edge of the window, their underline with them. */
   padding: 0;
-  background: var(--background-color-base);
-  border-bottom: 1px solid var(--color-neutral-85);
+  background: var(--window-bar-background);
+  border-bottom: 1px solid var(--border-color-softest);
 }
 
 .chat-modul__participants {
@@ -474,6 +469,12 @@ export default {
   background: var(--background-color-base);
 }
 
+/*  When a minimized video call is anchored above the footer, lift the chat */
+/*  above the video so both fit without overlap. Minimized video sits at */
+/*  bottom: 45px (matching the chat's footer offset) and is 280px tall. */
+/*  The inner chat content keeps its own height; whatever extends above the */
+/*  viewport gets clipped by the browser, leaving the message input and the */
+/*  latest messages visible — which is what the user interacts with. */
 .chat-modul--with-video {
   bottom: 333px; /*  45 (video bottom) + 280 (video height) + 8 (gap) */
 }

@@ -3,7 +3,7 @@
 // Bundles a brand into ONE `<id>.tar.gz` as a LIBRARY of bucket instances: manifest.json +
 // fragments/<type>.<name>.json (one sparse fragment per instance) + assets/ + html/. Consumers (webapp
 // serverMiddleware, branding plugin, backend bootstrap, maintenance) read the manifest and COMPOSE the
-// effective config (discover.composeArchive). See docu/branding-buckets-konzept.md.
+// effective config (discover.composeArchive).
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
@@ -173,8 +173,10 @@ export function brandVersion(brandDir: string): string | null {
   return readBrandPkg(brandDir)?.version ?? null
 }
 
+// `.ts` (type-checked against the schema) or `.mjs` (plain ESM, no TypeScript). No `.js`: whether that
+// loads as ESM or CommonJS depends on the brand repo's package.json, and no consumer accepted it anyway.
 export function findConfig(brandDir: string): string | null {
-  for (const name of ['brand.config.ts', 'brand.config.mjs', 'brand.config.js']) {
+  for (const name of ['brand.config.ts', 'brand.config.mjs']) {
     const p = join(brandDir, name)
     if (existsSync(p)) {
       return p
@@ -218,6 +220,202 @@ const LEGACY_LOCALE_DIRS = new Set(['tmp', 'html'])
  *     of each stylesheet has its `:root` selectors rewritten to `:root:root`, which wins on
  *     specificity no matter the order. The brand's source file is untouched — only what ships changes.
  */
+/**
+ * A brand with both schemes ('light dark') whose stylesheet sets a colour as ONE literal: that colour
+ * then holds in light and dark alike — a white header in the middle of a dark page. A `light-dark()`
+ * pair, or a var() onto a framework token (which carries its own pair), is what such a brand means.
+ */
+const NAMED_COLOURS = new Set([
+  'aliceblue',
+  'antiquewhite',
+  'aqua',
+  'aquamarine',
+  'azure',
+  'beige',
+  'bisque',
+  'black',
+  'blanchedalmond',
+  'blue',
+  'blueviolet',
+  'brown',
+  'burlywood',
+  'cadetblue',
+  'chartreuse',
+  'chocolate',
+  'coral',
+  'cornflowerblue',
+  'cornsilk',
+  'crimson',
+  'cyan',
+  'darkblue',
+  'darkcyan',
+  'darkgoldenrod',
+  'darkgray',
+  'darkgreen',
+  'darkgrey',
+  'darkkhaki',
+  'darkmagenta',
+  'darkolivegreen',
+  'darkorange',
+  'darkorchid',
+  'darkred',
+  'darksalmon',
+  'darkseagreen',
+  'darkslateblue',
+  'darkslategray',
+  'darkslategrey',
+  'darkturquoise',
+  'darkviolet',
+  'deeppink',
+  'deepskyblue',
+  'dimgray',
+  'dimgrey',
+  'dodgerblue',
+  'firebrick',
+  'floralwhite',
+  'forestgreen',
+  'fuchsia',
+  'gainsboro',
+  'ghostwhite',
+  'gold',
+  'goldenrod',
+  'gray',
+  'green',
+  'greenyellow',
+  'grey',
+  'honeydew',
+  'hotpink',
+  'indianred',
+  'indigo',
+  'ivory',
+  'khaki',
+  'lavender',
+  'lavenderblush',
+  'lawngreen',
+  'lemonchiffon',
+  'lightblue',
+  'lightcoral',
+  'lightcyan',
+  'lightgoldenrodyellow',
+  'lightgray',
+  'lightgreen',
+  'lightgrey',
+  'lightpink',
+  'lightsalmon',
+  'lightseagreen',
+  'lightskyblue',
+  'lightslategray',
+  'lightslategrey',
+  'lightsteelblue',
+  'lightyellow',
+  'lime',
+  'limegreen',
+  'linen',
+  'magenta',
+  'maroon',
+  'mediumaquamarine',
+  'mediumblue',
+  'mediumorchid',
+  'mediumpurple',
+  'mediumseagreen',
+  'mediumslateblue',
+  'mediumspringgreen',
+  'mediumturquoise',
+  'mediumvioletred',
+  'midnightblue',
+  'mintcream',
+  'mistyrose',
+  'moccasin',
+  'navajowhite',
+  'navy',
+  'oldlace',
+  'olive',
+  'olivedrab',
+  'orange',
+  'orangered',
+  'orchid',
+  'palegoldenrod',
+  'palegreen',
+  'paleturquoise',
+  'palevioletred',
+  'papayawhip',
+  'peachpuff',
+  'peru',
+  'pink',
+  'plum',
+  'powderblue',
+  'purple',
+  'rebeccapurple',
+  'red',
+  'rosybrown',
+  'royalblue',
+  'saddlebrown',
+  'salmon',
+  'sandybrown',
+  'seagreen',
+  'seashell',
+  'sienna',
+  'silver',
+  'skyblue',
+  'slateblue',
+  'slategray',
+  'slategrey',
+  'snow',
+  'springgreen',
+  'steelblue',
+  'tan',
+  'teal',
+  'thistle',
+  'tomato',
+  'turquoise',
+  'violet',
+  'wheat',
+  'white',
+  'whitesmoke',
+  'yellow',
+  'yellowgreen',
+])
+
+/**
+ * A brand that opts into both schemes but gives a token ONE colour — the dark theme then shows the
+ * light value.
+ *
+ * Only a token the framework itself declares as a light-dark() pair is checked: there a literal
+ * really does replace two values with one. A token the framework keeps single (the primary, success
+ * and danger colours, which are meant to be the same in both schemes), the brand's own variables and
+ * third-party ones are none of this check's business — flagging them buried the real findings under
+ * dozens of warnings. `transparent` and `color-mix(var(…))` are skipped for the same reason: the first
+ * is the same in both schemes, the second follows whatever its variables do.
+ */
+export function singleSchemeColours(
+  id: string,
+  colorScheme: string,
+  declared: Record<string, string>,
+  framework: Record<string, string> = FRAMEWORK_TOKENS,
+): string[] {
+  if (colorScheme !== 'light dark') {
+    return []
+  }
+  return Object.entries(declared)
+    .filter(([name, value]) => {
+      if (!Object.hasOwn(framework, name) || !framework[name].includes('light-dark(')) {
+        return false
+      }
+      const v = value.trim()
+      if (v.includes('var(')) {
+        return false
+      }
+      return (
+        /^(#|rgba?\(|hsla?\(|hwb\(|lab\(|lch\(|oklab\(|oklch\(|color\(|color-mix\()/i.test(v) ||
+        NAMED_COLOURS.has(v.toLowerCase())
+      )
+    })
+    .map(
+      ([name]) =>
+        `  ! ${id}: --${name} is one colour for both schemes — declare it as light-dark(light, dark)`,
+    )
+}
+
 function loadThemeFromStylesheets(
   dir: string,
   id: string,
@@ -253,6 +451,9 @@ function loadThemeFromStylesheets(
       .filter((name) => Object.hasOwn(resolved, name))
       .map((name) => [name, resolved[name]]),
   )
+  // Unconditional only: a literal that holds just inside a media rule is the dark half of a pair the
+  // brand may well have written as light-dark() on :root.
+  warnings.push(...singleSchemeColours(id, config.theme.colorScheme, unconditional))
   if (!unconditional['color-primary'] && declared['color-primary']) {
     warnings.push(
       `  ! ${id}: --color-primary is only declared inside an at-rule, so it cannot become the PWA` +
@@ -643,7 +844,7 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   const warnings: string[] = []
   const configPath = findConfig(dir)
   if (!configPath) {
-    throw new Error(`no brand.config.(ts|mjs|js) in ${dir}`)
+    throw new Error(`no brand.config.(ts|mjs) in ${dir}`)
   }
   const config = await loadConfig(configPath)
   // Brands may author i18n overrides as conventional locales/<code>.json files (in addition to, or
@@ -662,9 +863,15 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
   // would drop a top-level `id` anyway (it is not a bucket-owned path), and injecting version into
   // metadata would make the identity bucket always look "customised", breaking partial-package
   // detection. Consumers read id/version from the manifest (see src/discover.ts).
-  const label = config.metadata.applicationName // always set (merged default)
+  // The name the admin's brand list shows. A brand that names no network of its own (a style-only
+  // brand, composed with another brand's identity) would otherwise inherit the framework default and
+  // be listed as "ocelot.social" — show its id instead.
+  const label =
+    config.metadata.applicationName === brandingDefaults.metadata.applicationName
+      ? id
+      : config.metadata.applicationName
 
-  // Archive = a LIBRARY of bucket instances (docu/branding-buckets-konzept.md §11): each bucket type's
+  // Archive = a LIBRARY of bucket instances: each bucket type's
   // fragment is its own file `fragments/<type>.<name>.json`, indexed by manifest.json. A bucket is
   // emitted ONLY when the brand actually customises it (its owned slice differs from the framework
   // default) — so a package that defines only some buckets is genuinely PARTIAL. Unprovided buckets
@@ -740,6 +947,18 @@ export async function buildBrandArchive(brandDir: string): Promise<BuiltArchive>
 }
 
 /**
+ * The file names a brand is published under: `<id>.tar.gz` (latest) and, with a version,
+ * `<id>-<version>.tar.gz`. The one place that spells them, so a check for collisions between the
+ * brands of a repo (brand-repo.ts) sees exactly what will be written.
+ */
+export function archiveFileNames(
+  id: string,
+  version: string | null,
+): { latest: string; versioned: string | null } {
+  return { latest: `${id}.tar.gz`, versioned: version ? `${id}-${version}.tar.gz` : null }
+}
+
+/**
  * Build ONE brand and PUBLISH it into a dist directory as `<id>.tar.gz` (latest — the name consumers
  * mount) plus, when the package.json version is set, `<id>-<version>.tar.gz` (immutable history).
  * `outDir` defaults to `<brandDir>/dist`. `markDefault` additionally writes a `DEFAULT` marker (the
@@ -752,11 +971,12 @@ export async function publishBrandArchive(
   const built = await buildBrandArchive(brandDir)
   const dir = outDir ? resolve(outDir) : join(resolve(brandDir), 'dist')
   mkdirSync(dir, { recursive: true })
-  const latest = join(dir, `${built.id}.tar.gz`)
+  const names = archiveFileNames(built.id, built.version)
+  const latest = join(dir, names.latest)
   writeFileSync(latest, built.gz)
   let versioned: string | null = null
-  if (built.version) {
-    versioned = join(dir, `${built.id}-${built.version}.tar.gz`)
+  if (names.versioned) {
+    versioned = join(dir, names.versioned)
     writeFileSync(versioned, built.gz)
   }
   if (markDefault) {

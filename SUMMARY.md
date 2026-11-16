@@ -11,6 +11,8 @@
   * [HTML](webapp/html.md)
   * [SCSS](webapp/scss.md)
   * [Vue](webapp/vue.md)
+* [Maintenance Page](maintenance/README.md)
+* [Branding](packages/branding/README.md)
 * [Testing Guide](testing.md)
   * [End-to-end Tests](cypress/README.md)
   * [Webapp (Frontend) Tests](webapp/testing.md)

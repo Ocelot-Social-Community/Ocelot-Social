@@ -5,7 +5,7 @@
 //
 // Run it with `npm run tokens:snapshot`. framework-tokens.spec.ts fails when the snapshot drifts from
 // the stylesheets, in the checkouts where those can be read.
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { computeCatalog } from './theme-catalog.ts'
@@ -47,9 +47,27 @@ ${entries.join('\n')}
 `
 }
 
+const PUBLIC_TOKENS = new URL('./public-tokens.snapshot.json', import.meta.url)
+
+/**
+ * The names a brand may have set, as the list in public-tokens.snapshot.json plus `current`. Only ever
+ * ADDS: a name that is gone from the stylesheets stays, so scripts/public-tokens.spec.ts can fail on it
+ * — dropping it here would hide exactly what that test exists to catch.
+ */
+export function mergePublicTokens(known: readonly string[], current: Iterable<string>): string[] {
+  return [...new Set([...known, ...current])].sort((a, b) => (a < b ? -1 : 1))
+}
+
 /** Rewrite the generated module from the webapp's stylesheets. Only meaningful in this repository. */
-export function writeFrameworkTokens(outPath?: string): string {
+export function writeFrameworkTokens(outPath?: string, publicPath?: string): string {
   const out = outPath ?? fileURLToPath(SNAPSHOT)
-  writeFileSync(out, renderFrameworkTokens(computeCatalog()))
+  const catalog = computeCatalog()
+  writeFileSync(out, renderFrameworkTokens(catalog))
+  const list = publicPath ?? fileURLToPath(PUBLIC_TOKENS)
+  const known = (JSON.parse(readFileSync(list, 'utf8')) as { tokens: string[] }).tokens
+  writeFileSync(
+    list,
+    `${JSON.stringify({ tokens: mergePublicTokens(known, Object.keys(catalog)) }, null, 2)}\n`,
+  )
   return out
 }

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
 import { FRAMEWORK_TOKENS } from '../dist/frameworkTokens.js'
-import { DEFAULT_COLOR_PRIMARY, resolveThemeColor } from '../dist/theme.js'
+import { DEFAULT_COLOR_PRIMARY, colorSchemeOf, resolveThemeColor } from '../dist/theme.js'
 
 test("resolveThemeColor is the brand's color-primary token, else the framework default", () => {
   assert.equal(resolveThemeColor({ tokens: { 'color-primary': 'rgb(1, 2, 3)' } }), 'rgb(1, 2, 3)')
@@ -34,4 +34,12 @@ test('falls back to the pre-0.1.2 themeColor field of an older archive', () => {
 // The constant is no longer written by hand; it has to keep meaning what its name says.
 test("DEFAULT_COLOR_PRIMARY is the framework palette's own color-primary", () => {
   assert.equal(DEFAULT_COLOR_PRIMARY, FRAMEWORK_TOKENS['color-primary'])
+})
+
+test('colorSchemeOf: vanilla has both schemes, a brand has light unless it says otherwise', () => {
+  assert.equal(colorSchemeOf(undefined), 'light dark')
+  assert.equal(colorSchemeOf({}), 'light')
+  assert.equal(colorSchemeOf({ theme: { tokens: {} } }), 'light')
+  assert.equal(colorSchemeOf({ theme: { colorScheme: 'dark' } }), 'dark')
+  assert.equal(colorSchemeOf({ theme: { colorScheme: 'light dark' } }), 'light dark')
 })

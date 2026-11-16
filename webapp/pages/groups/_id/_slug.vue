@@ -353,7 +353,7 @@ import {
   videoCallParticipantCountChangedSubscription,
 } from '~/graphql/VideoCalls'
 import { muteGroup, unmuteGroup } from '~/graphql/settings/MutedGroups'
-import UpdateQuery from '~/components/utils/UpdateQuery'
+import { fetchMorePage } from '~/components/utils/UpdateQuery'
 import postListActions from '~/mixins/postListActions'
 import AvatarUploader from '~/components/Uploader/AvatarUploader'
 import Category from '~/components/Category'
@@ -799,14 +799,15 @@ export default {
       if (!PostQuery) return // seems this can be undefined on subpages
       this.offset += this.pageSize
 
-      PostQuery.fetchMore({
+      fetchMorePage(this, PostQuery, {
         variables: {
           offset: this.offset,
           filter: this.filter,
           first: this.pageSize,
           orderBy: ['groupPinned_asc', 'sortDate_desc'],
         },
-        updateQuery: UpdateQuery(this, { $state, pageKey: 'profilePagePosts' }),
+        $state,
+        pageKey: 'profilePagePosts',
       })
     },
     resetPostList() {

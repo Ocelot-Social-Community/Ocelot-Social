@@ -40,6 +40,53 @@
       @mic-change="emitSwitch('audioinput', mics, $event)"
       @speaker-change="emitSwitch('audiooutput', speakers, $event)"
     />
+    <div class="device-settings__row">
+      <label class="device-settings__label" for="video-call-send-quality">
+        {{ $t('videoCall.deviceSettings.sendQuality') }}
+      </label>
+      <select
+        id="video-call-send-quality"
+        data-test="video-call-send-quality"
+        :value="sendQuality"
+        :disabled="cameraRenewing"
+        @change="$emit('send-quality-change', $event.target.value)"
+      >
+        <option v-for="q in sendQualities" :key="q" :value="q" :selected="q === sendQuality">
+          {{ $t(`videoCall.deviceSettings.quality.${q}`) }}
+        </option>
+      </select>
+    </div>
+    <div class="device-settings__row">
+      <label class="device-settings__label" for="video-call-receive-quality">
+        {{ $t('videoCall.deviceSettings.receiveQuality') }}
+      </label>
+      <select
+        id="video-call-receive-quality"
+        data-test="video-call-receive-quality"
+        :value="receiveQuality"
+        @change="$emit('receive-quality-change', $event.target.value)"
+      >
+        <option v-for="q in receiveQualities" :key="q" :value="q" :selected="q === receiveQuality">
+          {{ $t(`videoCall.deviceSettings.quality.${q}`) }}
+        </option>
+      </select>
+    </div>
+    <label class="device-settings__option">
+      <input
+        type="checkbox"
+        data-test="video-call-dtx"
+        aria-describedby="video-call-dtx-hint"
+        :checked="dtx"
+        :disabled="dtxApplying"
+        @change="$emit('dtx-change', $event.target.checked)"
+      />
+      <span class="device-settings__option-text">
+        {{ $t('videoCall.deviceSettings.dtx') }}
+        <small id="video-call-dtx-hint" class="device-settings__option-hint">
+          {{ $t('videoCall.deviceSettings.dtxHint') }}
+        </small>
+      </span>
+    </label>
   </div>
 </template>
 
@@ -47,6 +94,7 @@
 import { OsButton, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import DeviceSelectors from './DeviceSelectors.vue'
+import { RECEIVE_QUALITIES, SEND_QUALITIES } from './devicePreferences'
 
 // Device selection during a running call. It only lists the devices and says
 // which one the user asked for — switching is up to the call, which owns the
@@ -79,6 +127,33 @@ export default {
       type: Boolean,
       default: false,
     },
+    // Whether our microphone leaves out pauses in speech (Opus DTX).
+    dtx: {
+      type: Boolean,
+      default: false,
+    },
+    // The microphone is being published anew to apply a change of `dtx`.
+    dtxApplying: {
+      type: Boolean,
+      default: false,
+    },
+    // The video quality the user asked for, one of the choices on offer (see devicePreferences):
+    // another value would select no option, and the call would take it for auto.
+    sendQuality: {
+      type: String,
+      default: 'auto',
+      validator: (value) => SEND_QUALITIES.includes(value),
+    },
+    receiveQuality: {
+      type: String,
+      default: 'auto',
+      validator: (value) => RECEIVE_QUALITIES.includes(value),
+    },
+    // Our camera is being started anew: a new send quality has to wait for it.
+    cameraRenewing: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -100,6 +175,8 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    this.sendQualities = SEND_QUALITIES
+    this.receiveQualities = RECEIVE_QUALITIES
   },
   async mounted() {
     this.$el.focus()
@@ -145,7 +222,7 @@ export default {
   padding: var(--space-small);
   background: var(--background-color-soft);
   color: var(--text-color-base);
-  border: 1px solid var(--color-neutral-85);
+  border: 1px solid var(--border-color-softest);
   border-radius: var(--border-radius-base);
   box-shadow: var(--box-shadow-large);
   /*  Scrolls down when the parked window is too low for it, never sideways: */
@@ -164,6 +241,49 @@ export default {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-x-small);
+}
+
+.device-settings__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxx-small);
+}
+
+.device-settings__label {
+  font-weight: var(--text-weight-bold);
+  font-size: var(--font-size-base);
+  color: var(--text-color-base);
+}
+
+.device-settings__row select {
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+  border: 1px solid var(--border-color-soft);
+  padding: var(--space-xx-small) var(--space-x-small);
+  border-radius: var(--border-radius-base);
+  width: 100%;
+  font-family: var(--font-family-text);
+  font-size: var(--font-size-base);
+}
+
+.device-settings__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-x-small);
+  cursor: pointer;
+}
+
+.device-settings__option input {
+  margin-top: 0.2em;
+}
+
+.device-settings__option-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.device-settings__option-hint {
+  color: var(--text-color-soft);
 }
 
 .device-settings__title {

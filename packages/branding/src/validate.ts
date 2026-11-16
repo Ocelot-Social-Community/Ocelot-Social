@@ -7,6 +7,8 @@
 // invariant lives inside ONE bucket domain (group/user/post/category/comment → behavior), so
 // cross-brand composition cannot violate them — no need (and it would be wrong) to re-validate +
 // throw at runtime.
+import { COLOR_SCHEMES, MAP_STYLE_IDS } from './theme.js'
+
 import type { BrandingConfig } from './schema.js'
 
 /**
@@ -16,6 +18,14 @@ import type { BrandingConfig } from './schema.js'
  * nothing to show next to their posts.
  */
 export const USER_NAME_LENGTH_FLOOR = 1
+
+/**
+ * The shortest group name any brand may require. Exported because the backend relies on it: its DB
+ * schema declares `Group.name` no stricter than this (asserted in `db/schema/schema.spec.ts`), so
+ * the audit never flags a name that a valid brand allowed. 1, not 0: a group without a name has
+ * nothing to show in its teaser or header.
+ */
+export const GROUP_NAME_LENGTH_FLOOR = 1
 
 /**
  * The shortest post title any brand may require. Exported because the backend relies on it: its DB
@@ -59,7 +69,7 @@ export function validateBranding(config: BrandingConfig): string[] {
 
   const { group, user, post, registration, comment, category, badges, metadata, dateTime } = config
 
-  atLeast('group.nameLengthMin', group.nameLengthMin, 0)
+  atLeast('group.nameLengthMin', group.nameLengthMin, GROUP_NAME_LENGTH_FLOOR)
   atMost('group.nameLengthMin', group.nameLengthMin, 'group.nameLengthMax', group.nameLengthMax)
   atLeast('group.descriptionMinLength', group.descriptionMinLength, 0)
   atLeast('group.descriptionExcerptLength', group.descriptionExcerptLength, 0)
@@ -100,6 +110,21 @@ export function validateBranding(config: BrandingConfig): string[] {
   // Intl.DateTimeFormat needs one of them; with neither the absolute timestamp has nothing to show.
   if (dateTime.dateStyle === null && dateTime.timeStyle === null) {
     violations.push('dateTime.dateStyle and dateTime.timeStyle must not both be null')
+  }
+
+  if (!COLOR_SCHEMES.includes(config.theme.colorScheme)) {
+    violations.push(
+      `theme.colorScheme must be one of ${COLOR_SCHEMES.map((s) => `'${s}'`).join(', ')} (got '${config.theme.colorScheme}')`,
+    )
+  }
+
+  for (const theme of ['light', 'dark'] as const) {
+    const id = config.map.defaultStyle[theme]
+    if (!MAP_STYLE_IDS.includes(id)) {
+      violations.push(
+        `map.defaultStyle.${theme} must be one of ${MAP_STYLE_IDS.map((s) => `'${s}'`).join(', ')} (got '${id}')`,
+      )
+    }
   }
 
   return violations

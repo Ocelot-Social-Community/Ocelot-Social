@@ -35,6 +35,8 @@ services:
       target: development
     environment:
       - NODE_ENV=development
+      # db:reset and db:seed may wipe the development database (backend/src/db/assertWipeAllowed.ts).
+      - DB_WIPE_ALLOWED=true
       - SMTP_PORT=1025
       - SMTP_HOST=mailserver
       - AWS_ACCESS_KEY_ID=minio
@@ -141,13 +143,11 @@ services:
       PORT: 8000
       IMAGOR_SECRET: mysecret # secret key for URL signature
       # IMAGOR_UNSAFE: 1 # unsafe URL for testing
-      AWS_ACCESS_KEY_ID: minio
-      AWS_SECRET_ACCESS_KEY: 12341234
-      AWS_ENDPOINT: http://minio:9000
       S3_FORCE_PATH_STYLE: 1
-      S3_LOADER_BUCKET: ocelot # enable S3 loader by specifying bucket
-      S3_STORAGE_BUCKET: ocelot # enable S3 storage by specifying bucket
-      S3_RESULT_STORAGE_BUCKET: ocelot # enable S3 result storage by specifying bucket
+      # Images come over HTTP from minio, as production loads them (helm chart: no S3_*_BUCKET).
+      # No S3 loader, storage or result storage: a bucket here switches them on, and imagor takes
+      # its endpoint from S3_ENDPOINT, not AWS_ENDPOINT — so they ran against no endpoint and
+      # failed a save on every image request (#10640).
       HTTP_LOADER_BASE_URL: http://minio:9000
       IMAGOR_CACHE_HEADER_TTL: 168h # 7 days
 
