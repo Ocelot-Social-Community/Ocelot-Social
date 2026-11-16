@@ -5,16 +5,21 @@
     @keydown.esc="muting && stopMuting()"
   >
     <!--
-      What concerns the whole call: the moderation's own controls, and the search once the list
-      is long. Somebody who may step into the moderation is offered that instead. While "mute
-      all" is being chosen, its question and answers take the controls' place, above the search.
+      What concerns the whole call: the moderation's own controls, and the filter. Somebody who
+      may step into the moderation is offered that instead. While "mute all" is being chosen, its
+      question and answers take the controls' place; the filter stays.
     -->
-    <div v-if="isModerator || mayTakeOver || searchable" class="call-participants__toolbar">
-      <div v-if="muting" class="call-participants__muting" data-test="call-participants-muting">
-        <h3 class="call-participants__muting-title">
-          {{ $t('videoCall.participants.muteWhom') }}
-        </h3>
-        <div class="call-participants__muting-actions">
+    <div class="call-participants__toolbar">
+      <h3
+        v-if="muting"
+        class="call-participants__muting-title"
+        data-test="call-participants-muting"
+      >
+        {{ $t('videoCall.participants.muteWhom') }}
+      </h3>
+      <!-- Its answers stand where the moderation's controls stood, the filter behind them. -->
+      <div class="call-participants__toolbar-actions">
+        <template v-if="muting">
           <os-button
             data-test="mute-all-cancel"
             appearance="outline"
@@ -34,20 +39,9 @@
           >
             {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
           </os-button>
-        </div>
-      </div>
-      <input
-        v-if="searchable"
-        v-model="search"
-        type="search"
-        class="call-participants__search"
-        data-test="call-participants-search"
-        :placeholder="$t('videoCall.participants.search')"
-        :aria-label="$t('videoCall.participants.search')"
-      />
-      <div v-if="!muting" class="call-participants__toolbar-actions">
+        </template>
         <os-button
-          v-if="isModerator"
+          v-if="isModerator && !muting"
           data-test="call-participants-mute-all"
           variant="primary"
           appearance="outline"
@@ -60,7 +54,7 @@
           {{ $t('videoCall.participants.muteAll') }}
         </os-button>
         <os-button
-          v-if="!isModerator && mayTakeOver"
+          v-if="!isModerator && mayTakeOver && !muting"
           data-test="call-participants-take-over"
           variant="primary"
           appearance="outline"
@@ -74,7 +68,7 @@
           {{ $t('videoCall.participants.takeOver') }}
         </os-button>
         <label
-          v-if="isModerator || moderation.everyone"
+          v-if="(isModerator || moderation.everyone) && !muting"
           class="call-participants__everyone"
           data-test="call-participants-everyone"
         >
@@ -86,6 +80,72 @@
           />
           {{ $t('videoCall.participants.everyoneModerates') }}
         </label>
+        <!--
+          The filter: its field opens to the left of its button, in the same line, with the
+          filter's symbol at its front. Closed, it filters no more, but keeps what was typed for
+          the next time.
+        -->
+        <span
+          :class="['call-participants__filter', { 'call-participants__filter--open': filterOpen }]"
+          data-test="call-participants-filter"
+        >
+          <span v-if="filterOpen" class="call-participants__filter-field">
+            <os-icon
+              :icon="icons.filter"
+              class="call-participants__filter-symbol"
+              aria-hidden="true"
+            />
+            <input
+              ref="filterName"
+              v-model="filterName"
+              type="text"
+              class="call-participants__filter-name"
+              data-test="call-participants-filter-name"
+              :placeholder="$t('videoCall.participants.filterName')"
+              :aria-label="$t('videoCall.participants.filterName')"
+              @keydown.esc.stop="clearFilterName"
+            />
+            <span
+              v-if="filtering"
+              class="call-participants__filter-count"
+              data-test="call-participants-filter-count"
+              aria-live="polite"
+            >
+              {{
+                $t('videoCall.participants.filterCount', {
+                  shown: shown.length,
+                  total: people.length,
+                })
+              }}
+            </span>
+            <button
+              v-if="filterName"
+              v-tooltip="$t('videoCall.participants.filterNameClear')"
+              type="button"
+              class="call-participants__filter-clear"
+              data-test="call-participants-filter-clear"
+              :aria-label="$t('videoCall.participants.filterNameClear')"
+              @click="clearFilterName"
+            >
+              <os-icon :icon="icons.close" />
+            </button>
+          </span>
+          <os-button
+            v-tooltip="$t('videoCall.participants.filter')"
+            data-test="call-participants-filter-toggle"
+            variant="primary"
+            :appearance="filterOpen ? 'filled' : 'ghost'"
+            circle
+            size="sm"
+            :aria-label="$t('videoCall.participants.filter')"
+            :aria-expanded="filterOpen ? 'true' : 'false'"
+            @click="toggleFilter"
+          >
+            <template #icon>
+              <os-icon :icon="icons.filter" />
+            </template>
+          </os-button>
+        </span>
       </div>
     </div>
 
@@ -266,6 +326,22 @@
           @change="spare(person.userId, !$event.target.checked)"
         />
       </li>
+      <li
+        v-if="filtering && !shown.length"
+        class="call-participants__none"
+        data-test="call-participants-filter-none"
+      >
+        {{ $t('videoCall.participants.filterNone') }}
+        <os-button
+          data-test="call-participants-filter-reset"
+          variant="primary"
+          appearance="outline"
+          size="sm"
+          @click="resetFilter"
+        >
+          {{ $t('videoCall.participants.filterReset') }}
+        </os-button>
+      </li>
     </ul>
 
     <!--
@@ -320,8 +396,14 @@ import {
   videoCallModerationRightsQuery,
 } from '~/graphql/VideoCalls'
 
-// From this many people on, the list can be searched.
-export const SEARCH_FROM = 10
+// A name as the filter compares it: whatever the case, and without accents, so that "jose"
+// finds José.
+const fold = (text) =>
+  (text || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
 
 // How long the rows stay where they are after the last move, click or key in the list. Whoever
 // aims at a switch, or has just pressed one, is not to see the row jump away under the pointer.
@@ -351,7 +433,9 @@ export default {
   emits: ['spotlight', 'local-mute', 'switch-off', 'switch-on'],
   data() {
     return {
-      search: '',
+      // The filter: whether its row is unfolded, and the part of a name it looks for.
+      filterOpen: false,
+      filterName: '',
       busy: false,
       // The heavier rights over the person whose menu is open, as the server answered them.
       rights: {},
@@ -393,9 +477,6 @@ export default {
       if (!this.moderation.everyone) return this.isModerator
       return this.moderation.moderators.includes(this.meId) || this.mayTakeOver
     },
-    searchable() {
-      return this.people.length >= SEARCH_FROM
-    },
     // Who speaks first, then oneself, then the moderation, then everybody else by name. The
     // speaking ones are held a moment by the call (its speaker hold), so nobody jumps about at
     // every word.
@@ -417,10 +498,14 @@ export default {
       }
       return live.sort((a, b) => place(a) - place(b))
     },
+    // Only while its field is open: closed, the filter keeps the name but filters no more.
+    filtering() {
+      return this.filterOpen && fold(this.filterName) !== ''
+    },
     shown() {
-      const needle = this.search.trim().toLowerCase()
-      if (!needle) return this.ordered
-      return this.ordered.filter((person) => (person.name || '').toLowerCase().includes(needle))
+      if (!this.filtering) return this.ordered
+      const needle = fold(this.filterName)
+      return this.ordered.filter((person) => fold(person.name).includes(needle))
     },
     // How many "mute all" would mute: everybody not spared and not given the floor whose
     // microphone is on.
@@ -499,6 +584,20 @@ export default {
       ]
         .filter(Boolean)
         .join(', ')
+    },
+    // Closing the filter keeps the name for the next time it opens.
+    toggleFilter() {
+      this.filterOpen = !this.filterOpen
+      if (this.filterOpen)
+        this.$nextTick(() => this.$refs.filterName && this.$refs.filterName.focus())
+    },
+    // Esc empties the name, and folds the filter away once it is empty.
+    clearFilterName(event) {
+      if (event && event.type === 'keydown' && !this.filterName) this.filterOpen = false
+      this.filterName = ''
+    },
+    resetFilter() {
+      this.filterName = ''
     },
     // A menu holds the order for as long as it is open, and a moment longer, like a click does.
     holdOrder(open) {
@@ -832,13 +931,74 @@ export default {
   align-items: center;
   gap: var(--space-x-small);
 }
-.call-participants__search {
-  width: 100%;
+.call-participants__filter {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xx-small);
+  min-width: 0;
+  margin-left: auto;
+}
+/*  Closed, only the button: it fits behind the moderation's controls. Open, the field wants room
+    and moves to a line of its own when that is too short. */
+.call-participants__filter--open {
+  flex: 1 1 12rem;
+}
+.call-participants__filter-field {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xx-small);
+  min-width: 0;
   padding: var(--space-xx-small) var(--space-x-small);
   border: 1px solid var(--border-color-soft);
   border-radius: var(--border-radius-base);
   background: var(--background-color-base);
+}
+.call-participants__filter-field:focus-within {
+  border-color: var(--border-color-active);
+}
+.call-participants__filter-symbol {
+  flex: 0 0 auto;
+  color: var(--text-color-soft);
+}
+.call-participants__filter-name {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
   color: var(--text-color-base);
+}
+.call-participants__filter-clear {
+  flex: 0 0 auto;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-color-soft);
+  cursor: pointer;
+}
+.call-participants__filter-clear:hover,
+.call-participants__filter-clear:focus-visible {
+  color: var(--text-color-base);
+}
+.call-participants__filter-count {
+  flex: 0 0 auto;
+  font-size: var(--font-size-x-small);
+  color: var(--text-color-soft);
+  white-space: nowrap;
+}
+.call-participants__none {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-x-small);
+  padding: var(--space-small);
+  color: var(--text-color-soft);
 }
 .call-participants__everyone {
   display: inline-flex;
@@ -983,20 +1143,10 @@ export default {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
-.call-participants__muting {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-x-small);
-}
 .call-participants__muting-title {
   margin: 0;
   font-size: var(--font-size-base);
   font-weight: bold;
-}
-.call-participants__muting-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-x-small);
 }
 .call-participants__pick {
   flex: 0 0 auto;

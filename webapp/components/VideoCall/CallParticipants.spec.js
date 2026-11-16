@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import flushPromises from 'flush-promises'
 import Dropdown from '~/components/Dropdown'
-import CallParticipants, { ORDER_REST, SEARCH_FROM } from './CallParticipants.vue'
+import CallParticipants, { ORDER_REST } from './CallParticipants.vue'
 
 const localVue = global.localVue
 
@@ -132,18 +132,74 @@ describe('CallParticipants', () => {
         'videoCall.participants.micOn, videoCall.participants.cameraOff',
       )
     })
+  })
 
-    it('can be searched once it is long', async () => {
-      const many = Array.from({ length: SEARCH_FROM }, (_, i) => person(`p${i}`, { name: `P${i}` }))
-      wrapper = Wrapper({ people: [...many, person('anna', { name: 'Anna' })] })
-      expect(wrapper.find('[data-test="call-participants-search"]').exists()).toBe(true)
-      await wrapper.find('[data-test="call-participants-search"]').setValue('ann')
-      expect(wrapper.vm.shown.map((p) => p.userId)).toEqual(['anna'])
+  describe('the filter', () => {
+    const find = (name) => wrapper.find(`[data-test="call-participants-${name}"]`)
+    const shown = () => wrapper.vm.shown.map((p) => p.userId)
+
+    it('opens its field before its button, for everybody, with the field in focus', async () => {
+      wrapper = Wrapper()
+      expect(find('filter-name').exists()).toBe(false)
+      expect(find('filter-toggle').attributes('aria-expanded')).toBe('false')
+      await find('filter-toggle').trigger('click')
+      await wrapper.vm.$nextTick()
+      const field = find('filter-name').element.parentElement
+      expect(field.nextElementSibling).toBe(find('filter-toggle').element)
+      expect(document.activeElement).toBe(find('filter-name').element)
     })
 
-    it('has no search while it is short', () => {
+    it('finds a part of a name whatever its case and accents, and tells how many of all', async () => {
+      wrapper = Wrapper({
+        people: [person('jose', { name: 'José' }), person('anna', { name: 'Anna' })],
+      })
+      await find('filter-toggle').trigger('click')
+      expect(find('filter-count').exists()).toBe(false)
+      await find('filter-name').setValue('  JOS ')
+      expect(shown()).toEqual(['jose'])
+      expect(find('filter-count').text()).toBe(
+        'videoCall.participants.filterCount {"shown":1,"total":2}',
+      )
+    })
+
+    it('filters no more once closed, and keeps the name for when it opens again', async () => {
       wrapper = Wrapper()
-      expect(wrapper.find('[data-test="call-participants-search"]').exists()).toBe(false)
+      await find('filter-toggle').trigger('click')
+      await find('filter-name').setValue('bo')
+      expect(shown()).toEqual(['bob'])
+      await find('filter-toggle').trigger('click')
+      expect(find('filter-name').exists()).toBe(false)
+      expect(wrapper.vm.filtering).toBe(false)
+      expect(shown()).toHaveLength(3)
+      await find('filter-toggle').trigger('click')
+      expect(find('filter-name').element.value).toBe('bo')
+      expect(shown()).toEqual(['bob'])
+    })
+
+    it('empties the name with the cross or Esc, and folds away on a second Esc', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      await find('filter-toggle').trigger('click')
+      await find('filter-name').setValue('bo')
+      await find('filter-clear').trigger('click')
+      expect(wrapper.vm.filterName).toBe('')
+      await find('filter-name').setValue('bo')
+      // Esc in the field leaves "mute all" alone.
+      await find('mute-all').trigger('click')
+      await find('filter-name').trigger('keydown', { key: 'Escape' })
+      expect(wrapper.vm.filterName).toBe('')
+      expect(wrapper.vm.muting).toBe(true)
+      await find('filter-name').trigger('keydown', { key: 'Escape' })
+      expect(find('filter-name').exists()).toBe(false)
+    })
+
+    it('says when nobody matches, and resets', async () => {
+      wrapper = Wrapper()
+      await find('filter-toggle').trigger('click')
+      await find('filter-name').setValue('zz')
+      expect(find('filter-none').exists()).toBe(true)
+      await find('filter-reset').trigger('click')
+      expect(find('filter-none').exists()).toBe(false)
+      expect(shown()).toHaveLength(3)
     })
   })
 
