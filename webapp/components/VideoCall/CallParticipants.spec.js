@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
 import flushPromises from 'flush-promises'
 import Dropdown from '~/components/Dropdown'
-import CallParticipants, { SEARCH_FROM } from './CallParticipants.vue'
+import CallParticipants, { ORDER_REST, SEARCH_FROM } from './CallParticipants.vue'
 
 const localVue = global.localVue
 
@@ -429,20 +429,40 @@ describe('CallParticipants', () => {
     })
   })
 
-  describe('while a menu is open', () => {
-    it('keeps the order, puts whoever joins last and lets it go again when the menu closes', async () => {
-      wrapper = Wrapper({ people: [person('anna'), person('bob')] })
-      const order = () => wrapper.vm.ordered.map((p) => p.userId)
-      wrapper.vm.holdOrder(true)
-      await wrapper.setProps({
+  describe('holding the order', () => {
+    const order = () => wrapper.vm.ordered.map((p) => p.userId)
+    const speakUp = () =>
+      wrapper.setProps({
         people: [
           person('anna'),
           person('bob', { speaking: true }),
           person('carl', { speaking: true }),
         ],
       })
+    const pointer = (type, pointerType = 'mouse') => {
+      const event = new Event(type)
+      event.pointerType = pointerType
+      wrapper.find('.call-participants__list').element.dispatchEvent(event)
+    }
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it('keeps the order while a menu is open, puts whoever joins last, and a moment longer', async () => {
+      wrapper = Wrapper({ people: [person('anna'), person('bob')] })
+      wrapper.vm.holdOrder(true)
+      await speakUp()
+      expect(order()).toEqual(['anna', 'bob', 'carl'])
+      jest.advanceTimersByTime(ORDER_REST * 2)
       expect(order()).toEqual(['anna', 'bob', 'carl'])
       wrapper.vm.holdOrder(false)
+      expect(order()).toEqual(['anna', 'bob', 'carl'])
+      jest.advanceTimersByTime(ORDER_REST)
       expect(order()).toEqual(['bob', 'carl', 'anna'])
     })
 
@@ -450,6 +470,39 @@ describe('CallParticipants', () => {
       wrapper = Wrapper({ people: [person('anna'), person('bob')] })
       await wrapper.findComponent(Dropdown).vm.$emit('open-change', true)
       expect(wrapper.vm.heldOrder).toEqual(['anna', 'bob'])
+    })
+
+    it('keeps it while the pointer moves in the list, until it has rested there a while', async () => {
+      wrapper = Wrapper({ people: [person('anna'), person('bob')] })
+      pointer('pointermove')
+      await speakUp()
+      jest.advanceTimersByTime(ORDER_REST - 1)
+      pointer('pointerdown')
+      jest.advanceTimersByTime(ORDER_REST - 1)
+      expect(order()).toEqual(['anna', 'bob', 'carl'])
+      jest.advanceTimersByTime(1)
+      expect(order()).toEqual(['bob', 'carl', 'anna'])
+    })
+
+    it('lets it go as soon as the mouse leaves the list, but not when a finger lifts', async () => {
+      wrapper = Wrapper({ people: [person('anna'), person('bob')] })
+      pointer('pointerdown', 'touch')
+      await speakUp()
+      pointer('pointerleave', 'touch')
+      expect(order()).toEqual(['anna', 'bob', 'carl'])
+      pointer('pointermove')
+      pointer('pointerleave')
+      expect(order()).toEqual(['bob', 'carl', 'anna'])
+    })
+
+    it('keeps it while a key is used in the list, and lets it go when the focus leaves', async () => {
+      wrapper = Wrapper({ people: [person('anna'), person('bob')] })
+      const list = wrapper.find('.call-participants__list')
+      await list.trigger('keydown', { key: 'Tab' })
+      await speakUp()
+      expect(order()).toEqual(['anna', 'bob', 'carl'])
+      await list.trigger('focusout', { relatedTarget: null })
+      expect(order()).toEqual(['bob', 'carl', 'anna'])
     })
   })
 

@@ -89,7 +89,15 @@
       </div>
     </div>
 
-    <ul class="call-participants__list">
+    <ul
+      class="call-participants__list"
+      @pointermove="noteActivity"
+      @pointerdown="noteActivity"
+      @keydown="noteActivity"
+      @focusin="noteActivity"
+      @pointerleave="$event.pointerType === 'mouse' && restOrder()"
+      @focusout="!$el.contains($event.relatedTarget) && restOrder()"
+    >
       <li
         v-for="person in shown"
         :key="person.userId"
@@ -315,6 +323,10 @@ import {
 // From this many people on, the list can be searched.
 export const SEARCH_FROM = 10
 
+// How long the rows stay where they are after the last move, click or key in the list. Whoever
+// aims at a switch, or has just pressed one, is not to see the row jump away under the pointer.
+export const ORDER_REST = 5000
+
 // The people in a video call, one row each however many devices they are in it with, and what
 // can be done about them. What everybody may do is about themselves (show somebody large, open
 // their profile, mute them for oneself); what a moderator may do on top goes to the server,
@@ -345,8 +357,11 @@ export default {
       rights: {},
       dialog: null,
       removing: null,
-      // The order of the rows as it was when a menu opened, by userId; null while none is open.
+      // The order of the rows as it was when it was stopped, by userId; null while it is live.
       heldOrder: null,
+      // What stops it: an open menu, or somebody busy in the list a moment ago.
+      menuOpen: false,
+      active: false,
       // Whether "mute all" is being chosen, right in the list.
       muting: false,
       spared: [],
@@ -357,6 +372,9 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+  },
+  beforeDestroy() {
+    clearTimeout(this.restTimer)
   },
   computed: {
     ...mapGetters({
@@ -392,7 +410,7 @@ export default {
         (a, b) => rank(a) - rank(b) || (a.name || '').localeCompare(b.name || ''),
       )
       if (!this.heldOrder) return live
-      // While a menu is open nobody moves; whoever joins meanwhile comes last.
+      // While the order is held nobody moves; whoever joins meanwhile comes last.
       const place = (person) => {
         const index = this.heldOrder.indexOf(person.userId)
         return index === -1 ? Infinity : index
@@ -482,11 +500,32 @@ export default {
         .filter(Boolean)
         .join(', ')
     },
+    // A menu holds the order for as long as it is open, and a moment longer, like a click does.
+    holdOrder(open) {
+      this.menuOpen = open
+      if (open) this.updateHold()
+      else this.noteActivity()
+    },
+    // Somebody moves, clicks or types in the list: the order stays until it has been quiet there
+    // for a while, so that the pointer resting somewhere does not stop it for good.
+    noteActivity() {
+      this.active = true
+      clearTimeout(this.restTimer)
+      this.restTimer = setTimeout(this.restOrder, ORDER_REST)
+      this.updateHold()
+    },
+    // Quiet for long enough, or gone from the list: the rows may move again, unless a menu is open.
+    restOrder() {
+      this.active = false
+      clearTimeout(this.restTimer)
+      this.updateHold()
+    },
+    updateHold() {
+      if (!this.menuOpen && !this.active) this.heldOrder = null
+      else if (!this.heldOrder) this.heldOrder = this.ordered.map((person) => person.userId)
+    },
     // The heavier rights are the server's to tell: they depend on the ranks in the group. Asked
     // when the menu opens, so the menu offers what will be allowed.
-    holdOrder(open) {
-      this.heldOrder = open ? this.ordered.map((person) => person.userId) : null
-    },
     async openMenu(person, toggleMenu) {
       toggleMenu()
       if (person.isMe || !this.isModerator) return
