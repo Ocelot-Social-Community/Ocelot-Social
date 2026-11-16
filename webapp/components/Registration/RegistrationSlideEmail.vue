@@ -4,7 +4,8 @@
       {{ $t('components.registration.signup.form.description') }}
     </p>
     <ocelot-input
-      :placeholder="$t('login.email')"
+      :label="$t('login.email')"
+      :placeholder="$t('login.emailPlaceholder')"
       type="email"
       id="email"
       model="email"

@@ -16,17 +16,22 @@
           <ocelot-input
             v-model="form.email"
             :disabled="pending"
-            :placeholder="$t('login.email')"
+            :label="$t('login.email')"
+            :placeholder="$t('login.emailPlaceholder')"
             type="email"
+            id="email"
             name="email"
             icon="envelope"
           />
+          <!-- The field sits in a box of its own with the show-password toggle, so its label stands
+               above that box rather than inside it. -->
+          <label class="ds-input-label" for="password">{{ $t('login.password') }}</label>
           <div class="password-wrapper">
             <ocelot-input
               v-model="form.password"
               :disabled="pending"
-              :placeholder="$t('login.password')"
               icon="lock"
+              id="password"
               name="password"
               class="password-field"
               ref="password"

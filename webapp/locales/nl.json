@@ -1293,6 +1293,7 @@
   },
   "login": {
     "email": "Uw E-mail",
+    "emailPlaceholder": "femanon@example.org",
     "failure": "Onjuist e-mailadres of wachtwoord.",
     "forgotPassword": "Wachtwoord vergeten?",
     "hello": "Hallo",

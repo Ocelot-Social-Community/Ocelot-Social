@@ -1293,6 +1293,7 @@
   },
   "login": {
     "email": "Ваша електронна пошта",
+    "emailPlaceholder": "femanon@example.org",
     "failure": "Невірна електронна адреса або пароль.",
     "forgotPassword": "Забули пароль?",
     "hello": "Привіт",

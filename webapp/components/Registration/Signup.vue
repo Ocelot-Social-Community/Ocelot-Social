@@ -18,7 +18,8 @@
         </p>
       </div>
       <ocelot-input
-        :placeholder="invitation ? $t('profile.invites.emailPlaceholder') : $t('login.email')"
+        :label="invitation ? $t('profile.invites.emailPlaceholder') : $t('login.email')"
+        :placeholder="$t('login.emailPlaceholder')"
         type="email"
         id="email"
         model="email"
