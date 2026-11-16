@@ -312,8 +312,12 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'video-call-bar-opacity': '90%',
   'video-call-bar-page-footer-color': 'var(--color-footer-background)',
   'video-call-bar-page-header-color': 'var(--color-header-background)',
-  'video-call-participant-inert-color':
+  'video-call-participant-inert-floor-color':
+    'light-dark(color-mix(in srgb, var(--color-primary) 45%, transparent), color-mix(in srgb, var(--color-primary) 70%, transparent))',
+  'video-call-participant-inert-off-color':
     'light-dark(color-mix(in srgb, var(--color-danger) 45%, transparent), color-mix(in srgb, var(--color-danger) 70%, transparent))',
+  'video-call-participant-inert-on-color':
+    'light-dark(color-mix(in srgb, var(--text-color-soft) 45%, transparent), color-mix(in srgb, var(--text-color-soft) 70%, transparent))',
   'video-on-media-color': 'var(--color-neutral-95)',
   'video-surface': 'var(--color-neutral-10)',
   'video-surface-deep': 'var(--color-neutral-0)',

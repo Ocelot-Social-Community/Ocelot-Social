@@ -331,7 +331,7 @@ describe('CallParticipants', () => {
       expect(wrapper.emitted('switch-off')).toEqual([['mic']])
     })
 
-    it('offers nothing to switch off what is off already, or to whoever does not moderate', () => {
+    it('offers nothing to switch off what is off already, or somebody else to whoever does not moderate', () => {
       wrapper = Wrapper({
         people: [person('bob', { micOn: false, cameraOn: false }), person('anna')],
         moderation: moderatedByMe,
@@ -344,19 +344,43 @@ describe('CallParticipants', () => {
       expect(wrapper.find('[data-test="call-participant-switch-mic-anna"]').exists()).toBe(false)
     })
 
-    it('lets what a moderator cannot switch on step back, and only for a moderator', () => {
-      const inert = (kind) =>
-        wrapper.find(`[data-test="call-participant-device-${kind}-bob"]`).classes()
+    it('lets everybody switch off their own microphone, camera and share right in the row', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true, cameraOn: true, screenSharing: true })],
+      })
+      for (const kind of ['screen', 'mic', 'camera']) {
+        await wrapper.find(`[data-test="call-participant-switch-${kind}-me"]`).trigger('click')
+      }
+      expect(wrapper.emitted('switch-off')).toEqual([['screen'], ['mic'], ['camera']])
+    })
+
+    it('lets whatever the viewer cannot switch step back, for everybody alike', () => {
+      const classes = (kind, id) =>
+        wrapper.find(`[data-test="call-participant-device-${kind}-${id}"]`).classes()
       wrapper = Wrapper({
         people: [person('bob', { micOn: false, cameraOn: false })],
         moderation: moderatedByMe,
       })
-      expect(inert('mic')).toContain('call-participants__inert')
-      expect(inert('camera')).toContain('call-participants__inert')
+      expect(classes('mic', 'bob')).toEqual(
+        expect.arrayContaining(['call-participants__inert', 'call-participants__off']),
+      )
+      expect(classes('camera', 'bob')).toContain('call-participants__inert')
       wrapper.destroy()
-      wrapper = Wrapper({ people: [person('bob', { micOn: false, cameraOn: false })] })
-      expect(inert('mic')).not.toContain('call-participants__inert')
-      expect(inert('camera')).not.toContain('call-participants__inert')
+      // Whoever does not moderate switches nobody else's: on or off, it steps back, and so does
+      // the bubble; their own microphone that is on is a switch.
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob', { micOn: true, cameraOn: false })],
+        moderation: { moderators: ['carl'], everyone: false, speakers: ['bob'] },
+      })
+      expect(classes('mic', 'bob')).toContain('call-participants__inert')
+      expect(classes('mic', 'bob')).not.toContain('call-participants__off')
+      expect(classes('camera', 'bob')).toEqual(
+        expect.arrayContaining(['call-participants__inert', 'call-participants__off']),
+      )
+      expect(wrapper.find('[data-test="call-participant-has-floor-bob"]').classes()).toContain(
+        'call-participants__inert',
+      )
+      expect(wrapper.find('[data-test="call-participant-switch-mic-me"]').exists()).toBe(true)
     })
   })
 

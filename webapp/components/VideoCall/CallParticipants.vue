@@ -167,7 +167,7 @@
           <os-icon
             v-else-if="!isModerator && hasFloor(person.userId)"
             :icon="icons.comment"
-            class="call-participants__give-floor--on"
+            class="call-participants__give-floor--on call-participants__inert"
             aria-hidden="true"
             :data-test="'call-participant-has-floor-' + person.userId"
           />
@@ -189,10 +189,7 @@
               v-else
               :key="device.kind"
               :icon="device.icon"
-              :class="{
-                'call-participants__off': !device.on,
-                'call-participants__inert': isModerator,
-              }"
+              :class="['call-participants__inert', { 'call-participants__off': !device.on }]"
               aria-hidden="true"
               :data-test="'call-participant-device-' + device.kind + '-' + person.userId"
             />
@@ -542,15 +539,16 @@ export default {
         // Without an answer the heavier entries stay away; the light ones need none.
       }
     },
-    // Microphone, camera and a running screen share as the row shows them; for a moderator, one
-    // that is on can be switched off right there, as from the menu.
+    // Microphone, camera and a running screen share as the row shows them. One that is on can be
+    // switched off right there, as from the menu: one's own by everybody, anybody's by a moderator.
     devicesOf(person) {
       const device = (kind, on, icon, iconOff, label, action) => ({
         kind,
         on,
         icon: on ? icon : iconOff,
         label,
-        switchOff: on && this.isModerator ? this.switchOff(person, kind, action) : null,
+        switchOff:
+          on && (person.isMe || this.isModerator) ? this.switchOff(person, kind, action) : null,
       })
       return [
         person.screenSharing &&
@@ -916,10 +914,15 @@ export default {
 .call-participants__off {
   color: var(--color-danger);
 }
-/*  For a moderator, the rest of the row is a switch: what it cannot switch, such as somebody's */
-/*  microphone that is off, steps back a little. */
+/*  What the viewer can work in a row is shown in full; whatever else steps back a little. */
 .call-participants__inert {
-  color: var(--video-call-participant-inert-color);
+  color: var(--video-call-participant-inert-on-color);
+}
+.call-participants__off.call-participants__inert {
+  color: var(--video-call-participant-inert-off-color);
+}
+.call-participants__give-floor--on.call-participants__inert {
+  color: var(--video-call-participant-inert-floor-color);
 }
 .call-participants__sr-only {
   position: absolute;
