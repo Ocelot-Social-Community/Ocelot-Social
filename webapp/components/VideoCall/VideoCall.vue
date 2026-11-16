@@ -4204,7 +4204,7 @@ export default {
   width: 100%;
   margin: 0 0 var(--space-small);
   padding: var(--space-xx-small) var(--space-x-small);
-  border: 1px solid var(--color-neutral-70);
+  border: 1px solid var(--border-color-soft);
   border-radius: var(--border-radius-base);
   background: var(--background-color-base);
   color: var(--text-color-base);

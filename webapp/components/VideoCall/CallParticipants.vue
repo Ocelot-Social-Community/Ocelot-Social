@@ -919,7 +919,7 @@ export default {
 /*  For a moderator, the rest of the row is a switch: what it cannot switch, such as somebody's */
 /*  microphone that is off, steps back a little. */
 .call-participants__inert {
-  opacity: 0.45;
+  color: var(--video-call-participant-inert-color);
 }
 .call-participants__sr-only {
   position: absolute;

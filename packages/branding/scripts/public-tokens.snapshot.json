@@ -284,6 +284,7 @@
     "video-call-bar-opacity",
     "video-call-bar-page-footer-color",
     "video-call-bar-page-header-color",
+    "video-call-participant-inert-color",
     "video-on-media-color",
     "video-surface",
     "video-surface-deep",
