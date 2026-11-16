@@ -343,6 +343,21 @@ describe('CallParticipants', () => {
       wrapper = Wrapper({ people: [person('anna')] })
       expect(wrapper.find('[data-test="call-participant-switch-mic-anna"]').exists()).toBe(false)
     })
+
+    it('lets what a moderator cannot switch on step back, and only for a moderator', () => {
+      const inert = (kind) =>
+        wrapper.find(`[data-test="call-participant-device-${kind}-bob"]`).classes()
+      wrapper = Wrapper({
+        people: [person('bob', { micOn: false, cameraOn: false })],
+        moderation: moderatedByMe,
+      })
+      expect(inert('mic')).toContain('call-participants__inert')
+      expect(inert('camera')).toContain('call-participants__inert')
+      wrapper.destroy()
+      wrapper = Wrapper({ people: [person('bob', { micOn: false, cameraOn: false })] })
+      expect(inert('mic')).not.toContain('call-participants__inert')
+      expect(inert('camera')).not.toContain('call-participants__inert')
+    })
   })
 
   describe('the screen share and the floor right in the row', () => {

@@ -181,8 +181,12 @@
               v-else
               :key="device.kind"
               :icon="device.icon"
-              :class="{ 'call-participants__off': !device.on }"
+              :class="{
+                'call-participants__off': !device.on,
+                'call-participants__inert': isModerator,
+              }"
               aria-hidden="true"
+              :data-test="'call-participant-device-' + device.kind + '-' + person.userId"
             />
           </template>
         </span>
@@ -872,6 +876,11 @@ export default {
 }
 .call-participants__off {
   color: var(--color-danger);
+}
+/*  For a moderator, the rest of the row is a switch: what it cannot switch, such as somebody's */
+/*  microphone that is off, steps back a little. */
+.call-participants__inert {
+  opacity: 0.45;
 }
 .call-participants__sr-only {
   position: absolute;
