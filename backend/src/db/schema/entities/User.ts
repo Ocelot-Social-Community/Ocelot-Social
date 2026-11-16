@@ -18,7 +18,6 @@ export const User = defineEntity({
   label: 'User',
   properties: {
     id: { type: 'string' },
-    actorId: { type: ['string', 'null'] },
     // Only a floor. The brandable bounds live in branding.user.nameLengthMin/-Max and are enforced
     // by the validation middleware where a name is written; a fixed 3 here would make the audit
     // flag every name a brand with a lower minimum allowed. Must not exceed the branding's
@@ -28,8 +27,6 @@ export const User = defineEntity({
     encryptedPassword: { type: 'string' },
     deleted: { type: 'boolean' },
     disabled: { type: 'boolean' },
-    publicKey: { type: ['string', 'null'] },
-    privateKey: { type: ['string', 'null'] },
     wasInvited: { type: 'boolean' },
     wasSeeded: { type: 'boolean' },
     locationName: { type: ['string', 'null'] },
