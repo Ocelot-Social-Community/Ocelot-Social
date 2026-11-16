@@ -6976,6 +6976,17 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(wrapper.vm.cameraEnabled).toBe(false)
     })
 
+    it("switches one's own microphone or camera on again from the list, only when off", () => {
+      const { wrapper } = setup()
+      const toggleMic = jest.spyOn(wrapper.vm, 'toggleMic').mockResolvedValue()
+      const toggleCamera = jest.spyOn(wrapper.vm, 'toggleCamera').mockResolvedValue()
+      wrapper.setData({ micEnabled: false, cameraEnabled: true })
+      wrapper.vm.switchOn('mic')
+      wrapper.vm.switchOn('camera')
+      expect(toggleMic).toHaveBeenCalledTimes(1)
+      expect(toggleCamera).not.toHaveBeenCalled()
+    })
+
     it('tells of a removal once, with or without a name', () => {
       const { wrapper } = setup()
       wrapper.vm.onModerationNotice(encode({ type: 'removed', by: 'Anna' }))

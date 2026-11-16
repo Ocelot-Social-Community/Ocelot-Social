@@ -354,6 +354,20 @@ describe('CallParticipants', () => {
       expect(wrapper.emitted('switch-off')).toEqual([['screen'], ['mic'], ['camera']])
     })
 
+    it('lets everybody switch their own microphone and camera on again right in the row', async () => {
+      wrapper = Wrapper({ people: [person('me', { isMe: true, micOn: false, cameraOn: false })] })
+      const mic = wrapper.find('[data-test="call-participant-switch-mic-me"]')
+      expect(mic.classes()).toEqual(
+        expect.arrayContaining(['call-participants__switch-on', 'call-participants__off']),
+      )
+      expect(mic.classes()).not.toContain('call-participants__inert')
+      expect(mic.attributes('aria-label')).toBe('videoCall.participants.micOnAction')
+      await mic.trigger('click')
+      await wrapper.find('[data-test="call-participant-switch-camera-me"]').trigger('click')
+      expect(wrapper.emitted('switch-on')).toEqual([['mic'], ['camera']])
+      expect(wrapper.find('[data-test="call-participant-device-mic-me"]').exists()).toBe(false)
+    })
+
     it('lets whatever the viewer cannot switch step back, for everybody alike', () => {
       const classes = (kind, id) =>
         wrapper.find(`[data-test="call-participant-device-${kind}-${id}"]`).classes()

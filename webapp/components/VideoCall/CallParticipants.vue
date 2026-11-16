@@ -173,15 +173,18 @@
           />
           <template v-for="device in devicesOf(person)">
             <button
-              v-if="device.switchOff"
+              v-if="device.toggle"
               :key="device.kind"
               type="button"
-              class="call-participants__switch"
+              :class="[
+                'call-participants__switch',
+                { 'call-participants__switch-on call-participants__off': !device.on },
+              ]"
               v-tooltip="device.label"
               :aria-label="device.label"
               :disabled="busy"
               :data-test="'call-participant-switch-' + device.kind + '-' + person.userId"
-              @click="device.switchOff"
+              @click="device.toggle"
             >
               <os-icon :icon="device.icon" />
             </button>
@@ -345,7 +348,7 @@ export default {
     // The people muted for the viewer alone, by userId.
     locallyMuted: { type: Object, default: () => ({}) },
   },
-  emits: ['spotlight', 'local-mute', 'switch-off'],
+  emits: ['spotlight', 'local-mute', 'switch-off', 'switch-on'],
   data() {
     return {
       search: '',
@@ -541,15 +544,20 @@ export default {
     },
     // Microphone, camera and a running screen share as the row shows them. One that is on can be
     // switched off right there, as from the menu: one's own by everybody, anybody's by a moderator.
+    // One's own can be switched on again there too.
     devicesOf(person) {
-      const device = (kind, on, icon, iconOff, label, action) => ({
-        kind,
-        on,
-        icon: on ? icon : iconOff,
-        label,
-        switchOff:
-          on && (person.isMe || this.isModerator) ? this.switchOff(person, kind, action) : null,
-      })
+      const device = (kind, on, icon, iconOff, label, action, labelOn) => {
+        let toggle = null
+        if (on && (person.isMe || this.isModerator)) toggle = this.switchOff(person, kind, action)
+        else if (!on && person.isMe) toggle = () => this.$emit('switch-on', kind)
+        return {
+          kind,
+          on,
+          icon: on ? icon : iconOff,
+          label: on ? label : labelOn,
+          toggle,
+        }
+      }
       return [
         person.screenSharing &&
           device(
@@ -567,6 +575,7 @@ export default {
           this.icons.microphoneSlash,
           this.$t('videoCall.participants.muteMicrophone'),
           'MUTE_MICROPHONE',
+          this.$t('videoCall.participants.micOnAction'),
         ),
         device(
           'camera',
@@ -575,6 +584,7 @@ export default {
           this.icons.videoCameraSlash,
           this.$t('videoCall.participants.cameraOffAction'),
           'DISABLE_CAMERA',
+          this.$t('videoCall.participants.cameraOnAction'),
         ),
       ].filter(Boolean)
     },
@@ -896,6 +906,10 @@ export default {
 .call-participants__switch:hover,
 .call-participants__switch:focus-visible {
   color: var(--color-danger);
+}
+.call-participants__switch-on:hover,
+.call-participants__switch-on:focus-visible {
+  color: var(--color-primary);
 }
 .call-participants__unmute {
   color: var(--video-call-participant-locally-muted-color);

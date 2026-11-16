@@ -420,6 +420,7 @@
               @spotlight="spotlightPerson"
               @local-mute="muteForMe"
               @switch-off="syncSwitchedOff"
+              @switch-on="switchOn"
             />
             <client-only v-else>
               <chat
@@ -2015,6 +2016,11 @@ export default {
           ],
         ],
       })
+    },
+    // One's own microphone or camera, switched on again from the participant list.
+    switchOn(kind) {
+      if (kind === 'mic' && !this.micEnabled) this.toggleMic()
+      if (kind === 'camera' && !this.cameraEnabled) this.toggleCamera()
     },
     async syncSwitchedOff(kind) {
       const local = this.room && this.room.localParticipant
