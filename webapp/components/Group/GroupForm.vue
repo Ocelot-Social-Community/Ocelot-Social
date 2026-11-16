@@ -829,6 +829,12 @@ export default {
   font-size: 0.9em;
 }
 
+/* The "pick a template" error hangs off the description, the last line of the template choice:
+   tight to it, the gap to the next field after the hint (see .os-validation-hint below). */
+.template-description:has(+ .os-validation-hint) {
+  margin-bottom: 0;
+}
+
 .template-description__item {
   grid-area: 1 / 1;
   margin: 0;
@@ -900,25 +906,27 @@ export default {
 
   /* ...unless the hint is actually showing: then the tight field+hint gap
      (the hint's own 4px top margin) is what should apply here instead, and
-     the space-base gap to the next field comes from the hint's own
-     margin-bottom below. Without this, the two would add up and push the
-     hint away from its select. */
+     the gap to the next field is the hint itself plus its margin-bottom
+     below. Without this, the two would add up and push the hint away from
+     its select. */
   > .visibility-wrap:has(+ .os-validation-hint),
   > .action-radius-wrap:has(+ .os-validation-hint) {
     margin-bottom: 0;
   }
 
+  /* The hint sits in the gap to the next field instead of adding its own height to it: a field
+     without a hint is followed by --space-base, one with a hint by its 4px lead-in, the ~19px hint
+     and this — about the same. Same as the settings page (pages/settings/index.vue). */
   > .os-validation-hint {
-    margin-bottom: var(--space-base);
+    margin-bottom: var(--space-xx-small);
     cursor: default;
   }
 
   /* Same double-margin problem as above, one field over: the slug field's
      own space-base spacer div (see template) assumes it sits right after
      the input — when the slug hint renders between them instead (error
-     state), its own margin-bottom already provides that gap, so the
-     spacer's identical margin would otherwise just add another one on
-     top. */
+     state), the hint already fills that gap, so the spacer's margin would
+     otherwise add a second one on top. */
   > .os-validation-hint + .ds-mb-base {
     margin-bottom: 0;
   }
@@ -942,8 +950,9 @@ export default {
     display: flex;
     flex-direction: column;
 
+    /* As the top-level hint above: in the gap, not on top of it. */
     > .os-validation-hint {
-      margin-bottom: var(--space-base);
+      margin-bottom: var(--space-xx-small);
       cursor: default;
     }
   }
