@@ -77,7 +77,7 @@ const LIVEKIT = {
 }
 
 let authenticatedUser: Context['user']
-const users: Record<string, Context['user']> = {}
+const users = new Map<string, Context['user']>()
 const context = () => ({
   authenticatedUser,
   config: LIVEKIT,
@@ -89,7 +89,7 @@ let database: ApolloTestSetup['database']
 let server: ApolloTestSetup['server']
 
 const as = (userId: string) => {
-  authenticatedUser = users[userId]
+  authenticatedUser = users.get(userId) ?? null
 }
 
 // Who the media server lists in the call: each with a microphone, a camera and a screen share
@@ -162,7 +162,7 @@ beforeEach(async () => {
     ['ute', 'Ute'],
     ['udo', 'Udo'],
   ]) {
-    users[id] = await (await Factory.build('user', { id, name })).toJson()
+    users.set(id, (await (await Factory.build('user', { id, name })).toJson()) as Context['user'])
   }
   await Factory.build(
     'group',

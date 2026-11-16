@@ -354,14 +354,15 @@ describe('the media server', () => {
   })
 
   it('sends a notice to some connections or to everybody, and none to nobody', async () => {
-    const service = client()
+    const sendData = vi.fn().mockResolvedValue(undefined)
+    const service = client({ sendData })
     await notify(service, 'group-g1', { type: 'floor', by: 'Anna' }, ['a#1'])
     await notify(service, 'group-g1', { type: 'everyoneModerates' })
     await notify(service, 'group-g1', { type: 'floor' }, [])
 
-    expect(service.sendData).toHaveBeenCalledTimes(2)
+    expect(sendData).toHaveBeenCalledTimes(2)
 
-    const [first, second] = vi.mocked(service.sendData).mock.calls
+    const [first, second] = sendData.mock.calls as [string, Uint8Array, unknown, unknown][]
 
     expect(JSON.parse(new TextDecoder().decode(first[1]))).toEqual({
       type: 'floor',
