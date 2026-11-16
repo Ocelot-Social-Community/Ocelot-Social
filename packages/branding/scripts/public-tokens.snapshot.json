@@ -287,6 +287,7 @@
     "video-call-participant-inert-floor-color",
     "video-call-participant-inert-off-color",
     "video-call-participant-inert-on-color",
+    "video-call-participant-locally-muted-color",
     "video-on-media-color",
     "video-surface",
     "video-surface-deep",

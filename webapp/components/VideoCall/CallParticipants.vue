@@ -897,6 +897,9 @@ export default {
 .call-participants__switch:focus-visible {
   color: var(--color-danger);
 }
+.call-participants__unmute {
+  color: var(--video-call-participant-locally-muted-color);
+}
 .call-participants__unmute:hover,
 .call-participants__unmute:focus-visible {
   color: var(--color-primary);
