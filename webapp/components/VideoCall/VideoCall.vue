@@ -363,7 +363,10 @@
               on a phone, higher or lower. Remembered per layout on this device.
             -->
             <div
-              class="video-call__sidebar-resizer"
+              :class="[
+                'video-call__sidebar-resizer',
+                { 'video-call__sidebar-resizer--dragging': sidebarResizing },
+              ]"
               role="separator"
               tabindex="0"
               data-test="video-call-sidebar-resizer"
@@ -952,6 +955,9 @@ export default {
       // until the user pulls it: the stylesheet's size then.
       sidebarWidth: null,
       sidebarHeight: null,
+      // Whether the sidebar's edge is being pulled: it stays lit until let go. Reactive, unlike
+      // the drag's own bookkeeping (sidebarDrag), so that the edge goes dark the moment it is.
+      sidebarResizing: false,
     }
   },
   computed: {
@@ -2173,6 +2179,7 @@ export default {
       const rect = sidebar.getBoundingClientRect()
       // The sidebar's far edge stays put; the near one follows the pointer.
       this.sidebarDrag = { right: rect.right, bottom: rect.bottom }
+      this.sidebarResizing = true
       if (event.target && event.target.setPointerCapture && event.pointerId !== undefined) {
         try {
           event.target.setPointerCapture(event.pointerId)
@@ -2198,6 +2205,7 @@ export default {
       window.removeEventListener('pointercancel', this.stopSidebarResize)
       if (!this.sidebarDrag) return
       this.sidebarDrag = null
+      this.sidebarResizing = false
       this.saveSidebarSize()
     },
     onSidebarResizeKey(event) {
@@ -4155,11 +4163,32 @@ export default {
   z-index: 1;
 }
 
+/*  A grip on it at all times, so that it can be found without a pointer to pass over it, as on a
+    phone: a short bar across its middle. */
+.video-call__sidebar-resizer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 32px;
+  border-radius: 2px;
+  background: var(--video-call-sidebar-grip-color);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/*  Passed over, in focus, or pulled until let go: the whole edge lights up, and the grip with it. */
 .video-call__sidebar-resizer:hover,
-.video-call__sidebar-resizer:focus-visible {
-  background: var(--color-primary);
-  opacity: 0.4;
+.video-call__sidebar-resizer:focus-visible,
+.video-call__sidebar-resizer--dragging {
+  background: var(--video-call-sidebar-resizer-active-color);
   outline: none;
+}
+.video-call__sidebar-resizer:hover::after,
+.video-call__sidebar-resizer:focus-visible::after,
+.video-call__sidebar-resizer--dragging::after {
+  background: var(--color-primary);
 }
 
 /*  Below the videos on a phone: the strip lies along the top edge, a finger's height. */
@@ -4170,6 +4199,10 @@ export default {
   height: 22px;
   margin-top: -11px;
   cursor: row-resize;
+}
+.video-call__body--chat-below .video-call__sidebar > .video-call__sidebar-resizer::after {
+  width: 32px;
+  height: 4px;
 }
 
 /*  The question who moderates on, over the whole call. */

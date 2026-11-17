@@ -7261,6 +7261,15 @@ describe('VideoCall — the people in the call and their moderation', () => {
       wrapper.vm.stopSidebarResize()
     })
 
+    it('is lit while it is pulled, and dark again the moment it is let go', () => {
+      const wrapper = sized()
+      expect(wrapper.vm.sidebarResizing).toBe(false)
+      wrapper.vm.startSidebarResize({ button: 0, target: {}, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarResizing).toBe(true)
+      wrapper.vm.stopSidebarResize()
+      expect(wrapper.vm.sidebarResizing).toBe(false)
+    })
+
     it('ignores another button than the main one, and a capture that fails', () => {
       const wrapper = sized()
       wrapper.vm.startSidebarResize({ button: 2, preventDefault: jest.fn() })

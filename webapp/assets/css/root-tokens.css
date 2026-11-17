@@ -597,4 +597,8 @@
      its own — red is for a device that is off for everybody. */
   --video-call-participant-locally-muted-color: var(--color-warning);
   --video-call-participant-inert-floor-color: light-dark(color-mix(in srgb, var(--color-primary) 45%, transparent), color-mix(in srgb, var(--color-primary) 70%, transparent));
+  /* The edge between the videos and the sidebar, to pull: its grip, always there but quiet, and the
+     edge lit up while it is passed over or pulled. */
+  --video-call-sidebar-grip-color: color-mix(in srgb, var(--text-color-soft) 50%, transparent);
+  --video-call-sidebar-resizer-active-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
