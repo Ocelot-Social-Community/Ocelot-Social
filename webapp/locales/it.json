@@ -2099,6 +2099,7 @@
       "filterCount": "{shown} di {total}",
       "filterName": "Filtra per nome",
       "filterNameClear": "Cancella nome",
+      "filterNamePlaceholder": "Filtra nomi",
       "filterNone": "Nessuno corrisponde al filtro.",
       "filterReset": "Reimposta filtro",
       "giveFloor": "Dai la parola",

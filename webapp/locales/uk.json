@@ -2099,6 +2099,7 @@
       "filterCount": "{shown} з {total}",
       "filterName": "Фільтр за іменем",
       "filterNameClear": "Очистити ім'я",
+      "filterNamePlaceholder": "Фільтр за ім’ям",
       "filterNone": "Ніхто не відповідає фільтру.",
       "filterReset": "Скинути фільтр",
       "giveFloor": "Надати слово",

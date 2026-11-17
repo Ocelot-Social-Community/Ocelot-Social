@@ -2099,6 +2099,7 @@
       "filterCount": "{shown} van {total}",
       "filterName": "Filteren op naam",
       "filterNameClear": "Naam wissen",
+      "filterNamePlaceholder": "Namen filteren",
       "filterNone": "Niemand voldoet aan het filter.",
       "filterReset": "Filter wissen",
       "giveFloor": "Het woord geven",

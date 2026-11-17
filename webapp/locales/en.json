@@ -2099,6 +2099,7 @@
       "filterCount": "{shown} of {total}",
       "filterName": "Filter by name",
       "filterNameClear": "Clear name",
+      "filterNamePlaceholder": "Filter names",
       "filterNone": "Nobody matches the filter.",
       "filterReset": "Reset filter",
       "giveFloor": "Give the floor",

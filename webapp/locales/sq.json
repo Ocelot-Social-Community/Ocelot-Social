@@ -2099,6 +2099,7 @@
       "filterCount": "{shown} nga {total}",
       "filterName": "Filtro sipas emrit",
       "filterNameClear": "Pastro emrin",
+      "filterNamePlaceholder": "Filtro emrat",
       "filterNone": "Askush nuk përputhet me filtrin.",
       "filterReset": "Rivendos filtrin",
       "giveFloor": "Jepi fjalën",

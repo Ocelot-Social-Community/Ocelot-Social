@@ -154,7 +154,7 @@
               type="text"
               class="call-participants__filter-name"
               data-test="call-participants-filter-name"
-              :placeholder="$t('videoCall.participants.filterName')"
+              :placeholder="$t('videoCall.participants.filterNamePlaceholder')"
               :aria-label="$t('videoCall.participants.filterName')"
               @keydown.esc.stop="clearFilterName"
             />
