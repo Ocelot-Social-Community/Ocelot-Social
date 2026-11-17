@@ -226,6 +226,18 @@ describe('CallParticipants', () => {
         expect(find('filter-chosen-micOn').exists()).toBe(false)
       })
 
+      it('let go of one with a click on its symbol in the field', async () => {
+        wrapper = Wrapper({ people })
+        await find('filter-toggle').trigger('click')
+        await chip('cameraOn').setChecked(true)
+        await chip('micOn').setChecked(true)
+        expect(shown()).toEqual(['anna'])
+        await find('filter-chosen-micOn').trigger('click')
+        expect(find('filter-chosen-micOn').exists()).toBe(false)
+        expect(chip('micOn').element.checked).toBe(false)
+        expect(shown().sort()).toEqual(['anna', 'me'])
+      })
+
       it.each([
         ['micOn', ['bob', 'anna']],
         ['cameraOn', ['me', 'anna']],

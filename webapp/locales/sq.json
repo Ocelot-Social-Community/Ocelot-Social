@@ -2096,6 +2096,7 @@
         "sharing": "Ndan ekranin",
         "speaking": "Po flet tani"
       },
+      "filterChipRemove": "Hiq „{name}“",
       "filterCount": "{shown} nga {total}",
       "filterName": "Filtro sipas emrit",
       "filterNameClear": "Pastro emrin",

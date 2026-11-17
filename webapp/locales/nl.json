@@ -2096,6 +2096,7 @@
         "sharing": "Deelt het scherm",
         "speaking": "Spreekt nu"
       },
+      "filterChipRemove": "„{name}” uitzetten",
       "filterCount": "{shown} van {total}",
       "filterName": "Filteren op naam",
       "filterNameClear": "Naam wissen",

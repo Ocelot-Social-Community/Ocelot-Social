@@ -2096,6 +2096,7 @@
         "sharing": "Partage l’écran",
         "speaking": "Parle en ce moment"
       },
+      "filterChipRemove": "Retirer « {name} »",
       "filterCount": "{shown} sur {total}",
       "filterName": "Filtrer par nom",
       "filterNameClear": "Effacer le nom",

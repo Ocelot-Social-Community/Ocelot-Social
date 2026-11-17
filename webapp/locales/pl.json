@@ -2096,6 +2096,7 @@
         "sharing": "Udostępnia ekran",
         "speaking": "Właśnie mówi"
       },
+      "filterChipRemove": "Odznacz „{name}”",
       "filterCount": "{shown} z {total}",
       "filterName": "Filtruj po nazwie",
       "filterNameClear": "Wyczyść nazwę",

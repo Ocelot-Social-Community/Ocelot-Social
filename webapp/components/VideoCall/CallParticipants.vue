@@ -138,16 +138,19 @@
                 </div>
               </template>
             </dropdown>
-            <!-- What the filter looks for besides the name, at a glance. -->
-            <span
+            <!-- What the filter looks for besides the name, at a glance; a click lets go of it. -->
+            <button
               v-for="chip in chosenChips"
               :key="chip.key"
-              v-tooltip="chip.label"
+              v-tooltip="$t('videoCall.participants.filterChipRemove', { name: chip.label })"
+              type="button"
               class="call-participants__filter-chosen"
+              :aria-label="$t('videoCall.participants.filterChipRemove', { name: chip.label })"
               :data-test="'call-participants-filter-chosen-' + chip.key"
+              @click="toggleChip(chip.key)"
             >
-              <os-icon :icon="chip.icon" :aria-label="chip.label" />
-            </span>
+              <os-icon :icon="chip.icon" />
+            </button>
             <input
               ref="filterName"
               v-model="filterName"
@@ -1122,7 +1125,15 @@ export default {
 .call-participants__filter-chosen {
   flex: 0 0 auto;
   display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--color-primary);
+  cursor: pointer;
+}
+.call-participants__filter-chosen:hover,
+.call-participants__filter-chosen:focus-visible {
+  color: var(--color-danger);
 }
 .call-participants__filter-more {
   flex: 0 0 auto;

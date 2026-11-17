@@ -2096,6 +2096,7 @@
         "sharing": "Показывает экран",
         "speaking": "Сейчас говорит"
       },
+      "filterChipRemove": "Убрать «{name}»",
       "filterCount": "{shown} из {total}",
       "filterName": "Фильтр по имени",
       "filterNameClear": "Очистить имя",
