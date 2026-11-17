@@ -1128,16 +1128,19 @@ export default {
   flex: 0 0 auto;
   display: inline-flex;
 }
+/*  The popover has its own padding: the options keep to it, only their hover reaches a little
+    beyond. */
 .call-participants__filter-menu {
   display: flex;
   flex-direction: column;
-  padding: var(--space-xx-small) 0;
+  margin: 0 calc(-1 * var(--space-x-small));
 }
 .call-participants__filter-option {
   display: flex;
   align-items: center;
   gap: var(--space-x-small);
-  padding: var(--space-xx-small) var(--space-small);
+  padding: var(--space-xx-small) var(--space-x-small);
+  border-radius: var(--border-radius-base);
   white-space: nowrap;
   cursor: pointer;
 }
