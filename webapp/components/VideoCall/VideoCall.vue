@@ -2177,8 +2177,14 @@ export default {
       event.preventDefault()
       const sidebar = this.$el.querySelector('.video-call__sidebar')
       const rect = sidebar.getBoundingClientRect()
-      // The sidebar's far edge stays put; the near one follows the pointer.
-      this.sidebarDrag = { right: rect.right, bottom: rect.bottom }
+      // The sidebar's far edge stays put; the near one follows the pointer, which keeps to where
+      // it took hold of the edge, as on its grip, instead of the edge jumping under it.
+      const offset = (pointer, edge) =>
+        Number.isFinite(pointer) && Number.isFinite(edge) ? pointer - edge : 0
+      this.sidebarDrag = {
+        right: rect.right + offset(event.clientX, rect.left),
+        bottom: rect.bottom + offset(event.clientY, rect.top),
+      }
       this.sidebarResizing = true
       if (event.target && event.target.setPointerCapture && event.pointerId !== undefined) {
         try {

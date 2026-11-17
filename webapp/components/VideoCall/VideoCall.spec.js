@@ -7261,6 +7261,27 @@ describe('VideoCall — the people in the call and their moderation', () => {
       wrapper.vm.stopSidebarResize()
     })
 
+    it('keeps the pointer where it took hold of the edge, as on its grip', () => {
+      const wrapper = sized()
+      const querySelector = wrapper.vm.$el.querySelector
+      wrapper.vm.$el.querySelector = (selector) =>
+        selector === '.video-call__sidebar'
+          ? { getBoundingClientRect: () => ({ left: 640, right: 1000, top: 500, bottom: 800 }) }
+          : querySelector(selector)
+      // Taken hold of 4px inside the edge: the edge does not jump, but follows 4px ahead.
+      wrapper.vm.startSidebarResize({
+        button: 0,
+        clientX: 644,
+        target: {},
+        preventDefault: jest.fn(),
+      })
+      wrapper.vm.onSidebarResize({ clientX: 644 })
+      expect(wrapper.vm.sidebarWidth).toBe(360)
+      wrapper.vm.onSidebarResize({ clientX: 604 })
+      expect(wrapper.vm.sidebarWidth).toBe(400)
+      wrapper.vm.stopSidebarResize()
+    })
+
     it('is lit while it is pulled, and dark again the moment it is let go', () => {
       const wrapper = sized()
       expect(wrapper.vm.sidebarResizing).toBe(false)
