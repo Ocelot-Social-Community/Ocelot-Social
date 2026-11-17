@@ -95,6 +95,16 @@
               class="call-participants__filter-symbol"
               aria-hidden="true"
             />
+            <!-- What the filter looks for besides the name, at a glance. -->
+            <span
+              v-for="chip in chosenChips"
+              :key="chip.key"
+              v-tooltip="chip.label"
+              class="call-participants__filter-chosen"
+              :data-test="'call-participants-filter-chosen-' + chip.key"
+            >
+              <os-icon :icon="chip.icon" :aria-label="chip.label" />
+            </span>
             <input
               ref="filterName"
               v-model="filterName"
@@ -118,6 +128,49 @@
                 })
               }}
             </span>
+            <!--
+              The rest of what the filter can look for, to tick in a menu: whoever matches all that
+              is ticked, and the name, stays. The menu stays open for ticking more than one.
+            -->
+            <dropdown class="call-participants__filter-more" placement="bottom-end" offset="5">
+              <template #default="{ toggleMenu, isOpen }">
+                <button
+                  v-tooltip="$t('videoCall.participants.filterBy')"
+                  type="button"
+                  class="call-participants__filter-more-toggle"
+                  data-test="call-participants-filter-more"
+                  :aria-label="$t('videoCall.participants.filterBy')"
+                  aria-haspopup="true"
+                  :aria-expanded="isOpen ? 'true' : 'false'"
+                  @click.prevent="toggleMenu"
+                >
+                  <os-icon :icon="isOpen ? icons.angleUp : icons.angleDown" />
+                </button>
+              </template>
+              <template #popover>
+                <div
+                  class="call-participants__filter-menu"
+                  role="group"
+                  :aria-label="$t('videoCall.participants.filterBy')"
+                  data-test="call-participants-filter-menu"
+                >
+                  <label
+                    v-for="chip in filterChips"
+                    :key="chip.key"
+                    class="call-participants__filter-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :checked="filterKeys.includes(chip.key)"
+                      :data-test="'call-participants-filter-chip-' + chip.key"
+                      @change="toggleChip(chip.key)"
+                    />
+                    <os-icon :icon="chip.icon" aria-hidden="true" />
+                    {{ chip.label }}
+                  </label>
+                </div>
+              </template>
+            </dropdown>
             <button
               v-if="filterName"
               v-tooltip="$t('videoCall.participants.filterNameClear')"
@@ -146,33 +199,6 @@
             </template>
           </os-button>
         </span>
-      </div>
-      <!--
-        What else the filter looks for, below its field: each chip chosen narrows the list further,
-        and with the name, too, only whoever matches all of them stays.
-      -->
-      <div
-        v-if="filterOpen"
-        class="call-participants__filter-chips"
-        role="group"
-        :aria-label="$t('videoCall.participants.filterBy')"
-        data-test="call-participants-filter-chips"
-      >
-        <os-button
-          v-for="chip in filterChips"
-          :key="chip.key"
-          variant="primary"
-          :appearance="filterKeys.includes(chip.key) ? 'filled' : 'outline'"
-          size="sm"
-          :aria-pressed="filterKeys.includes(chip.key) ? 'true' : 'false'"
-          :data-test="'call-participants-filter-chip-' + chip.key"
-          @click="toggleChip(chip.key)"
-        >
-          <template #icon>
-            <os-icon :icon="chip.icon" />
-          </template>
-          {{ chip.label }}
-        </os-button>
       </div>
     </div>
 
@@ -576,6 +602,9 @@ export default {
         ),
       ]
     },
+    chosenChips() {
+      return this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
+    },
     // Only while its field is open: closed, the filter keeps name and chips but filters no more.
     filtering() {
       return this.filterOpen && (fold(this.filterName) !== '' || this.filterKeys.length > 0)
@@ -583,10 +612,10 @@ export default {
     shown() {
       if (!this.filtering) return this.ordered
       const needle = fold(this.filterName)
-      const chips = this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
       return this.ordered.filter(
         (person) =>
-          fold(person.name).includes(needle) && chips.every((chip) => chip.matches(person)),
+          fold(person.name).includes(needle) &&
+          this.chosenChips.every((chip) => chip.matches(person)),
       )
     },
     // How many "mute all" would mute: everybody not spared and not given the floor whose
@@ -1061,7 +1090,8 @@ export default {
   background: none;
   color: var(--text-color-base);
 }
-.call-participants__filter-clear {
+.call-participants__filter-clear,
+.call-participants__filter-more-toggle {
   flex: 0 0 auto;
   display: inline-flex;
   padding: 0;
@@ -1071,7 +1101,9 @@ export default {
   cursor: pointer;
 }
 .call-participants__filter-clear:hover,
-.call-participants__filter-clear:focus-visible {
+.call-participants__filter-clear:focus-visible,
+.call-participants__filter-more-toggle:hover,
+.call-participants__filter-more-toggle:focus-visible {
   color: var(--text-color-base);
 }
 .call-participants__filter-count {
@@ -1080,10 +1112,30 @@ export default {
   color: var(--text-color-soft);
   white-space: nowrap;
 }
-.call-participants__filter-chips {
+.call-participants__filter-chosen {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--color-primary);
+}
+.call-participants__filter-more {
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+.call-participants__filter-menu {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xx-small);
+  flex-direction: column;
+  padding: var(--space-xx-small) 0;
+}
+.call-participants__filter-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-x-small);
+  padding: var(--space-xx-small) var(--space-small);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.call-participants__filter-option:hover {
+  background: var(--background-color-softer);
 }
 .call-participants__none {
   display: flex;

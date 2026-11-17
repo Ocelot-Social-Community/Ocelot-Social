@@ -212,12 +212,18 @@ describe('CallParticipants', () => {
       ]
       const moderation = { moderators: ['mod'], everyone: false, speakers: ['anna'] }
 
-      it('show below the field, only while it is open', async () => {
+      it('are ticked in a menu in the field, and the ticked ones show in the field', async () => {
         wrapper = Wrapper()
-        expect(find('filter-chips').exists()).toBe(false)
+        expect(find('filter-more').exists()).toBe(false)
         await find('filter-toggle').trigger('click')
+        expect(find('filter-more').attributes('aria-expanded')).toBe('false')
         expect(wrapper.findAll('[data-test^="call-participants-filter-chip-"]')).toHaveLength(7)
-        expect(chip('micOn').attributes('aria-pressed')).toBe('false')
+        expect(chip('micOn').element.checked).toBe(false)
+        expect(find('filter-chosen-micOn').exists()).toBe(false)
+        await chip('micOn').setChecked(true)
+        expect(find('filter-chosen-micOn').exists()).toBe(true)
+        await chip('micOn').setChecked(false)
+        expect(find('filter-chosen-micOn').exists()).toBe(false)
       })
 
       it.each([
@@ -231,51 +237,51 @@ describe('CallParticipants', () => {
       ])('"%s" keeps only whoever matches it', async (key, expected) => {
         wrapper = Wrapper({ people, moderation, locallyMuted: { anna: true } })
         await find('filter-toggle').trigger('click')
-        await chip(key).trigger('click')
-        expect(chip(key).attributes('aria-pressed')).toBe('true')
+        await chip(key).setChecked(true)
+        expect(chip(key).element.checked).toBe(true)
         expect(shown().sort()).toEqual([...expected].sort())
       })
 
       it('counts everybody as moderating while everybody moderates', async () => {
         wrapper = Wrapper({ people, moderation: { ...moderation, everyone: true } })
         await find('filter-toggle').trigger('click')
-        await chip('moderator').trigger('click')
+        await chip('moderator').setChecked(true)
         expect(shown()).toHaveLength(4)
       })
 
       it('keep only whoever matches all chips chosen, and the name too', async () => {
         wrapper = Wrapper({ people })
         await find('filter-toggle').trigger('click')
-        await chip('cameraOn').trigger('click')
+        await chip('cameraOn').setChecked(true)
         expect(shown().sort()).toEqual(['anna', 'me'])
-        await chip('micOn').trigger('click')
+        await chip('micOn').setChecked(true)
         expect(shown()).toEqual(['anna'])
         expect(find('filter-count').text()).toBe(
           'videoCall.participants.filterCount {"shown":1,"total":4}',
         )
         await find('filter-name').setValue('bo')
         expect(find('filter-none').exists()).toBe(true)
-        await chip('cameraOn').trigger('click')
-        expect(chip('cameraOn').attributes('aria-pressed')).toBe('false')
+        await chip('cameraOn').setChecked(false)
+        expect(chip('cameraOn').element.checked).toBe(false)
         expect(shown()).toEqual(['bob'])
       })
 
       it('filter no more once closed, and are chosen again when it opens', async () => {
         wrapper = Wrapper({ people })
         await find('filter-toggle').trigger('click')
-        await chip('speaking').trigger('click')
+        await chip('speaking').setChecked(true)
         await find('filter-toggle').trigger('click')
         expect(wrapper.vm.filtering).toBe(false)
         expect(shown()).toHaveLength(4)
         await find('filter-toggle').trigger('click')
-        expect(chip('speaking').attributes('aria-pressed')).toBe('true')
+        expect(chip('speaking').element.checked).toBe(true)
         expect(shown()).toEqual(['bob'])
       })
 
       it('are left alone by the cross and Esc, and reset with the name', async () => {
         wrapper = Wrapper({ people })
         await find('filter-toggle').trigger('click')
-        await chip('sharing').trigger('click')
+        await chip('sharing').setChecked(true)
         await find('filter-name').setValue('zz')
         await find('filter-clear').trigger('click')
         expect(shown()).toEqual(['bob'])
