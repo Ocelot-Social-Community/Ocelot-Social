@@ -2086,6 +2086,16 @@
       "devices": "Пристроїв: {count}",
       "everyoneModerates": "Модерують усі",
       "filter": "Фільтрувати учасників",
+      "filterBy": "Фільтрувати за",
+      "filterChip": {
+        "cameraOn": "Камеру увімкнено",
+        "floor": "Має слово",
+        "micOn": "Мікрофон увімкнено",
+        "moderator": "Модерація",
+        "mutedForMe": "Заглушено для мене",
+        "sharing": "Показує екран",
+        "speaking": "Зараз говорить"
+      },
       "filterCount": "{shown} з {total}",
       "filterName": "Фільтр за іменем",
       "filterNameClear": "Очистити ім'я",

@@ -201,6 +201,91 @@ describe('CallParticipants', () => {
       expect(find('filter-none').exists()).toBe(false)
       expect(shown()).toHaveLength(3)
     })
+
+    describe('its chips', () => {
+      const chip = (key) => find('filter-chip-' + key)
+      const people = [
+        person('me', { isMe: true, micOn: false, cameraOn: true }),
+        person('bob', { speaking: true, screenSharing: true }),
+        person('anna', { cameraOn: true }),
+        person('mod', { micOn: false }),
+      ]
+      const moderation = { moderators: ['mod'], everyone: false, speakers: ['anna'] }
+
+      it('show below the field, only while it is open', async () => {
+        wrapper = Wrapper()
+        expect(find('filter-chips').exists()).toBe(false)
+        await find('filter-toggle').trigger('click')
+        expect(wrapper.findAll('[data-test^="call-participants-filter-chip-"]')).toHaveLength(7)
+        expect(chip('micOn').attributes('aria-pressed')).toBe('false')
+      })
+
+      it.each([
+        ['micOn', ['bob', 'anna']],
+        ['cameraOn', ['me', 'anna']],
+        ['speaking', ['bob']],
+        ['floor', ['anna']],
+        ['moderator', ['mod']],
+        ['sharing', ['bob']],
+        ['mutedForMe', ['anna']],
+      ])('"%s" keeps only whoever matches it', async (key, expected) => {
+        wrapper = Wrapper({ people, moderation, locallyMuted: { anna: true } })
+        await find('filter-toggle').trigger('click')
+        await chip(key).trigger('click')
+        expect(chip(key).attributes('aria-pressed')).toBe('true')
+        expect(shown().sort()).toEqual([...expected].sort())
+      })
+
+      it('counts everybody as moderating while everybody moderates', async () => {
+        wrapper = Wrapper({ people, moderation: { ...moderation, everyone: true } })
+        await find('filter-toggle').trigger('click')
+        await chip('moderator').trigger('click')
+        expect(shown()).toHaveLength(4)
+      })
+
+      it('keep only whoever matches all chips chosen, and the name too', async () => {
+        wrapper = Wrapper({ people })
+        await find('filter-toggle').trigger('click')
+        await chip('cameraOn').trigger('click')
+        expect(shown().sort()).toEqual(['anna', 'me'])
+        await chip('micOn').trigger('click')
+        expect(shown()).toEqual(['anna'])
+        expect(find('filter-count').text()).toBe(
+          'videoCall.participants.filterCount {"shown":1,"total":4}',
+        )
+        await find('filter-name').setValue('bo')
+        expect(find('filter-none').exists()).toBe(true)
+        await chip('cameraOn').trigger('click')
+        expect(chip('cameraOn').attributes('aria-pressed')).toBe('false')
+        expect(shown()).toEqual(['bob'])
+      })
+
+      it('filter no more once closed, and are chosen again when it opens', async () => {
+        wrapper = Wrapper({ people })
+        await find('filter-toggle').trigger('click')
+        await chip('speaking').trigger('click')
+        await find('filter-toggle').trigger('click')
+        expect(wrapper.vm.filtering).toBe(false)
+        expect(shown()).toHaveLength(4)
+        await find('filter-toggle').trigger('click')
+        expect(chip('speaking').attributes('aria-pressed')).toBe('true')
+        expect(shown()).toEqual(['bob'])
+      })
+
+      it('are left alone by the cross and Esc, and reset with the name', async () => {
+        wrapper = Wrapper({ people })
+        await find('filter-toggle').trigger('click')
+        await chip('sharing').trigger('click')
+        await find('filter-name').setValue('zz')
+        await find('filter-clear').trigger('click')
+        expect(shown()).toEqual(['bob'])
+        await find('filter-name').setValue('zz')
+        await find('filter-reset').trigger('click')
+        expect(wrapper.vm.filterKeys).toEqual([])
+        expect(wrapper.vm.filterName).toBe('')
+        expect(shown()).toHaveLength(4)
+      })
+    })
   })
 
   describe('what everybody can do', () => {

@@ -2086,6 +2086,16 @@
       "devices": "{count} apparaten",
       "everyoneModerates": "Iedereen modereert",
       "filter": "Deelnemers filteren",
+      "filterBy": "Filteren op",
+      "filterChip": {
+        "cameraOn": "Camera aan",
+        "floor": "Heeft het woord",
+        "micOn": "Microfoon aan",
+        "moderator": "Moderatie",
+        "mutedForMe": "Voor mij gedempt",
+        "sharing": "Deelt het scherm",
+        "speaking": "Spreekt nu"
+      },
       "filterCount": "{shown} van {total}",
       "filterName": "Filteren op naam",
       "filterNameClear": "Naam wissen",

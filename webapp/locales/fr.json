@@ -2086,6 +2086,16 @@
       "devices": "{count} appareils",
       "everyoneModerates": "Tout le monde modère",
       "filter": "Filtrer les participants",
+      "filterBy": "Filtrer par",
+      "filterChip": {
+        "cameraOn": "Caméra activée",
+        "floor": "A la parole",
+        "micOn": "Micro activé",
+        "moderator": "Modération",
+        "mutedForMe": "Son coupé pour moi",
+        "sharing": "Partage l’écran",
+        "speaking": "Parle en ce moment"
+      },
       "filterCount": "{shown} sur {total}",
       "filterName": "Filtrer par nom",
       "filterNameClear": "Effacer le nom",

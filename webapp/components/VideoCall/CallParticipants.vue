@@ -147,6 +147,33 @@
           </os-button>
         </span>
       </div>
+      <!--
+        What else the filter looks for, below its field: each chip chosen narrows the list further,
+        and with the name, too, only whoever matches all of them stays.
+      -->
+      <div
+        v-if="filterOpen"
+        class="call-participants__filter-chips"
+        role="group"
+        :aria-label="$t('videoCall.participants.filterBy')"
+        data-test="call-participants-filter-chips"
+      >
+        <os-button
+          v-for="chip in filterChips"
+          :key="chip.key"
+          variant="primary"
+          :appearance="filterKeys.includes(chip.key) ? 'filled' : 'outline'"
+          size="sm"
+          :aria-pressed="filterKeys.includes(chip.key) ? 'true' : 'false'"
+          :data-test="'call-participants-filter-chip-' + chip.key"
+          @click="toggleChip(chip.key)"
+        >
+          <template #icon>
+            <os-icon :icon="chip.icon" />
+          </template>
+          {{ chip.label }}
+        </os-button>
+      </div>
     </div>
 
     <ul
@@ -433,9 +460,11 @@ export default {
   emits: ['spotlight', 'local-mute', 'switch-off', 'switch-on'],
   data() {
     return {
-      // The filter: whether its row is unfolded, and the part of a name it looks for.
+      // The filter: whether its row is unfolded, the part of a name it looks for, and the chips
+      // chosen, by key.
       filterOpen: false,
       filterName: '',
+      filterKeys: [],
       busy: false,
       // The heavier rights over the person whose menu is open, as the server answered them.
       rights: {},
@@ -498,14 +527,67 @@ export default {
       }
       return live.sort((a, b) => place(a) - place(b))
     },
-    // Only while its field is open: closed, the filter keeps the name but filters no more.
+    // What the filter can look for besides a name. "Speaking" comes and goes with every word, but
+    // shows where a background noise comes from.
+    filterChips() {
+      const chip = (key, icon, label, matches) => ({ key, icon, label, matches })
+      return [
+        chip(
+          'micOn',
+          this.icons.microphone,
+          this.$t('videoCall.participants.filterChip.micOn'),
+          (person) => person.micOn,
+        ),
+        chip(
+          'cameraOn',
+          this.icons.videoCamera,
+          this.$t('videoCall.participants.filterChip.cameraOn'),
+          (person) => person.cameraOn,
+        ),
+        chip(
+          'speaking',
+          this.icons.volumeUp,
+          this.$t('videoCall.participants.filterChip.speaking'),
+          (person) => person.speaking,
+        ),
+        chip(
+          'floor',
+          this.icons.comment,
+          this.$t('videoCall.participants.filterChip.floor'),
+          (person) => this.hasFloor(person.userId),
+        ),
+        chip(
+          'moderator',
+          this.icons.shield,
+          this.$t('videoCall.participants.filterChip.moderator'),
+          (person) => this.moderation.everyone || this.isNamedModerator(person.userId),
+        ),
+        chip(
+          'sharing',
+          this.icons.desktop,
+          this.$t('videoCall.participants.filterChip.sharing'),
+          (person) => person.screenSharing,
+        ),
+        chip(
+          'mutedForMe',
+          this.icons.volumeOff,
+          this.$t('videoCall.participants.filterChip.mutedForMe'),
+          (person) => !!this.locallyMuted[person.userId],
+        ),
+      ]
+    },
+    // Only while its field is open: closed, the filter keeps name and chips but filters no more.
     filtering() {
-      return this.filterOpen && fold(this.filterName) !== ''
+      return this.filterOpen && (fold(this.filterName) !== '' || this.filterKeys.length > 0)
     },
     shown() {
       if (!this.filtering) return this.ordered
       const needle = fold(this.filterName)
-      return this.ordered.filter((person) => fold(person.name).includes(needle))
+      const chips = this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
+      return this.ordered.filter(
+        (person) =>
+          fold(person.name).includes(needle) && chips.every((chip) => chip.matches(person)),
+      )
     },
     // How many "mute all" would mute: everybody not spared and not given the floor whose
     // microphone is on.
@@ -596,8 +678,14 @@ export default {
       if (event && event.type === 'keydown' && !this.filterName) this.filterOpen = false
       this.filterName = ''
     },
+    toggleChip(key) {
+      this.filterKeys = this.filterKeys.includes(key)
+        ? this.filterKeys.filter((chosen) => chosen !== key)
+        : [...this.filterKeys, key]
+    },
     resetFilter() {
       this.filterName = ''
+      this.filterKeys = []
     },
     // A menu holds the order for as long as it is open, and a moment longer, like a click does.
     holdOrder(open) {
@@ -991,6 +1079,11 @@ export default {
   font-size: var(--font-size-x-small);
   color: var(--text-color-soft);
   white-space: nowrap;
+}
+.call-participants__filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xx-small);
 }
 .call-participants__none {
   display: flex;

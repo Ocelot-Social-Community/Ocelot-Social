@@ -2086,6 +2086,16 @@
       "devices": "Устройств: {count}",
       "everyoneModerates": "Модерируют все",
       "filter": "Фильтровать участников",
+      "filterBy": "Фильтровать по",
+      "filterChip": {
+        "cameraOn": "Камера включена",
+        "floor": "Имеет слово",
+        "micOn": "Микрофон включён",
+        "moderator": "Модерация",
+        "mutedForMe": "Заглушён для меня",
+        "sharing": "Показывает экран",
+        "speaking": "Сейчас говорит"
+      },
       "filterCount": "{shown} из {total}",
       "filterName": "Фильтр по имени",
       "filterNameClear": "Очистить имя",
