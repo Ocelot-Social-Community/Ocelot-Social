@@ -1107,7 +1107,7 @@ export default {
 }
 .call-participants__filter-more-arrow {
   flex: 0 0 auto;
-  font-size: 0.6em;
+  font-size: 0.45em;
 }
 .call-participants__filter-name {
   flex: 1 1 auto;
