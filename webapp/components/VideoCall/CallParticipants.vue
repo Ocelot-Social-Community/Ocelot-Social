@@ -90,11 +90,54 @@
           data-test="call-participants-filter"
         >
           <span v-if="filterOpen" class="call-participants__filter-field">
-            <os-icon
-              :icon="icons.filter"
-              class="call-participants__filter-symbol"
-              aria-hidden="true"
-            />
+            <!--
+              The filter's symbol at the field's front opens, with the small arrow up at its side,
+              the rest of what the filter can look for, to tick in a menu: whoever matches all that
+              is ticked, and the name, stays. The menu stays open for ticking more than one.
+            -->
+            <dropdown class="call-participants__filter-more" placement="bottom-start" offset="5">
+              <template #default="{ toggleMenu, isOpen }">
+                <button
+                  v-tooltip="$t('videoCall.participants.filterBy')"
+                  type="button"
+                  class="call-participants__filter-more-toggle"
+                  data-test="call-participants-filter-more"
+                  :aria-label="$t('videoCall.participants.filterBy')"
+                  aria-haspopup="true"
+                  :aria-expanded="isOpen ? 'true' : 'false'"
+                  @click.prevent="toggleMenu"
+                >
+                  <os-icon :icon="icons.filter" class="call-participants__filter-symbol" />
+                  <os-icon
+                    :icon="isOpen ? icons.angleUp : icons.angleDown"
+                    class="call-participants__filter-more-arrow"
+                  />
+                </button>
+              </template>
+              <template #popover>
+                <div
+                  class="call-participants__filter-menu"
+                  role="group"
+                  :aria-label="$t('videoCall.participants.filterBy')"
+                  data-test="call-participants-filter-menu"
+                >
+                  <label
+                    v-for="chip in filterChips"
+                    :key="chip.key"
+                    class="call-participants__filter-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :checked="filterKeys.includes(chip.key)"
+                      :data-test="'call-participants-filter-chip-' + chip.key"
+                      @change="toggleChip(chip.key)"
+                    />
+                    <os-icon :icon="chip.icon" aria-hidden="true" />
+                    {{ chip.label }}
+                  </label>
+                </div>
+              </template>
+            </dropdown>
             <!-- What the filter looks for besides the name, at a glance. -->
             <span
               v-for="chip in chosenChips"
@@ -128,49 +171,6 @@
                 })
               }}
             </span>
-            <!--
-              The rest of what the filter can look for, to tick in a menu: whoever matches all that
-              is ticked, and the name, stays. The menu stays open for ticking more than one.
-            -->
-            <dropdown class="call-participants__filter-more" placement="bottom-end" offset="5">
-              <template #default="{ toggleMenu, isOpen }">
-                <button
-                  v-tooltip="$t('videoCall.participants.filterBy')"
-                  type="button"
-                  class="call-participants__filter-more-toggle"
-                  data-test="call-participants-filter-more"
-                  :aria-label="$t('videoCall.participants.filterBy')"
-                  aria-haspopup="true"
-                  :aria-expanded="isOpen ? 'true' : 'false'"
-                  @click.prevent="toggleMenu"
-                >
-                  <os-icon :icon="isOpen ? icons.angleUp : icons.angleDown" />
-                </button>
-              </template>
-              <template #popover>
-                <div
-                  class="call-participants__filter-menu"
-                  role="group"
-                  :aria-label="$t('videoCall.participants.filterBy')"
-                  data-test="call-participants-filter-menu"
-                >
-                  <label
-                    v-for="chip in filterChips"
-                    :key="chip.key"
-                    class="call-participants__filter-option"
-                  >
-                    <input
-                      type="checkbox"
-                      :checked="filterKeys.includes(chip.key)"
-                      :data-test="'call-participants-filter-chip-' + chip.key"
-                      @change="toggleChip(chip.key)"
-                    />
-                    <os-icon :icon="chip.icon" aria-hidden="true" />
-                    {{ chip.label }}
-                  </label>
-                </div>
-              </template>
-            </dropdown>
             <button
               v-if="filterName"
               v-tooltip="$t('videoCall.participants.filterNameClear')"
@@ -1078,7 +1078,14 @@ export default {
 }
 .call-participants__filter-symbol {
   flex: 0 0 auto;
-  color: var(--text-color-soft);
+}
+/*  The small arrow sits up at the symbol's side, like an exponent: both are the menu's button. */
+.call-participants__filter-more-toggle {
+  align-items: flex-start;
+}
+.call-participants__filter-more-arrow {
+  flex: 0 0 auto;
+  font-size: 0.6em;
 }
 .call-participants__filter-name {
   flex: 1 1 auto;
