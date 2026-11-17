@@ -9,7 +9,10 @@
       may step into the moderation is offered that instead. While "mute all" is being chosen, its
       question and answers take the controls' place; the filter stays.
     -->
-    <div class="call-participants__toolbar">
+    <div
+      :class="['call-participants__toolbar', { 'call-participants__toolbar--slim': onlyFilter }]"
+      data-test="call-participants-toolbar"
+    >
       <h3
         v-if="muting"
         class="call-participants__muting-title"
@@ -605,6 +608,17 @@ export default {
         ),
       ]
     },
+    // Whether the toolbar holds nothing but the filter's button: then it takes less room. Its
+    // field open, it has its full height again.
+    onlyFilter() {
+      return (
+        !this.filterOpen &&
+        !this.muting &&
+        !this.isModerator &&
+        !this.mayTakeOver &&
+        !this.moderation.everyone
+      )
+    },
     chosenChips() {
       return this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
     },
@@ -1044,6 +1058,11 @@ export default {
   gap: var(--space-x-small);
   padding: var(--space-x-small);
   border-bottom: 1px solid var(--border-color-softer);
+}
+/*  Nothing but the filter's button in it: no more room above and below than the button needs. */
+.call-participants__toolbar--slim {
+  padding-top: var(--space-xxx-small);
+  padding-bottom: var(--space-xxx-small);
 }
 .call-participants__toolbar-actions {
   display: flex;

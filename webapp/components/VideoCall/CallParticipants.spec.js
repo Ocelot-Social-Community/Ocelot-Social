@@ -149,6 +149,20 @@ describe('CallParticipants', () => {
       expect(document.activeElement).toBe(find('filter-name').element)
     })
 
+    it('takes less room where its button is all the toolbar holds', async () => {
+      const slim = () => find('toolbar').classes('call-participants__toolbar--slim')
+      wrapper = Wrapper()
+      expect(slim()).toBe(true)
+      await find('filter-toggle').trigger('click')
+      expect(slim()).toBe(false)
+      wrapper.destroy()
+      wrapper = Wrapper({ mayTakeOver: true })
+      expect(slim()).toBe(false)
+      wrapper.destroy()
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      expect(slim()).toBe(false)
+    })
+
     it('finds a part of a name whatever its case and accents, and tells how many of all', async () => {
       wrapper = Wrapper({
         people: [person('jose', { name: 'José' }), person('anna', { name: 'Anna' })],
