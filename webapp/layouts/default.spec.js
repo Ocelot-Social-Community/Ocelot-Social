@@ -240,6 +240,31 @@ describe('default.vue', () => {
         expect(Default.computed.participantsHeight.call({})).toBe('calc(100dvh - 500px)')
       })
 
+      it('give way to a chat opened from anywhere, but not to the call chat following its room', () => {
+        const watcher = Default.watch.openChatTarget
+        const setParticipantsOpen = jest.fn()
+        const vm = (roomId, participantsOpen = true) => ({
+          participantsOpen,
+          getShowChat: { roomId },
+          videoCallChatRoomId: 'call-room',
+          setParticipantsOpen,
+        })
+        watcher.call(vm(null, false), 'u2||')
+        watcher.call(vm('call-room'), '||call-room')
+        watcher.call(vm(null), null)
+        expect(setParticipantsOpen).not.toHaveBeenCalled()
+        watcher.call(vm(null), 'u2||')
+        expect(setParticipantsOpen).toHaveBeenCalledWith(false)
+        expect(
+          Default.computed.openChatTarget.call({
+            getShowChat: { showChat: true, chatUserId: 'u2', groupId: null, roomId: null },
+          }),
+        ).toBe('u2||')
+        expect(
+          Default.computed.openChatTarget.call({ getShowChat: { showChat: false } }),
+        ).toBeNull()
+      })
+
       it('hand what is done for oneself to the call, and close with the window', () => {
         const spotlightPerson = jest.fn()
         Default.methods.callAction.call(

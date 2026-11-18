@@ -128,6 +128,10 @@ describe('CallParticipants', () => {
       ).toBe(
         'videoCall.participants.micOff, videoCall.participants.cameraOn, videoCall.participants.sharing',
       )
+      // The ring around whoever speaks, in words.
+      expect(wrapper.vm.stateLabel(person('z', { speaking: true }))).toBe(
+        'videoCall.participants.speaking, videoCall.participants.micOn, videoCall.participants.cameraOff',
+      )
       expect(wrapper.vm.stateLabel(person('y'))).toBe(
         'videoCall.participants.micOn, videoCall.participants.cameraOff',
       )

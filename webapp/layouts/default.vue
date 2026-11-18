@@ -203,6 +203,11 @@ export default {
         !!this.participantsView
       )
     },
+    // Which chat is asked for, as one value to watch.
+    openChatTarget() {
+      const { showChat, chatUserId, groupId, roomId } = this.getShowChat
+      return showChat ? [chatUserId, groupId, roomId].join('|') : null
+    },
     // As high as the chat it stands for (Chat.vue's chatHeight beside a parked call).
     participantsHeight() {
       return `calc(100dvh - ${420 + CALL_CHAT_TABS_HEIGHT + CALL_CHAT_HEADER_HEIGHT}px)`
@@ -276,6 +281,13 @@ export default {
   watch: {
     'getShowChat.roomId'() {
       this.chatEmpty = false
+    },
+    // A chat opened from anywhere (a profile, a group) is shown, not hidden behind the call's
+    // participants. The call's own chat following it to a new room is no such opening.
+    openChatTarget(target) {
+      if (!target || !this.participantsOpen) return
+      if (this.getShowChat.roomId && this.getShowChat.roomId === this.videoCallChatRoomId) return
+      this.setParticipantsOpen(false)
     },
     'getShowChat.groupId'() {
       this.chatEmpty = false
