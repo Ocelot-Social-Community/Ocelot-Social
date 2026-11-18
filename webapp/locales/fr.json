@@ -1955,9 +1955,13 @@
     "chatTabs": {
       "call": "Appel",
       "callHint": "Visible uniquement par les participants de cet appel vidéo (sans notifications)",
+      "callTitle": "Chat de l’appel",
       "group": "Groupe",
       "groupHint": "Visible par tous les membres du groupe (avec notifications)",
-      "label": "Choisir le chat"
+      "groupTitle": "Chat du groupe",
+      "label": "Choisir le chat",
+      "participants": "Participants",
+      "participantsHint": "Qui est dans l’appel"
     },
     "closeChat": "Fermer le chat",
     "connecting": "Connexion…",
@@ -1968,6 +1972,7 @@
       "chat": "Chat",
       "leave": "Raccrocher",
       "microphone": "Microphone",
+      "participants": "Participants",
       "screen": "Écran",
       "startSharing": "Partager l'écran, une fenêtre ou un onglet",
       "stopSharing": "{surface} : ne plus partager",
@@ -2040,6 +2045,16 @@
     "micUnmuted": "Microphone activé",
     "minimize": "Réduire",
     "openChat": "Ouvrir le chat",
+    "participants": {
+      "cameraOff": "caméra coupée",
+      "cameraOn": "caméra activée",
+      "close": "Masquer les participants",
+      "label": "Participants de l’appel",
+      "micOff": "micro coupé",
+      "micOn": "micro activé",
+      "open": "Afficher les participants",
+      "sharing": "partage l’écran"
+    },
     "prejoin": {
       "camera": "Caméra",
       "cameraDisabled": "La caméra est désactivée.",
@@ -2093,6 +2108,7 @@
     },
     "reconnecting": "Connexion perdue — reconnexion…",
     "reloadPending": "La plateforme a un nouveau design. Il sera appliqué dès que vous quitterez l’appel.",
+    "resizeSidebar": "Redimensionner la barre latérale",
     "restartMic": "Redémarrer le microphone",
     "restoreQuality": "Rétablir la qualité",
     "screenShare": "Écran",

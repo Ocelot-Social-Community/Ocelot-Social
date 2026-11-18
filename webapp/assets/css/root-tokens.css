@@ -588,4 +588,8 @@
   --video-call-bar-page-footer-color: var(--color-footer-background);
   --video-call-bar-header-color: var(--window-bar-background);
   --video-call-bar-controls-color: var(--window-bar-background);
+  /* The edge between the videos and the sidebar, to pull: its grip, always there but quiet, and the
+     edge lit up while it is passed over or pulled. */
+  --video-call-sidebar-grip-color: color-mix(in srgb, var(--text-color-soft) 50%, transparent);
+  --video-call-sidebar-resizer-active-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
 }

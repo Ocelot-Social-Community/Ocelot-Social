@@ -34,13 +34,18 @@
         :aria-label="$t('videoCall.gotoGroup', { name: groupName || $t('videoCall.title') })"
         @title-click="onGroupLinkClick"
       >
-        <span
+        <!-- A shortcut to the list of participants; the control bar has its own button. -->
+        <button
           v-if="phase === 'in-call'"
+          v-tooltip="$t('videoCall.participants.open')"
+          type="button"
           class="video-call__count"
           data-test="video-call-participants"
+          :aria-label="$t('videoCall.participants.open')"
+          @click="openParticipants"
         >
           {{ uniqueParticipantCount }}
-        </span>
+        </button>
         <div class="video-call__header-actions">
           <os-button
             v-if="showFullscreenButton"
@@ -350,8 +355,28 @@
           <aside
             v-if="showChatSidebar"
             class="video-call__sidebar"
+            :style="sidebarStyle"
             :aria-label="$t('videoCall.openChat')"
           >
+            <!--
+              Pulled to make the sidebar wider or narrower — or, with the chat below the videos
+              on a phone, higher or lower. Remembered per layout on this device.
+            -->
+            <div
+              :class="[
+                'video-call__sidebar-resizer',
+                { 'video-call__sidebar-resizer--dragging': sidebarResizing },
+              ]"
+              role="separator"
+              tabindex="0"
+              data-test="video-call-sidebar-resizer"
+              :aria-orientation="mobileChatOpen ? 'horizontal' : 'vertical'"
+              :aria-label="$t('videoCall.resizeSidebar')"
+              :aria-valuenow="mobileChatOpen ? sidebarHeight : sidebarWidth"
+              @pointerdown="startSidebarResize"
+              @dblclick="resetSidebarSize"
+              @keydown="onSidebarResizeKey"
+            />
             <!--
               Two chats in a call: the conference chat only its participants share,
               and the group's own, which reaches every member. The choice is offered
@@ -365,7 +390,8 @@
             -->
             <div class="video-call__chat-tabs">
               <call-chat-tabs
-                v-if="chatRoomId"
+                with-participants
+                :participant-count="uniqueParticipantCount"
                 exportable
                 :exporting="chatExporting"
                 :exportEmpty="callChatEmpty"
@@ -388,7 +414,8 @@
                 </os-button>
               </div>
             </div>
-            <client-only>
+            <call-participants v-if="participantsOpen" :people="people" />
+            <client-only v-else>
               <chat
                 ref="inCallChat"
                 :key="activeChatTab"
@@ -530,6 +557,23 @@
           </template>
         </os-button>
         <os-button
+          v-tooltip="controlTooltip(participantsAction)"
+          data-test="video-call-participants-toggle"
+          :variant="participantsShown ? 'primary' : 'default'"
+          appearance="outline"
+          :size="parked ? 'sm' : 'md'"
+          :circle="iconOnly"
+          :aria-label="controlName(participantsLabel, participantsAction)"
+          @click="toggleParticipants"
+        >
+          <template #icon>
+            <os-icon :icon="icons.users" />
+          </template>
+          <template v-if="!iconOnly">
+            {{ participantsLabel }}
+          </template>
+        </os-button>
+        <os-button
           v-tooltip="controlTooltip(leaveAction)"
           variant="danger"
           appearance="filled"
@@ -585,12 +629,16 @@ import { joinGroupVideoCallMutation, joinGroupVideoCallChatMutation } from '~/gr
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import CallParticipants from '~/components/VideoCall/CallParticipants.vue'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import VideoTile from './VideoTile.vue'
 import PreJoin from './PreJoin.vue'
 import DeviceSettings from './DeviceSettings.vue'
 import CallNotice from './CallNotice.vue'
+
+// The narrowest the sidebar beside the videos may be pulled: its three tabs still fit.
+const SIDEBAR_MIN_WIDTH = 280
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 
@@ -702,6 +750,7 @@ export default {
     OsCounterIcon,
     OsIcon,
     CallChatTabs,
+    CallParticipants,
     Chat,
     RoomHeader,
   },
@@ -808,6 +857,13 @@ export default {
       // had their labels (see controlsCrowded).
       controlsWidth: 0,
       labeledControlsWidth: 0,
+      // How wide the sidebar is beside the videos, and how high below them on a phone. Null
+      // until the user pulls it: the stylesheet's size then.
+      sidebarWidth: null,
+      sidebarHeight: null,
+      // Whether the sidebar's edge is being pulled: it stays lit until let go. Reactive, unlike
+      // the drag's own bookkeeping (sidebarDrag), so that the edge goes dark the moment it is.
+      sidebarResizing: false,
     }
   },
   computed: {
@@ -842,6 +898,7 @@ export default {
       conferenceUnread: 'videoCall/conferenceUnread',
       groupChatUnread: 'videoCall/groupChatUnread',
       lastChatTab: 'videoCall/lastChatTab',
+      participantsOpen: 'videoCall/participantsOpen',
       reloadPending: 'videoCall/reloadPending',
       getShowChat: 'chat/showChat',
       currentUser: 'auth/user',
@@ -866,7 +923,68 @@ export default {
       // chat continues to live in the chat-modul (layouts/default.vue). On a
       // phone the call is always maximized and the chat takes the place below
       // a single small tile (see mobileChatOpen).
-      return this.phase === 'in-call' && this.chatOpenForThisCall && !this.parked
+      return (
+        this.phase === 'in-call' &&
+        (this.chatOpenForThisCall || this.participantsOpen) &&
+        !this.parked
+      )
+    },
+    // Whether the sidebar shows the participants rather than a chat.
+    participantsShown() {
+      return this.showChatSidebar && this.participantsOpen
+    },
+    participantsLabel() {
+      return this.$t('videoCall.controls.participants')
+    },
+    participantsAction() {
+      return this.participantsShown
+        ? this.$t('videoCall.participants.close')
+        : this.$t('videoCall.participants.open')
+    },
+    // The people in the call, one entry each however many devices they are in it with. Built
+    // from the tiles, which hold what LiveKit tells about every connection.
+    people() {
+      const byUser = new Map()
+      for (const tile of this.tiles) {
+        const userId = (tile.profile && tile.profile.id) || tile.identity
+        let person = byUser.get(userId)
+        if (!person) {
+          person = {
+            userId,
+            name: tile.name,
+            profile: tile.profile,
+            isMe: !!tile.isLocal,
+            micOn: false,
+            cameraOn: false,
+            screenSharing: false,
+            speaking: false,
+          }
+          byUser.set(userId, person)
+        }
+        if (tile.isLocal) person.isMe = true
+        if (tile.isScreen) {
+          person.screenSharing = true
+        } else {
+          person.micOn = person.micOn || !!tile.micEnabled
+          person.cameraOn = person.cameraOn || !!tile.videoTrack
+        }
+        if (this.activeSpeakerSet.has(tile.identity)) person.speaking = true
+      }
+      return [...byUser.values()]
+    },
+    // What the participant list shows, for the floating window beside the parked call too.
+    participantsView() {
+      return { people: this.people }
+    },
+    sidebarStyle() {
+      if (this.mobileChatOpen) {
+        return this.sidebarHeight ? { flex: `0 0 ${this.sidebarHeight}px` } : null
+      }
+      if (!this.sidebarWidth) return null
+      // The maximized call lays the sidebar out in a grid, where its width counts, not its flex;
+      // the cap there is the body's half too (clampSidebarSize).
+      const width = `${this.sidebarWidth}px`
+      return { flex: `0 0 ${width}`, width, maxWidth: 'none' }
     },
     // On a phone there is no room for the chat beside the videos: it goes below,
     // and the stage shrinks to one small tile, the person speaking.
@@ -1215,6 +1333,12 @@ export default {
     },
   },
   watch: {
+    participantsView: {
+      handler(view) {
+        this.setParticipantsView(view)
+      },
+      immediate: true,
+    },
     // A warning unfolds the notices, each time one comes up: without sound or with a silent
     // microphone, the call does not work, and the user is to learn that without looking for
     // it. Each warning for itself — one the user folded away does not hide the next. What
@@ -1377,8 +1501,10 @@ export default {
     // overtaken by a push gives way to it (loadConferenceUnread, loadGroupChatUnread).
     this.conferenceUnreadPushes = 0
     this.groupChatUnreadPushes = 0
+    this.sidebarDrag = null
   },
   mounted() {
+    this.restoreSidebarSize()
     this.isChromium = typeof navigator !== 'undefined' && !!navigator.userAgentData
     this.canFullscreen = !!document.fullscreenEnabled
     document.addEventListener('fullscreenchange', this.onFullscreenChange)
@@ -1400,6 +1526,7 @@ export default {
     this.setPageBars('normal')
     this.disconnectStageObserver()
     this.closeDeviceSettings()
+    this.stopSidebarResize()
     this.cleanup()
     this.watchCallChats(false)
   },
@@ -1413,6 +1540,8 @@ export default {
       setConferenceUnread: 'videoCall/SET_CONFERENCE_UNREAD',
       setGroupChatUnread: 'videoCall/SET_GROUP_CHAT_UNREAD',
       setLastChatTab: 'videoCall/SET_LAST_CHAT_TAB',
+      setParticipantsOpen: 'videoCall/SET_PARTICIPANTS_OPEN',
+      setParticipantsView: 'videoCall/SET_PARTICIPANTS_VIEW',
       setPageBars: 'videoCall/SET_PAGE_BARS',
       setShowChat: 'chat/SET_OPEN_CHAT',
     }),
@@ -1625,6 +1754,12 @@ export default {
       }
     },
     toggleChat() {
+      if (this.participantsShown) {
+        // The sidebar is open on the participants: the button brings the chat there.
+        this.setParticipantsOpen(false)
+        if (!this.chatOpenForThisCall) this.selectChatTab(this.lastChatTab)
+        return
+      }
       if (this.chatOpenForThisCall) {
         this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
         return
@@ -1638,7 +1773,126 @@ export default {
       // way no navigation is needed.
     },
     closeInCallChat() {
+      this.setParticipantsOpen(false)
       this.setShowChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    toggleParticipants() {
+      if (this.participantsShown) {
+        this.closeInCallChat()
+        return
+      }
+      this.openParticipants()
+    },
+    openParticipants() {
+      this.setParticipantsOpen(true)
+      // In the parked window there is no sidebar: the list needs the call maximized.
+      if (this.minimized && !this.isMobile) this.toggleMinimize()
+    },
+    // --- The sidebar's size ---------------------------------------------------------------
+    sidebarStorageKey() {
+      return this.mobileChatOpen ? 'videoCall.sidebarHeight' : 'videoCall.sidebarWidth'
+    },
+    restoreSidebarSize() {
+      try {
+        const width = Number(window.localStorage.getItem('videoCall.sidebarWidth'))
+        const height = Number(window.localStorage.getItem('videoCall.sidebarHeight'))
+        this.sidebarWidth = width > 0 ? width : null
+        this.sidebarHeight = height > 0 ? height : null
+      } catch (_e) {
+        /* no storage: the stylesheet's size */
+      }
+    },
+    saveSidebarSize() {
+      try {
+        const value = this.mobileChatOpen ? this.sidebarHeight : this.sidebarWidth
+        if (value) window.localStorage.setItem(this.sidebarStorageKey(), String(value))
+        else window.localStorage.removeItem(this.sidebarStorageKey())
+      } catch (_e) {
+        /* remembered for this call only */
+      }
+    },
+    // What the sidebar may measure: wide enough for its tabs and at most half the body beside
+    // the videos; on a phone, below them, room for the message field and a few messages, and
+    // never so high that not even the small tile is left.
+    clampSidebarSize(size) {
+      // The maximized call takes its body out of the box tree (display: contents), which then
+      // measures nothing: the call itself is as wide there.
+      const body = this.$el && this.$el.querySelector('.video-call__body')
+      let rect = body ? body.getBoundingClientRect() : { width: 1000, height: 800 }
+      if (body && !rect.width && !rect.height) rect = this.$el.getBoundingClientRect()
+      if (this.mobileChatOpen) {
+        return Math.round(Math.min(Math.max(size, 200), Math.max(rect.height - 110, 200)))
+      }
+      return Math.round(
+        Math.min(Math.max(size, SIDEBAR_MIN_WIDTH), Math.max(rect.width / 2, SIDEBAR_MIN_WIDTH)),
+      )
+    },
+    currentSidebarSize() {
+      const sidebar = this.$el && this.$el.querySelector('.video-call__sidebar')
+      if (!sidebar) return this.mobileChatOpen ? 320 : 360
+      const rect = sidebar.getBoundingClientRect()
+      return this.mobileChatOpen ? rect.height : rect.width
+    },
+    setSidebarSize(size) {
+      if (this.mobileChatOpen) this.sidebarHeight = this.clampSidebarSize(size)
+      else this.sidebarWidth = this.clampSidebarSize(size)
+    },
+    startSidebarResize(event) {
+      if (event.button !== undefined && event.button !== 0) return
+      event.preventDefault()
+      const sidebar = this.$el.querySelector('.video-call__sidebar')
+      const rect = sidebar.getBoundingClientRect()
+      // The sidebar's far edge stays put; the near one follows the pointer, which keeps to where
+      // it took hold of the edge, as on its grip, instead of the edge jumping under it.
+      const offset = (pointer, edge) =>
+        Number.isFinite(pointer) && Number.isFinite(edge) ? pointer - edge : 0
+      this.sidebarDrag = {
+        right: rect.right + offset(event.clientX, rect.left),
+        bottom: rect.bottom + offset(event.clientY, rect.top),
+      }
+      this.sidebarResizing = true
+      if (event.target && event.target.setPointerCapture && event.pointerId !== undefined) {
+        try {
+          event.target.setPointerCapture(event.pointerId)
+        } catch (_e) {
+          /* captured or not, the window listeners below follow the pointer */
+        }
+      }
+      window.addEventListener('pointermove', this.onSidebarResize)
+      window.addEventListener('pointerup', this.stopSidebarResize)
+      window.addEventListener('pointercancel', this.stopSidebarResize)
+    },
+    onSidebarResize(event) {
+      if (!this.sidebarDrag) return
+      this.setSidebarSize(
+        this.mobileChatOpen
+          ? this.sidebarDrag.bottom - event.clientY
+          : this.sidebarDrag.right - event.clientX,
+      )
+    },
+    stopSidebarResize() {
+      window.removeEventListener('pointermove', this.onSidebarResize)
+      window.removeEventListener('pointerup', this.stopSidebarResize)
+      window.removeEventListener('pointercancel', this.stopSidebarResize)
+      if (!this.sidebarDrag) return
+      this.sidebarDrag = null
+      this.sidebarResizing = false
+      this.saveSidebarSize()
+    },
+    onSidebarResizeKey(event) {
+      // Towards the videos makes the sidebar bigger: left beside them, up below them.
+      const grow = this.mobileChatOpen ? 'ArrowUp' : 'ArrowLeft'
+      const shrink = this.mobileChatOpen ? 'ArrowDown' : 'ArrowRight'
+      if (event.key !== grow && event.key !== shrink) return
+      event.preventDefault()
+      const step = event.shiftKey ? 64 : 16
+      this.setSidebarSize(this.currentSidebarSize() + (event.key === grow ? step : -step))
+      this.saveSidebarSize()
+    },
+    resetSidebarSize() {
+      if (this.mobileChatOpen) this.sidebarHeight = null
+      else this.sidebarWidth = null
+      this.saveSidebarSize()
     },
     // The export is the chat's own doing (it knows the room and fetches every message);
     // only its button sits here, in the tab row.
@@ -3416,10 +3670,13 @@ export default {
   background: var(--color-primary);
   color: var(--color-primary-inverse);
   padding: 2px var(--space-x-small);
+  border: 0;
   border-radius: var(--border-radius-rounded);
+  font: inherit;
   font-size: var(--font-size-small);
   min-width: 28px;
   text-align: center;
+  cursor: pointer;
 }
 
 .video-call__header-actions {
@@ -3528,6 +3785,69 @@ export default {
   background: var(--background-color-base);
   border-left: 1px solid var(--border-color-softest);
   overflow: hidden;
+  /*  The resizer is placed on its edge. */
+  position: relative;
+}
+
+/*  A pulled width is the user's: only the half of the body caps it (clampSidebarSize). */
+.video-call__sidebar[style] {
+  max-width: none;
+}
+
+/*  A strip along the sidebar's edge towards the videos, wider than it looks so it is easy */
+/*  to catch. Out of the flow: the sidebar's children fill it as before. */
+.video-call__sidebar > .video-call__sidebar-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  flex: none;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 1;
+}
+
+/*  A grip on it at all times, so that it can be found without a pointer to pass over it, as on a
+    phone: a short bar across its middle. */
+.video-call__sidebar-resizer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 32px;
+  border-radius: 2px;
+  background: var(--video-call-sidebar-grip-color);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/*  Passed over, in focus, or pulled until let go: the whole edge lights up, and the grip with it. */
+.video-call__sidebar-resizer:hover,
+.video-call__sidebar-resizer:focus-visible,
+.video-call__sidebar-resizer--dragging {
+  background: var(--video-call-sidebar-resizer-active-color);
+  outline: none;
+}
+.video-call__sidebar-resizer:hover::after,
+.video-call__sidebar-resizer:focus-visible::after,
+.video-call__sidebar-resizer--dragging::after {
+  background: var(--color-primary);
+}
+
+/*  Below the videos on a phone: the strip lies along the top edge, a finger's height. */
+.video-call__body--chat-below .video-call__sidebar > .video-call__sidebar-resizer {
+  right: 0;
+  bottom: auto;
+  width: auto;
+  height: 22px;
+  margin-top: -11px;
+  cursor: row-resize;
+}
+.video-call__body--chat-below .video-call__sidebar > .video-call__sidebar-resizer::after {
+  width: 32px;
+  height: 4px;
 }
 
 .video-call__sidebar > * {
@@ -3554,6 +3874,14 @@ export default {
   min-height: 0;
   border-left: 0;
   border-top: 1px solid var(--border-color-softest);
+  /*  The strip along its top edge reaches over it. */
+  overflow: visible;
+}
+
+/*  A pulled height leaves the rest to the videos, which then grow instead. */
+.video-call__body--chat-below:has(.video-call__sidebar[style]) .video-call__stage {
+  flex: 1 1 0;
+  height: auto;
 }
 
 /*  The notices sit at the bottom of the body, which is the chat here: keep them */

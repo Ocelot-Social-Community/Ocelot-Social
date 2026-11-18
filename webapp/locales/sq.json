@@ -1955,9 +1955,13 @@
     "chatTabs": {
       "call": "Telefonata",
       "callHint": "E dukshme vetëm për pjesëmarrësit e kësaj telefonate me video (pa njoftime)",
+      "callTitle": "Biseda e thirrjes",
       "group": "Grupi",
       "groupHint": "E dukshme për të gjithë anëtarët e grupit (me njoftime)",
-      "label": "Zgjidh bisedën"
+      "groupTitle": "Biseda e grupit",
+      "label": "Zgjidh bisedën",
+      "participants": "Pjesëmarrësit",
+      "participantsHint": "Kush është në thirrje"
     },
     "closeChat": "Mbylle bisedën",
     "connecting": "Po lidhet…",
@@ -1968,6 +1972,7 @@
       "chat": "Bisedë",
       "leave": "Largohu",
       "microphone": "Mikrofoni",
+      "participants": "Pjesëmarrësit",
       "screen": "Ekrani",
       "startSharing": "Ndaj ekranin, një dritare ose një skedë",
       "stopSharing": "{surface}: ndalo ndarjen",
@@ -2040,6 +2045,16 @@
     "micUnmuted": "Mikrofoni ndezur",
     "minimize": "Minimizo",
     "openChat": "Hap bisedën",
+    "participants": {
+      "cameraOff": "kamera fikur",
+      "cameraOn": "kamera ndezur",
+      "close": "Fshih pjesëmarrësit",
+      "label": "Pjesëmarrësit e thirrjes",
+      "micOff": "mikrofoni fikur",
+      "micOn": "mikrofoni ndezur",
+      "open": "Shfaq pjesëmarrësit",
+      "sharing": "ndan ekranin"
+    },
     "prejoin": {
       "camera": "Kamera",
       "cameraDisabled": "Kamera është e fikur.",
@@ -2093,6 +2108,7 @@
     },
     "reconnecting": "Lidhja u humb — po rilidhet…",
     "reloadPending": "Platforma ka një dizajn të ri. Do të zbatohet sapo të largoheni nga thirrja.",
+    "resizeSidebar": "Ndrysho madhësinë e shiritit anësor",
     "restartMic": "Rinis mikrofonin",
     "restoreQuality": "Rikthe cilësinë",
     "screenShare": "Ekrani",

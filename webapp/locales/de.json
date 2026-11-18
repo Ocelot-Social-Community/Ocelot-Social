@@ -1955,9 +1955,13 @@
     "chatTabs": {
       "call": "Anruf",
       "callHint": "Nur für die Teilnehmer dieses Videoanrufs sichtbar (ohne Benachrichtigung)",
+      "callTitle": "Anrufchat",
       "group": "Gruppe",
       "groupHint": "Für alle Mitglieder der Gruppe sichtbar (mit Benachrichtigung)",
-      "label": "Chat auswählen"
+      "groupTitle": "Gruppenchat",
+      "label": "Chat auswählen",
+      "participants": "Teilnehmer",
+      "participantsHint": "Wer im Anruf ist"
     },
     "closeChat": "Chat schließen",
     "connecting": "Verbinde…",
@@ -1968,6 +1972,7 @@
       "chat": "Chat",
       "leave": "Auflegen",
       "microphone": "Mikrofon",
+      "participants": "Teilnehmer",
       "screen": "Bildschirm",
       "startSharing": "Bildschirm, Fenster oder Tab teilen",
       "stopSharing": "{surface}: nicht mehr teilen",
@@ -2040,6 +2045,16 @@
     "micUnmuted": "Mikrofon an",
     "minimize": "Minimieren",
     "openChat": "Chat öffnen",
+    "participants": {
+      "cameraOff": "Kamera aus",
+      "cameraOn": "Kamera an",
+      "close": "Teilnehmer ausblenden",
+      "label": "Teilnehmer des Anrufs",
+      "micOff": "Mikrofon aus",
+      "micOn": "Mikrofon an",
+      "open": "Teilnehmer anzeigen",
+      "sharing": "teilt den Bildschirm"
+    },
     "prejoin": {
       "camera": "Kamera",
       "cameraDisabled": "Kamera ist deaktiviert.",
@@ -2093,6 +2108,7 @@
     },
     "reconnecting": "Verbindung unterbrochen – verbinde neu…",
     "reloadPending": "Die Plattform hat ein neues Design. Es wird übernommen, sobald du den Anruf verlässt.",
+    "resizeSidebar": "Seitenleiste in der Größe ändern",
     "restartMic": "Mikrofon neu starten",
     "restoreQuality": "Qualität wiederherstellen",
     "screenShare": "Bildschirm",

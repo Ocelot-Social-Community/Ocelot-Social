@@ -16,10 +16,11 @@
     >
       <button
         ref="tabs"
-        v-tooltip="{ content: tab.hint, placement: 'bottom', classes: 'tooltip--narrow' }"
+        v-tooltip="{ content: tab.tooltip, placement: 'bottom', classes: 'tooltip--narrow' }"
         type="button"
         role="tab"
         class="call-chat-tabs__tab"
+        :aria-label="tab.title"
         :aria-selected="tab.value === active ? 'true' : 'false'"
         :aria-description="tab.hint"
         :tabindex="tab.value === focusable ? 0 : -1"
@@ -28,11 +29,16 @@
         @keydown.left.prevent="step(-1)"
         @keydown.right.prevent="step(1)"
       >
+        <!-- What kind of tab it is, at a glance: one of the two chats, or the people. -->
+        <os-icon :icon="tab.icon" class="call-chat-tabs__icon" />
         <span class="call-chat-tabs__label">{{ tab.label }}</span>
-        <!-- Unread messages, as the red count the app shows on its icons. -->
+        <!--
+          Unread messages, as the red count the app shows on its icons; how many are in the
+          call, in the calm colour.
+        -->
         <os-badge
           v-if="tab.count > 0"
-          variant="danger"
+          :variant="tab.neutral ? 'default' : 'danger'"
           :count="tab.count"
           :data-test="'call-chat-tab-count-' + tab.value"
         />
@@ -103,6 +109,11 @@ export default {
     exportable: { type: Boolean, default: false },
     // Whether a download asked for is still under way.
     exporting: { type: Boolean, default: false },
+    // Whether the participants of the call are a third tab: in the call's own sidebar, not in
+    // the floating chat window beside the parked call, which only ever holds a chat.
+    withParticipants: { type: Boolean, default: false },
+    // How many people are in the call, for that tab.
+    participantCount: { type: Number, default: 0 },
     // Whether the conference chat is known to hold no message: its download says so, and can
     // still be had.
     exportEmpty: { type: Boolean, default: false },
@@ -118,8 +129,10 @@ export default {
       unread: 'videoCall/conferenceUnread',
       groupUnread: 'videoCall/groupChatUnread',
       chat: 'chat/showChat',
+      participantsOpen: 'videoCall/participantsOpen',
     }),
     active() {
+      if (this.withParticipants && this.participantsOpen) return 'participants'
       return activeCallChatTab(this.chat, this)
     },
     // The entries of the conference chat's menu. One so far; others, such as who may write,
@@ -140,19 +153,52 @@ export default {
     focusable() {
       return this.active || this.tabs[0].value
     },
+    // Short on the tab, with a symbol for its kind; spelled out in the tooltip, before what it
+    // is for.
     tabs() {
+      return this.tabList.map((tab) => ({
+        ...tab,
+        tooltip: `${tab.title} – ${tab.hint}`,
+      }))
+    },
+    tabList() {
       return [
-        {
-          value: 'call',
-          label: this.$t('videoCall.chatTabs.call'),
-          // Held to a narrow tooltip, the hint wraps by itself. The same text is the note
-          // above the chat's messages, where it wraps to the chat's width.
-          hint: this.$t('videoCall.chatTabs.callHint'),
-          count: this.unread,
-        },
+        // The people first: from the call itself, over its own chat, to the chat of the whole
+        // group.
+        ...(this.withParticipants
+          ? [
+              {
+                value: 'participants',
+                label: this.$t('videoCall.chatTabs.participants'),
+                title: this.$t('videoCall.chatTabs.participants'),
+                icon: this.icons.users,
+                hint: this.$t('videoCall.chatTabs.participantsHint'),
+                count: this.participantCount,
+                neutral: true,
+              },
+            ]
+          : []),
+        // Beside the participants, the conference chat's tab waits for the chat: before the
+        // server has confirmed the participation it would open the group's chat a second time.
+        ...(this.withParticipants && !this.chatRoomId
+          ? []
+          : [
+              {
+                value: 'call',
+                label: this.$t('videoCall.chatTabs.call'),
+                title: this.$t('videoCall.chatTabs.callTitle'),
+                icon: this.icons.chatBubble,
+                // Held to a narrow tooltip, the hint wraps by itself. The same text is the note
+                // above the chat's messages, where it wraps to the chat's width.
+                hint: this.$t('videoCall.chatTabs.callHint'),
+                count: this.unread,
+              },
+            ]),
         {
           value: 'group',
           label: this.$t('videoCall.chatTabs.group'),
+          title: this.$t('videoCall.chatTabs.groupTitle'),
+          icon: this.icons.chatBubble,
           hint: this.$t('videoCall.chatTabs.groupHint'),
           count: this.groupUnread,
         },
@@ -162,8 +208,14 @@ export default {
   methods: {
     ...mapMutations({
       openChat: 'chat/SET_OPEN_CHAT',
+      setParticipantsOpen: 'videoCall/SET_PARTICIPANTS_OPEN',
     }),
     select(tab) {
+      if (tab === 'participants') {
+        this.setParticipantsOpen(true)
+        return
+      }
+      this.setParticipantsOpen(false)
       this.openChat(callChatTarget(tab, this))
     },
     runAction(action, toggleMenu) {
@@ -236,6 +288,9 @@ export default {
 
 /*  The label gives way when the row gets narrow; the count beside it does not (OsBadge's */
 /*  `count` never shrinks). */
+.call-chat-tabs__icon {
+  flex: 0 0 auto;
+}
 .call-chat-tabs__label {
   min-width: 0;
   white-space: nowrap;
