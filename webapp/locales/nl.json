@@ -2049,11 +2049,13 @@
       "cameraOff": "camera uit",
       "cameraOn": "camera aan",
       "close": "Deelnemers verbergen",
+      "countWithDevices": "Deelnemers: {people} · Apparaten: {devices}",
       "label": "Deelnemers aan het gesprek",
       "micOff": "microfoon uit",
       "micOn": "microfoon aan",
       "open": "Deelnemers tonen",
-      "sharing": "deelt het scherm"
+      "sharing": "deelt het scherm",
+      "speaking": "spreekt"
     },
     "prejoin": {
       "camera": "Camera",

@@ -2049,11 +2049,13 @@
       "cameraOff": "kamera fikur",
       "cameraOn": "kamera ndezur",
       "close": "Fshih pjesëmarrësit",
+      "countWithDevices": "Pjesëmarrësit: {people} · Pajisjet: {devices}",
       "label": "Pjesëmarrësit e thirrjes",
       "micOff": "mikrofoni fikur",
       "micOn": "mikrofoni ndezur",
       "open": "Shfaq pjesëmarrësit",
-      "sharing": "ndan ekranin"
+      "sharing": "ndan ekranin",
+      "speaking": "po flet"
     },
     "prejoin": {
       "camera": "Kamera",

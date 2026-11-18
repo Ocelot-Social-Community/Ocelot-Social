@@ -2049,11 +2049,13 @@
       "cameraOff": "caméra coupée",
       "cameraOn": "caméra activée",
       "close": "Masquer les participants",
+      "countWithDevices": "Participants : {people} · Appareils : {devices}",
       "label": "Participants de l’appel",
       "micOff": "micro coupé",
       "micOn": "micro activé",
       "open": "Afficher les participants",
-      "sharing": "partage l’écran"
+      "sharing": "partage l’écran",
+      "speaking": "parle"
     },
     "prejoin": {
       "camera": "Caméra",

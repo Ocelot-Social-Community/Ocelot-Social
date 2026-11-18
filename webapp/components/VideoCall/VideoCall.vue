@@ -37,7 +37,7 @@
         <!-- A shortcut to the list of participants; the control bar has its own button. -->
         <button
           v-if="phase === 'in-call'"
-          v-tooltip="$t('videoCall.participants.open')"
+          v-tooltip="countTooltip"
           type="button"
           class="video-call__count"
           data-test="video-call-participants"
@@ -966,7 +966,8 @@ export default {
           person.screenSharing = true
         } else {
           person.micOn = person.micOn || !!tile.micEnabled
-          person.cameraOn = person.cameraOn || !!tile.videoTrack
+          // A camera that is on but not received here (audio only, videos off) is on all the same.
+          person.cameraOn = person.cameraOn || !!tile.videoTrack || !!tile.cameraHidden
         }
         if (this.activeSpeakerSet.has(tile.identity)) person.speaking = true
       }
@@ -977,14 +978,18 @@ export default {
       return { people: this.people }
     },
     sidebarStyle() {
+      // A size remembered on a larger screen, or before the window was made smaller, is capped
+      // as pulling caps it (clampSidebarSize): it never takes the videos' place.
       if (this.mobileChatOpen) {
-        return this.sidebarHeight ? { flex: `0 0 ${this.sidebarHeight}px` } : null
+        return this.sidebarHeight
+          ? { flex: `0 0 ${this.sidebarHeight}px`, maxHeight: 'calc(100% - 110px)' }
+          : null
       }
       if (!this.sidebarWidth) return null
       // The maximized call lays the sidebar out in a grid, where its width counts, not its flex;
-      // the cap there is the body's half too (clampSidebarSize).
+      // the cap there is half of the call, which is as wide as the window.
       const width = `${this.sidebarWidth}px`
-      return { flex: `0 0 ${width}`, width, maxWidth: 'none' }
+      return { flex: `0 0 ${width}`, width, maxWidth: '50vw' }
     },
     // On a phone there is no room for the chat beside the videos: it goes below,
     // and the stage shrinks to one small tile, the person speaking.
@@ -1227,10 +1232,25 @@ export default {
         this.controlsWidth < this.labeledControlsWidth
       )
     },
+    // How many people are in the call, as the participant list has them: one however many
+    // devices they are in it with, and with camera and screen share alike.
     uniqueParticipantCount() {
-      // A single participant publishing both camera and screen share still counts
-      // as one — count distinct identities, not tiles.
+      return this.people.length
+    },
+    // The connections to the call, one per device: what the tiles are of.
+    connectionCount() {
       return new Set(this.tiles.map((t) => t.identity)).size
+    },
+    // More tiles than people, somebody being in the call on several devices: the count's
+    // tooltip says both, so the tiles beyond the count are no puzzle.
+    countTooltip() {
+      if (this.connectionCount <= this.uniqueParticipantCount) {
+        return this.$t('videoCall.participants.open')
+      }
+      return this.$t('videoCall.participants.countWithDevices', {
+        people: this.uniqueParticipantCount,
+        devices: this.connectionCount,
+      })
     },
     activeSpeakers() {
       // Deduplicate identities and resolve display names from the tile list.
@@ -1754,8 +1774,9 @@ export default {
       }
     },
     toggleChat() {
-      if (this.participantsShown) {
-        // The sidebar is open on the participants: the button brings the chat there.
+      if (this.participantsShown || (this.participantsOpen && this.parked)) {
+        // The sidebar, or beside the parked call the floating window, is open on the
+        // participants: the button brings the chat there.
         this.setParticipantsOpen(false)
         if (!this.chatOpenForThisCall) this.selectChatTab(this.lastChatTab)
         return

@@ -2049,11 +2049,13 @@
       "cameraOff": "camera off",
       "cameraOn": "camera on",
       "close": "Hide the people in the call",
+      "countWithDevices": "People: {people} · Devices: {devices}",
       "label": "People in the call",
       "micOff": "microphone off",
       "micOn": "microphone on",
       "open": "Show the people in the call",
-      "sharing": "sharing the screen"
+      "sharing": "sharing the screen",
+      "speaking": "speaking"
     },
     "prejoin": {
       "camera": "Camera",

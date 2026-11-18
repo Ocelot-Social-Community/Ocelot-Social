@@ -2049,11 +2049,13 @@
       "cameraOff": "câmera desligada",
       "cameraOn": "câmera ligada",
       "close": "Ocultar as pessoas da chamada",
+      "countWithDevices": "Pessoas: {people} · Dispositivos: {devices}",
       "label": "Pessoas na chamada",
       "micOff": "microfone desligado",
       "micOn": "microfone ligado",
       "open": "Mostrar as pessoas da chamada",
-      "sharing": "compartilha a tela"
+      "sharing": "compartilha a tela",
+      "speaking": "está falando"
     },
     "prejoin": {
       "camera": "Câmera",

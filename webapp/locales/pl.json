@@ -2049,11 +2049,13 @@
       "cameraOff": "kamera wyłączona",
       "cameraOn": "kamera włączona",
       "close": "Ukryj uczestników",
+      "countWithDevices": "Uczestnicy: {people} · Urządzenia: {devices}",
       "label": "Uczestnicy rozmowy",
       "micOff": "mikrofon wyłączony",
       "micOn": "mikrofon włączony",
       "open": "Pokaż uczestników",
-      "sharing": "udostępnia ekran"
+      "sharing": "udostępnia ekran",
+      "speaking": "mówi"
     },
     "prejoin": {
       "camera": "Kamera",

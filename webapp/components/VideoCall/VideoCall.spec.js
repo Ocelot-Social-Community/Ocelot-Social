@@ -308,6 +308,24 @@ describe('VideoCall', () => {
   })
 
   describe('uniqueParticipantCount + activeSpeakers + activeSpeakerSet', () => {
+    it('counts people, not their tiles or devices, and says so where they differ', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [
+          { identity: 'bob#1', name: 'Bob', key: 'a', profile: { id: 'bob' } },
+          { identity: 'bob#2', name: 'Bob', key: 'b', profile: { id: 'bob' } },
+          { identity: 'u2', name: 'Ann', key: 'c' },
+        ],
+      })
+      expect(wrapper.vm.uniqueParticipantCount).toBe(2)
+      expect(wrapper.vm.connectionCount).toBe(3)
+      expect(wrapper.vm.countTooltip).toBe(
+        'videoCall.participants.countWithDevices:{"people":2,"devices":3}',
+      )
+      wrapper.setData({ tiles: [{ identity: 'u2', name: 'Ann', key: 'c' }] })
+      expect(wrapper.vm.countTooltip).toBe('videoCall.participants.open')
+    })
+
     it('counts distinct identities, not tiles', () => {
       const { wrapper } = factory({ show: true })
       wrapper.setData({
@@ -6756,6 +6774,27 @@ describe('VideoCall — the people in the call', () => {
         }),
       ])
     })
+
+    it('counts a camera as on that is not received here, as with audio only', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [tile('bob#1', 'bob', { cameraHidden: true }), tile('ann#1', 'ann')],
+      })
+      expect(wrapper.vm.people.map(({ userId, cameraOn }) => [userId, cameraOn])).toEqual([
+        ['bob', true],
+        ['ann', false],
+      ])
+    })
+
+    it('counts people, not their devices, on the tab', async () => {
+      const { wrapper } = factory({ show: true, participantsOpen: true })
+      wrapper.setData({
+        phase: 'in-call',
+        tiles: [tile('me#1', 'u1', { isLocal: true }), tile('bob#1', 'bob'), tile('bob#2', 'bob')],
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findComponent({ name: 'CallChatTabs' }).vm.$attrs['participant-count']).toBe(2)
+    })
   })
 
   describe('the sidebar on the participants', () => {
@@ -6790,6 +6829,19 @@ describe('VideoCall — the people in the call', () => {
         participantsOpen: true,
       })
       wrapper.setData({ phase: 'in-call' })
+      wrapper.vm.toggleChat()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
+      expect(showChat).toHaveBeenCalled()
+    })
+
+    it('brings the chat in place of the participants beside the parked call too', () => {
+      const { wrapper, setParticipantsOpen, showChat } = factory({
+        show: true,
+        minimized: true,
+        participantsOpen: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.participantsShown).toBe(false)
       wrapper.vm.toggleChat()
       expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
       expect(showChat).toHaveBeenCalled()
@@ -6850,7 +6902,8 @@ describe('VideoCall — the people in the call', () => {
       expect(wrapper.vm.sidebarStyle).toEqual({
         flex: '0 0 420px',
         width: '420px',
-        maxWidth: 'none',
+        // Remembered on a larger screen, it is capped all the same.
+        maxWidth: '50vw',
       })
     })
 
@@ -6940,7 +6993,10 @@ describe('VideoCall — the people in the call', () => {
       expect(wrapper.vm.sidebarHeight).toBe(400)
       wrapper.vm.onSidebarResize({ clientY: 750 })
       expect(wrapper.vm.sidebarHeight).toBe(200)
-      expect(wrapper.vm.sidebarStyle).toEqual({ flex: '0 0 200px' })
+      expect(wrapper.vm.sidebarStyle).toEqual({
+        flex: '0 0 200px',
+        maxHeight: 'calc(100% - 110px)',
+      })
       wrapper.vm.stopSidebarResize()
       wrapper.vm.onSidebarResizeKey({ key: 'ArrowUp', shiftKey: false, preventDefault: jest.fn() })
       expect(wrapper.vm.sidebarHeight).toBe(316)
