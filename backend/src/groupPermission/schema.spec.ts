@@ -43,6 +43,7 @@ const EXPECTED_KEYS: GroupPermissionKey[] = [
   'group.chat.participate',
   'group.videoCall.create',
   'group.videoCall.join',
+  'group.videoCall.moderate',
 ]
 
 describe('group permission catalog', () => {

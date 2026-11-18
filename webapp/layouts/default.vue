@@ -79,13 +79,25 @@
           />
         </div>
       </template>
-      <!-- The list of the call's participants, as in the call's own sidebar. -->
+      <!--
+        The list of the call's participants, as in the call's own sidebar; what is done there for
+        oneself (show somebody large, mute somebody for oneself, switch something off) is the
+        call's doing.
+      -->
       <div
         v-if="participantsInWindow"
         class="chat-modul__participants"
         :style="{ height: participantsHeight }"
       >
-        <call-participants :people="participantsView.people" />
+        <call-participants
+          :people="participantsView.people"
+          :moderation="participantsView.moderation"
+          :may-take-over="participantsView.mayTakeOver"
+          :locally-muted="participantsView.locallyMuted"
+          @spotlight="callAction('spotlightPerson', $event)"
+          @local-mute="(userId, muted) => callAction('muteForMe', userId, muted)"
+          @switch-off="callAction('syncSwitchedOff', $event)"
+        />
       </div>
       <client-only v-else>
         <chat
@@ -107,7 +119,7 @@
     <client-only>
       <dock side="left" />
       <dock side="right" />
-      <video-call v-if="showVideoCall" />
+      <video-call v-if="showVideoCall" ref="videoCall" />
     </client-only>
   </div>
 </template>
@@ -295,6 +307,11 @@ export default {
     closeSingleRoom() {
       this.setParticipantsOpen(false)
       this.showChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    // What the list asks of the call itself; the call is mounted while there is a list.
+    callAction(method, ...args) {
+      const call = this.$refs.videoCall
+      if (call) call[method](...args)
     },
     // The export is the chat's own doing; only its button sits in the header drawn here.
     async exportChat() {

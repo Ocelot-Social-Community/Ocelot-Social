@@ -90,3 +90,77 @@ export const activeVideoCallChangedSubscription = () => gql`
     }
   }
 `
+
+// Moderating a running call. Who moderates, who has the floor and whether everybody moderates
+// arrive with the room's metadata (see VideoCall.vue); these are the acts.
+export const videoCallModerationRightsQuery = () => gql`
+  query ($groupId: ID!, $userId: ID!) {
+    videoCallModerationRights(groupId: $groupId, userId: $userId) {
+      userId
+      remove
+      revokeModeration
+    }
+  }
+`
+
+export const videoCallModerationSuccessorQuery = () => gql`
+  query ($groupId: ID!) {
+    videoCallModerationSuccessor(groupId: $groupId)
+  }
+`
+
+export const moderateVideoCallParticipantMutation = () => gql`
+  mutation ($groupId: ID!, $userId: ID!, $action: VideoCallModerationAction!) {
+    moderateVideoCallParticipant(groupId: $groupId, userId: $userId, action: $action)
+  }
+`
+
+export const muteAllInVideoCallMutation = () => gql`
+  mutation ($groupId: ID!, $exceptUserIds: [ID!]!, $floorUserIds: [ID!]!) {
+    muteAllInVideoCall(
+      groupId: $groupId
+      exceptUserIds: $exceptUserIds
+      floorUserIds: $floorUserIds
+    )
+  }
+`
+
+export const setVideoCallModeratorMutation = () => gql`
+  mutation ($groupId: ID!, $userId: ID!, $moderator: Boolean!) {
+    setVideoCallModerator(groupId: $groupId, userId: $userId, moderator: $moderator)
+  }
+`
+
+export const setVideoCallEveryoneModeratesMutation = () => gql`
+  mutation ($groupId: ID!, $enabled: Boolean!) {
+    setVideoCallEveryoneModerates(groupId: $groupId, enabled: $enabled)
+  }
+`
+
+export const takeOverVideoCallModerationMutation = () => gql`
+  mutation ($groupId: ID!) {
+    takeOverVideoCallModeration(groupId: $groupId)
+  }
+`
+
+export const setVideoCallFloorMutation = () => gql`
+  mutation ($groupId: ID!, $userId: ID!, $floor: Boolean!) {
+    setVideoCallFloor(groupId: $groupId, userId: $userId, floor: $floor)
+  }
+`
+
+export const handOverVideoCallModerationMutation = () => gql`
+  mutation ($groupId: ID!, $toUserId: ID, $everyone: Boolean) {
+    handOverVideoCallModeration(groupId: $groupId, toUserId: $toUserId, everyone: $everyone)
+  }
+`
+
+// Whether the viewer may step into the moderation of the group's calls (group.videoCall.moderate).
+export const videoCallGroupPermissionsQuery = () => gql`
+  query ($id: ID!) {
+    Group(id: $id) {
+      id
+      myGroupPermissions
+    }
+  }
+`

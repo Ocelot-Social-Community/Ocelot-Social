@@ -1,6 +1,97 @@
 <template>
-  <section class="call-participants" :aria-label="$t('videoCall.participants.label')">
-    <ul class="call-participants__list">
+  <section
+    class="call-participants"
+    :aria-label="$t('videoCall.participants.label')"
+    @keydown.esc="muting && stopMuting()"
+  >
+    <!--
+      What concerns the whole call: the moderation's own controls. Somebody who may step into the
+      moderation is offered that instead. While "mute all" is being chosen, its question and
+      answers take the controls' place.
+    -->
+    <div v-if="hasToolbar" class="call-participants__toolbar" data-test="call-participants-toolbar">
+      <h3
+        v-if="muting"
+        class="call-participants__muting-title"
+        data-test="call-participants-muting"
+      >
+        {{ $t('videoCall.participants.muteWhom') }}
+      </h3>
+      <!-- Its answers stand where the moderation's controls stood. -->
+      <div class="call-participants__toolbar-actions">
+        <template v-if="muting">
+          <os-button
+            data-test="mute-all-cancel"
+            appearance="outline"
+            variant="primary"
+            size="sm"
+            @click="stopMuting"
+          >
+            {{ $t('actions.cancel') }}
+          </os-button>
+          <os-button
+            data-test="mute-all-confirm"
+            variant="danger"
+            size="sm"
+            :loading="busy"
+            :disabled="muteCount === 0 && floorUnchanged"
+            @click="muteAll"
+          >
+            {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
+          </os-button>
+        </template>
+        <os-button
+          v-if="isModerator && !muting"
+          data-test="call-participants-mute-all"
+          variant="primary"
+          appearance="outline"
+          size="sm"
+          @click="openMuteAll"
+        >
+          <template #icon>
+            <os-icon :icon="icons.microphoneSlash" />
+          </template>
+          {{ $t('videoCall.participants.muteAll') }}
+        </os-button>
+        <os-button
+          v-if="!isModerator && mayTakeOver && !muting"
+          data-test="call-participants-take-over"
+          variant="primary"
+          appearance="outline"
+          size="sm"
+          :loading="busy"
+          @click="takeOver"
+        >
+          <template #icon>
+            <os-icon :icon="icons.shield" />
+          </template>
+          {{ $t('videoCall.participants.takeOver') }}
+        </os-button>
+        <label
+          v-if="(isModerator || moderation.everyone) && !muting"
+          class="call-participants__everyone"
+          data-test="call-participants-everyone"
+        >
+          <input
+            type="checkbox"
+            :checked="moderation.everyone"
+            :disabled="busy || !mayToggleEveryone"
+            @change="setEveryone($event.target.checked)"
+          />
+          {{ $t('videoCall.participants.everyoneModerates') }}
+        </label>
+      </div>
+    </div>
+
+    <ul
+      class="call-participants__list"
+      @pointermove="noteActivity"
+      @pointerdown="noteActivity"
+      @keydown="noteActivity"
+      @focusin="noteActivity"
+      @pointerleave="$event.pointerType === 'mouse' && restOrder()"
+      @focusout="!$el.contains($event.relatedTarget) && restOrder()"
+    >
       <li
         v-for="person in ordered"
         :key="person.userId"
@@ -12,57 +103,376 @@
         </span>
         <span class="call-participants__who">
           <span class="call-participants__name">{{ person.name }}</span>
+          <!-- What sets them apart, on one line: "You: Moderator – Has the floor". -->
+          <span
+            v-if="badgeLine(person)"
+            class="call-participants__badges"
+            :data-test="'call-participant-badges-' + person.userId"
+          >
+            <template v-for="(mark, index) in badges(person)">
+              <!-- v-text: no white space may come between a mark and what follows it. -->
+              <span v-if="index > 0" :key="'sep-' + index" v-text="mark.after" />
+              <span
+                :key="mark.key"
+                :class="{ 'call-participants__mark--role': mark.role }"
+                :data-test="'call-participant-' + mark.key"
+                v-text="mark.text"
+              />
+            </template>
+          </span>
         </span>
-        <!-- What is on and what is off, to see: a screen share first, as it is not always there. -->
+        <!--
+          A moderator switches a microphone, a camera or a screen share that is on off with a click
+          on it, and gives or takes the floor with the speech bubble, which everybody else sees only
+          on whoever has the floor. What is not always there comes first, so that the devices stay
+          in line: whether one muted somebody for oneself, the bubble, a screen share.
+        -->
         <span class="call-participants__state">
+          <!-- Muted for oneself alone: a click lets one hear them again. -->
+          <button
+            v-if="locallyMuted[person.userId]"
+            v-tooltip="$t('videoCall.participants.unmuteForMe')"
+            type="button"
+            class="call-participants__switch call-participants__unmute"
+            :aria-label="$t('videoCall.participants.unmuteForMe')"
+            :data-test="'call-participant-unmute-for-me-' + person.userId"
+            @click="$emit('local-mute', person.userId, false)"
+          >
+            <os-icon :icon="icons.volumeOff" />
+          </button>
+          <button
+            v-if="isModerator && !muting"
+            type="button"
+            :class="[
+              'call-participants__switch',
+              'call-participants__give-floor',
+              { 'call-participants__give-floor--on': hasFloor(person.userId) },
+            ]"
+            v-tooltip="floorLabel(person)"
+            :aria-label="floorLabel(person)"
+            :aria-pressed="hasFloor(person.userId) ? 'true' : 'false'"
+            :disabled="busy"
+            :data-test="'call-participant-floor-toggle-' + person.userId"
+            @click="setFloor(person, !hasFloor(person.userId))"
+          >
+            <os-icon :icon="icons.comment" />
+          </button>
+          <!-- Everybody else sees the bubble only on whoever has the floor. -->
           <os-icon
-            v-for="device in devicesOf(person)"
-            :key="device.kind"
-            :icon="device.icon"
-            :class="{ 'call-participants__off': !device.on }"
+            v-else-if="!isModerator && hasFloor(person.userId)"
+            :icon="icons.comment"
+            class="call-participants__give-floor--on call-participants__inert"
             aria-hidden="true"
-            :data-test="'call-participant-device-' + device.kind + '-' + person.userId"
+            :data-test="'call-participant-has-floor-' + person.userId"
           />
+          <template v-for="device in devicesOf(person)">
+            <button
+              v-if="device.toggle"
+              :key="device.kind"
+              type="button"
+              :class="[
+                'call-participants__switch',
+                { 'call-participants__switch-on call-participants__off': !device.on },
+              ]"
+              v-tooltip="device.label"
+              :aria-label="device.label"
+              :disabled="busy"
+              :data-test="'call-participant-switch-' + device.kind + '-' + person.userId"
+              @click="device.toggle"
+            >
+              <os-icon :icon="device.icon" />
+            </button>
+            <os-icon
+              v-else
+              :key="device.kind"
+              :icon="device.icon"
+              :class="['call-participants__inert', { 'call-participants__off': !device.on }]"
+              aria-hidden="true"
+              :data-test="'call-participant-device-' + device.kind + '-' + person.userId"
+            />
+          </template>
         </span>
         <span class="call-participants__sr-only">{{ stateLabel(person) }}</span>
+        <button
+          v-if="muting"
+          type="button"
+          :class="[
+            'call-participants__floor',
+            { 'call-participants__floor--on': floor.includes(person.userId) },
+          ]"
+          :aria-pressed="floor.includes(person.userId) ? 'true' : 'false'"
+          :data-test="'mute-all-floor-' + person.userId"
+          @click="toggleFloor(person.userId)"
+        >
+          <os-icon :icon="icons.comment" />
+          {{
+            floor.includes(person.userId)
+              ? $t('videoCall.participants.hasFloor')
+              : $t('videoCall.participants.giveFloor')
+          }}
+        </button>
+        <dropdown
+          v-else
+          class="call-participants__menu"
+          placement="bottom-end"
+          offset="5"
+          @open-change="holdOrder"
+        >
+          <template #default="{ toggleMenu }">
+            <os-button
+              :data-test="'call-participant-menu-' + person.userId"
+              variant="primary"
+              appearance="ghost"
+              circle
+              size="sm"
+              :aria-label="$t('videoCall.participants.actionsFor', { name: person.name })"
+              @click.prevent="openMenu(person, toggleMenu)"
+            >
+              <template #icon>
+                <os-icon :icon="icons.ellipsisV" />
+              </template>
+            </os-button>
+          </template>
+          <template #popover="{ toggleMenu }">
+            <os-menu dropdown :routes="actionsFor(person)">
+              <template #menuitem="item">
+                <os-menu-item
+                  :route="item.route"
+                  :parents="item.parents"
+                  :data-test="'call-participant-action-' + item.route.name"
+                  @click.stop.prevent="run(item.route, toggleMenu)"
+                >
+                  <os-icon :icon="item.route.icon" />
+                  {{ item.route.label }}
+                </os-menu-item>
+              </template>
+            </os-menu>
+          </template>
+        </dropdown>
+        <!-- Ticked: muted by "mute all"; whoever is not ticked is spared. -->
+        <input
+          v-if="muting"
+          type="checkbox"
+          class="call-participants__pick"
+          :checked="!spared.includes(person.userId)"
+          :aria-label="$t('videoCall.participants.muteName', { name: person.name })"
+          :data-test="'mute-all-pick-' + person.userId"
+          @change="spare(person.userId, !$event.target.checked)"
+        />
       </li>
     </ul>
+
+    <!--
+      The question before removing somebody, over the list, inside the sidebar, so the call stays
+      in view.
+    -->
+    <div
+      v-if="dialog === 'remove' && removing"
+      class="call-participants__dialog"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="$t('videoCall.participants.remove')"
+      data-test="call-participants-dialog"
+      @keydown.esc="closeDialog"
+    >
+      <h3 class="call-participants__dialog-title">
+        {{ $t('videoCall.participants.removeQuestion', { name: removing.name }) }}
+      </h3>
+      <p class="call-participants__dialog-text">
+        {{ $t('videoCall.participants.removeExplanation') }}
+      </p>
+      <div class="call-participants__dialog-actions">
+        <os-button appearance="outline" variant="primary" @click="closeDialog">
+          {{ $t('actions.cancel') }}
+        </os-button>
+        <os-button
+          data-test="remove-confirm"
+          variant="danger"
+          :loading="busy"
+          @click="remove(removing)"
+        >
+          {{ $t('videoCall.participants.remove') }}
+        </os-button>
+      </div>
+    </div>
   </section>
 </template>
 
 <script>
-import { OsIcon } from '@ocelot-social/ui'
+import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
+import { mapGetters } from 'vuex'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
+import Dropdown from '~/components/Dropdown'
+import {
+  moderateVideoCallParticipantMutation,
+  muteAllInVideoCallMutation,
+  setVideoCallEveryoneModeratesMutation,
+  setVideoCallFloorMutation,
+  setVideoCallModeratorMutation,
+  takeOverVideoCallModerationMutation,
+  videoCallModerationRightsQuery,
+} from '~/graphql/VideoCalls'
+
+// How long the rows stay where they are after the last move, click or key in the list. Whoever
+// aims at a switch, or has just pressed one, is not to see the row jump away under the pointer.
+export const ORDER_REST = 5000
 
 // The people in a video call, one row each however many devices they are in it with, and what
-// they have on.
+// can be done about them. What everybody may do is about themselves (show somebody large, open
+// their profile, mute them for oneself); what a moderator may do on top goes to the server,
+// which decides it again (backend: videoCallModeration.ts).
 export default {
   name: 'CallParticipants',
-  components: { AvatarImage, OsIcon },
+  components: { AvatarImage, Dropdown, OsButton, OsIcon, OsMenu, OsMenuItem },
   props: {
-    // One entry per person: { userId, name, profile, isMe, micOn, cameraOn, screenSharing,
-    // speaking }.
+    // One entry per person: { userId, name, slug, profile, isMe, micOn, cameraOn,
+    // screenSharing, speaking, devices }.
     people: { type: Array, required: true },
+    // What the room's metadata says: { moderators: [userId], everyone, speakers: [userId] }.
+    moderation: {
+      type: Object,
+      default: () => ({ moderators: [], everyone: false, speakers: [] }),
+    },
+    // Whether the viewer may step into the moderation (group.videoCall.moderate).
+    mayTakeOver: { type: Boolean, default: false },
+    // The people muted for the viewer alone, by userId.
+    locallyMuted: { type: Object, default: () => ({}) },
+  },
+  emits: ['spotlight', 'local-mute', 'switch-off', 'switch-on'],
+  data() {
+    return {
+      busy: false,
+      // The heavier rights over the person whose menu is open, as the server answered them.
+      rights: {},
+      dialog: null,
+      removing: null,
+      // The order of the rows as it was when it was stopped, by userId; null while it is live.
+      heldOrder: null,
+      // What stops it: an open menu, or somebody busy in the list a moment ago.
+      menuOpen: false,
+      active: false,
+      // Whether "mute all" is being chosen, right in the list.
+      muting: false,
+      spared: [],
+      floor: [],
+      // Those ticked only because they were given the floor here: taking it back unticks them.
+      sparedForFloor: [],
+    }
   },
   created() {
     this.icons = iconRegistry
   },
+  beforeDestroy() {
+    clearTimeout(this.restTimer)
+  },
   computed: {
-    // Who speaks first, then oneself, then everybody else by name. The speaking ones are held a
-    // moment by the call (its speaker hold), so nobody jumps about at every word.
+    ...mapGetters({
+      groupId: 'videoCall/groupId',
+      currentUser: 'auth/user',
+    }),
+    meId() {
+      return this.currentUser && this.currentUser.id
+    },
+    isModerator() {
+      return this.moderation.everyone || this.moderation.moderators.includes(this.meId)
+    },
+    // Ending "everybody moderates" takes a moderator named as such, or somebody who may step
+    // in; whoever moderates only because everybody does cannot end it for the others.
+    mayToggleEveryone() {
+      if (!this.moderation.everyone) return this.isModerator
+      return this.moderation.moderators.includes(this.meId) || this.mayTakeOver
+    },
+    // Who speaks first, then oneself, then the moderation, then everybody else by name. The
+    // speaking ones are held a moment by the call (its speaker hold), so nobody jumps about at
+    // every word.
     ordered() {
       const rank = (person) => {
         if (person.speaking) return 0
         if (person.isMe) return 1
-        return 2
+        if (this.isNamedModerator(person.userId)) return 2
+        return 3
       }
-      return [...this.people].sort(
+      const live = [...this.people].sort(
         (a, b) => rank(a) - rank(b) || (a.name || '').localeCompare(b.name || ''),
       )
+      if (!this.heldOrder) return live
+      // While the order is held nobody moves; whoever joins meanwhile comes last.
+      const place = (person) => {
+        const index = this.heldOrder.indexOf(person.userId)
+        return index === -1 ? Infinity : index
+      }
+      return live.sort((a, b) => place(a) - place(b))
+    },
+    // Whether there is anything for the whole call to show above the list.
+    hasToolbar() {
+      return this.muting || this.isModerator || this.mayTakeOver || this.moderation.everyone
+    },
+    // How many "mute all" would mute: everybody not spared and not given the floor whose
+    // microphone is on.
+    muteCount() {
+      return this.people.filter(
+        (person) =>
+          person.micOn &&
+          !this.spared.includes(person.userId) &&
+          !this.floor.includes(person.userId),
+      ).length
+    },
+    floorUnchanged() {
+      const before = [...this.moderation.speakers].sort()
+      const after = [...this.floor].sort()
+      return before.length === after.length && before.every((id, i) => id === after[i])
+    },
+  },
+  watch: {
+    // Whoever no longer moderates has nothing left to choose.
+    isModerator(moderating) {
+      if (!moderating) this.stopMuting()
     },
   },
   methods: {
+    isNamedModerator(userId) {
+      return this.moderation.moderators.includes(userId)
+    },
+    hasFloor(userId) {
+      return this.moderation.speakers.includes(userId)
+    },
+    // What sets somebody apart, in order; the roles in the call stand out in colour. Each knows
+    // what goes before it: ": " after "you", " – " between the others. While everybody
+    // moderates, everybody is marked as moderating, and those named as such, who alone can end
+    // it, as leading the moderation.
+    badges(person) {
+      const marks = [
+        person.isMe && { key: 'you', text: this.$t('videoCall.you') },
+        (this.moderation.everyone || this.isNamedModerator(person.userId)) && {
+          key: 'moderator',
+          text:
+            this.moderation.everyone && this.isNamedModerator(person.userId)
+              ? this.$t('videoCall.participants.leadModerator')
+              : this.$t('videoCall.participants.moderator'),
+          role: true,
+        },
+        this.hasFloor(person.userId) && {
+          key: 'floor',
+          text: this.$t('videoCall.participants.hasFloor'),
+          role: true,
+        },
+        person.devices > 1 && {
+          key: 'devices',
+          text: this.$t('videoCall.participants.devices', { count: person.devices }),
+        },
+      ].filter(Boolean)
+      return marks.map((mark, index) => ({
+        ...mark,
+        after: index === 1 && marks[0].key === 'you' ? ': ' : ' – ',
+      }))
+    },
+    // The same, as one line of text: what a screen reader and the tests read.
+    badgeLine(person) {
+      return this.badges(person)
+        .map((mark, index) => (index > 0 ? mark.after : '') + mark.text)
+        .join('')
+    },
     stateLabel(person) {
       return [
         person.micOn
@@ -76,14 +486,311 @@ export default {
         .filter(Boolean)
         .join(', ')
     },
-    // Microphone, camera and a running screen share as the row shows them.
+    // A menu holds the order for as long as it is open, and a moment longer, like a click does.
+    holdOrder(open) {
+      this.menuOpen = open
+      if (open) this.updateHold()
+      else this.noteActivity()
+    },
+    // Somebody moves, clicks or types in the list: the order stays until it has been quiet there
+    // for a while, so that the pointer resting somewhere does not stop it for good.
+    noteActivity() {
+      this.active = true
+      clearTimeout(this.restTimer)
+      this.restTimer = setTimeout(this.restOrder, ORDER_REST)
+      this.updateHold()
+    },
+    // Quiet for long enough, or gone from the list: the rows may move again, unless a menu is open.
+    restOrder() {
+      this.active = false
+      clearTimeout(this.restTimer)
+      this.updateHold()
+    },
+    updateHold() {
+      if (!this.menuOpen && !this.active) this.heldOrder = null
+      else if (!this.heldOrder) this.heldOrder = this.ordered.map((person) => person.userId)
+    },
+    // The heavier rights are the server's to tell: they depend on the ranks in the group. Asked
+    // when the menu opens, so the menu offers what will be allowed.
+    async openMenu(person, toggleMenu) {
+      toggleMenu()
+      if (person.isMe || !this.isModerator) return
+      try {
+        const {
+          data: { videoCallModerationRights },
+        } = await this.$apollo.query({
+          query: videoCallModerationRightsQuery(),
+          variables: { groupId: this.groupId, userId: person.userId },
+          fetchPolicy: 'no-cache',
+        })
+        this.rights = { ...this.rights, [person.userId]: videoCallModerationRights }
+      } catch {
+        // Without an answer the heavier entries stay away; the light ones need none.
+      }
+    },
+    // Microphone, camera and a running screen share as the row shows them. One that is on can be
+    // switched off right there, as from the menu: one's own by everybody, anybody's by a moderator.
+    // One's own can be switched on again there too.
     devicesOf(person) {
-      const device = (kind, on, icon, iconOff) => ({ kind, on, icon: on ? icon : iconOff })
+      const device = (kind, on, icon, iconOff, label, action, labelOn) => {
+        let toggle = null
+        if (on && (person.isMe || this.isModerator)) toggle = this.switchOff(person, kind, action)
+        else if (!on && person.isMe) toggle = () => this.$emit('switch-on', kind)
+        return {
+          kind,
+          on,
+          icon: on ? icon : iconOff,
+          label: on ? label : labelOn,
+          toggle,
+        }
+      }
       return [
-        person.screenSharing && device('screen', true, this.icons.desktop, this.icons.desktop),
-        device('mic', person.micOn, this.icons.microphone, this.icons.microphoneSlash),
-        device('camera', person.cameraOn, this.icons.videoCamera, this.icons.videoCameraSlash),
+        person.screenSharing &&
+          device(
+            'screen',
+            true,
+            this.icons.desktop,
+            this.icons.desktop,
+            this.$t('videoCall.participants.stopSharing'),
+            'STOP_SCREEN_SHARE',
+          ),
+        device(
+          'mic',
+          person.micOn,
+          this.icons.microphone,
+          this.icons.microphoneSlash,
+          this.$t('videoCall.participants.muteMicrophone'),
+          'MUTE_MICROPHONE',
+          this.$t('videoCall.participants.micOnAction'),
+        ),
+        device(
+          'camera',
+          person.cameraOn,
+          this.icons.videoCamera,
+          this.icons.videoCameraSlash,
+          this.$t('videoCall.participants.cameraOffAction'),
+          'DISABLE_CAMERA',
+          this.$t('videoCall.participants.cameraOnAction'),
+        ),
       ].filter(Boolean)
+    },
+    floorLabel(person) {
+      return this.hasFloor(person.userId)
+        ? this.$t('videoCall.participants.takeFloor')
+        : this.$t('videoCall.participants.giveFloor')
+    },
+    // One's own goes off right here, for everybody; somebody else's is asked of the server.
+    switchOff(person, kind, action) {
+      return person.isMe
+        ? () => this.$emit('switch-off', kind)
+        : () => this.moderate(person, action)
+    },
+    actionsFor(person) {
+      const entry = (name, label, icon, callback) => ({ name, label, icon, callback })
+      const actions = [
+        entry('spotlight', this.$t('videoCall.participants.showLarge'), this.icons.expand, () =>
+          this.$emit('spotlight', person.userId),
+        ),
+      ]
+      if (person.slug) {
+        actions.push(
+          entry('profile', this.$t('videoCall.participants.openProfile'), this.icons.user, () =>
+            this.$router.push({
+              name: 'profile-id-slug',
+              params: { id: person.userId, slug: person.slug },
+            }),
+          ),
+        )
+      }
+      if (!person.isMe) {
+        const muted = !!this.locallyMuted[person.userId]
+        actions.push(
+          entry(
+            'localMute',
+            muted
+              ? this.$t('videoCall.participants.unmuteForMe')
+              : this.$t('videoCall.participants.muteForMe'),
+            muted ? this.icons.volumeUp : this.icons.volumeOff,
+            () => this.$emit('local-mute', person.userId, !muted),
+          ),
+        )
+      }
+      if (person.isMe && this.isNamedModerator(person.userId)) {
+        actions.push(
+          entry('resign', this.$t('videoCall.participants.resign'), this.icons.shieldSlash, () =>
+            this.setModerator(person, false),
+          ),
+        )
+      }
+      // One's own microphone, camera and screen share are one's own to switch off — here as on
+      // the control bar, whose buttons follow (switch-off). Somebody else's are the moderation's,
+      // and go through the server.
+      const own = person.isMe
+      if (own || this.isModerator) {
+        const switchOff = (kind, action) => this.switchOff(person, kind, action)
+        if (person.micOn) {
+          actions.push(
+            entry(
+              'mute',
+              this.$t('videoCall.participants.muteMicrophone'),
+              this.icons.microphoneSlash,
+              switchOff('mic', 'MUTE_MICROPHONE'),
+            ),
+          )
+        }
+        if (person.cameraOn) {
+          actions.push(
+            entry(
+              'camera',
+              this.$t('videoCall.participants.cameraOffAction'),
+              this.icons.videoCameraSlash,
+              switchOff('camera', 'DISABLE_CAMERA'),
+            ),
+          )
+        }
+        if (person.screenSharing) {
+          actions.push(
+            entry(
+              'screen',
+              this.$t('videoCall.participants.stopSharing'),
+              this.icons.desktopSlash,
+              switchOff('screen', 'STOP_SCREEN_SHARE'),
+            ),
+          )
+        }
+      }
+      if (!this.isModerator) return actions
+      actions.push(
+        this.hasFloor(person.userId)
+          ? entry(
+              'floor',
+              this.$t('videoCall.participants.takeFloor'),
+              this.icons.commentSlash,
+              () => this.setFloor(person, false),
+            )
+          : entry('floor', this.$t('videoCall.participants.giveFloor'), this.icons.comment, () =>
+              this.setFloor(person, true),
+            ),
+      )
+      if (person.isMe) return actions
+      const rights = this.rights[person.userId] || {}
+      if (!this.isNamedModerator(person.userId)) {
+        actions.push(
+          entry('appoint', this.$t('videoCall.participants.makeModerator'), this.icons.shield, () =>
+            this.setModerator(person, true),
+          ),
+        )
+      } else if (rights.revokeModeration) {
+        actions.push(
+          entry(
+            'revoke',
+            this.$t('videoCall.participants.revokeModerator'),
+            this.icons.shieldSlash,
+            () => this.setModerator(person, false),
+          ),
+        )
+      }
+      if (rights.remove) {
+        actions.push(
+          entry(
+            'remove',
+            this.$t('videoCall.participants.removeEllipsis'),
+            this.icons.userTimes,
+            () => {
+              this.removing = person
+              this.dialog = 'remove'
+            },
+          ),
+        )
+      }
+      return actions
+    },
+    run(action, toggleMenu) {
+      toggleMenu()
+      action.callback()
+    },
+    async mutate(mutation, variables) {
+      this.busy = true
+      try {
+        await this.$apollo.mutate({
+          mutation,
+          variables: { groupId: this.groupId, ...variables },
+        })
+        return true
+      } catch (error) {
+        this.$toastBackendError(error)
+        return false
+      } finally {
+        this.busy = false
+      }
+    },
+    moderate(person, action) {
+      return this.mutate(moderateVideoCallParticipantMutation(), { userId: person.userId, action })
+    },
+    setFloor(person, floor) {
+      return this.mutate(setVideoCallFloorMutation(), { userId: person.userId, floor })
+    },
+    setModerator(person, moderator) {
+      return this.mutate(setVideoCallModeratorMutation(), { userId: person.userId, moderator })
+    },
+    setEveryone(enabled) {
+      return this.mutate(setVideoCallEveryoneModeratesMutation(), { enabled })
+    },
+    takeOver() {
+      return this.mutate(takeOverVideoCallModerationMutation(), {})
+    },
+    async remove(person) {
+      if (await this.moderate(person, 'REMOVE')) this.closeDialog()
+    },
+    // Spared from the start: oneself, and those with the floor; without anybody given the
+    // floor, whoever is speaking right now — the one a moderator usually wants to go on.
+    openMuteAll() {
+      this.floor = [...this.moderation.speakers]
+      const speaking = this.floor.length
+        ? []
+        : this.people.filter((person) => person.speaking && !person.isMe).map((p) => p.userId)
+      this.spared = [this.meId, ...this.floor, ...speaking].filter(Boolean)
+      this.sparedForFloor = []
+      this.muting = true
+    },
+    stopMuting() {
+      this.muting = false
+    },
+    spare(userId, spared) {
+      this.spared = spared ? [...this.spared, userId] : this.spared.filter((id) => id !== userId)
+    },
+    // Giving the floor spares; taking it back unticks again whoever was ticked only by giving
+    // it, and leaves a tick set before.
+    toggleFloor(userId) {
+      if (this.floor.includes(userId)) {
+        this.floor = this.floor.filter((id) => id !== userId)
+        if (this.sparedForFloor.includes(userId)) {
+          this.spared = this.spared.filter((id) => id !== userId)
+          this.sparedForFloor = this.sparedForFloor.filter((id) => id !== userId)
+        }
+        return
+      }
+      this.floor = [...this.floor, userId]
+      if (!this.spared.includes(userId)) {
+        this.spared = [...this.spared, userId]
+        this.sparedForFloor = [...this.sparedForFloor, userId]
+      }
+    },
+    async muteAll() {
+      const done = await this.mutate(muteAllInVideoCallMutation(), {
+        exceptUserIds: this.spared,
+        floorUserIds: this.floor,
+      })
+      if (!done) return
+      // Muted along with the others: the own button follows, as nobody tells us about ourselves.
+      if (!this.spared.includes(this.meId) && !this.floor.includes(this.meId)) {
+        this.$emit('switch-off', 'mic')
+      }
+      this.stopMuting()
+    },
+    closeDialog() {
+      this.dialog = null
+      this.removing = null
     },
   },
 }
@@ -97,6 +804,25 @@ export default {
   min-height: 0;
   height: 100%;
   background: var(--background-color-base);
+}
+.call-participants__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-x-small);
+  padding: var(--space-x-small);
+  border-bottom: 1px solid var(--border-color-softer);
+}
+.call-participants__toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-x-small);
+}
+.call-participants__everyone {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xx-small);
+  font-size: var(--font-size-small);
 }
 .call-participants__list {
   flex: 1 1 auto;
@@ -131,14 +857,67 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.call-participants__mark--role {
+  color: var(--color-primary);
+}
+.call-participants__badges {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-x-small);
+  color: var(--text-color-soft);
+}
 .call-participants__state {
   flex: 0 0 auto;
   display: inline-flex;
   gap: var(--space-xx-small);
   color: var(--text-color-soft);
 }
+.call-participants__switch {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.call-participants__switch:hover,
+.call-participants__switch:focus-visible {
+  color: var(--color-danger);
+}
+.call-participants__switch-on:hover,
+.call-participants__switch-on:focus-visible {
+  color: var(--color-primary);
+}
+.call-participants__unmute {
+  color: var(--video-call-participant-locally-muted-color);
+}
+.call-participants__unmute:hover,
+.call-participants__unmute:focus-visible {
+  color: var(--color-primary);
+}
+.call-participants__give-floor--on {
+  color: var(--color-primary);
+}
+.call-participants__give-floor:hover,
+.call-participants__give-floor:focus-visible {
+  color: var(--color-primary);
+}
+.call-participants__switch:disabled {
+  cursor: default;
+}
 .call-participants__off {
   color: var(--color-danger);
+}
+/*  What the viewer can work in a row is shown in full; whatever else steps back a little. */
+.call-participants__inert {
+  color: var(--video-call-participant-inert-on-color);
+}
+.call-participants__off.call-participants__inert {
+  color: var(--video-call-participant-inert-off-color);
+}
+.call-participants__give-floor--on.call-participants__inert {
+  color: var(--video-call-participant-inert-floor-color);
 }
 .call-participants__sr-only {
   position: absolute;
@@ -147,5 +926,55 @@ export default {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+.call-participants__dialog {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-small);
+  padding: var(--space-small);
+  overflow-y: auto;
+  background: var(--background-color-base);
+}
+.call-participants__dialog-title {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+.call-participants__dialog-text {
+  margin: 0;
+  color: var(--text-color-soft);
+}
+.call-participants__floor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxx-small);
+  padding: var(--space-xxx-small) var(--space-xx-small);
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-base);
+  background: none;
+  color: var(--text-color-soft);
+  font-size: var(--font-size-small);
+  cursor: pointer;
+}
+.call-participants__floor--on {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.call-participants__muting-title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: bold;
+}
+.call-participants__pick {
+  flex: 0 0 auto;
+}
+.call-participants__floor {
+  flex: 0 0 auto;
+}
+.call-participants__dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-x-small);
 }
 </style>

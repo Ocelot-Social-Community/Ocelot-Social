@@ -1,0 +1,7 @@
+mutation ModerateVideoCallParticipant(
+  $groupId: ID!
+  $userId: ID!
+  $action: VideoCallModerationAction!
+) {
+  moderateVideoCallParticipant(groupId: $groupId, userId: $userId, action: $action)
+}

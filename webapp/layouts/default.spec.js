@@ -195,7 +195,12 @@ describe('default.vue', () => {
     })
 
     describe('participants of the parked call in the floating window', () => {
-      const view = { people: [{ userId: 'u1' }] }
+      const view = {
+        people: [{ userId: 'u1' }],
+        moderation: {},
+        mayTakeOver: false,
+        locallyMuted: {},
+      }
       const inWindow = (overrides = {}) =>
         Default.computed.participantsInWindow.call({
           showVideoCall: true,
@@ -235,7 +240,17 @@ describe('default.vue', () => {
         expect(Default.computed.participantsHeight.call({})).toBe('calc(100dvh - 500px)')
       })
 
-      it('close with the window', () => {
+      it('hand what is done for oneself to the call, and close with the window', () => {
+        const spotlightPerson = jest.fn()
+        Default.methods.callAction.call(
+          { $refs: { videoCall: { spotlightPerson } } },
+          'spotlightPerson',
+          'u1',
+        )
+        expect(spotlightPerson).toHaveBeenCalledWith('u1')
+        expect(() =>
+          Default.methods.callAction.call({ $refs: {} }, 'spotlightPerson'),
+        ).not.toThrow()
         const setParticipantsOpen = jest.fn()
         const showChat = jest.fn()
         Default.methods.closeSingleRoom.call({ setParticipantsOpen, showChat })

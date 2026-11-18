@@ -49,6 +49,13 @@ vi.mock('@src/livekit/callSession', () => ({
   __esModule: true,
   endCallSessionsOfMissingRoom: async (...args: unknown[]) => mockEndOfMissingRoom(...args),
 }))
+// Keeping the moderation in step is moderationService's business (moderationService.spec.ts);
+// here it only has to be asked for when the people in a room change.
+const mockSettle = vi.fn<(...args: unknown[]) => Promise<void>>()
+vi.mock('@src/livekit/moderationService', () => ({
+  __esModule: true,
+  settleAndPublishModeration: async (...args: unknown[]) => mockSettle(...args),
+}))
 vi.mock('@src/db/neo4j', () => ({
   __esModule: true,
   getDriver: () => 'driver',
@@ -102,6 +109,7 @@ beforeEach(() => {
   mockPublish.mockReset().mockResolvedValue(undefined)
   // Settled at once, unless a test says otherwise.
   mockEndOfMissingRoom.mockReset().mockResolvedValue(true)
+  mockSettle.mockReset().mockResolvedValue(undefined)
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
   mockLogger.error.mockReset()
@@ -254,6 +262,8 @@ describe('poll tick', () => {
       'VIDEO_CALL_PARTICIPANT_COUNT_CHANGED',
       expect.objectContaining({ groupId: expect.stringContaining('other') }),
     )
+    // An empty room has nobody to moderate.
+    expect(mockSettle.mock.calls.map(([, groupId]) => groupId)).toEqual(['a'])
 
     // Second tick with identical counts: no new publishes
     mockPublish.mockClear()
@@ -517,6 +527,8 @@ describe('poll tick', () => {
       await vi.advanceTimersByTimeAsync(5_000)
 
       expect(mockListParticipants).not.toHaveBeenCalled()
+      // Somebody came: the moderation is checked for the room.
+      expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a')
       expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
         groupId: 'a',
         count: 2,

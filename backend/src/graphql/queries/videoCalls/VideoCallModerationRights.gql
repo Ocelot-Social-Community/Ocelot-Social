@@ -1,0 +1,7 @@
+query VideoCallModerationRights($groupId: ID!, $userId: ID!) {
+  videoCallModerationRights(groupId: $groupId, userId: $userId) {
+    userId
+    remove
+    revokeModeration
+  }
+}

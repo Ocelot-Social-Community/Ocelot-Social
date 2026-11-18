@@ -115,9 +115,11 @@ export const joinCallSession = async (
         )
       }
       if (!sessionId) {
+        // Whoever opens the session started the call, and moderates it (see moderation.ts).
         const created = await transaction.run(
           `
             MATCH (group:Group { id: $groupId })
+            MATCH (starter:User { id: $userId })
             CREATE (room:Room { id: apoc.create.uuid(), createdAt: toString(datetime()) })
             CREATE (session:VideoCallSession {
               id: apoc.create.uuid(),
@@ -126,9 +128,11 @@ export const joinCallSession = async (
               createdAt: toString(datetime())
             })
             CREATE (room)-[:ROOM_FOR]->(session)-[:CALL_IN]->(group)
+            CREATE (starter)-[:STARTED_CALL { handedOver: false }]->(session)
+            CREATE (starter)-[:MODERATES_CALL]->(session)
             RETURN session.id AS id
           `,
-          { groupId, livekitRoom, livekitSid },
+          { groupId, userId, livekitRoom, livekitSid },
         )
         sessionId = created.records[0].get('id') as string
       }

@@ -1,0 +1,3 @@
+mutation TakeOverVideoCallModeration($groupId: ID!) {
+  takeOverVideoCallModeration(groupId: $groupId)
+}

@@ -259,7 +259,7 @@ describe('videoCall store', () => {
 
     describe('SET_PARTICIPANTS_VIEW', () => {
       it('keeps what the participant list shows, for the window beside the parked call', () => {
-        const view = { people: [] }
+        const view = { people: [], moderation: {}, mayTakeOver: false, locallyMuted: {} }
         mutations.SET_PARTICIPANTS_VIEW(state, view)
         expect(getters.participantsView(state)).toBe(view)
         mutations.SET_PARTICIPANTS_VIEW(state, undefined)

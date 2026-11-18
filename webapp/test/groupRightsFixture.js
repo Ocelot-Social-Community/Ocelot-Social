@@ -25,6 +25,7 @@ const ADMIN = [
   'group.settings.manage',
   'group.invite',
   'group.invite.external',
+  'group.videoCall.moderate',
 ]
 
 const OWNER = [...ADMIN, 'group.role.manage']
