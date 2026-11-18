@@ -708,6 +708,7 @@ export default {
     },
     stateLabel(person) {
       return [
+        person.speaking ? this.$t('videoCall.participants.speaking') : null,
         person.micOn
           ? this.$t('videoCall.participants.micOn')
           : this.$t('videoCall.participants.micOff'),
