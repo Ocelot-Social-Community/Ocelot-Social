@@ -1955,9 +1955,13 @@
     "chatTabs": {
       "call": "Chamada",
       "callHint": "Visível apenas para os participantes desta videochamada (sem notificações)",
+      "callTitle": "Chat da chamada",
       "group": "Grupo",
       "groupHint": "Visível para todos os membros do grupo (com notificações)",
-      "label": "Escolher chat"
+      "groupTitle": "Chat do grupo",
+      "label": "Escolher chat",
+      "participants": "Pessoas",
+      "participantsHint": "Quem está na chamada"
     },
     "closeChat": "Fechar chat",
     "connecting": "Conectando…",
@@ -1968,6 +1972,7 @@
       "chat": "Chat",
       "leave": "Desligar",
       "microphone": "Microfone",
+      "participants": "Pessoas",
       "screen": "Tela",
       "startSharing": "Compartilhar a tela, uma janela ou uma aba",
       "stopSharing": "{surface}: parar de compartilhar",
@@ -2040,6 +2045,18 @@
     "micUnmuted": "Microfone ligado",
     "minimize": "Minimizar",
     "openChat": "Abrir chat",
+    "participants": {
+      "cameraOff": "câmera desligada",
+      "cameraOn": "câmera ligada",
+      "close": "Ocultar as pessoas da chamada",
+      "countWithDevices": "Pessoas: {people} · Dispositivos: {devices}",
+      "label": "Pessoas na chamada",
+      "micOff": "microfone desligado",
+      "micOn": "microfone ligado",
+      "open": "Mostrar as pessoas da chamada",
+      "sharing": "compartilha a tela",
+      "speaking": "está falando"
+    },
     "prejoin": {
       "camera": "Câmera",
       "cameraDisabled": "A câmera está desativada.",
@@ -2093,6 +2110,7 @@
     },
     "reconnecting": "Conexão perdida — reconectando…",
     "reloadPending": "A plataforma tem um novo design. Ele será aplicado assim que você sair da chamada.",
+    "resizeSidebar": "Redimensionar a barra lateral",
     "restartMic": "Reiniciar microfone",
     "restoreQuality": "Restaurar qualidade",
     "screenShare": "Tela",

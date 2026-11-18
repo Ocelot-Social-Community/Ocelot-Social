@@ -1955,9 +1955,13 @@
     "chatTabs": {
       "call": "Call",
       "callHint": "Visible only to the participants of this video call (without notifications)",
+      "callTitle": "Call chat",
       "group": "Group",
       "groupHint": "Visible to all members of the group (with notifications)",
-      "label": "Choose chat"
+      "groupTitle": "Group chat",
+      "label": "Choose chat",
+      "participants": "People",
+      "participantsHint": "Who is in the call"
     },
     "closeChat": "Close chat",
     "connecting": "Connecting…",
@@ -1968,6 +1972,7 @@
       "chat": "Chat",
       "leave": "Leave",
       "microphone": "Microphone",
+      "participants": "People",
       "screen": "Screen",
       "startSharing": "Share your screen, a window or a tab",
       "stopSharing": "{surface}: stop sharing",
@@ -2040,6 +2045,18 @@
     "micUnmuted": "Microphone on",
     "minimize": "Minimize",
     "openChat": "Open chat",
+    "participants": {
+      "cameraOff": "camera off",
+      "cameraOn": "camera on",
+      "close": "Hide the people in the call",
+      "countWithDevices": "People: {people} · Devices: {devices}",
+      "label": "People in the call",
+      "micOff": "microphone off",
+      "micOn": "microphone on",
+      "open": "Show the people in the call",
+      "sharing": "sharing the screen",
+      "speaking": "speaking"
+    },
     "prejoin": {
       "camera": "Camera",
       "cameraDisabled": "Camera is disabled.",
@@ -2093,6 +2110,7 @@
     },
     "reconnecting": "Connection lost — reconnecting…",
     "reloadPending": "The platform has a new design. It will be applied once you leave the call.",
+    "resizeSidebar": "Resize the sidebar",
     "restartMic": "Restart microphone",
     "restoreQuality": "Restore quality",
     "screenShare": "Screen",

@@ -1955,9 +1955,13 @@
     "chatTabs": {
       "call": "Rozmowa",
       "callHint": "Widoczny tylko dla uczestników tej rozmowy wideo (bez powiadomień)",
+      "callTitle": "Czat rozmowy",
       "group": "Grupa",
       "groupHint": "Widoczny dla wszystkich członków grupy (z powiadomieniami)",
-      "label": "Wybierz czat"
+      "groupTitle": "Czat grupy",
+      "label": "Wybierz czat",
+      "participants": "Uczestnicy",
+      "participantsHint": "Kto jest w rozmowie"
     },
     "closeChat": "Zamknij czat",
     "connecting": "Łączenie…",
@@ -1968,6 +1972,7 @@
       "chat": "Czat",
       "leave": "Rozłącz",
       "microphone": "Mikrofon",
+      "participants": "Uczestnicy",
       "screen": "Ekran",
       "startSharing": "Udostępnij ekran, okno lub kartę",
       "stopSharing": "{surface}: przestań udostępniać",
@@ -2040,6 +2045,18 @@
     "micUnmuted": "Mikrofon włączony",
     "minimize": "Minimalizuj",
     "openChat": "Otwórz czat",
+    "participants": {
+      "cameraOff": "kamera wyłączona",
+      "cameraOn": "kamera włączona",
+      "close": "Ukryj uczestników",
+      "countWithDevices": "Uczestnicy: {people} · Urządzenia: {devices}",
+      "label": "Uczestnicy rozmowy",
+      "micOff": "mikrofon wyłączony",
+      "micOn": "mikrofon włączony",
+      "open": "Pokaż uczestników",
+      "sharing": "udostępnia ekran",
+      "speaking": "mówi"
+    },
     "prejoin": {
       "camera": "Kamera",
       "cameraDisabled": "Kamera jest wyłączona.",
@@ -2093,6 +2110,7 @@
     },
     "reconnecting": "Utracono połączenie — ponowne łączenie…",
     "reloadPending": "Platforma ma nowy wygląd. Zostanie zastosowany, gdy tylko opuścisz rozmowę.",
+    "resizeSidebar": "Zmień rozmiar paska bocznego",
     "restartMic": "Uruchom ponownie mikrofon",
     "restoreQuality": "Przywróć jakość",
     "screenShare": "Ekran",

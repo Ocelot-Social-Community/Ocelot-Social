@@ -50,10 +50,13 @@ describe('default.vue', () => {
         'videoCall/phase': () => 'idle',
         'videoCall/chatRoomId': () => null,
         'videoCall/pageBars': (state) => state.pageBars,
+        'videoCall/participantsOpen': () => false,
+        'videoCall/participantsView': () => null,
       },
       mutations: {
         'chat/SET_OPEN_CHAT': jest.fn(),
         'videoCall/SET_ENABLED': jest.fn(),
+        'videoCall/SET_PARTICIPANTS_OPEN': jest.fn(),
       },
     })
   })
@@ -188,6 +191,81 @@ describe('default.vue', () => {
         ).toBe(false)
         expect(shows({ showVideoCall: false })).toBe(false)
         expect(shows({ videoCallPhase: 'prejoin' })).toBe(false)
+      })
+    })
+
+    describe('participants of the parked call in the floating window', () => {
+      const view = { people: [{ userId: 'u1' }] }
+      const inWindow = (overrides = {}) =>
+        Default.computed.participantsInWindow.call({
+          showVideoCall: true,
+          videoCallMinimized: true,
+          isMobile: false,
+          videoCallPhase: 'in-call',
+          participantsOpen: true,
+          participantsView: view,
+          ...overrides,
+        })
+
+      it('are shown beside the parked call while the list is open', () => {
+        expect(inWindow()).toBe(true)
+      })
+
+      it('are not shown in the maximized call, on a phone, outside a call or with the list closed', () => {
+        expect(inWindow({ videoCallMinimized: false })).toBe(false)
+        expect(inWindow({ isMobile: true })).toBe(false)
+        expect(inWindow({ videoCallPhase: 'connecting' })).toBe(false)
+        expect(inWindow({ participantsOpen: false })).toBe(false)
+        expect(inWindow({ participantsView: null })).toBe(false)
+      })
+
+      it('keep the tabs offered without a chat of the call open', () => {
+        expect(
+          Default.computed.showCallChatTabs.call({
+            showVideoCall: true,
+            videoCallPhase: 'in-call',
+            videoCallChatRoomId: null,
+            callChatTab: null,
+            participantsInWindow: true,
+          }),
+        ).toBe(true)
+      })
+
+      it('are as high as the chat they stand for', () => {
+        expect(Default.computed.participantsHeight.call({})).toBe('calc(100dvh - 500px)')
+      })
+
+      it('give way to a chat opened from anywhere, but not to the call chat following its room', () => {
+        const watcher = Default.watch.openChatTarget
+        const setParticipantsOpen = jest.fn()
+        const vm = (roomId, participantsOpen = true) => ({
+          participantsOpen,
+          getShowChat: { roomId },
+          videoCallChatRoomId: 'call-room',
+          setParticipantsOpen,
+        })
+        watcher.call(vm(null, false), 'u2||')
+        watcher.call(vm('call-room'), '||call-room')
+        watcher.call(vm(null), null)
+        expect(setParticipantsOpen).not.toHaveBeenCalled()
+        watcher.call(vm(null), 'u2||')
+        expect(setParticipantsOpen).toHaveBeenCalledWith(false)
+        expect(
+          Default.computed.openChatTarget.call({
+            getShowChat: { showChat: true, chatUserId: 'u2', groupId: null, roomId: null },
+          }),
+        ).toBe('u2||')
+        expect(
+          Default.computed.openChatTarget.call({ getShowChat: { showChat: false } }),
+        ).toBeNull()
+      })
+
+      it('close with the window', () => {
+        const setParticipantsOpen = jest.fn()
+        const showChat = jest.fn()
+        Default.methods.closeSingleRoom.call({ setParticipantsOpen, showChat })
+        expect(setParticipantsOpen).toHaveBeenCalledWith(false)
+        expect(showChat).toHaveBeenCalled()
       })
     })
 

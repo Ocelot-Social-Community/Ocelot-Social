@@ -148,6 +148,9 @@ const buildStore = (state = {}) => {
   const setChatRoomId = jest.fn()
   const setConferenceUnread = jest.fn()
   const setLastChatTab = jest.fn()
+  const setParticipantsOpen = jest.fn((_state, open) => {
+    state.participantsOpen = open
+  })
   const setPageBars = jest.fn()
   return {
     store: new Vuex.Store({
@@ -162,6 +165,7 @@ const buildStore = (state = {}) => {
         'videoCall/conferenceUnread': () => state.conferenceUnread ?? 0,
         'videoCall/groupChatUnread': () => state.groupChatUnread ?? 0,
         'videoCall/lastChatTab': () => state.lastChatTab ?? 'call',
+        'videoCall/participantsOpen': () => state.participantsOpen ?? false,
         'videoCall/reloadPending': () => state.reloadPending ?? false,
         'chat/showChat': () => state.chat ?? { showChat: false, chatUserId: null, groupId: null },
         'auth/user': () => state.user ?? { id: 'u1', name: 'Alice', avatar: { url: 'a.png' } },
@@ -175,6 +179,8 @@ const buildStore = (state = {}) => {
         'videoCall/SET_CONFERENCE_UNREAD': setConferenceUnread,
         'videoCall/SET_GROUP_CHAT_UNREAD': jest.fn(),
         'videoCall/SET_LAST_CHAT_TAB': setLastChatTab,
+        'videoCall/SET_PARTICIPANTS_OPEN': setParticipantsOpen,
+        'videoCall/SET_PARTICIPANTS_VIEW': jest.fn(),
         'videoCall/SET_PAGE_BARS': setPageBars,
         'chat/SET_OPEN_CHAT': showChat,
       },
@@ -185,6 +191,7 @@ const buildStore = (state = {}) => {
     showChat,
     setChatRoomId,
     setLastChatTab,
+    setParticipantsOpen,
     setPageBars,
   }
 }
@@ -301,6 +308,24 @@ describe('VideoCall', () => {
   })
 
   describe('uniqueParticipantCount + activeSpeakers + activeSpeakerSet', () => {
+    it('counts people, not their tiles or devices, and says so where they differ', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [
+          { identity: 'bob#1', name: 'Bob', key: 'a', profile: { id: 'bob' } },
+          { identity: 'bob#2', name: 'Bob', key: 'b', profile: { id: 'bob' } },
+          { identity: 'u2', name: 'Ann', key: 'c' },
+        ],
+      })
+      expect(wrapper.vm.uniqueParticipantCount).toBe(2)
+      expect(wrapper.vm.connectionCount).toBe(3)
+      expect(wrapper.vm.countTooltip).toBe(
+        'videoCall.participants.countWithDevices:{"people":2,"devices":3}',
+      )
+      wrapper.setData({ tiles: [{ identity: 'u2', name: 'Ann', key: 'c' }] })
+      expect(wrapper.vm.countTooltip).toBe('videoCall.participants.open')
+    })
+
     it('counts distinct identities, not tiles', () => {
       const { wrapper } = factory({ show: true })
       wrapper.setData({
@@ -439,9 +464,11 @@ describe('VideoCall', () => {
       })
     })
 
-    it('closeInCallChat clears the open chat', () => {
+    it('closeInCallChat clears the open chat and the participants', () => {
       const setShowChat = jest.fn()
-      VideoCall.methods.closeInCallChat.call({ setShowChat })
+      const setParticipantsOpen = jest.fn()
+      VideoCall.methods.closeInCallChat.call({ setShowChat, setParticipantsOpen })
+      expect(setParticipantsOpen).toHaveBeenCalledWith(false)
       expect(setShowChat).toHaveBeenCalledWith({
         showChat: false,
         chatUserId: null,
@@ -6707,6 +6734,314 @@ describe('VideoCall', () => {
       expect(factory({ show: true, routeName: 'groups-id-slug' }).wrapper.vm.onCallRoute).toBe(
         false,
       )
+    })
+  })
+})
+
+describe('VideoCall — the people in the call', () => {
+  const tile = (identity, userId, overrides = {}) => ({
+    key: `${identity}/main`,
+    identity,
+    name: userId,
+    profile: { id: userId },
+    isLocal: false,
+    isScreen: false,
+    micEnabled: true,
+    videoTrack: null,
+    ...overrides,
+  })
+
+  describe('people', () => {
+    it('makes one entry of every person, however many devices they are in it with', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [
+          tile('me#1', 'u1', { isLocal: true, micEnabled: false }),
+          tile('bob#1', 'bob', { micEnabled: false }),
+          tile('bob#2', 'bob', { videoTrack: {} }),
+          { ...tile('bob#2', 'bob'), key: 'bob#2/screen', isScreen: true },
+        ],
+        activeSpeakerIds: ['bob#2'],
+      })
+      expect(wrapper.vm.people).toEqual([
+        expect.objectContaining({ userId: 'u1', isMe: true, micOn: false }),
+        expect.objectContaining({
+          userId: 'bob',
+          micOn: true,
+          cameraOn: true,
+          screenSharing: true,
+          speaking: true,
+        }),
+      ])
+    })
+
+    it('counts a camera as on that is not received here, as with audio only', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [tile('bob#1', 'bob', { cameraHidden: true }), tile('ann#1', 'ann')],
+      })
+      expect(wrapper.vm.people.map(({ userId, cameraOn }) => [userId, cameraOn])).toEqual([
+        ['bob', true],
+        ['ann', false],
+      ])
+    })
+
+    it('counts people, not their devices, on the tab', async () => {
+      const { wrapper } = factory({ show: true, participantsOpen: true })
+      wrapper.setData({
+        phase: 'in-call',
+        tiles: [tile('me#1', 'u1', { isLocal: true }), tile('bob#1', 'bob'), tile('bob#2', 'bob')],
+      })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findComponent({ name: 'CallChatTabs' }).vm.$attrs['participant-count']).toBe(2)
+    })
+  })
+
+  describe('the sidebar on the participants', () => {
+    it('opens the participants, maximizing a parked call', () => {
+      const { wrapper, setParticipantsOpen, setMinimized } = factory({
+        show: true,
+        minimized: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.participantsAction).toBe('videoCall.participants.open')
+      wrapper.vm.toggleParticipants()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), true)
+      expect(setMinimized).toHaveBeenCalled()
+    })
+
+    it('closes the participants when they are on screen', () => {
+      const { wrapper, setParticipantsOpen, showChat } = factory({
+        show: true,
+        participantsOpen: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.participantsShown).toBe(true)
+      expect(wrapper.vm.participantsAction).toBe('videoCall.participants.close')
+      wrapper.vm.toggleParticipants()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
+      expect(showChat).toHaveBeenCalled()
+    })
+
+    it('brings the chat in place of the participants on the chat button', () => {
+      const { wrapper, setParticipantsOpen, showChat } = factory({
+        show: true,
+        participantsOpen: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      wrapper.vm.toggleChat()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
+      expect(showChat).toHaveBeenCalled()
+    })
+
+    it('brings the chat in place of the participants beside the parked call too', () => {
+      const { wrapper, setParticipantsOpen, showChat } = factory({
+        show: true,
+        minimized: true,
+        participantsOpen: true,
+      })
+      wrapper.setData({ phase: 'in-call' })
+      expect(wrapper.vm.participantsShown).toBe(false)
+      wrapper.vm.toggleChat()
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
+      expect(showChat).toHaveBeenCalled()
+    })
+
+    it('opens the list from the count in the header', async () => {
+      const { wrapper, setParticipantsOpen } = factory({ show: true })
+      wrapper.setData({ phase: 'in-call' })
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="video-call-participants"]').trigger('click')
+      expect(setParticipantsOpen).toHaveBeenCalledWith(expect.anything(), true)
+    })
+
+    it('hands what the list shows to the store, for the window beside the parked call', () => {
+      const { wrapper, store } = factory({ show: true })
+      const commit = jest.spyOn(store, 'commit')
+      wrapper.setData({ tiles: [tile('bob#1', 'bob')] })
+      return wrapper.vm.$nextTick().then(() => {
+        expect(commit).toHaveBeenCalledWith('videoCall/SET_PARTICIPANTS_VIEW', {
+          people: [expect.objectContaining({ userId: 'bob' })],
+        })
+      })
+    })
+  })
+
+  describe('the size of the sidebar', () => {
+    // The body and the sidebar, measured as on a screen; anything else as rendered.
+    const measured = (wrapper, found = true) => {
+      const own = wrapper.vm.$el.querySelector.bind(wrapper.vm.$el)
+      jest.spyOn(wrapper.vm.$el, 'querySelector').mockImplementation((selector) => {
+        if (selector !== '.video-call__body' && selector !== '.video-call__sidebar') {
+          return own(selector)
+        }
+        if (!found) return null
+        return {
+          getBoundingClientRect: () =>
+            selector === '.video-call__body'
+              ? { width: 1000, height: 800 }
+              : { width: 360, height: 300, right: 1000, bottom: 800 },
+        }
+      })
+    }
+    const sized = () => {
+      const { wrapper } = factory({ show: true })
+      measured(wrapper)
+      return wrapper
+    }
+
+    afterEach(() => {
+      window.localStorage.clear()
+    })
+
+    it('starts at what was remembered, and at the stylesheet without it', () => {
+      window.localStorage.setItem('videoCall.sidebarWidth', '420')
+      const { wrapper } = factory({ show: true })
+      expect(wrapper.vm.sidebarWidth).toBe(420)
+      expect(wrapper.vm.sidebarHeight).toBeNull()
+      expect(wrapper.vm.sidebarStyle).toEqual({
+        flex: '0 0 420px',
+        width: '420px',
+        // Remembered on a larger screen, it is capped all the same.
+        maxWidth: '50vw',
+      })
+    })
+
+    it('is pulled within its bounds and remembered', () => {
+      const wrapper = sized()
+      const target = { setPointerCapture: jest.fn() }
+      wrapper.vm.startSidebarResize({ button: 0, pointerId: 1, target, preventDefault: jest.fn() })
+      expect(target.setPointerCapture).toHaveBeenCalledWith(1)
+      wrapper.vm.onSidebarResize({ clientX: 500 })
+      expect(wrapper.vm.sidebarWidth).toBe(500)
+      wrapper.vm.onSidebarResize({ clientX: 100 })
+      expect(wrapper.vm.sidebarWidth).toBe(500)
+      wrapper.vm.onSidebarResize({ clientX: 950 })
+      expect(wrapper.vm.sidebarWidth).toBe(280)
+      wrapper.vm.stopSidebarResize()
+      expect(window.localStorage.getItem('videoCall.sidebarWidth')).toBe('280')
+      // Moves after letting go change nothing.
+      wrapper.vm.onSidebarResize({ clientX: 500 })
+      expect(wrapper.vm.sidebarWidth).toBe(280)
+      wrapper.vm.stopSidebarResize()
+    })
+
+    it('keeps the pointer where it took hold of the edge, as on its grip', () => {
+      const wrapper = sized()
+      const querySelector = wrapper.vm.$el.querySelector
+      wrapper.vm.$el.querySelector = (selector) =>
+        selector === '.video-call__sidebar'
+          ? { getBoundingClientRect: () => ({ left: 640, right: 1000, top: 500, bottom: 800 }) }
+          : querySelector(selector)
+      // Taken hold of 4px inside the edge: the edge does not jump, but follows 4px ahead.
+      wrapper.vm.startSidebarResize({
+        button: 0,
+        clientX: 644,
+        target: {},
+        preventDefault: jest.fn(),
+      })
+      wrapper.vm.onSidebarResize({ clientX: 644 })
+      expect(wrapper.vm.sidebarWidth).toBe(360)
+      wrapper.vm.onSidebarResize({ clientX: 604 })
+      expect(wrapper.vm.sidebarWidth).toBe(400)
+      wrapper.vm.stopSidebarResize()
+    })
+
+    it('is lit while it is pulled, and dark again the moment it is let go', () => {
+      const wrapper = sized()
+      expect(wrapper.vm.sidebarResizing).toBe(false)
+      wrapper.vm.startSidebarResize({ button: 0, target: {}, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarResizing).toBe(true)
+      wrapper.vm.stopSidebarResize()
+      expect(wrapper.vm.sidebarResizing).toBe(false)
+    })
+
+    it('ignores another button than the main one, and a capture that fails', () => {
+      const wrapper = sized()
+      wrapper.vm.startSidebarResize({ button: 2, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarDrag).toBeNull()
+      const target = {
+        setPointerCapture: () => {
+          throw new Error('no')
+        },
+      }
+      wrapper.vm.startSidebarResize({ button: 0, pointerId: 1, target, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarDrag).not.toBeNull()
+      wrapper.vm.stopSidebarResize()
+    })
+
+    it('follows the arrow keys, further with shift, and resets on a double click', () => {
+      const wrapper = sized()
+      const key = (k, shiftKey = false) => ({ key: k, shiftKey, preventDefault: jest.fn() })
+      wrapper.vm.onSidebarResizeKey(key('ArrowLeft'))
+      expect(wrapper.vm.sidebarWidth).toBe(376)
+      wrapper.vm.onSidebarResizeKey(key('ArrowRight', true))
+      expect(wrapper.vm.sidebarWidth).toBe(296)
+      wrapper.vm.onSidebarResizeKey(key('Enter'))
+      expect(wrapper.vm.sidebarWidth).toBe(296)
+      wrapper.vm.resetSidebarSize()
+      expect(wrapper.vm.sidebarWidth).toBeNull()
+      expect(window.localStorage.getItem('videoCall.sidebarWidth')).toBeNull()
+    })
+
+    it('below the videos on a phone, is pulled in its height', () => {
+      const wrapper = sized()
+      Object.defineProperty(wrapper.vm, 'mobileChatOpen', { get: () => true })
+      expect(wrapper.vm.sidebarStorageKey()).toBe('videoCall.sidebarHeight')
+      wrapper.vm.startSidebarResize({ preventDefault: jest.fn(), target: {} })
+      wrapper.vm.onSidebarResize({ clientY: 400 })
+      expect(wrapper.vm.sidebarHeight).toBe(400)
+      wrapper.vm.onSidebarResize({ clientY: 750 })
+      expect(wrapper.vm.sidebarHeight).toBe(200)
+      expect(wrapper.vm.sidebarStyle).toEqual({
+        flex: '0 0 200px',
+        maxHeight: 'calc(100% - 110px)',
+      })
+      wrapper.vm.stopSidebarResize()
+      wrapper.vm.onSidebarResizeKey({ key: 'ArrowUp', shiftKey: false, preventDefault: jest.fn() })
+      expect(wrapper.vm.sidebarHeight).toBe(316)
+      wrapper.vm.resetSidebarSize()
+      expect(wrapper.vm.sidebarHeight).toBeNull()
+      expect(wrapper.vm.sidebarStyle).toBeNull()
+    })
+
+    it('measures the call itself where its body has no box of its own (maximized)', () => {
+      const { wrapper } = factory({ show: true })
+      const own = wrapper.vm.$el.querySelector.bind(wrapper.vm.$el)
+      jest
+        .spyOn(wrapper.vm.$el, 'querySelector')
+        .mockImplementation((selector) =>
+          selector === '.video-call__body'
+            ? { getBoundingClientRect: () => ({ width: 0, height: 0 }) }
+            : own(selector),
+        )
+      jest
+        .spyOn(wrapper.vm.$el, 'getBoundingClientRect')
+        .mockReturnValue({ width: 1600, height: 900 })
+      expect(wrapper.vm.clampSidebarSize(600)).toBe(600)
+      expect(wrapper.vm.clampSidebarSize(10000)).toBe(800)
+    })
+
+    it('measures nothing without the elements', () => {
+      const { wrapper } = factory({ show: true })
+      measured(wrapper, false)
+      expect(wrapper.vm.currentSidebarSize()).toBe(360)
+      expect(wrapper.vm.clampSidebarSize(10000)).toBe(500)
+    })
+
+    it('carries on without storage', () => {
+      const { wrapper } = factory({ show: true })
+      const getItem = jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('blocked')
+      })
+      const setItem = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('blocked')
+      })
+      wrapper.vm.restoreSidebarSize()
+      wrapper.vm.sidebarWidth = 300
+      expect(() => wrapper.vm.saveSidebarSize()).not.toThrow()
+      getItem.mockRestore()
+      setItem.mockRestore()
     })
   })
 })
