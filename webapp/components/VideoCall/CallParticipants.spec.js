@@ -236,6 +236,11 @@ describe('CallParticipants', () => {
         expect(find('filter-chosen-micOn').exists()).toBe(false)
         await chip('micOn').setChecked(true)
         expect(find('filter-chosen-micOn').exists()).toBe(true)
+        // As a badge, with a cross that tells a click lets go of it.
+        expect(find('filter-chosen-micOn').find('.os-badge').exists()).toBe(true)
+        expect(
+          find('filter-chosen-micOn').find('.call-participants__filter-chosen-cross').exists(),
+        ).toBe(true)
         await chip('micOn').setChecked(false)
         expect(find('filter-chosen-micOn').exists()).toBe(false)
       })

@@ -141,7 +141,10 @@
                 </div>
               </template>
             </dropdown>
-            <!-- What the filter looks for besides the name, at a glance; a click lets go of it. -->
+            <!--
+              What the filter looks for besides the name, at a glance, each as a badge with a cross:
+              a click on it lets go of it.
+            -->
             <button
               v-for="chip in chosenChips"
               :key="chip.key"
@@ -152,7 +155,10 @@
               :data-test="'call-participants-filter-chosen-' + chip.key"
               @click="toggleChip(chip.key)"
             >
-              <os-icon :icon="chip.icon" />
+              <os-badge variant="primary" class="call-participants__filter-chosen-badge">
+                <os-icon :icon="chip.icon" />
+                <os-icon :icon="icons.close" class="call-participants__filter-chosen-cross" />
+              </os-badge>
             </button>
             <input
               ref="filterName"
@@ -440,7 +446,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
@@ -474,7 +480,7 @@ export const ORDER_REST = 5000
 // which decides it again (backend: videoCallModeration.ts).
 export default {
   name: 'CallParticipants',
-  components: { AvatarImage, Dropdown, OsButton, OsIcon, OsMenu, OsMenuItem },
+  components: { AvatarImage, Dropdown, OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem },
   props: {
     // One entry per person: { userId, name, slug, profile, isMe, micOn, cameraOn,
     // screenSharing, speaking, devices }.
@@ -1123,17 +1129,21 @@ export default {
 .call-participants__filter-more-toggle {
   flex: 0 0 auto;
   display: inline-flex;
-  padding: 0;
+  padding: 2px;
+  margin: -2px;
   border: 0;
+  border-radius: 999px;
   background: none;
   color: var(--text-color-soft);
   cursor: pointer;
 }
+/*  Under the pointer, both get a grey ground, the same as the menu's options. */
 .call-participants__filter-clear:hover,
 .call-participants__filter-clear:focus-visible,
 .call-participants__filter-more-toggle:hover,
 .call-participants__filter-more-toggle:focus-visible {
   color: var(--text-color-base);
+  background: var(--background-color-softer);
 }
 .call-participants__filter-count {
   flex: 0 0 auto;
@@ -1150,9 +1160,18 @@ export default {
   color: var(--color-primary);
   cursor: pointer;
 }
-.call-participants__filter-chosen:hover,
 .call-participants__filter-chosen:focus-visible {
-  color: var(--color-danger);
+  outline: none;
+}
+/*  The badge's own colours come as utilities that outweigh plain component rules: to turn it
+    to danger under the pointer, the override needs !important. */
+.call-participants__filter-chosen:hover .call-participants__filter-chosen-badge,
+.call-participants__filter-chosen:focus-visible .call-participants__filter-chosen-badge {
+  color: var(--color-danger-contrast) !important;
+  background: var(--color-danger-fill, var(--color-danger)) !important;
+}
+.call-participants__filter-chosen-cross {
+  font-size: 0.8em;
 }
 .call-participants__filter-more {
   flex: 0 0 auto;
