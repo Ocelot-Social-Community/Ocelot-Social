@@ -53,12 +53,47 @@ describe('pages/groups/_id/_slug.vue — methods', () => {
       expect(ctx.videoCallRemoved).toBe(false)
     })
 
+    it('asks again once loaded when a push arrived while the first answer was on its way', () => {
+      let next
+      const query = { loading: true }
+      const ctx = {
+        $route: { params: { id: 'g1' } },
+        $apollo: {
+          queries: { videoCallParticipantCount: query },
+          subscribe: () => ({
+            subscribe: (handlers) => {
+              next = handlers.next
+              return { unsubscribe: jest.fn() }
+            },
+          }),
+        },
+        refetchVideoCallParticipantCount: jest.fn(),
+        reloadVideoCallCountAfterLoad: false,
+        videoCallParticipantCount: 0,
+        videoCallRemoved: false,
+      }
+      methods.setupVideoCallCountSubscription.call(ctx)
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 2, removed: true } },
+      })
+      // The first answer, older than the push, arrives after it.
+      query.loading = false
+      apollo.videoCallParticipantCount.result.call(ctx, { data: { videoCallRemoved: false } })
+      expect(ctx.refetchVideoCallParticipantCount).toHaveBeenCalledTimes(1)
+      expect(ctx.reloadVideoCallCountAfterLoad).toBe(false)
+      // That second answer includes the push, and asks for nothing more.
+      apollo.videoCallParticipantCount.result.call(ctx, { data: { videoCallRemoved: true } })
+      expect(ctx.refetchVideoCallParticipantCount).toHaveBeenCalledTimes(1)
+      expect(ctx.videoCallRemoved).toBe(true)
+    })
+
     it('follows every count pushed, and is forgotten with the subscription', () => {
       let next
       const unsubscribe = jest.fn()
       const ctx = {
         $route: { params: { id: 'g1' } },
         $apollo: {
+          queries: {},
           subscribe: () => ({
             subscribe: (handlers) => {
               next = handlers.next

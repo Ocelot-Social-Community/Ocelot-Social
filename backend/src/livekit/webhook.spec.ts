@@ -303,7 +303,16 @@ describe('registerLiveKitWebhook', () => {
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
-    it('ends the session before it publishes the zero, which tells the removed they may join', async () => {
+    it('publishes the zero only once the session has ended, so it frees the removed', async () => {
+      // Each receiver's `removed` is read when the zero reaches them: published while the
+      // session still ran, it would keep them out.
+      let ended: () => void = () => undefined
+      mockEndCallSession.mockReturnValueOnce(
+        // eslint-disable-next-line promise/avoid-new
+        new Promise<void>((resolve) => {
+          ended = resolve
+        }),
+      )
       mockReceive.mockResolvedValueOnce({
         event: 'room_finished',
         room: { name: 'group-finished', sid: 'RM_finished' },
@@ -311,9 +320,16 @@ describe('registerLiveKitWebhook', () => {
       handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
       await flushPromises()
 
-      expect(mockEndCallSession.mock.invocationCallOrder[0]).toBeLessThan(
-        mockPublish.mock.invocationCallOrder[0],
-      )
+      expect(mockEndCallSession).toHaveBeenCalled()
+      expect(mockPublish).not.toHaveBeenCalled()
+
+      ended()
+      await flushPromises()
+
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'finished',
+        count: 0,
+      })
     })
 
     it('ends the call session of a finished room by the sid of that room', async () => {

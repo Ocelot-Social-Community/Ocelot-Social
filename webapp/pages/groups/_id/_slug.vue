@@ -445,6 +445,8 @@ export default {
       videoCallParticipantCount: 0,
       // Removed from the call running now: no joining it until it is over.
       videoCallRemoved: false,
+      // A count pushed while the count query was still loading: its answer may predate the push.
+      reloadVideoCallCountAfterLoad: false,
     }
   },
   computed: {
@@ -693,6 +695,12 @@ export default {
         next: ({ data }) => {
           const update = data?.videoCallParticipantCountChanged
           if (update && update.groupId === groupId) {
+            if (this.$apollo.queries.videoCallParticipantCount?.loading) {
+              // The count query is still on its way, and its answer may predate this push —
+              // applied after it, it would undo it. Asked again once it is there, the answer
+              // includes it.
+              this.reloadVideoCallCountAfterLoad = true
+            }
             this.videoCallParticipantCount = update.count
             // Answered for this viewer: the count of a call that is over frees them again.
             this.videoCallRemoved = !!update.removed
@@ -975,6 +983,10 @@ export default {
       },
       result({ data }) {
         this.videoCallRemoved = !!(data && data.videoCallRemoved)
+        if (this.reloadVideoCallCountAfterLoad) {
+          this.reloadVideoCallCountAfterLoad = false
+          this.refetchVideoCallParticipantCount()
+        }
       },
       skip() {
         return !this.canShowVideoCallButton || !this.$route.params.id
