@@ -6,7 +6,8 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
-import { createReadStream } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { faker } from '@faker-js/faker'
@@ -1542,9 +1543,8 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
       },
       {
         groupId: 'g17',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/ocelot.social-Logo-Text-normal-v02-945x630-2.webp',
+        file: 'g17-ocelot-social-logo-squared.png',
         alt: 'Ocelot.Social Logo',
-        aspectRatio: 1.5,
       },
       {
         groupId: 'g18',
@@ -1640,10 +1640,14 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
       if ('file' in entry) {
         const filePath = path.join(SEED_GROUP_AVATARS_DIRECTORY, entry.file)
         const { width, height } = await sharp(filePath).metadata()
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const body = await readFile(filePath)
+        // The hash is part of the name: the bucket serves with a week of Cache-Control and imagor
+        // caches by path, so a changed picture must not keep the name of the old one.
+        const hash = createHash('sha1').update(body).digest('hex').slice(0, 8)
         url = await uploadFile({
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          createReadStream: () => createReadStream(filePath),
-          uniqueFilename: entry.file,
+          createReadStream: () => body,
+          uniqueFilename: `${hash}-${entry.file}`,
           mimetype: imageTypeOf(entry.file),
         })
         aspectRatio = width / height
