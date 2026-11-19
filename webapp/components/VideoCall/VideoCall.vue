@@ -636,12 +636,15 @@
       -->
       <div
         v-if="handover"
+        ref="handover"
         class="video-call__handover"
         role="dialog"
         aria-modal="true"
+        tabindex="-1"
         :aria-label="$t('videoCall.handover.title')"
         data-test="video-call-handover"
-        @keydown.esc="handover = null"
+        @keydown.esc="cancelHandover"
+        @keydown="trapFocus($refs.handover, $event)"
       >
         <div class="video-call__handover-box">
           <h3 class="video-call__handover-title">{{ $t('videoCall.handover.title') }}</h3>
@@ -655,6 +658,7 @@
             class="video-call__handover-select"
             :aria-label="$t('videoCall.handover.title')"
             data-test="handover-select"
+            data-autofocus
           >
             <option value="everyone" data-test="handover-everyone">
               {{ $t('videoCall.participants.everyoneModerates') }}
@@ -673,13 +677,21 @@
             </option>
           </select>
           <div class="video-call__handover-actions">
-            <os-button appearance="outline" variant="primary" @click="handover = null">
+            <!-- Once on its way, the handover is not to be called back: it reaches the server. -->
+            <os-button
+              appearance="outline"
+              variant="primary"
+              data-test="handover-cancel"
+              :disabled="handover.busy"
+              @click="cancelHandover"
+            >
               {{ $t('actions.cancel') }}
             </os-button>
             <os-button
               appearance="outline"
               variant="danger"
               data-test="handover-skip"
+              :disabled="handover.busy"
               @click="leaveAfterHandover(null)"
             >
               {{ $t('videoCall.handover.skip') }}
@@ -727,6 +739,7 @@ import CallNotice from './CallNotice.vue'
 const SIDEBAR_MIN_WIDTH = 280
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
+import { takeFocus, trapFocus } from './dialogFocus'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -1477,6 +1490,20 @@ export default {
     },
   },
   watch: {
+    // The keyboard goes with the question who moderates on, and comes back once it is answered.
+    handover(now, before) {
+      if (!now === !before) return
+      if (now) {
+        this.$nextTick(() => {
+          // Gone again before it was drawn: nothing to take the focus to.
+          if (this.$refs.handover) this.giveHandoverFocusBack = takeFocus(this.$refs.handover)
+        })
+        return
+      }
+      const giveBack = this.giveHandoverFocusBack
+      this.giveHandoverFocusBack = null
+      if (giveBack) giveBack()
+    },
     participantsView: {
       handler(view) {
         this.setParticipantsView(view)
@@ -2031,6 +2058,8 @@ export default {
       if (notice.type === 'microphoneMuted') this.syncSwitchedOff('mic')
       if (notice.type === 'cameraOff') this.syncSwitchedOff('camera')
       if (notice.type === 'screenShareStopped') this.syncSwitchedOff('screen')
+      // Done by oneself, on another device: the buttons follow, nothing to be told.
+      if (notice.self) return
       if (notice.type === 'removed') {
         this.tellRemoved(message())
         return
@@ -2055,7 +2084,7 @@ export default {
             `<button type="button">${label}</button>`,
             (instance, toast) => {
               instance.hide({}, toast, 'button')
-              if (this.room === room && !this.micEnabled) this.toggleMic()
+              if (this.isLive(room) && !this.micEnabled) this.toggleMic()
             },
             true,
           ],
@@ -2110,7 +2139,7 @@ export default {
           variables: { id: this.groupId },
           fetchPolicy: 'no-cache',
         })
-        if (this.room !== room || this.groupId !== groupId) return
+        if (!this.isLive(room) || this.groupId !== groupId) return
         const permissions = (Group && Group[0] && Group[0].myGroupPermissions) || []
         this.mayTakeOverModeration = permissions.includes('group.videoCall.moderate')
       } catch (_e) {
@@ -2159,8 +2188,12 @@ export default {
         busy: false,
       }
     },
+    trapFocus,
+    cancelHandover() {
+      if (this.handover && !this.handover.busy) this.handover = null
+    },
     async leaveAfterHandover(choice) {
-      if (!this.handover) return
+      if (!this.handover || this.handover.busy) return
       const room = this.room
       const dialog = this.handover
       dialog.busy = true
@@ -3918,6 +3951,8 @@ export default {
       }
     },
     async cleanup() {
+      // A dialog asking about this call is gone with it.
+      this.handover = null
       // A quality chosen holds for this call only.
       this.sendQuality = 'auto'
       this.receiveQuality = 'auto'

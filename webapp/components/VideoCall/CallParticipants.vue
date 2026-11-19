@@ -272,13 +272,16 @@
       in view.
     -->
     <div
-      v-if="dialog === 'remove' && removing"
+      v-if="removalOpen"
+      ref="dialog"
       class="call-participants__dialog"
       role="dialog"
       aria-modal="true"
+      tabindex="-1"
       :aria-label="$t('videoCall.participants.remove')"
       data-test="call-participants-dialog"
       @keydown.esc="closeDialog"
+      @keydown="trapFocus($refs.dialog, $event)"
     >
       <h3 class="call-participants__dialog-title">
         {{ $t('videoCall.participants.removeQuestion', { name: removing.name }) }}
@@ -287,7 +290,14 @@
         {{ $t('videoCall.participants.removeExplanation') }}
       </p>
       <div class="call-participants__dialog-actions">
-        <os-button appearance="outline" variant="primary" @click="closeDialog">
+        <!-- The keyboard starts on the harmless answer. -->
+        <os-button
+          appearance="outline"
+          variant="primary"
+          data-test="remove-cancel"
+          data-autofocus
+          @click="closeDialog"
+        >
           {{ $t('actions.cancel') }}
         </os-button>
         <os-button
@@ -318,6 +328,7 @@ import {
   takeOverVideoCallModerationMutation,
   videoCallModerationRightsQuery,
 } from '~/graphql/VideoCalls'
+import { takeFocus, trapFocus } from './dialogFocus'
 
 // How long the rows stay where they are after the last move, click or key in the list. Whoever
 // aims at a switch, or has just pressed one, is not to see the row jump away under the pointer.
@@ -372,6 +383,9 @@ export default {
     clearTimeout(this.restTimer)
   },
   computed: {
+    removalOpen() {
+      return this.dialog === 'remove' && !!this.removing
+    },
     ...mapGetters({
       groupId: 'videoCall/groupId',
       currentUser: 'auth/user',
@@ -425,12 +439,31 @@ export default {
     },
   },
   watch: {
+    // The keyboard goes with the question, and comes back once it is answered: to where it was,
+    // or, as the menu that asked is gone by then, to the menu of whoever it was about.
+    removalOpen(open) {
+      if (open) {
+        const menu = `[data-test="call-participant-menu-${this.removing.userId}"]`
+        this.$nextTick(() => {
+          // Gone again before it was drawn: nothing to take the focus to.
+          if (!this.$refs.dialog) return
+          this.giveRemovalFocusBack = takeFocus(this.$refs.dialog, () =>
+            this.$el.querySelector(menu),
+          )
+        })
+        return
+      }
+      const giveBack = this.giveRemovalFocusBack
+      this.giveRemovalFocusBack = null
+      if (giveBack) giveBack()
+    },
     // Whoever no longer moderates has nothing left to choose.
     isModerator(moderating) {
       if (!moderating) this.stopMuting()
     },
   },
   methods: {
+    trapFocus,
     isNamedModerator(userId) {
       return this.moderation.moderators.includes(userId)
     },

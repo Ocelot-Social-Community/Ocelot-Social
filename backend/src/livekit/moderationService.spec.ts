@@ -162,10 +162,27 @@ describe('settleAndPublishModeration', () => {
 
     expect(service.removeParticipant).not.toHaveBeenCalled()
 
-    await settleAndPublishModeration({ driver, config }, 'g1', { removeLeftovers: true })
+    await settleAndPublishModeration({ driver, config }, 'g1', { leftoversIn: 'RM_1' })
 
     expect(service.removeParticipant).toHaveBeenCalledTimes(1)
     expect(service.removeParticipant).toHaveBeenCalledWith('group-g1', 'udo#1')
+  })
+
+  it('leaves alone whoever was removed from an earlier room of the same name', async () => {
+    await joinCallSession(driver, {
+      groupId: 'g1',
+      userId: 'ute',
+      livekitRoom: 'group-g1',
+      livekitSid: 'RM_1',
+      presentUserIds: ['ute', 'udo'],
+    })
+    const sessionId = (await readModeration(driver, 'g1'))?.sessionId as string
+    await markRemoved(driver, sessionId, 'udo')
+    // The room was opened anew, and nobody has asked for its chat yet.
+    service.listParticipants.mockResolvedValue([participant('udo', 2n)])
+    await settleAndPublishModeration({ driver, config }, 'g1', { leftoversIn: 'RM_2' })
+
+    expect(service.removeParticipant).not.toHaveBeenCalled()
   })
 
   it('never throws', async () => {

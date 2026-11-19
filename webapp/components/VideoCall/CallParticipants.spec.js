@@ -281,6 +281,40 @@ describe('CallParticipants', () => {
       expect(wrapper.find('[data-test="call-participants-dialog"]').exists()).toBe(false)
     })
 
+    it('takes the keyboard into the question, keeps it there and gives it back', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      await wrapper.vm.openMenu(person('bob'), jest.fn())
+      wrapper.vm
+        .actionsFor(person('bob'))
+        .find((action) => action.name === 'remove')
+        .callback()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      const dialog = wrapper.find('[data-test="call-participants-dialog"]')
+      const cancel = wrapper.find('[data-test="remove-cancel"]')
+      expect(document.activeElement).toBe(cancel.element)
+      // From the first answer back to the last, without leaving the question.
+      await dialog.trigger('keydown', { key: 'Tab', shiftKey: true })
+      expect(document.activeElement).toBe(wrapper.find('[data-test="remove-confirm"]').element)
+      await dialog.trigger('keydown.esc')
+      await wrapper.vm.$nextTick()
+      // The menu entry that asked is gone: the keyboard is back on that person's menu.
+      expect(document.activeElement).toBe(
+        wrapper.find('[data-test="call-participant-menu-bob"]').element,
+      )
+    })
+
+    it('takes the keyboard nowhere for a question gone before it was drawn', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      wrapper.vm.removing = person('bob')
+      wrapper.vm.$options.watch.removalOpen.call(wrapper.vm, true)
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.giveRemovalFocusBack).toBeUndefined()
+      // Closing it then has nothing to give back.
+      wrapper.vm.$options.watch.removalOpen.call(wrapper.vm, false)
+      expect(wrapper.vm.giveRemovalFocusBack).toBeNull()
+    })
+
     it('keeps the question open and says why when the server refuses', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       const error = new Error('outranked')

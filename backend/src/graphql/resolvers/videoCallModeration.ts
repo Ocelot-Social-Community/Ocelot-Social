@@ -229,14 +229,14 @@ export default {
         // Every action but REMOVE is in the table; the schema's enum allows no other.
         const { sources, notice } = LIGHT.get(action) as NonNullable<ReturnType<typeof LIGHT.get>>
         await muteTracks(client, roomName, theirs, sources)
-        if (userId !== me.id) {
-          await notify(
-            client,
-            roomName,
-            { type: notice, by: me.name },
-            identitiesOf(theirs, [userId]),
-          )
-        }
+        // One's own devices are told as well, so that their buttons follow; `self` spares them
+        // being told who did it.
+        await notify(
+          client,
+          roomName,
+          userId === me.id ? { type: notice, self: true } : { type: notice, by: me.name },
+          identitiesOf(theirs, [userId]),
+        )
       }
       await settleAndPublishModeration(context, groupId)
       return true
@@ -267,6 +267,17 @@ export default {
         roomName,
         { type: 'microphoneMuted', by: me.name },
         identitiesOf(connections, others),
+      )
+      // Muted along with the others, one's own devices are told as well, so that their buttons
+      // follow — without being told who did it.
+      await notify(
+        client,
+        roomName,
+        { type: 'microphoneMuted', self: true },
+        identitiesOf(
+          connections,
+          muted.filter((userId) => userId === me.id),
+        ),
       )
       const newSpeakers = speakers.filter(
         (userId) => userId !== me.id && !state.speakerIds.includes(userId),

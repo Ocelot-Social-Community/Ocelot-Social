@@ -96,8 +96,9 @@ const pollOnce = async () => {
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const listed = Number(room.numParticipants ?? 0) || 0
+      // Who is there: as listed, or as the participants themselves say for a told room.
+      let count = listed
       if (lastSeenCounts.get(room.name) !== listed || told.has(room.name)) {
-        let count = listed
         if (told.has(room.name)) {
           // The correction for a told room asks the participants themselves, as the count query
           // does: the room list can lag behind them, and its count, published as "the truth",
@@ -128,11 +129,12 @@ const pollOnce = async () => {
       // as a moderator goes leaves it the same. If it was the last moderator, the call needs
       // another one — nothing else notices a moderator who closed the tab. And whatever an act of
       // moderation left undone is put right here (see moderationService.ts).
-      if (listed > 0) {
+      if (count > 0) {
         const metadata: unknown = room.metadata
+        const sid: unknown = room.sid
         await settleAndPublishModeration({ driver: getDriver(), config: CONFIG }, groupId, {
           published: typeof metadata === 'string' ? metadata : '',
-          removeLeftovers: true,
+          leftoversIn: typeof sid === 'string' ? sid : undefined,
         })
       }
       owed.delete(room.name)

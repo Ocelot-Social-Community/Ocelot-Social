@@ -6900,6 +6900,20 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(wrapper.vm.mayTakeOverModeration).toBe(false)
     })
 
+    it('takes no answer about the take-over while the call is being left', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1' })
+      const room = { name: 'first' }
+      wrapper.vm.room = room
+      wrapper.vm.$apollo = {
+        query: jest.fn().mockImplementation(async () => {
+          wrapper.vm.closingRoom = room
+          return { data: { Group: [{ myGroupPermissions: ['group.videoCall.moderate'] }] } }
+        }),
+      }
+      await wrapper.vm.loadModerationPermission()
+      expect(wrapper.vm.mayTakeOverModeration).toBe(false)
+    })
+
     it('offers no take-over when the group cannot be asked, or there is none', async () => {
       const { wrapper } = factory({ show: true, groupId: 'g1' })
       wrapper.vm.$apollo = { query: jest.fn().mockRejectedValue(new Error('offline')) }
@@ -6985,6 +6999,27 @@ describe('VideoCall — the people in the call and their moderation', () => {
       onClick({ hide: jest.fn() }, 'toast')
       await flushPromises()
       expect(toggleMic).not.toHaveBeenCalled()
+    })
+
+    it('switches the microphone on not while the call is being left', async () => {
+      const { wrapper } = setup()
+      wrapper.setData({ micEnabled: false })
+      wrapper.vm.onModerationNotice(encode({ type: 'floor', by: 'Anna' }))
+      const [, , options] = wrapper.vm.$toast.info.mock.calls[0]
+      const [, onClick] = options.buttons[0]
+      wrapper.vm.leaving = true
+      const toggleMic = jest.spyOn(wrapper.vm, 'toggleMic').mockResolvedValue()
+      onClick({ hide: jest.fn() }, 'toast')
+      await flushPromises()
+      expect(toggleMic).not.toHaveBeenCalled()
+    })
+
+    it('follows what was done on another device of ours, telling nothing', () => {
+      const { wrapper } = setup()
+      const sync = jest.spyOn(wrapper.vm, 'syncSwitchedOff').mockImplementation(() => {})
+      wrapper.vm.onModerationNotice(encode({ type: 'microphoneMuted', self: true }))
+      expect(sync).toHaveBeenCalledWith('mic')
+      expect(wrapper.vm.$toast.info).not.toHaveBeenCalled()
     })
 
     it('mutes the held microphone while a dtx switch has it unpublished', async () => {
@@ -7367,6 +7402,89 @@ describe('VideoCall — the people in the call and their moderation', () => {
         toUserId: null,
         everyone: true,
       })
+    })
+
+    it('cannot be cancelled once the handover is on its way', async () => {
+      let settle
+      const { wrapper, leave } = inCall(
+        { moderators: ['u1'], everyone: false, speakers: [] },
+        {
+          mutate: jest.fn().mockImplementation(() => new Promise((resolve) => (settle = resolve))),
+        },
+      )
+      await wrapper.vm.requestLeave()
+      const going = wrapper.vm.leaveAfterHandover('bob')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('[data-test="handover-cancel"]').attributes('disabled')).toBe('disabled')
+      expect(wrapper.find('[data-test="handover-skip"]').attributes('disabled')).toBe('disabled')
+      wrapper.vm.cancelHandover()
+      await wrapper.find('[data-test="video-call-handover"]').trigger('keydown.esc')
+      expect(wrapper.vm.handover).not.toBeNull()
+      // Nor asked a second time.
+      const asked = wrapper.vm.$apollo.mutate.mock.calls.length
+      await wrapper.vm.leaveAfterHandover(null)
+      expect(wrapper.vm.$apollo.mutate).toHaveBeenCalledTimes(asked)
+      settle({ data: {} })
+      await going
+      expect(leave).toHaveBeenCalledTimes(1)
+    })
+
+    it('is cancelled by button or Escape before it is on its way', async () => {
+      const { wrapper, leave } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      await wrapper.vm.requestLeave()
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="handover-cancel"]').trigger('click')
+      expect(wrapper.vm.handover).toBeNull()
+      await wrapper.vm.requestLeave()
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="video-call-handover"]').trigger('keydown.esc')
+      expect(wrapper.vm.handover).toBeNull()
+      expect(leave).not.toHaveBeenCalled()
+    })
+
+    it('takes the keyboard into the question, keeps it there and gives it back', async () => {
+      const { wrapper } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      document.body.appendChild(wrapper.vm.$el)
+      const hangUp = document.createElement('button')
+      document.body.appendChild(hangUp)
+      hangUp.focus()
+      await wrapper.vm.requestLeave()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      const select = wrapper.find('[data-test="handover-select"]').element
+      expect(document.activeElement).toBe(select)
+      // From the first answer back to the last, without leaving the question.
+      await wrapper.find('[data-test="video-call-handover"]').trigger('keydown', {
+        key: 'Tab',
+        shiftKey: true,
+      })
+      expect(document.activeElement).toBe(wrapper.find('[data-test="handover-confirm"]').element)
+      // Another question in its place changes nothing about where the keyboard goes back to.
+      wrapper.vm.handover = { ...wrapper.vm.handover }
+      await wrapper.vm.$nextTick()
+      wrapper.vm.cancelHandover()
+      await wrapper.vm.$nextTick()
+      expect(document.activeElement).toBe(hangUp)
+      hangUp.remove()
+      wrapper.vm.$el.remove()
+    })
+
+    it('takes the keyboard nowhere for a question gone before it was drawn', async () => {
+      const { wrapper } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      wrapper.vm.$options.watch.handover.call(wrapper.vm, { busy: false }, null)
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.giveHandoverFocusBack).toBeUndefined()
+      // Closing it then has nothing to give back.
+      wrapper.vm.$options.watch.handover.call(wrapper.vm, null, { busy: false })
+      expect(wrapper.vm.giveHandoverFocusBack).toBeNull()
+    })
+
+    it('is gone with the call it asked about', async () => {
+      const { wrapper } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      await wrapper.vm.requestLeave()
+      expect(wrapper.vm.handover).not.toBeNull()
+      await wrapper.vm.cleanup()
+      expect(wrapper.vm.handover).toBeNull()
     })
 
     it('leaves all the same when the server cannot be told, or when skipped', async () => {

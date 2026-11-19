@@ -338,7 +338,7 @@ describe('moderateVideoCallParticipant', () => {
     ])
   })
 
-  it('reaches somebody above, and tells nobody when it is oneself', async () => {
+  it("reaches somebody above, and tells one's own devices without naming anybody", async () => {
     inCall('ute', 'olga')
     await open('ute')
     as('ute')
@@ -346,7 +346,10 @@ describe('moderateVideoCallParticipant', () => {
     await moderate('ute', 'MUTE_MICROPHONE')
 
     expect(room.mutePublishedTrack).toHaveBeenCalledTimes(2)
-    expect(told()).toEqual([{ type: 'microphoneMuted', by: 'Ute', to: ['olga'] }])
+    expect(told()).toEqual([
+      { type: 'microphoneMuted', by: 'Ute', to: ['olga'] },
+      { type: 'microphoneMuted', self: true, to: ['ute'] },
+    ])
   })
 
   it('removes a peer, who cannot join again while the call lasts', async () => {
@@ -426,7 +429,11 @@ describe('muteAllInVideoCall', () => {
     })
 
     expect(result.data?.muteAllInVideoCall).toBe(2)
-    expect(told()).toEqual([{ type: 'microphoneMuted', by: 'Ute', to: ['udo'] }])
+    // Their own devices follow as well, without being told who did it.
+    expect(told()).toEqual([
+      { type: 'microphoneMuted', by: 'Ute', to: ['udo'] },
+      { type: 'microphoneMuted', self: true, to: ['ute'] },
+    ])
   })
 
   it('is for moderators', async () => {

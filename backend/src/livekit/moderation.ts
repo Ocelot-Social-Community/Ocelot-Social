@@ -37,6 +37,8 @@ export const MODERATION_TOPIC = 'moderation'
 
 export interface ModerationState {
   sessionId: string
+  /** The id of the media-server room the session runs in; it tells this call from the next. */
+  livekitSid: string | null
   starterId: string | null
   starterHandedOver: boolean
   moderatorIds: string[]
@@ -69,6 +71,7 @@ export const readModeration = async (
           ${OPEN_SESSION}
           OPTIONAL MATCH (starter:User)-[started:STARTED_CALL]->(session)
           RETURN session.id AS sessionId,
+                 session.livekitSid AS livekitSid,
                  starter.id AS starterId,
                  coalesce(started.handedOver, false) AS starterHandedOver,
                  coalesce(session.everyoneModerates, false) AS everyoneModerates,
@@ -86,6 +89,7 @@ export const readModeration = async (
     }
     return {
       sessionId: record.get('sessionId') as string,
+      livekitSid: record.get('livekitSid') as string | null,
       starterId: record.get('starterId') as string | null,
       starterHandedOver: record.get('starterHandedOver') === true,
       everyoneModerates: record.get('everyoneModerates') === true,
@@ -480,6 +484,8 @@ export interface ModerationNotice {
   by?: string
   /** For `moderator`: how it came about. */
   reason?: 'appointed' | 'handedOver' | 'automatic'
+  /** Done by the user themselves, for their other devices: their buttons follow, nothing told. */
+  self?: true
 }
 
 /** Tells these connections — or everybody, without any — what was done. */

@@ -87,13 +87,23 @@ export const joinCallSession = async (
                  session.livekitSid = $livekitSid AND size([
                    (member:User)-[:CHATS_IN]->(room)
                      WHERE member.id IN $presentUserIds | member
-                 ]) > 0 AS carriedOn
+                 ]) > 0 AS carriedOn,
+                 session.livekitSid = $livekitSid AND size([
+                   (removed:User { id: $userId })-[:REMOVED_FROM_CALL]->(session) | removed
+                 ]) > 0 AS barred
           // Compared as datetimes, not as the stored strings: toString(datetime()) drops
           // trailing zeros of the fraction, so the strings do not sort chronologically.
           ORDER BY datetime(session.createdAt) DESC
         `,
-        { groupId, livekitSid, presentUserIds },
+        { groupId, livekitSid, userId, presentUserIds },
       )
+      // Whoever was removed from this very call is not let back into its chat (see markRemoved),
+      // and asking must not end its session either: were the others gone, the removed one would
+      // otherwise open a new session of their own, chat in it and moderate it. A new call in the
+      // group, a media-server room of another sid, is open to them again.
+      if (open.records.some((record) => record.get('barred') === true)) {
+        return null
+      }
       const sessions = open.records
         .map((record) => ({
           id: record.get('id') as string | null,
@@ -136,20 +146,17 @@ export const joinCallSession = async (
         )
         sessionId = created.records[0].get('id') as string
       }
-      // Whoever was removed from the call is not let back into its chat (see markRemoved).
       const joined = await transaction.run(
         `
           MATCH (room:Room)-[:ROOM_FOR]->(session:VideoCallSession { id: $sessionId })
           MATCH (user:User { id: $userId })
-          WHERE NOT (user)-[:REMOVED_FROM_CALL]->(session)
           MERGE (user)-[:CHATS_IN]->(room)
           RETURN room.id AS roomId
         `,
         { sessionId, userId },
       )
-      // No row for whoever was removed; the lock above has found the user, and a session always
-      // has its room.
-      return (joined.records[0]?.get('roomId') as string | undefined) ?? null
+      // The lock above has found the user, and a session always has its room.
+      return joined.records[0].get('roomId') as string
     })
   } finally {
     await session.close()

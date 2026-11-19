@@ -268,7 +268,7 @@ describe('poll tick', () => {
     // Second tick with identical counts: no new publishes
     mockPublish.mockClear()
     mockListRooms.mockResolvedValueOnce([
-      { name: 'group-a', numParticipants: 2 },
+      { name: 'group-a', sid: 'RM_a', numParticipants: 2 },
       { name: 'group-b', numParticipants: 0 },
     ])
     mockSettle.mockClear()
@@ -279,7 +279,7 @@ describe('poll tick', () => {
     expect(mockSettle).toHaveBeenCalledTimes(1)
     expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
       published: '',
-      removeLeftovers: true,
+      leftoversIn: 'RM_a',
     })
   })
 
@@ -528,10 +528,27 @@ describe('poll tick', () => {
       expect(mockPublish).not.toHaveBeenCalled()
     })
 
+    it('keeps the moderation in step by the participants of one the list has empty', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+      mockSettle.mockClear()
+
+      // The list lags the other way: somebody is there, the list has nobody yet.
+      noteCountTold('group-a', 1)
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', sid: 'RM_a', numParticipants: 0 }])
+      mockListParticipants.mockResolvedValueOnce([{ identity: 'u1' }])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
+        published: '',
+        leftoversIn: 'RM_a',
+      })
+    })
+
     it('asks only for told rooms, and trusts the list for the others', async () => {
       startLiveKitPoller()
       mockListRooms.mockResolvedValueOnce([
-        { name: 'group-a', numParticipants: 2, metadata: '{"moderation":null}' },
+        { name: 'group-a', sid: 'RM_a', numParticipants: 2, metadata: '{"moderation":null}' },
       ])
       await vi.advanceTimersByTimeAsync(5_000)
 
@@ -539,7 +556,7 @@ describe('poll tick', () => {
       // Somebody came: the moderation is checked for the room.
       expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
         published: '{"moderation":null}',
-        removeLeftovers: true,
+        leftoversIn: 'RM_a',
       })
       expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
         groupId: 'a',

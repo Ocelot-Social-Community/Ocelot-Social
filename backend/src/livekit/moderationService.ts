@@ -52,10 +52,12 @@ interface Upkeep {
    */
   published?: string
   /**
-   * Disconnects whoever was removed from the call and is still in it: a removal whose
-   * disconnecting failed for one of their devices is finished this way.
+   * The id of the media-server room as listed. Given, whoever was removed from the call and is
+   * still in it is disconnected: a removal whose disconnecting failed for one of their devices is
+   * finished this way. Only if the session is that room's: a session left over from an earlier
+   * room of the same name, not yet replaced, removed nobody from the call running now.
    */
-  removeLeftovers?: boolean
+  leftoversIn?: string
 }
 
 /**
@@ -66,7 +68,7 @@ interface Upkeep {
 export const settleAndPublishModeration = async (
   { driver, config: rawConfig }: Dependencies,
   groupId: string,
-  { published, removeLeftovers = false }: Upkeep = {},
+  { published, leftoversIn }: Upkeep = {},
 ): Promise<void> => {
   const config = liveKitConfigOf(rawConfig)
   if (!config) {
@@ -97,7 +99,7 @@ export const settleAndPublishModeration = async (
     const leftovers = connections.filter(
       (connection) => connection.userId && state?.removedIds.includes(connection.userId),
     )
-    if (removeLeftovers && leftovers.length > 0) {
+    if (leftoversIn && state?.livekitSid === leftoversIn && leftovers.length > 0) {
       await removeConnections(client, roomName, leftovers)
     }
     // eslint-disable-next-line no-catch-all/no-catch-all

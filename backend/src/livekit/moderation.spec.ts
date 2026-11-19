@@ -94,6 +94,7 @@ describe(readModeration, () => {
 
     expect(await state()).toEqual({
       sessionId: expect.any(String),
+      livekitSid: 'RM_1',
       starterId: 'ute',
       starterHandedOver: false,
       moderatorIds: ['ute'],
@@ -203,6 +204,39 @@ describe(markRemoved, () => {
     const chats = await run(`MATCH (:User { id: 'udo' })-[c:CHATS_IN]->() RETURN count(c) AS n`)
 
     expect(Number(chats.records[0].get('n'))).toBe(0)
+  })
+
+  it('does not let them open a session of their own once the others have gone', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    // Ute has left; Udo is still connected, the disconnecting not through yet.
+    expect(await open('udo', ['udo'])).toBeNull()
+    expect(await state()).toMatchObject({ sessionId, removedIds: ['udo'] })
+
+    const chats = await run(`MATCH (:User { id: 'udo' })-[c:CHATS_IN]->() RETURN count(c) AS n`)
+
+    expect(Number(chats.records[0].get('n'))).toBe(0)
+  })
+
+  it('lets them into the next call, a media-server room of another sid', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    const roomId = await joinCallSession(driver, {
+      groupId: 'g1',
+      userId: 'udo',
+      livekitRoom: 'group-g1',
+      livekitSid: 'RM_2',
+      presentUserIds: ['udo'],
+    })
+
+    expect(roomId).toEqual(expect.any(String))
+    expect(await state()).toMatchObject({ removedIds: [] })
   })
 })
 
