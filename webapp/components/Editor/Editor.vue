@@ -47,6 +47,7 @@ import { HASHTAG, MENTION } from '../../constants/editor'
 import defaultExtensions from './defaultExtensions'
 import EventHandler from './plugins/eventHandler'
 import LinkShortcut from './plugins/linkShortcut'
+import { getMarkRange } from 'tiptap-utils'
 import LinkSelection, { markLinkSelection } from './plugins/linkSelection'
 import UnfinishedSuggestions, {
   UNFINISHED_CLASS,
@@ -152,7 +153,14 @@ export default {
     // the selected text is marked meanwhile, so it can be seen what the link is for.
     isLinkInputActive(active) {
       if (!this.editor) return
-      const { from, to } = this.editor.state.selection
+      const { selection, schema } = this.editor.state
+      let { from, to } = selection
+      // Only a cursor, inside a link: the link is what is edited, so it is the whole link that
+      // is marked.
+      if (from === to) {
+        const link = getMarkRange(selection.$from, schema.marks.link)
+        if (link) ({ from, to } = link)
+      }
       markLinkSelection(this.editor.view, active && from < to ? { from, to } : null)
     },
     placeholder: {

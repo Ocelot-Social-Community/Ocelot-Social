@@ -909,6 +909,19 @@ describe('Editor.vue', () => {
         expect(editorElement().querySelectorAll('.link-selection')).toHaveLength(0)
       })
 
+      it('marks the whole link when only the cursor is in it', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>See <a href="https://example.org">the link</a> now</p>')
+        await settle()
+        const { state, dispatch } = wrapper.vm.editor.view
+        dispatch(state.tr.setSelection(TextSelection.create(state.doc, 8)))
+        await settle()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        expect(editorElement().querySelector('.link-selection').textContent).toBe('the link')
+      })
+
       it('puts the anchor under a selection within one line', () => {
         const { view } = wrapper.vm.editor
         view.coordsAtPos = (pos) =>
