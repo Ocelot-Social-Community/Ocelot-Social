@@ -114,12 +114,14 @@
               variant="primary"
               appearance="outline"
               full-width
-              :class="{ 'permission-denied': videoCallOpenDenied }"
-              :aria-disabled="videoCallOpenDenied"
+              :class="{ 'permission-denied': videoCallOpenDenied || videoCallRemoved }"
+              :aria-disabled="videoCallOpenDenied || videoCallRemoved"
               v-tooltip="{
-                content: videoCallOpenDenied
-                  ? $t('permissions.deniedHint')
-                  : $t('videoCall.groupVideoCallButton.tooltip', { name: groupName }),
+                content: videoCallRemoved
+                  ? $t('backendErrors.VIDEO_CALL_REMOVED_FROM_CALL')
+                  : videoCallOpenDenied
+                    ? $t('permissions.deniedHint')
+                    : $t('videoCall.groupVideoCallButton.tooltip', { name: groupName }),
                 placement: 'bottom-start',
               }"
               @click="openGroupVideoCall(group.id)"
@@ -127,7 +129,12 @@
               <template #icon>
                 <os-counter-icon :icon="icons.videoCamera" :count="videoCallParticipantCount" />
               </template>
-              {{ $t('videoCall.groupVideoCallButton.label') }}
+              <!-- Removed from the call running now: said on the button, not only on hover. -->
+              {{
+                videoCallRemoved
+                  ? $t('videoCall.groupVideoCallButton.removed')
+                  : $t('videoCall.groupVideoCallButton.label')
+              }}
             </os-button>
           </div>
           <hr />
@@ -436,6 +443,8 @@ export default {
       chatRoom: null,
       hydrated: false,
       videoCallParticipantCount: 0,
+      // Removed from the call running now: no joining it until it is over.
+      videoCallRemoved: false,
     }
   },
   computed: {
@@ -685,6 +694,8 @@ export default {
           const update = data?.videoCallParticipantCountChanged
           if (update && update.groupId === groupId) {
             this.videoCallParticipantCount = update.count
+            // Answered for this viewer: the count of a call that is over frees them again.
+            this.videoCallRemoved = !!update.removed
           }
         },
         error: (err) => {
@@ -697,6 +708,7 @@ export default {
       this._videoCallCountSub?.unsubscribe()
       this._videoCallCountSub = null
       this.videoCallParticipantCount = 0
+      this.videoCallRemoved = false
     },
     async refetchVideoCallParticipantCount() {
       try {
@@ -713,7 +725,7 @@ export default {
       // The deny rests on the live participant count, so refetch before blocking: a
       // stale snapshot (subscription lag / load race) must not reject a JOIN that the
       // backend would allow once a call is actually running.
-      if (this.videoCallOpenDenied) {
+      if (this.videoCallOpenDenied || this.videoCallRemoved) {
         try {
           await this.$apollo.queries.videoCallParticipantCount?.refetch()
         } catch (err) {
@@ -721,6 +733,10 @@ export default {
           // eslint-disable-next-line no-console
           console.error('videoCallParticipantCount refetch failed:', err)
         }
+      }
+      if (this.videoCallRemoved) {
+        this.$toast.error(this.$t('backendErrors.VIDEO_CALL_REMOVED_FROM_CALL'))
+        return
       }
       if (this.videoCallOpenDenied) {
         this.$toast.error(this.$t('permissions.deniedHint'))
@@ -956,6 +972,9 @@ export default {
       },
       update({ videoCallParticipantCount }) {
         return videoCallParticipantCount || 0
+      },
+      result({ data }) {
+        this.videoCallRemoved = !!(data && data.videoCallRemoved)
       },
       skip() {
         return !this.canShowVideoCallButton || !this.$route.params.id

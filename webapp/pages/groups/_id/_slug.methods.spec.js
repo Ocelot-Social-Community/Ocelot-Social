@@ -44,6 +44,50 @@ describe('pages/groups/_id/_slug.vue — methods', () => {
     })
   })
 
+  describe('whether the viewer was removed from the call running now', () => {
+    it('is taken from the first answer', () => {
+      const ctx = { videoCallRemoved: false }
+      apollo.videoCallParticipantCount.result.call(ctx, { data: { videoCallRemoved: true } })
+      expect(ctx.videoCallRemoved).toBe(true)
+      apollo.videoCallParticipantCount.result.call(ctx, { data: null })
+      expect(ctx.videoCallRemoved).toBe(false)
+    })
+
+    it('follows every count pushed, and is forgotten with the subscription', () => {
+      let next
+      const unsubscribe = jest.fn()
+      const ctx = {
+        $route: { params: { id: 'g1' } },
+        $apollo: {
+          subscribe: () => ({
+            subscribe: (handlers) => {
+              next = handlers.next
+              return { unsubscribe }
+            },
+          }),
+        },
+        videoCallParticipantCount: 0,
+        videoCallRemoved: false,
+      }
+      methods.setupVideoCallCountSubscription.call(ctx)
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 2, removed: true } },
+      })
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 2, videoCallRemoved: true })
+      // The count of a call that is over frees them again.
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 0, removed: false } },
+      })
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 0, videoCallRemoved: false })
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 1, removed: true } },
+      })
+      methods.teardownVideoCallCountSubscription.call(ctx)
+      expect(unsubscribe).toHaveBeenCalled()
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 0, videoCallRemoved: false })
+    })
+  })
+
   describe('apollo.profilePagePosts.error', () => {
     it('ends the spinner of a list that never loaded with "no posts"', () => {
       const ctx = { posts: null }

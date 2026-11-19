@@ -38,10 +38,11 @@ vi.mock('livekit-server-sdk', async (importOriginal) => {
 const { TrackSource } = await import('livekit-server-sdk')
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { createApolloTestSetup } = await import('@root/test/helpers')
-const { joinCallSession } = await import('@src/livekit/callSession')
+const { endCallSession, joinCallSession } = await import('@src/livekit/callSession')
 const { readModeration, setEveryoneModerates, setModerator, markRemoved } =
   await import('@src/livekit/moderation')
 const { standing } = await import('./videoCallModeration')
+const { default: videoCallResolvers } = await import('./videoCalls')
 const q = async (name: string) => (await import(`@graphql/queries/videoCalls/${name}.gql`)).default
 const [
   Moderate,
@@ -54,6 +55,7 @@ const [
   Rights,
   Successor,
   JoinGroupVideoCall,
+  VideoCallRemoved,
 ] = await Promise.all(
   [
     'ModerateVideoCallParticipant',
@@ -66,6 +68,7 @@ const [
     'VideoCallModerationRights',
     'VideoCallModerationSuccessor',
     'JoinGroupVideoCall',
+    'VideoCallRemoved',
   ].map(q),
 )
 
@@ -374,6 +377,67 @@ describe('moderateVideoCallParticipant', () => {
     expect(
       (await mutate({ mutation: JoinGroupVideoCall, variables: { groupId: 'g1' } })).errors,
     ).toBeUndefined()
+  })
+
+  it('tells the one removed, and only them, that they cannot join until the call is over', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    await moderate('udo', 'REMOVE')
+    const removed = async () =>
+      (await query({ query: VideoCallRemoved, variables: { groupId: 'g1' } })).data
+        ?.videoCallRemoved
+
+    expect(await removed()).toBe(false)
+
+    as('udo')
+
+    expect(await removed()).toBe(true)
+
+    // Pushed alike to everybody, the count and the call in the dock are answered per viewer.
+    const viewer = (userId: string | null) =>
+      ({ user: userId ? { id: userId } : null, driver: database.driver }) as unknown as Context
+
+    expect(
+      await videoCallResolvers.VideoCallParticipantCount.removed(
+        { groupId: 'g1' },
+        {},
+        viewer('udo'),
+      ),
+    ).toBe(true)
+    expect(
+      await videoCallResolvers.ActiveVideoCall.removed(
+        { groupId: 'g1' } as never,
+        {},
+        viewer('ute'),
+      ),
+    ).toBe(false)
+    expect(
+      await videoCallResolvers.VideoCallParticipantCount.removed(
+        { groupId: 'g1' },
+        {},
+        viewer(null),
+      ),
+    ).toBe(false)
+
+    // Over once the session has ended.
+    await endCallSession(database.driver, 'RM_1')
+
+    expect(await removed()).toBe(false)
+  })
+
+  it('keeps one removed out of the room everybody has left, until the call is over', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    await moderate('udo', 'REMOVE')
+    // Everybody has gone; the media server keeps the empty room a while, the session runs on.
+    inCall()
+    as('udo')
+
+    expect(
+      errorOf(await mutate({ mutation: JoinGroupVideoCall, variables: { groupId: 'g1' } })),
+    ).toBe('You were removed from this video call. You can join the next one.')
   })
 
   it('removes neither oneself, nor the owner, nor somebody above, nor a moderating peer', async () => {

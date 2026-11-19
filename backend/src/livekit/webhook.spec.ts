@@ -303,6 +303,19 @@ describe('registerLiveKitWebhook', () => {
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
+    it('ends the session before it publishes the zero, which tells the removed they may join', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndCallSession.mock.invocationCallOrder[0]).toBeLessThan(
+        mockPublish.mock.invocationCallOrder[0],
+      )
+    })
+
     it('ends the call session of a finished room by the sid of that room', async () => {
       mockReceive.mockResolvedValueOnce({
         event: 'room_finished',

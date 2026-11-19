@@ -86,20 +86,10 @@ export const registerLiveKitWebhook = (app: Express) => {
       'room_started',
       'room_finished',
     ])
-    if (relevantEvents.has(event.event)) {
-      try {
-        if (event.event === 'room_finished') {
-          await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: 0 })
-        } else {
-          await publishCount(livekitUrl, apiKey, apiSecret, groupId, roomName)
-        }
-        // eslint-disable-next-line no-catch-all/no-catch-all
-      } catch (err: unknown) {
-        logger.error('Failed to publish LiveKit participant count update', err)
-      }
-    }
     if (event.event === 'room_finished') {
-      // The call is over: its session ends, and with it writing to its conference chat.
+      // The call is over: its session ends, and with it writing to its conference chat. Before
+      // the count below goes out: whoever was removed from the call learns with it that they
+      // may join again, which holds only once the session has ended.
       // By the room's sid where the event carries it: a late report about one call must not
       // end the next one, which runs in a room of the same name.
       const roomSid: string | undefined = event.room?.sid
@@ -118,6 +108,18 @@ export const registerLiveKitWebhook = (app: Express) => {
         // Left to the poller as well: it asks again on its next run, by which time whatever
         // failed here may be over.
         markRoomTold(roomName)
+      }
+    }
+    if (relevantEvents.has(event.event)) {
+      try {
+        if (event.event === 'room_finished') {
+          await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: 0 })
+        } else {
+          await publishCount(livekitUrl, apiKey, apiSecret, groupId, roomName)
+        }
+        // eslint-disable-next-line no-catch-all/no-catch-all
+      } catch (err: unknown) {
+        logger.error('Failed to publish LiveKit participant count update', err)
       }
     }
     res.status(204).end()

@@ -2040,6 +2040,7 @@
     "gotoGroup": "Shko te grupi „{name}“",
     "groupVideoCallButton": {
       "label": "Video grupi",
+      "removed": "U hoqe nga kjo thirrje",
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
     "handover": {

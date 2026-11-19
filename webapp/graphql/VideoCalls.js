@@ -12,6 +12,7 @@ export const videoCallConfigQuery = () => gql`
 export const videoCallParticipantCountQuery = () => gql`
   query ($groupId: ID!) {
     videoCallParticipantCount(groupId: $groupId)
+    videoCallRemoved(groupId: $groupId)
   }
 `
 
@@ -38,6 +39,7 @@ export const videoCallParticipantCountChangedSubscription = () => gql`
     videoCallParticipantCountChanged(groupId: $groupId) {
       groupId
       count
+      removed
     }
   }
 `
@@ -56,6 +58,7 @@ const activeVideoCallFields = gql`
       }
     }
     participantCount
+    removed
     participants {
       id
       slug

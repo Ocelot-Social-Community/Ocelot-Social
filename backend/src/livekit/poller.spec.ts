@@ -426,12 +426,31 @@ describe('poll tick', () => {
     )
   })
 
-  it('does not emit a duplicate zero when the disappeared room was already at 0', async () => {
+  // The count is answered per subscriber with whether they were removed from the call
+  // (`removed`), which ends with the session: one more zero tells them they may join again.
+  it('emits one more zero once the session of a room already at 0 has ended', async () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
     startLiveKitPoller()
     await vi.advanceTimersByTimeAsync(5_000)
     mockPublish.mockClear()
 
+    mockListRooms.mockResolvedValueOnce([])
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockPublish).toHaveBeenCalledTimes(1)
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'a',
+      count: 0,
+    })
+  })
+
+  it('emits no duplicate zero for a room already at 0 while its session is spared', async () => {
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+    mockPublish.mockClear()
+
+    mockEndOfMissingRoom.mockResolvedValueOnce(false)
     mockListRooms.mockResolvedValueOnce([])
     await vi.advanceTimersByTimeAsync(15_000)
 

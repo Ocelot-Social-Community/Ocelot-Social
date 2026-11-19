@@ -11,6 +11,11 @@ type ActiveVideoCall {
   The user behind each connection, in the order they joined — a user twice for two connections, as two people may share an account.
   """
   participants: [User!]!
+
+  """
+  Whether the current user was removed from this call. Until it is over, they cannot join it.
+  """
+  removed: Boolean!
 }
 
 """A group's call started, changed or ended."""
@@ -2219,6 +2224,11 @@ type Query {
   Current number of participants in a group's video call. Requires authentication.
   """
   videoCallParticipantCount(groupId: ID!): Int!
+
+  """
+  Whether the current user was removed from the group's call running now. Until it is over, they cannot join it. Requires authentication.
+  """
+  videoCallRemoved(groupId: ID!): Boolean!
 }
 
 """Relationship recording a moderator's decision on a report."""
@@ -2772,6 +2782,11 @@ type VideoCallModerationRights {
 type VideoCallParticipantCount {
   count: Int!
   groupId: ID!
+
+  """
+  Whether the current user was removed from the call running now. Until it is over, they cannot join it.
+  """
+  removed: Boolean!
 }
 
 """Who is allowed to see a post."""

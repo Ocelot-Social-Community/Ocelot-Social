@@ -165,7 +165,9 @@ const pollOnce = async () => {
         const message = err instanceof Error ? err.message : String(err)
         logger.warn(`Ending the call session of ${roomName} failed:`, message)
       }
-      if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName)) {
+      // Also for a room already seen empty, once its session has ended: whoever was removed from
+      // the call learns with the count that they may join again (`removed` on the count).
+      if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName) || sessionsSettled) {
         const groupId = groupIdFromRoomName(roomName)
         // Always a group id here: only names that already yielded one are recorded in
         // lastSeenCounts (the loop above `continue`s on a falsy groupId), and the rooms a client

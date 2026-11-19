@@ -2040,6 +2040,7 @@
     "gotoGroup": "Ir para o grupo “{name}”",
     "groupVideoCallButton": {
       "label": "Vídeo de grupo",
+      "removed": "Removido desta chamada",
       "tooltip": "Videochamada no grupo “{name}”"
     },
     "handover": {

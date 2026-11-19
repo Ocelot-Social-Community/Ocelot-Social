@@ -2040,6 +2040,7 @@
     "gotoGroup": "Перейти до групи «{name}»",
     "groupVideoCallButton": {
       "label": "Відео групи",
+      "removed": "Видалено з цього дзвінка",
       "tooltip": "Відеовиклик у групі «{name}»"
     },
     "handover": {
