@@ -440,6 +440,26 @@ describe('moderateVideoCallParticipant', () => {
     ).toBe('You were removed from this video call. You can join the next one.')
   })
 
+  it('keeps one removed out when somebody new opens a chat of their own in the emptied room', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    await moderate('udo', 'REMOVE')
+    // Everybody has gone; Adam, who was not in the call, walks into the room the media server
+    // still keeps, and gets a new session with a new chat — in the same call.
+    inCall('adam')
+    await open('adam')
+    as('udo')
+
+    expect(
+      errorOf(await mutate({ mutation: JoinGroupVideoCall, variables: { groupId: 'g1' } })),
+    ).toBe('You were removed from this video call. You can join the next one.')
+    expect(
+      (await query({ query: VideoCallRemoved, variables: { groupId: 'g1' } })).data
+        ?.videoCallRemoved,
+    ).toBe(true)
+  })
+
   it('removes neither oneself, nor the owner, nor somebody above, nor a moderating peer', async () => {
     inCall('ute', 'udo', 'olga', 'adam')
     const sessionId = await open('ute')

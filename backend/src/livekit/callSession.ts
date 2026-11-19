@@ -126,6 +126,10 @@ export const joinCallSession = async (
       }
       if (!sessionId) {
         // Whoever opens the session started the call, and moderates it (see moderation.ts).
+        // A new session in the same media-server room is a new chat, but still the same call:
+        // whoever was removed from it stays removed until the media server closes the room.
+        // So the removals of the sessions ended just now in this room carry over; those of
+        // another room, an earlier call, do not.
         const created = await transaction.run(
           `
             MATCH (group:Group { id: $groupId })
@@ -140,9 +144,14 @@ export const joinCallSession = async (
             CREATE (room)-[:ROOM_FOR]->(session)-[:CALL_IN]->(group)
             CREATE (starter)-[:STARTED_CALL { handedOver: false }]->(session)
             CREATE (starter)-[:MODERATES_CALL]->(session)
+            WITH session
+            OPTIONAL MATCH (removed:User)-[:REMOVED_FROM_CALL]->(earlier:VideoCallSession)
+              WHERE earlier.id IN $over AND earlier.livekitSid = $livekitSid
+            WITH session, collect(DISTINCT removed) AS removed
+            FOREACH (user IN removed | MERGE (user)-[:REMOVED_FROM_CALL]->(session))
             RETURN session.id AS id
           `,
-          { groupId, userId, livekitRoom, livekitSid },
+          { groupId, userId, livekitRoom, livekitSid, over },
         )
         sessionId = created.records[0].get('id') as string
       }
