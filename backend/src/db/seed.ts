@@ -1423,6 +1423,31 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
       variables: { groupId: 'g33', userId: 'u6', roleInGroup: 'usual' },
     })
 
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g34',
+        name: 'busFaktor() e.V.',
+        about:
+          'Wir pflegen FOSSware: ein Netzwerk für Menschen, die freie und Open-Source-Software nutzen und pflegen.',
+        description: `<h3>Worum geht es?</h3><p>Weil eine freie Gesellschaft freie und offene Software braucht: Der busFaktor() e.V. verbreitet Wissen und verteilt Aufgaben auf mehr Schultern, damit Projekte widerstandsfähig und langfristig tragfähig werden.</p><h3>Aktivitäten</h3><p>Ein Netzwerk für Menschen, die freie und Open-Source-Software (FOSSware) nutzen und pflegen – offene Veranstaltungen, gemeinnützige Bildungsangebote und Software-Projekte. Willkommen sind auch Betreiber, Server-Administratoren, Designer und Anwender.</p><h3>Projekte</h3><p>Tech-Day (aufgezeichnete Online-Vortragsreihe), Ocelot.Social und Utopia Map. Unterstützen kannst du den Verein mit einer Spende oder einer Fördermitgliedschaft. Mehr unter <a href="https://busfaktor.org/de" target="_blank">busfaktor.org/de</a>.</p>`,
+        template: 'public',
+        actionRadius: 'global',
+        categoryIds: ['cat15', 'cat0'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g34', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g34', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g34', userId: 'u1', roleInGroup: 'admin' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g34', userId: 'u4', roleInGroup: 'usual' },
+    })
+
     // eslint-disable-next-line no-console
     console.log('seed', 'group avatars')
     // Pictures the project has the right to use are files in seed/group-avatars/ (see its README),
@@ -1601,6 +1626,11 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
         url: 'https://menschlichwirtschaften.de/wp-content/uploads/pregnant-6189040_640.jpg',
         alt: 'Unterstützung von Hebammen',
         aspectRatio: 1.5,
+      },
+      {
+        groupId: 'g34',
+        file: 'g34-busfaktor-logo-de.png',
+        alt: 'busFaktor() Logo – Wir pflegen FOSSware',
       },
     ]
     for (const entry of groupAvatars) {
