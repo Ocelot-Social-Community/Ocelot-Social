@@ -31,6 +31,12 @@ export const SEED_IMAGES_DIRECTORY = path.join(
   'images',
 )
 
+// The pictures of the seeded groups, kept as they are rather than cropped: see group-avatars/README.md.
+export const SEED_GROUP_AVATARS_DIRECTORY = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  'group-avatars',
+)
+
 export const loadSeedImageSources = async (
   directory = SEED_IMAGES_DIRECTORY,
 ): Promise<SeedImageSource[]> => {

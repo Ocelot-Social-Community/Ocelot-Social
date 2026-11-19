@@ -6,8 +6,12 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
+import { createReadStream } from 'node:fs'
+import path from 'node:path'
+
 import { faker } from '@faker-js/faker'
 import sample from 'lodash/sample.js'
+import sharp from 'sharp'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
@@ -21,12 +25,13 @@ import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { NONE_ROLE, seedGroupRoleTemplates, writeGroupRole } from '@src/groupRole'
 import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
+import { s3Service } from '@src/uploads/s3Service'
 
 import { assertWipeAllowed } from './assertWipeAllowed'
 import Factory, { setImageUrlSource } from './factories'
 import { nudgeCacheResync } from './resync-caches'
 import { trophies, verification } from './seed/badges'
-import { resolveSeedImages, seedImageUploader } from './seed/images'
+import { SEED_GROUP_AVATARS_DIRECTORY, resolveSeedImages, seedImageUploader } from './seed/images'
 
 import type { TestNode } from './testing/node'
 
@@ -40,8 +45,8 @@ const requireNode = (node: TestNode | null, what: string): TestNode => {
   return node
 }
 
-// The media type of an external image, by its extension: the seeded group avatars are JPEG,
-// PNG and WebP.
+// The media type of an image, by the extension of its file name or URL: the seeded group avatars
+// are JPEG, PNG and WebP.
 const imageTypeOf = (url: string): string => {
   if (url.endsWith('.png')) {
     return 'image/png'
@@ -1420,27 +1425,30 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
 
     // eslint-disable-next-line no-console
     console.log('seed', 'group avatars')
-    // External images, so their ratio and type are written down rather than measured on upload.
-    // The ratios are measured off the images (#9288); a guessed one makes every consumer that
-    // sizes a group avatar by it reserve the wrong space.
-    for (const { groupId, url, alt, aspectRatio } of [
+    // Pictures the project has the right to use are files in seed/group-avatars/ (see its README),
+    // uploaded like any upload and served from the bucket; their ratio is measured off the file. The
+    // others are still linked from the site they belong to, with their ratio and type written down
+    // since there is nothing to measure. The ratios are measured off the images (#9288): a guessed
+    // one makes every consumer that sizes a group avatar by it reserve the wrong space.
+    const { uploadFile } = s3Service(CONFIG, 'seed')
+    const groupAvatars: (
+      | { groupId: string; alt: string; file: string }
+      | { groupId: string; alt: string; url: string; aspectRatio: number }
+    )[] = [
       {
         groupId: 'g3',
-        url: 'https://nsosp.org/share/images/FrQFT/FrQFT_header_v01_3.jpg',
+        file: 'g3-FrQFT_header_v01_3.jpg',
         alt: 'Quantum Flow Theory',
-        aspectRatio: 5.25,
       },
       {
         groupId: 'g4',
-        url: 'https://nsosp.org/share/images/NSOSP/NSOSP_header_v01_9.jpg',
+        file: 'g4-NSOSP_header_v01_9.jpg',
         alt: 'New Soul Of Science Project',
-        aspectRatio: 5.25,
       },
       {
         groupId: 'g5',
-        url: 'https://nsosp.org/share/images/SN/SN_header_v04-01.jpg',
+        file: 'g5-SN_header_v04-01.jpg',
         alt: 'Superial Numbers',
-        aspectRatio: 5.25,
       },
       {
         groupId: 'g6',
@@ -1462,9 +1470,8 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
       },
       {
         groupId: 'g9',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/IT4C-Website-Bild-ohne-Text.webp',
+        file: 'g9-IT4C-Website-Bild-ohne-Text.webp',
         alt: 'IT4C Team',
-        aspectRatio: 1.99,
       },
       {
         groupId: 'g10',
@@ -1552,15 +1559,13 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
       },
       {
         groupId: 'g24',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Hermesstab-schwarzweisseFluegel-v01-clip-3-2.jpg',
+        file: 'g24-Hermesstab-schwarzweisseFluegel-v01-clip-3-2.jpg',
         alt: 'Konstitutionstherapie Hermesstab',
-        aspectRatio: 1.5,
       },
       {
         groupId: 'g27',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Natur-und-Imkerhof-Zingst.jpg',
+        file: 'g27-Natur-und-Imkerhof-Zingst.jpg',
         alt: 'Naturerlebnis Zingst Imkerhof',
-        aspectRatio: 0.56,
       },
       {
         groupId: 'g28',
@@ -1570,9 +1575,8 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
       },
       {
         groupId: 'g29',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Landladen-Rullstorf.jpg',
+        file: 'g29-Landladen-Rullstorf.jpg',
         alt: 'Landladen Rullstorf',
-        aspectRatio: 0.75,
       },
       {
         groupId: 'g30',
@@ -1598,7 +1602,24 @@ const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
         alt: 'Unterstützung von Hebammen',
         aspectRatio: 1.5,
       },
-    ]) {
+    ]
+    for (const entry of groupAvatars) {
+      const { groupId, alt } = entry
+      let url: string
+      let aspectRatio: number
+      if ('file' in entry) {
+        const filePath = path.join(SEED_GROUP_AVATARS_DIRECTORY, entry.file)
+        const { width, height } = await sharp(filePath).metadata()
+        url = await uploadFile({
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          createReadStream: () => createReadStream(filePath),
+          uniqueFilename: entry.file,
+          mimetype: imageTypeOf(entry.file),
+        })
+        aspectRatio = width / height
+      } else {
+        ;({ url, aspectRatio } = entry)
+      }
       await database.write({
         query: `
           MATCH (group:Group {id: $groupId})
