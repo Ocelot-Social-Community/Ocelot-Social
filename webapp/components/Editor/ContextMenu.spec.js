@@ -31,15 +31,15 @@ describe('ContextMenu', () => {
   })
 
   describe('displayContextMenu', () => {
-    it('uses click + right placement for links', () => {
+    it('uses manual + bottom-start placement for links, under the selection', () => {
       const wrapper = Wrapper()
       const target = document.createElement('a')
       const content = document.createElement('div')
       wrapper.vm.displayContextMenu(target, content, 'link')
       const [el, opts] = tippy.mock.calls[0]
       expect(el).toBe(target)
-      expect(opts.placement).toBe('right')
-      expect(opts.trigger).toBe('click')
+      expect(opts.placement).toBe('bottom-start')
+      expect(opts.trigger).toBe('manual')
       expect(menu.show).toHaveBeenCalled()
     })
 

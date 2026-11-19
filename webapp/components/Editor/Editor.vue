@@ -263,6 +263,40 @@ export default {
         clientHeight: 0,
       }
     },
+    // Anchors the link input at the selected text, below it, so it does not cover what is being
+    // linked. It is a virtual reference, measured anew every time popper asks (on scroll, on every
+    // change of the text), like the suggestion anchor above:
+    // • a cursor only: at the cursor;
+    // • a selection within one line: under the whole selection;
+    // • a selection over several lines: under its end, where the cursor is after selecting.
+    selectionAnchor(view) {
+      // Until the first measurement succeeds: an empty box, which popper can place (null it cannot).
+      let rect = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 }
+      return {
+        getBoundingClientRect() {
+          const { from, to } = view.state.selection
+          try {
+            const start = view.coordsAtPos(from)
+            const end = view.coordsAtPos(to)
+            const oneLine = start.top === end.top
+            const left = oneLine ? start.left : end.left
+            rect = {
+              left,
+              right: end.right,
+              top: end.top,
+              bottom: end.bottom,
+              width: end.right - left,
+              height: end.bottom - end.top,
+            }
+          } catch (e) {
+            // The position is not in the view (anymore): stay where we were.
+          }
+          return rect
+        },
+        clientWidth: 0,
+        clientHeight: 0,
+      }
+    },
     showSuggestionMenu(view) {
       if (!view) return
       const hasDecoration = () => !!view.dom.querySelector('[data-decoration-id]')
@@ -519,7 +553,11 @@ export default {
         this.linkUrl = attrs.href
         this.isLinkInputActive = true
         this.$nextTick(() => {
-          this.$refs.contextMenu.displayContextMenu(element, this.$refs.linkInput, 'link')
+          this.$refs.contextMenu.displayContextMenu(
+            this.selectionAnchor(this.editor.view),
+            this.$refs.linkInput,
+            'link',
+          )
         })
       } else {
         this.isLinkInputActive = false
@@ -592,7 +630,7 @@ export default {
       if (!resume || this.suggestionType) return
       this.openSuggestionList(resume.props, resume.suggestionType)
     },
-    // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored to that button.
+    // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored at the selection.
     toggleLinkInputByShortcut() {
       this.toggleLinkInput(
         this.editor.getMarkAttrs('link'),

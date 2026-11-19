@@ -8,8 +8,10 @@ export default {
   },
   methods: {
     displayContextMenu(target, content, type) {
-      const placement = type === 'link' ? 'right' : 'top-start'
-      const trigger = type === 'link' ? 'click' : 'mouseenter'
+      // The link input sits under the selected text; its anchor is a virtual reference, which has
+      // nothing to click, so it is opened and closed by the editor ('manual').
+      const placement = type === 'link' ? 'bottom-start' : 'top-start'
+      const trigger = type === 'link' ? 'manual' : 'mouseenter'
 
       if (this.menu) {
         return
