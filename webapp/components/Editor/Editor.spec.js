@@ -895,8 +895,133 @@ describe('Editor.vue', () => {
         expect(linkInputShown()).toBe(true)
       })
 
-      it('opens the link menu at the toolbar link button', () => {
-        expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
+      it('opens the link menu at the selected text, not at the toolbar link button', () => {
+        const { reference } = wrapper.vm.$refs.contextMenu.menu
+        expect(reference).not.toBe(linkButton())
+        expect(typeof reference.getBoundingClientRect).toBe('function')
+      })
+
+      it('keeps the selected text marked while the input is open, and drops it on close', async () => {
+        expect(editorElement().querySelectorAll('.link-selection')).toHaveLength(1)
+        expect(editorElement().querySelector('.link-selection').textContent).toBe('Example text')
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        expect(editorElement().querySelectorAll('.link-selection')).toHaveLength(0)
+      })
+
+      it('marks the whole link when only the cursor is in it', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>See <a href="https://example.org">the link</a> now</p>')
+        await settle()
+        const { state, dispatch } = wrapper.vm.editor.view
+        dispatch(state.tr.setSelection(TextSelection.create(state.doc, 8)))
+        await settle()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        expect(editorElement().querySelector('.link-selection').textContent).toBe('the link')
+      })
+
+      it('puts the anchor under a selection within one line', () => {
+        const { view } = wrapper.vm.editor
+        view.coordsAtPos = (pos) =>
+          pos === view.state.selection.from
+            ? { left: 10, right: 10, top: 100, bottom: 120 }
+            : { left: 90, right: 90, top: 100, bottom: 120 }
+        expect(wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()).toEqual({
+          left: 10,
+          right: 90,
+          top: 100,
+          bottom: 120,
+          width: 80,
+          height: 20,
+        })
+      })
+
+      it('puts the anchor at the end of a selection over several lines', () => {
+        const { view } = wrapper.vm.editor
+        view.coordsAtPos = (pos) =>
+          pos === view.state.selection.from
+            ? { left: 10, right: 10, top: 100, bottom: 120 }
+            : { left: 40, right: 40, top: 140, bottom: 160 }
+        expect(wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()).toEqual({
+          left: 40,
+          right: 40,
+          top: 140,
+          bottom: 160,
+          width: 0,
+          height: 20,
+        })
+      })
+
+      it('does nothing with the link input once the editor is destroyed', () => {
+        const focus = jest.spyOn(wrapper.vm.editor, 'focus')
+        const { vm } = wrapper
+        wrapper.destroy()
+        // the focused input's blur on removal
+        expect(() => vm.toggleLinkInput()).not.toThrow()
+        expect(focus).not.toHaveBeenCalled()
+      })
+
+      it('measures the end of a selection on the selected side of a wrap point', () => {
+        const { view } = wrapper.vm.editor
+        const sides = []
+        view.coordsAtPos = (pos, side) => {
+          sides.push(side)
+          return { left: 0, right: 0, top: 0, bottom: 0 }
+        }
+        wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()
+        // the end of a nonempty selection: the character before it
+        expect(sides[sides.length - 1]).toBe(-1)
+      })
+
+      it('measures before a hard line break at the end of the selection', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>one<br>two</p>')
+        await settle()
+        const { view } = wrapper.vm.editor
+        // 1..4 is "one", 4..5 the break: the selection ends at the start of the next line, 5.
+        view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 1, 5)))
+        await settle()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        const positions = []
+        view.coordsAtPos = (pos) => {
+          positions.push(pos)
+          return { left: 0, right: 0, top: 0, bottom: 0 }
+        }
+        wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()
+        expect(positions).toEqual([1, 4])
+      })
+
+      it('measures before the paragraph break at the end of the selection', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>one</p><p>two</p>')
+        await settle()
+        const { view } = wrapper.vm.editor
+        // 1..4 is "one"; 6 is the start of the next paragraph, which the selection ends at.
+        view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 1, 6)))
+        await settle()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        const positions = []
+        view.coordsAtPos = (pos) => {
+          positions.push(pos)
+          return { left: 0, right: 0, top: 0, bottom: 0 }
+        }
+        wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()
+        expect(positions).toEqual([1, 4])
+      })
+
+      it('follows the selection: it is measured anew every time', () => {
+        const { view } = wrapper.vm.editor
+        const { reference } = wrapper.vm.$refs.contextMenu.menu
+        view.coordsAtPos = () => ({ left: 5, right: 5, top: 10, bottom: 30 })
+        expect(reference.getBoundingClientRect().top).toBe(10)
+        view.coordsAtPos = () => ({ left: 5, right: 5, top: 210, bottom: 230 })
+        expect(reference.getBoundingClientRect().top).toBe(210)
       })
 
       it('links the selected text with the URL entered', async () => {
@@ -957,7 +1082,7 @@ describe('Editor.vue', () => {
       expect(wrapper.vm.suggestionRange).toBeNull()
       expect(wrapper.vm.filteredItems).toEqual([])
       expect(wrapper.vm.isLinkInputActive).toBe(true)
-      expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
+      expect(wrapper.vm.$refs.contextMenu.menu.reference).not.toBe(linkButton())
       expect(wrapper.vm.navigateSuggestionList({ event: { keyCode: 13 } })).toBe(false)
 
       // Return to the editor and continue the active mention. The plugin calls onChange,
@@ -1074,7 +1199,7 @@ describe('Editor.vue', () => {
       await settle()
       expect(wrapper.vm.isLinkInputActive).toBe(true)
       expect(linkInputShown()).toBe(true)
-      expect(wrapper.vm.$refs.contextMenu.menu.reference).toBe(linkButton())
+      expect(wrapper.vm.$refs.contextMenu.menu.reference).not.toBe(linkButton())
     })
 
     it('still makes the selection bold with Ctrl+B', async () => {

@@ -31,15 +31,16 @@ describe('ContextMenu', () => {
   })
 
   describe('displayContextMenu', () => {
-    it('uses click + right placement for links', () => {
+    it('uses manual + bottom-start placement for links, under the selection', () => {
       const wrapper = Wrapper()
       const target = document.createElement('a')
       const content = document.createElement('div')
       wrapper.vm.displayContextMenu(target, content, 'link')
       const [el, opts] = tippy.mock.calls[0]
       expect(el).toBe(target)
-      expect(opts.placement).toBe('right')
-      expect(opts.trigger).toBe('click')
+      expect(opts.placement).toBe('bottom-start')
+      expect(opts.trigger).toBe('manual')
+      expect(opts.sticky).toBe(true)
       expect(menu.show).toHaveBeenCalled()
     })
 
@@ -118,6 +119,25 @@ describe('ContextMenu', () => {
       expect(menu.destroy).toHaveBeenCalled()
       expect(wrapper.vm.menu).toBeNull()
       expect(observer.disconnect).toHaveBeenCalled()
+    })
+
+    it('is done when the component is destroyed with a popup open', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.displayContextMenu(
+        document.createElement('a'),
+        document.createElement('div'),
+        'link',
+      )
+      const observer = observerInstances[0]
+      wrapper.destroy()
+      expect(menu.destroy).toHaveBeenCalled()
+      expect(observer.disconnect).toHaveBeenCalled()
+    })
+
+    it('is done without a popup when the component is destroyed', () => {
+      const wrapper = Wrapper()
+      expect(() => wrapper.destroy()).not.toThrow()
+      expect(menu.destroy).not.toHaveBeenCalled()
     })
 
     it('is a no-op when nothing is open', () => {
