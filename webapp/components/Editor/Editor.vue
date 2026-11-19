@@ -47,6 +47,7 @@ import { HASHTAG, MENTION } from '../../constants/editor'
 import defaultExtensions from './defaultExtensions'
 import EventHandler from './plugins/eventHandler'
 import LinkShortcut from './plugins/linkShortcut'
+import LinkSelection, { markLinkSelection } from './plugins/linkSelection'
 import UnfinishedSuggestions, {
   UNFINISHED_CLASS,
   UNFINISHED_TYPE_ATTRIBUTE,
@@ -147,6 +148,13 @@ export default {
     },
   },
   watch: {
+    // The editor loses the focus to the input, and with it the browser's drawing of the selection:
+    // the selected text is marked meanwhile, so it can be seen what the link is for.
+    isLinkInputActive(active) {
+      if (!this.editor) return
+      const { from, to } = this.editor.state.selection
+      markLinkSelection(this.editor.view, active && from < to ? { from, to } : null)
+    },
     placeholder: {
       immediate: true,
       handler: function (val) {
@@ -181,6 +189,8 @@ export default {
         // Only here, not in defaultExtensions: the read-only ContentViewer shares those.
         new LinkShortcut({ onShortcut: () => this.toggleLinkInputByShortcut() }),
         // Also only here: a mention or hashtag typed and not chosen from the list is framed.
+        // Keeps the text a link is made for marked while the link input has the focus.
+        new LinkSelection(),
         new UnfinishedSuggestions({
           types: [this.mentionSuggestions && MENTION, this.hashtagSuggestions && HASHTAG].filter(
             Boolean,
@@ -697,6 +707,12 @@ li > p {
   .unfinished-suggestion {
     outline: 1px solid var(--border-color-base);
     outline-offset: 1px;
+    border-radius: var(--border-radius-base);
+  }
+
+  /* The text the link input is open for, while the editor itself has no focus. */
+  .link-selection {
+    background-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
     border-radius: var(--border-radius-base);
   }
 

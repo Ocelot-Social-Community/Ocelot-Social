@@ -901,6 +901,14 @@ describe('Editor.vue', () => {
         expect(typeof reference.getBoundingClientRect).toBe('function')
       })
 
+      it('keeps the selected text marked while the input is open, and drops it on close', async () => {
+        expect(editorElement().querySelectorAll('.link-selection')).toHaveLength(1)
+        expect(editorElement().querySelector('.link-selection').textContent).toBe('Example text')
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        expect(editorElement().querySelectorAll('.link-selection')).toHaveLength(0)
+      })
+
       it('puts the anchor under a selection within one line', () => {
         const { view } = wrapper.vm.editor
         view.coordsAtPos = (pos) =>
