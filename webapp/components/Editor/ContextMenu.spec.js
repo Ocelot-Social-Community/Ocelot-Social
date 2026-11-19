@@ -121,6 +121,25 @@ describe('ContextMenu', () => {
       expect(observer.disconnect).toHaveBeenCalled()
     })
 
+    it('is done when the component is destroyed with a popup open', () => {
+      const wrapper = Wrapper()
+      wrapper.vm.displayContextMenu(
+        document.createElement('a'),
+        document.createElement('div'),
+        'link',
+      )
+      const observer = observerInstances[0]
+      wrapper.destroy()
+      expect(menu.destroy).toHaveBeenCalled()
+      expect(observer.disconnect).toHaveBeenCalled()
+    })
+
+    it('is done without a popup when the component is destroyed', () => {
+      const wrapper = Wrapper()
+      expect(() => wrapper.destroy()).not.toThrow()
+      expect(menu.destroy).not.toHaveBeenCalled()
+    })
+
     it('is a no-op when nothing is open', () => {
       const wrapper = Wrapper()
       expect(() => wrapper.vm.hideContextMenu()).not.toThrow()

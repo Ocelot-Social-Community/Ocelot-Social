@@ -86,6 +86,11 @@ export default {
       }
     },
   },
+  // An open popup lives on document.body, not in this component: without this it would stay after
+  // the editor is gone, with its anchor (and so the editor's view) and the sticky frame loop alive.
+  beforeDestroy() {
+    this.hideContextMenu()
+  },
   render() {
     return null
   },
