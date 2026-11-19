@@ -246,6 +246,30 @@ describe('HeaderMenu', () => {
       expect(wrapper.vm.navbarRevealedByHover).toBe(true)
     })
 
+    it('tells what sticks below the header, when the navbar is revealed by hovering', async () => {
+      const wrapper = Wrapper()
+      // jsdom has no layout: give the header a height.
+      Object.defineProperty(wrapper.vm.$el, 'offsetHeight', { value: 66 })
+      wrapper.vm.hideNavbar = true
+      wrapper.vm.updateHeaderOffset()
+      expect(document.documentElement.style.getPropertyValue('--header-height')).toBe('0px')
+      wrapper.vm.handleMouseMove({ clientY: 10 })
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      expect(document.documentElement.style.getPropertyValue('--header-height')).toBe('66px')
+    })
+
+    it('tells it again when the hover-revealed navbar hides', async () => {
+      const wrapper = Wrapper()
+      wrapper.vm.hideNavbar = false
+      wrapper.vm.navbarRevealedByHover = true
+      wrapper.vm.updateHeaderOffset()
+      wrapper.vm.handleMouseMove({ clientY: 500 })
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      expect(document.documentElement.style.getPropertyValue('--header-height')).toBe('0px')
+    })
+
     it('re-hides a hover-revealed navbar when the cursor leaves it', () => {
       const wrapper = Wrapper()
       wrapper.vm.hideNavbar = false
