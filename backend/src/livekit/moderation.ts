@@ -378,6 +378,11 @@ export const SOURCES = {
 /**
  * Mutes what these connections publish from those sources. Unmuting is left to the person
  * themselves: nobody gets somebody else's microphone opened.
+ *
+ * Every track is tried on its own: one that fails does not hold back the others, nor what is
+ * done after them. A track can be gone since the connections were listed — a client switching
+ * DTX publishes its microphone anew, under another SID (#10792). Whoever it belongs to is told
+ * all the same (see notify), and their client then switches it off itself.
  */
 export const muteTracks = async (
   client: RoomServiceClient,
@@ -385,7 +390,7 @@ export const muteTracks = async (
   connections: Connection[],
   sources: readonly number[],
 ): Promise<void> => {
-  await Promise.all(
+  const results = await Promise.allSettled(
     connections.flatMap((connection) =>
       connection.tracks
         .filter((track) => sources.includes(track.source) && !track.muted)
@@ -398,6 +403,11 @@ export const muteTracks = async (
         ),
     ),
   )
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      logger.warn(`A track in ${roomName} could not be muted:`, result.reason)
+    }
+  }
 }
 
 export const removeConnections = async (

@@ -330,6 +330,31 @@ describe('the media server', () => {
     expect(service.mutePublishedTrack).toHaveBeenCalledWith('group-g1', 'a#1', 'mic', true)
   })
 
+  it('mutes every other track when one cannot be muted, and does not fail', async () => {
+    const mutePublishedTrack = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('track not found'))
+      .mockResolvedValue(undefined)
+    const service = client({ mutePublishedTrack })
+    const connections: Connection[] = [
+      {
+        identity: 'a#1',
+        userId: 'a',
+        tracks: [{ sid: 'gone', source: TrackSource.MICROPHONE, muted: false }],
+      },
+      {
+        identity: 'b#1',
+        userId: 'b',
+        tracks: [{ sid: 'mic', source: TrackSource.MICROPHONE, muted: false }],
+      },
+    ]
+
+    await expect(
+      muteTracks(service, 'group-g1', connections, SOURCES.microphone),
+    ).resolves.toBeUndefined()
+    expect(mutePublishedTrack).toHaveBeenCalledWith('group-g1', 'b#1', 'mic', true)
+  })
+
   it('removes connections', async () => {
     const service = client()
     await removeConnections(service, 'group-g1', [{ identity: 'a#1', userId: 'a', tracks: [] }])
