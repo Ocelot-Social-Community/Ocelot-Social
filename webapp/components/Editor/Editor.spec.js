@@ -954,6 +954,58 @@ describe('Editor.vue', () => {
         })
       })
 
+      it('measures the end of a selection on the selected side of a wrap point', () => {
+        const { view } = wrapper.vm.editor
+        const sides = []
+        view.coordsAtPos = (pos, side) => {
+          sides.push(side)
+          return { left: 0, right: 0, top: 0, bottom: 0 }
+        }
+        wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()
+        // the end of a nonempty selection: the character before it
+        expect(sides[sides.length - 1]).toBe(-1)
+      })
+
+      it('measures before a hard line break at the end of the selection', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>one<br>two</p>')
+        await settle()
+        const { view } = wrapper.vm.editor
+        // 1..4 is "one", 4..5 the break: the selection ends at the start of the next line, 5.
+        view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 1, 5)))
+        await settle()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        const positions = []
+        view.coordsAtPos = (pos) => {
+          positions.push(pos)
+          return { left: 0, right: 0, top: 0, bottom: 0 }
+        }
+        wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()
+        expect(positions).toEqual([1, 4])
+      })
+
+      it('measures before the paragraph break at the end of the selection', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>one</p><p>two</p>')
+        await settle()
+        const { view } = wrapper.vm.editor
+        // 1..4 is "one"; 6 is the start of the next paragraph, which the selection ends at.
+        view.dispatch(view.state.tr.setSelection(TextSelection.create(view.state.doc, 1, 6)))
+        await settle()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        const positions = []
+        view.coordsAtPos = (pos) => {
+          positions.push(pos)
+          return { left: 0, right: 0, top: 0, bottom: 0 }
+        }
+        wrapper.vm.$refs.contextMenu.menu.reference.getBoundingClientRect()
+        expect(positions).toEqual([1, 4])
+      })
+
       it('follows the selection: it is measured anew every time', () => {
         const { view } = wrapper.vm.editor
         const { reference } = wrapper.vm.$refs.contextMenu.menu

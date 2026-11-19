@@ -35,6 +35,10 @@ export default {
         // below). Left to tippy, a click anywhere else would hide it for good: the instance stays,
         // so displayContextMenu() above sees a menu and never shows it again.
         hideOnClick: type === 'link',
+        // Re-reads the virtual anchor on every frame, so a layout shift above the selection (an
+        // image or a font that loads) moves the link input along; the observer below only sees
+        // changes of the input itself.
+        sticky: type === 'link',
         placement,
         theme: 'ocelot-social',
         trigger,

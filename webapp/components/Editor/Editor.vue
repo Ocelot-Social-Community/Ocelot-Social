@@ -292,10 +292,26 @@ export default {
       let rect = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 }
       return {
         getBoundingClientRect() {
-          const { from, to } = view.state.selection
+          const { doc, selection } = view.state
+          const { from } = selection
+          let { to } = selection
+          // A selection that takes a line break along, a hard one or the end of a paragraph, ends at
+          // the start of the NEXT line, and that is the only line the browser reports for it. The
+          // input belongs under the last selected word, so the end is measured before the break.
+          while (to - 1 > from) {
+            const $to = doc.resolve(to)
+            const afterBreak =
+              $to.nodeBefore?.type.name === 'hard_break' ||
+              !$to.parent.inlineContent ||
+              $to.parentOffset === 0
+            if (!afterBreak) break
+            to -= 1
+          }
           try {
             const start = view.coordsAtPos(from)
-            const end = view.coordsAtPos(to)
+            // For a nonempty selection `to` is exclusive: measure the last selected character
+            // (side -1), so a wrap point does not put the input under the next, unselected line.
+            const end = view.coordsAtPos(to, from < to ? -1 : 1)
             const oneLine = start.top === end.top
             const left = oneLine ? start.left : end.left
             rect = {

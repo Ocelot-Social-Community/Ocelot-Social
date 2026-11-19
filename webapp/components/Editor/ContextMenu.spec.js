@@ -40,6 +40,7 @@ describe('ContextMenu', () => {
       expect(el).toBe(target)
       expect(opts.placement).toBe('bottom-start')
       expect(opts.trigger).toBe('manual')
+      expect(opts.sticky).toBe(true)
       expect(menu.show).toHaveBeenCalled()
     })
 
