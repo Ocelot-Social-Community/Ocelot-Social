@@ -276,6 +276,33 @@ describe('videoCall store', () => {
       })
     })
 
+    describe('the participant list', () => {
+      const view = { people: [], moderation: {}, mayTakeOver: false, locallyMuted: {} }
+      const shown = () => {
+        mutations.SET_PARTICIPANTS_OPEN(state, true)
+        mutations.SET_PARTICIPANTS_VIEW(state, view)
+      }
+
+      beforeEach(() => {
+        mutations.OPEN(state, { groupId: 'g1' })
+        shown()
+      })
+
+      it('is kept when the running call is brought up again', () => {
+        mutations.OPEN(state, { groupId: 'g1' })
+        expect(state).toMatchObject({ participantsOpen: true, participantsView: view })
+      })
+
+      it("is forgotten for another group's call, and when the call is closed", () => {
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state).toMatchObject({ participantsOpen: false, participantsView: null })
+
+        shown()
+        mutations.CLOSE(state)
+        expect(state).toMatchObject({ participantsOpen: false, participantsView: null })
+      })
+    })
+
     describe('SET_LAST_CHAT_TAB', () => {
       it('remembers which of the two chats was looked at last', () => {
         mutations.SET_LAST_CHAT_TAB(state, 'group')

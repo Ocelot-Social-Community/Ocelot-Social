@@ -79,6 +79,26 @@ describe('default.vue', () => {
       expect(wrapper.classes('layout-default')).toBe(true)
     })
 
+    it('hands the own microphone and camera, switched on or off in the parked list, to the call', () => {
+      const parked = shallowMount(Default, {
+        store,
+        mocks,
+        localVue,
+        stubs,
+        computed: {
+          participantsInWindow: () => true,
+          participantsView: () => ({ people: [], moderation: {}, locallyMuted: {} }),
+        },
+      })
+      const call = { switchOn: jest.fn(), syncSwitchedOff: jest.fn() }
+      parked.vm.$refs.videoCall = call
+      const list = parked.findComponent({ name: 'CallParticipants' })
+      list.vm.$emit('switch-on', 'mic')
+      list.vm.$emit('switch-off', 'camera')
+      expect(call.switchOn).toHaveBeenCalledWith('mic')
+      expect(call.syncSwitchedOff).toHaveBeenCalledWith('camera')
+    })
+
     describe('header and footer beside a maximized video call', () => {
       const classes = () =>
         ['movable', 'glass', 'away'].filter((name) =>
@@ -257,9 +277,15 @@ describe('default.vue', () => {
         expect(setParticipantsOpen).toHaveBeenCalledWith(false)
         expect(
           Default.computed.openChatTarget.call({
-            getShowChat: { showChat: true, chatUserId: 'u2', groupId: null, roomId: null },
+            getShowChat: {
+              showChat: true,
+              chatUserId: 'u2',
+              groupId: null,
+              roomId: null,
+              openings: 3,
+            },
           }),
-        ).toBe('u2||')
+        ).toBe('u2|||3')
         expect(
           Default.computed.openChatTarget.call({ getShowChat: { showChat: false } }),
         ).toBeNull()

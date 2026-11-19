@@ -2045,7 +2045,7 @@
     "handover": {
       "confirm": "Hand on and leave",
       "skip": "Leave without choosing",
-      "suggested": "suggested",
+      "suggestedName": "{name} (suggested)",
       "text": "You are the last moderator of this call. Hand the moderation on before you leave.",
       "title": "Who moderates from now on?"
     },

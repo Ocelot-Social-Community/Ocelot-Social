@@ -2045,7 +2045,7 @@
     "handover": {
       "confirm": "Doorgeven en verlaten",
       "skip": "Verlaten zonder te kiezen",
-      "suggested": "voorstel",
+      "suggestedName": "{name} (voorstel)",
       "text": "Je bent de laatste die dit gesprek modereert. Geef de moderatie door voordat je gaat.",
       "title": "Wie modereert er voortaan?"
     },

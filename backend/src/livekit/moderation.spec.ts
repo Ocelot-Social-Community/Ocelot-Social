@@ -191,6 +191,19 @@ describe(markRemoved, () => {
 
     expect(Number(chats.records[0].get('n'))).toBe(0)
   })
+
+  it('does not let them back into the chat by a join asked for before', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    expect(await open('udo', ['ute', 'udo'])).toBeNull()
+
+    const chats = await run(`MATCH (:User { id: 'udo' })-[c:CHATS_IN]->() RETURN count(c) AS n`)
+
+    expect(Number(chats.records[0].get('n'))).toBe(0)
+  })
 })
 
 describe(successorOf, () => {

@@ -7,6 +7,7 @@ const service = {
   listParticipants: vi.fn(),
   updateRoomMetadata: vi.fn(),
   sendData: vi.fn(),
+  removeParticipant: vi.fn(),
 }
 
 vi.mock('livekit-server-sdk', async (importOriginal) => {
@@ -22,7 +23,8 @@ vi.mock('livekit-server-sdk', async (importOriginal) => {
 
 const { TwirpError } = await import('livekit-server-sdk')
 const { joinCallSession } = await import('./callSession')
-const { readModeration, setModerator } = await import('./moderation')
+const { markRemoved, moderationMetadata, readModeration, setModerator } =
+  await import('./moderation')
 const { connectionsOf, settleAndPublishModeration } = await import('./moderationService')
 
 const driver = getDriver()
@@ -44,6 +46,7 @@ beforeEach(async () => {
   service.listParticipants.mockResolvedValue([])
   service.updateRoomMetadata.mockResolvedValue({})
   service.sendData.mockResolvedValue(undefined)
+  service.removeParticipant.mockResolvedValue(undefined)
   await cleanDatabase()
   const session = driver.session()
   try {
@@ -123,6 +126,46 @@ describe('settleAndPublishModeration', () => {
       JSON.stringify({ moderation: null }),
     )
     expect(service.sendData).not.toHaveBeenCalled()
+  })
+
+  it('publishes only what differs from what the room has, when told what it has', async () => {
+    await joinCallSession(driver, {
+      groupId: 'g1',
+      userId: 'ute',
+      livekitRoom: 'group-g1',
+      livekitSid: 'RM_1',
+      presentUserIds: ['ute'],
+    })
+    service.listParticipants.mockResolvedValue([participant('ute', 1n)])
+    const current = moderationMetadata(await readModeration(driver, 'g1'))
+    await settleAndPublishModeration({ driver, config }, 'g1', { published: current })
+
+    expect(service.updateRoomMetadata).not.toHaveBeenCalled()
+
+    await settleAndPublishModeration({ driver, config }, 'g1', { published: '' })
+
+    expect(service.updateRoomMetadata).toHaveBeenCalledWith('group-g1', current)
+  })
+
+  it('disconnects whoever was removed and is still there, when asked to', async () => {
+    await joinCallSession(driver, {
+      groupId: 'g1',
+      userId: 'ute',
+      livekitRoom: 'group-g1',
+      livekitSid: 'RM_1',
+      presentUserIds: ['ute', 'udo'],
+    })
+    const sessionId = (await readModeration(driver, 'g1'))?.sessionId as string
+    await markRemoved(driver, sessionId, 'udo')
+    service.listParticipants.mockResolvedValue([participant('ute', 1n), participant('udo', 2n)])
+    await settleAndPublishModeration({ driver, config }, 'g1')
+
+    expect(service.removeParticipant).not.toHaveBeenCalled()
+
+    await settleAndPublishModeration({ driver, config }, 'g1', { removeLeftovers: true })
+
+    expect(service.removeParticipant).toHaveBeenCalledTimes(1)
+    expect(service.removeParticipant).toHaveBeenCalledWith('group-g1', 'udo#1')
   })
 
   it('never throws', async () => {

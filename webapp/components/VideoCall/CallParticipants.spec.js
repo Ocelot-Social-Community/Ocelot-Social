@@ -625,6 +625,75 @@ describe('CallParticipants', () => {
       expect(wrapper.emitted('switch-off')).toEqual([['mic']])
     })
 
+    it('decides about the own microphone by what was sent, not by what is ticked meanwhile', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      wrapper.vm.openMuteAll()
+      mocks.$apollo.mutate.mockImplementationOnce(async () => {
+        wrapper.vm.spare('me', false)
+        return { data: {} }
+      })
+      await wrapper.vm.muteAll()
+      expect(mocks.$apollo.mutate.mock.calls[0][0].variables.exceptUserIds).toContain('me')
+      expect(wrapper.emitted('switch-off')).toBeUndefined()
+    })
+
+    it('keeps the tick of whoever is given the floor locked until it is taken back', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob')],
+        moderation: moderatedByMe,
+      })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      const pick = () => wrapper.find('[data-test="mute-all-pick-bob"]')
+      expect(pick().attributes('disabled')).toBeUndefined()
+      await wrapper.vm.toggleFloor('bob')
+      await wrapper.vm.$nextTick()
+      expect(pick().attributes('disabled')).toBe('disabled')
+      expect(pick().element.checked).toBe(false)
+      await wrapper.vm.toggleFloor('bob')
+      await wrapper.vm.$nextTick()
+      expect(pick().attributes('disabled')).toBeUndefined()
+      expect(pick().element.checked).toBe(true)
+    })
+
+    it('gives and takes back the floor at once, not only with "mute all"', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob')],
+        moderation: moderatedByMe,
+      })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      await wrapper.find('[data-test="mute-all-floor-bob"]').trigger('click')
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual({
+        groupId: 'g1',
+        userId: 'bob',
+        floor: true,
+      })
+      expect(wrapper.vm.floor).toEqual(['bob'])
+      await wrapper.find('[data-test="mute-all-floor-bob"]').trigger('click')
+      await flushPromises()
+      expect(mocks.$apollo.mutate.mock.calls[1][0].variables).toEqual({
+        groupId: 'g1',
+        userId: 'bob',
+        floor: false,
+      })
+      expect(wrapper.vm.floor).toEqual([])
+      expect(wrapper.vm.muting).toBe(true)
+    })
+
+    it('leaves the floor and the ticks as they were when the server refuses the floor', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('speaker')],
+        moderation: { moderators: ['me'], everyone: false, speakers: ['speaker'] },
+      })
+      wrapper.vm.openMuteAll()
+      mocks.$apollo.mutate.mockRejectedValueOnce(new Error('no'))
+      await wrapper.vm.toggleFloor('speaker')
+      expect(wrapper.vm.floor).toEqual(['speaker'])
+      expect(wrapper.vm.spared).toEqual(['me', 'speaker'])
+    })
+
     it('keeps the question open when the server refuses', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       mocks.$apollo.mutate.mockRejectedValueOnce(new Error('no'))
@@ -634,7 +703,7 @@ describe('CallParticipants', () => {
       expect(wrapper.emitted('switch-off')).toBeUndefined()
     })
 
-    it('spares those with the floor instead of whoever speaks, and gives it on the way', async () => {
+    it('spares those with the floor instead of whoever speaks', async () => {
       wrapper = Wrapper({
         people: [
           person('me', { isMe: true }),
@@ -646,21 +715,44 @@ describe('CallParticipants', () => {
       })
       wrapper.vm.openMuteAll()
       expect(wrapper.vm.spared).toEqual(['me', 'speaker'])
-      expect(wrapper.vm.floorUnchanged).toBe(true)
-      wrapper.vm.toggleFloor('bob')
+      await wrapper.vm.toggleFloor('bob')
       expect(wrapper.vm.spared).toContain('bob')
       expect(wrapper.vm.floor).toEqual(['speaker', 'bob'])
-      expect(wrapper.vm.floorUnchanged).toBe(false)
       // Taking it back unticks whoever was ticked only by giving it …
-      wrapper.vm.toggleFloor('bob')
+      await wrapper.vm.toggleFloor('bob')
       expect(wrapper.vm.floor).toEqual(['speaker'])
       expect(wrapper.vm.spared).not.toContain('bob')
       // … and leaves a tick that was set before.
-      wrapper.vm.toggleFloor('me')
-      wrapper.vm.toggleFloor('me')
+      await wrapper.vm.toggleFloor('me')
+      await wrapper.vm.toggleFloor('me')
       expect(wrapper.vm.spared).toContain('me')
-      wrapper.vm.toggleFloor('speaker')
-      expect(wrapper.vm.spared).toContain('speaker')
+    })
+
+    it('ticks whoever had the floor as soon as it is taken back', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('speaker')],
+        moderation: { moderators: ['me'], everyone: false, speakers: ['speaker'] },
+      })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      const pick = () => wrapper.find('[data-test="mute-all-pick-speaker"]')
+      expect(pick().attributes('disabled')).toBe('disabled')
+      expect(pick().element.checked).toBe(false)
+      await wrapper.vm.toggleFloor('speaker')
+      await wrapper.vm.$nextTick()
+      expect(pick().attributes('disabled')).toBeUndefined()
+      expect(pick().element.checked).toBe(true)
+      expect(wrapper.vm.spared).toEqual(['me'])
+    })
+
+    it('keeps oneself spared when one had the floor and takes it back', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob')],
+        moderation: { moderators: ['me'], everyone: false, speakers: ['me'] },
+      })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.toggleFloor('me')
+      expect(wrapper.vm.spared).toContain('me')
     })
   })
 

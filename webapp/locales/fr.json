@@ -2045,7 +2045,7 @@
     "handover": {
       "confirm": "Transmettre et partir",
       "skip": "Partir sans choisir",
-      "suggested": "suggestion",
+      "suggestedName": "{name} (suggestion)",
       "text": "Tu es le dernier à modérer cet appel. Transmets la modération avant de partir.",
       "title": "Qui modère désormais ?"
     },

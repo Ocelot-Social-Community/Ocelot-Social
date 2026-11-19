@@ -303,6 +303,19 @@ describe('moderateVideoCallParticipant', () => {
     )
   })
 
+  it('is not for one removed, even while still connected and everybody moderates', async () => {
+    inCall('ute', 'udo')
+    const sessionId = await open('ute')
+    await setEveryoneModerates(database.driver, sessionId, true)
+    await markRemoved(database.driver, sessionId, 'udo')
+    as('udo')
+
+    expect(errorOf(await moderate('ute', 'MUTE_MICROPHONE'))).toBe(
+      'Only those taking part in the video call can moderate it.',
+    )
+    expect(room.mutePublishedTrack).not.toHaveBeenCalled()
+  })
+
   it('mutes, switches off and ends a share, and says who did it', async () => {
     inCall('ute', 'udo')
     await open('ute')
@@ -648,6 +661,22 @@ describe('handOverVideoCallModeration', () => {
 
     expect((await state())?.moderatorIds).toEqual(['udo'])
     expect(told()).toEqual([])
+  })
+
+  it('gives it to a revoked one named only if the giver may give it back', async () => {
+    inCall('ute', 'udo', 'adam')
+    const sessionId = await open('ute')
+    await setModerator(database.driver, sessionId, 'udo', { moderator: false, revoked: true })
+    as('ute')
+    await handOver({ toUserId: 'udo' })
+
+    expect(await state()).toMatchObject({ moderatorIds: ['adam'], revokedIds: ['udo'] })
+
+    // An admin, who may step into calls, can.
+    as('adam')
+    await handOver({ toUserId: 'udo' })
+
+    expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: [] })
   })
 
   it('passes over a revoked one, unless nobody else is there', async () => {

@@ -2045,7 +2045,7 @@
     "handover": {
       "confirm": "Przekaż i wyjdź",
       "skip": "Wyjdź bez wyboru",
-      "suggested": "propozycja",
+      "suggestedName": "{name} (propozycja)",
       "text": "Moderujesz tę rozmowę jako ostatni. Przekaż moderację, zanim wyjdziesz.",
       "title": "Kto teraz moderuje?"
     },

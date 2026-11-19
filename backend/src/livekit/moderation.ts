@@ -198,7 +198,12 @@ export const markRemoved = async (driver: Driver, sessionId: string, userId: str
   write(
     driver,
     `
-      MATCH (session:VideoCallSession { id: $sessionId })
+      // The group's lock, as joining the call's chat takes it (see joinCallSession): a join
+      // asked for before the removal cannot let them back into the chat after it.
+      MATCH (session:VideoCallSession { id: $sessionId })-[:CALL_IN]->(group:Group)
+      SET group.callSessionLock = true
+      REMOVE group.callSessionLock
+      WITH session
       MATCH (user:User { id: $userId })
       MERGE (user)-[:REMOVED_FROM_CALL]->(session)
       WITH user, session

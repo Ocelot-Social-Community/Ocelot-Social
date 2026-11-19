@@ -271,9 +271,16 @@ describe('poll tick', () => {
       { name: 'group-a', numParticipants: 2 },
       { name: 'group-b', numParticipants: 0 },
     ])
+    mockSettle.mockClear()
     await vi.advanceTimersByTimeAsync(15_000)
 
     expect(mockPublish).not.toHaveBeenCalled()
+    // The moderation is kept in step all the same, told what the room has published.
+    expect(mockSettle).toHaveBeenCalledTimes(1)
+    expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
+      published: '',
+      removeLeftovers: true,
+    })
   })
 
   it('publishes count: 0 for rooms that disappeared from the list', async () => {
@@ -523,12 +530,17 @@ describe('poll tick', () => {
 
     it('asks only for told rooms, and trusts the list for the others', async () => {
       startLiveKitPoller()
-      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 2 }])
+      mockListRooms.mockResolvedValueOnce([
+        { name: 'group-a', numParticipants: 2, metadata: '{"moderation":null}' },
+      ])
       await vi.advanceTimersByTimeAsync(5_000)
 
       expect(mockListParticipants).not.toHaveBeenCalled()
       // Somebody came: the moderation is checked for the room.
-      expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a')
+      expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
+        published: '{"moderation":null}',
+        removeLeftovers: true,
+      })
       expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
         groupId: 'a',
         count: 2,

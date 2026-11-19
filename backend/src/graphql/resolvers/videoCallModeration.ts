@@ -64,7 +64,9 @@ const callFor = async (context: Context, groupId: string) => {
   const connections = await connectionsOf(config, groupId)
   const present = presentUsers(connections)
   const state = present.includes(me.id) ? await readModeration(context.driver, groupId) : null
-  if (!state) {
+  // Removed, but still connected for a moment (or a device whose disconnecting failed): out of
+  // the call all the same.
+  if (!state || state.removedIds.includes(me.id)) {
     throw new AppError(Errors.VIDEO_CALL_MODERATION_NOT_IN_CALL)
   }
   return {
@@ -109,9 +111,17 @@ type Standing = Awaited<ReturnType<typeof standing>>
 
 type Call = Awaited<ReturnType<typeof callFor>>
 
+// Whether the caller may moderate any call in the group — and so give the moderation back to
+// somebody it was taken from.
+const mayModerateGroupCalls = async (context: Context, groupId: string) =>
+  ((await context.groupAuthorization.forGroup(groupId)) as GroupAuthorization).has(
+    'group.videoCall.moderate',
+  )
+
 // Gives the caller's moderation to somebody else in the call: the one named, if they are there,
 // else whom it would go to anyway (successorOf) — never back to the caller. Whoever had it taken
-// away is passed over while anybody else is left.
+// away is passed over while anybody else is left; named, they get it only from somebody who may
+// give it back to them (as with setVideoCallModerator).
 const handOn = async (
   context: Context,
   groupId: string,
@@ -121,19 +131,23 @@ const handOn = async (
   const me = userOf(context)
   const others = present.filter((userId) => userId !== me.id && !state.removedIds.includes(userId))
   const eligible = others.filter((userId) => !state.revokedIds.includes(userId))
-  const successor =
-    toUserId && others.includes(toUserId)
-      ? toUserId
-      : await successorOf(context.driver, groupId, eligible.length > 0 ? eligible : others)
-  if (successor && !state.moderatorIds.includes(successor)) {
-    await setModerator(context.driver, state.sessionId, successor, { moderator: true })
-    await notify(
-      client,
-      roomName,
-      { type: 'moderator', reason: 'handedOver', by: me.name },
-      identitiesOf(connections, [successor]),
-    )
+  const named =
+    !!toUserId &&
+    others.includes(toUserId) &&
+    (!state.revokedIds.includes(toUserId) || (await mayModerateGroupCalls(context, groupId)))
+  const successor = named
+    ? toUserId
+    : await successorOf(context.driver, groupId, eligible.length > 0 ? eligible : others)
+  if (!successor || state.moderatorIds.includes(successor)) {
+    return
   }
+  await setModerator(context.driver, state.sessionId, successor, { moderator: true })
+  await notify(
+    client,
+    roomName,
+    { type: 'moderator', reason: 'handedOver', by: me.name },
+    identitiesOf(connections, [successor]),
+  )
 }
 
 // Removing: never the owner; a moderator only by somebody above them; anybody else by somebody
@@ -330,8 +344,7 @@ export default {
         requireModerator(state, me.id)
       } else if (!state.moderatorIds.includes(me.id)) {
         // Whoever moderates only because everybody does cannot end that for the others.
-        const actor = (await context.groupAuthorization.forGroup(groupId)) as GroupAuthorization
-        if (!actor.has('group.videoCall.moderate')) {
+        if (!(await mayModerateGroupCalls(context, groupId))) {
           throw new AppError(Errors.VIDEO_CALL_MODERATION_NOT_MODERATOR)
         }
       }

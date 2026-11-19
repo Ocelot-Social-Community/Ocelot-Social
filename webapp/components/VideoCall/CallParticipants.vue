@@ -34,7 +34,7 @@
             variant="danger"
             size="sm"
             :loading="busy"
-            :disabled="muteCount === 0 && floorUnchanged"
+            :disabled="muteCount === 0"
             @click="muteAll"
           >
             {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
@@ -201,6 +201,7 @@
             { 'call-participants__floor--on': floor.includes(person.userId) },
           ]"
           :aria-pressed="floor.includes(person.userId) ? 'true' : 'false'"
+          :disabled="busy"
           :data-test="'mute-all-floor-' + person.userId"
           @click="toggleFloor(person.userId)"
         >
@@ -249,12 +250,16 @@
             </os-menu>
           </template>
         </dropdown>
-        <!-- Ticked: muted by "mute all"; whoever is not ticked is spared. -->
+        <!--
+          Ticked: muted by "mute all"; whoever is not ticked is spared. Whoever is given the floor
+          is spared: their tick is free again once the floor is taken back.
+        -->
         <input
           v-if="muting"
           type="checkbox"
           class="call-participants__pick"
           :checked="!spared.includes(person.userId)"
+          :disabled="floor.includes(person.userId)"
           :aria-label="$t('videoCall.participants.muteName', { name: person.name })"
           :data-test="'mute-all-pick-' + person.userId"
           @change="spare(person.userId, !$event.target.checked)"
@@ -417,11 +422,6 @@ export default {
           !this.spared.includes(person.userId) &&
           !this.floor.includes(person.userId),
       ).length
-    },
-    floorUnchanged() {
-      const before = [...this.moderation.speakers].sort()
-      const after = [...this.floor].sort()
-      return before.length === after.length && before.every((id, i) => id === after[i])
     },
   },
   watch: {
@@ -745,13 +745,14 @@ export default {
     },
     // Spared from the start: oneself, and those with the floor; without anybody given the
     // floor, whoever is speaking right now — the one a moderator usually wants to go on.
+    // Those with the floor are spared only for it: taking it back ticks them at once.
     openMuteAll() {
       this.floor = [...this.moderation.speakers]
       const speaking = this.floor.length
         ? []
         : this.people.filter((person) => person.speaking && !person.isMe).map((p) => p.userId)
       this.spared = [this.meId, ...this.floor, ...speaking].filter(Boolean)
-      this.sparedForFloor = []
+      this.sparedForFloor = this.floor.filter((id) => id !== this.meId)
       this.muting = true
     },
     stopMuting() {
@@ -760,10 +761,13 @@ export default {
     spare(userId, spared) {
       this.spared = spared ? [...this.spared, userId] : this.spared.filter((id) => id !== userId)
     },
-    // Giving the floor spares; taking it back unticks again whoever was ticked only by giving
-    // it, and leaves a tick set before.
-    toggleFloor(userId) {
-      if (this.floor.includes(userId)) {
+    // Giving or taking back the floor counts at once, not only with "mute all". Giving it
+    // spares; taking it back unticks again whoever was ticked only by giving it, and leaves a
+    // tick set before.
+    async toggleFloor(userId) {
+      const giving = !this.floor.includes(userId)
+      if (!(await this.mutate(setVideoCallFloorMutation(), { userId, floor: giving }))) return
+      if (!giving) {
         this.floor = this.floor.filter((id) => id !== userId)
         if (this.sparedForFloor.includes(userId)) {
           this.spared = this.spared.filter((id) => id !== userId)
@@ -778,13 +782,16 @@ export default {
       }
     },
     async muteAll() {
+      // What was sent counts, not what is ticked while it is on its way.
+      const spared = [...this.spared]
+      const floor = [...this.floor]
       const done = await this.mutate(muteAllInVideoCallMutation(), {
-        exceptUserIds: this.spared,
-        floorUserIds: this.floor,
+        exceptUserIds: spared,
+        floorUserIds: floor,
       })
       if (!done) return
       // Muted along with the others: the own button follows, as nobody tells us about ourselves.
-      if (!this.spared.includes(this.meId) && !this.floor.includes(this.meId)) {
+      if (!spared.includes(this.meId) && !floor.includes(this.meId)) {
         this.$emit('switch-off', 'mic')
       }
       this.stopMuting()

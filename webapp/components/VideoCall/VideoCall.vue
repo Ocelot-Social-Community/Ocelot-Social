@@ -354,6 +354,7 @@
           </div>
           <aside
             v-if="showChatSidebar"
+            id="video-call-sidebar"
             class="video-call__sidebar"
             :style="sidebarStyle"
             :aria-label="$t('videoCall.openChat')"
@@ -372,6 +373,8 @@
               data-test="video-call-sidebar-resizer"
               :aria-orientation="mobileChatOpen ? 'horizontal' : 'vertical'"
               :aria-label="$t('videoCall.resizeSidebar')"
+              aria-controls="video-call-sidebar"
+              :aria-valuemin="mobileChatOpen ? 200 : sidebarMinWidth"
               :aria-valuenow="mobileChatOpen ? sidebarHeight : sidebarWidth"
               @pointerdown="startSidebarResize"
               @dblclick="resetSidebarSize"
@@ -664,7 +667,7 @@
             >
               {{
                 person.userId === handover.suggested
-                  ? `${person.name} (${$t('videoCall.handover.suggested')})`
+                  ? $t('videoCall.handover.suggestedName', { name: person.name })
                   : person.name
               }}
             </option>
@@ -1111,6 +1114,9 @@ export default {
     },
     // On a phone there is no room for the chat beside the videos: it goes below,
     // and the stage shrinks to one small tile, the person speaking.
+    sidebarMinWidth() {
+      return SIDEBAR_MIN_WIDTH
+    },
     mobileChatOpen() {
       return this.isMobile && this.showChatSidebar
     },
@@ -1933,6 +1939,9 @@ export default {
     // corner, where it was parked.
     spotlightPerson(userId) {
       if (this.minimized && !this.isMobile) this.toggleMinimize()
+      // On a phone the open list keeps the stage to one tile, the one speaking: closed, the
+      // person shows.
+      if (this.isMobile && this.participantsShown) this.closeInCallChat()
       const tile = this.tiles.find(
         (candidate) =>
           !candidate.isScreen &&
@@ -1952,7 +1961,14 @@ export default {
       for (const participant of room.remoteParticipants.values()) {
         const userId = this.userIdOfParticipant(participant)
         if (typeof participant.setVolume === 'function') {
-          participant.setVolume(this.locallyMuted[userId] ? 0 : 1)
+          const volume = this.locallyMuted[userId] ? 0 : 1
+          // The sound of a shared screen is theirs too.
+          if (this.Track) {
+            participant.setVolume(volume, this.Track.Source.Microphone)
+            participant.setVolume(volume, this.Track.Source.ScreenShareAudio)
+          } else {
+            participant.setVolume(volume)
+          }
         }
       }
     },
@@ -2030,6 +2046,8 @@ export default {
     askForMicrophone(by) {
       if (!this.$toast || typeof this.$toast.info !== 'function') return
       const label = escapeHtml(this.$t('videoCall.moderation.switchMicOn'))
+      // Only for the call that asked: in one joined since, it would open the microphone there.
+      const room = this.room
       this.$toast.info(this.$t('videoCall.moderation.floorMicOff', { name: by }), '', {
         timeout: FLOOR_TOAST_TIMEOUT,
         buttons: [
@@ -2037,7 +2055,7 @@ export default {
             `<button type="button">${label}</button>`,
             (instance, toast) => {
               instance.hide({}, toast, 'button')
-              if (!this.micEnabled) this.toggleMic()
+              if (this.room === room && !this.micEnabled) this.toggleMic()
             },
             true,
           ],
@@ -2054,7 +2072,10 @@ export default {
       try {
         if (kind === 'mic') {
           this.micEnabled = false
-          if (local) await local.setMicrophoneEnabled(false)
+          // While a dtx switch has the microphone unpublished, LiveKit finds nothing to mute and
+          // the track would go out again open: muted on the track itself, as toggleMic does.
+          if (this.dtxSwitch && this.dtxTrack) await this.dtxTrack.mute()
+          else if (local) await local.setMicrophoneEnabled(false)
         } else if (kind === 'camera') {
           this.cameraEnabled = false
           if (local) await local.setCameraEnabled(false)
@@ -2078,6 +2099,9 @@ export default {
     async loadModerationPermission() {
       this.mayTakeOverModeration = false
       if (!this.groupId) return
+      // An answer for a call left meanwhile is not this one's.
+      const room = this.room
+      const groupId = this.groupId
       try {
         const {
           data: { Group },
@@ -2086,6 +2110,7 @@ export default {
           variables: { id: this.groupId },
           fetchPolicy: 'no-cache',
         })
+        if (this.room !== room || this.groupId !== groupId) return
         const permissions = (Group && Group[0] && Group[0].myGroupPermissions) || []
         this.mayTakeOverModeration = permissions.includes('group.videoCall.moderate')
       } catch (_e) {
@@ -2106,6 +2131,7 @@ export default {
         await this.leave()
         return
       }
+      const room = this.room
       let suggested = null
       try {
         const {
@@ -2119,16 +2145,25 @@ export default {
       } catch (_e) {
         /* no suggestion: the first of the others is picked */
       }
-      const fallback = this.handoverCandidates[0].userId
+      // Meanwhile the call may be over, or everybody else gone.
+      if (this.room !== room) return
+      const candidates = this.handoverCandidates
+      if (candidates.length === 0) {
+        await this.leave()
+        return
+      }
+      if (!candidates.some((person) => person.userId === suggested)) suggested = null
       this.handover = {
         suggested,
-        choice: suggested || fallback,
+        choice: suggested || candidates[0].userId,
         busy: false,
       }
     },
     async leaveAfterHandover(choice) {
       if (!this.handover) return
-      this.handover.busy = true
+      const room = this.room
+      const dialog = this.handover
+      dialog.busy = true
       try {
         await this.$apollo.mutate({
           mutation: handOverVideoCallModerationMutation(),
@@ -2141,7 +2176,9 @@ export default {
       } catch (_e) {
         // Leaving is what was asked for; the server hands the moderation on by itself then.
       }
-      this.handover = null
+      if (this.handover === dialog) this.handover = null
+      // A call joined meanwhile is not the one to leave.
+      if (this.room !== room) return
       await this.leave()
     },
     // --- The sidebar's size ---------------------------------------------------------------
@@ -2682,10 +2719,15 @@ export default {
           if (this.room === room) this.applyRoomMetadata(metadata)
         })
         // What the moderation did to us comes from the server, not from a participant.
-        room.on(RoomEvent.DataReceived, (payload, participant, _kind, topic) => {
-          if (this.room !== room || participant || topic !== 'moderation') return
-          this.onModerationNotice(payload)
-        })
+        // Without a sender: a participant's packet that comes before its sender is known has no
+        // participant object either, but its identity.
+        room.on(
+          RoomEvent.DataReceived,
+          (payload, participant, _kind, topic, _encryption, sender) => {
+            if (this.room !== room || participant || sender || topic !== 'moderation') return
+            this.onModerationNotice(payload)
+          },
+        )
 
         // LiveKit plays remote audio through the <audio> elements the tiles
         // attach. When the browser's autoplay policy rejects play() — Safari

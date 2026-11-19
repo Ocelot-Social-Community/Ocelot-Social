@@ -2045,7 +2045,7 @@
     "handover": {
       "confirm": "Weitergeben und verlassen",
       "skip": "Ohne Auswahl verlassen",
-      "suggested": "Vorschlag",
+      "suggestedName": "{name} (Vorschlag)",
       "text": "Du moderierst diesen Anruf als Letzter. Gib die Moderation weiter, bevor du gehst.",
       "title": "Wer moderiert ab jetzt?"
     },

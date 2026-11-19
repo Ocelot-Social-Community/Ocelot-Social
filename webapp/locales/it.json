@@ -2045,7 +2045,7 @@
     "handover": {
       "confirm": "Passa ed esci",
       "skip": "Esci senza scegliere",
-      "suggested": "suggerimento",
+      "suggestedName": "{name} (suggerimento)",
       "text": "Sei l’ultimo a moderare questa chiamata. Passa la moderazione prima di uscire.",
       "title": "Chi modera d’ora in poi?"
     },

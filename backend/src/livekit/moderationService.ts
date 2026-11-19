@@ -1,17 +1,20 @@
 // Keeping a call's moderation in step with who is in it, and telling the participants.
 //
 // Called whenever the moderation may have changed: after every act of moderation, when somebody
-// joins the call's chat (which is when a session opens), and by the poller when the number of
-// people in a room changes — the one place that notices a moderator who has simply gone.
+// joins the call's chat (which is when a session opens), and by the poller on every poll of a room
+// with people in it — the one place that notices a moderator who has simply gone, and that puts
+// right what an act of moderation left undone.
 import { TwirpError } from 'livekit-server-sdk'
 
 import {
   identitiesOf,
   listConnections,
+  moderationMetadata,
   notify,
   presentUsers,
   publishModeration,
   readModeration,
+  removeConnections,
   settleModeration,
 } from '@src/livekit/moderation'
 import { liveKitConfigOf, roomNameForGroup, roomServiceFor, userIdOf } from '@src/livekit/rooms'
@@ -41,14 +44,29 @@ export const connectionsOf = async (
   }
 }
 
+interface Upkeep {
+  /**
+   * The metadata the room has now, as the media server listed it. Given, the state is published
+   * only if it differs — the poller asks on every poll, and every publish reaches every
+   * participant.
+   */
+  published?: string
+  /**
+   * Disconnects whoever was removed from the call and is still in it: a removal whose
+   * disconnecting failed for one of their devices is finished this way.
+   */
+  removeLeftovers?: boolean
+}
+
 /**
  * Makes sure the group's running call has a moderator (see settleModeration), hands the state to
  * the media server for every participant, and tells whoever was made a moderator. Never throws:
- * the moderation in the database stands either way, and the next change publishes it again.
+ * the moderation in the database stands either way, and the next poll publishes it again.
  */
 export const settleAndPublishModeration = async (
   { driver, config: rawConfig }: Dependencies,
   groupId: string,
+  { published, removeLeftovers = false }: Upkeep = {},
 ): Promise<void> => {
   const config = liveKitConfigOf(rawConfig)
   if (!config) {
@@ -62,7 +80,12 @@ export const settleAndPublishModeration = async (
     const client = roomServiceFor(config)
     const roomName = roomNameForGroup(groupId)
     const appointed = await settleModeration(driver, groupId, presentUsers(connections))
-    await publishModeration(client, roomName, await readModeration(driver, groupId))
+    const state = await readModeration(driver, groupId)
+    // Published again even when the state is unchanged: two backends acting on the same call at
+    // once can publish in the wrong order, and the older state would otherwise stay.
+    if (published === undefined || moderationMetadata(state) !== published) {
+      await publishModeration(client, roomName, state)
+    }
     if (appointed) {
       await notify(
         client,
@@ -70,6 +93,12 @@ export const settleAndPublishModeration = async (
         { type: 'moderator', reason: 'automatic' },
         identitiesOf(connections, [appointed]),
       )
+    }
+    const leftovers = connections.filter(
+      (connection) => connection.userId && state?.removedIds.includes(connection.userId),
+    )
+    if (removeLeftovers && leftovers.length > 0) {
+      await removeConnections(client, roomName, leftovers)
     }
     // eslint-disable-next-line no-catch-all/no-catch-all
   } catch (err: unknown) {

@@ -136,16 +136,19 @@ export const joinCallSession = async (
         )
         sessionId = created.records[0].get('id') as string
       }
+      // Whoever was removed from the call is not let back into its chat (see markRemoved).
       const joined = await transaction.run(
         `
-          MATCH (room:Room)-[:ROOM_FOR]->(:VideoCallSession { id: $sessionId })
+          MATCH (room:Room)-[:ROOM_FOR]->(session:VideoCallSession { id: $sessionId })
           MATCH (user:User { id: $userId })
+          WHERE NOT (user)-[:REMOVED_FROM_CALL]->(session)
           MERGE (user)-[:CHATS_IN]->(room)
           RETURN room.id AS roomId
         `,
         { sessionId, userId },
       )
-      /* v8 ignore next -- unreachable: the lock above has found the user, and a session always has its room */
+      // No row for whoever was removed; the lock above has found the user, and a session always
+      // has its room.
       return (joined.records[0]?.get('roomId') as string | undefined) ?? null
     })
   } finally {
