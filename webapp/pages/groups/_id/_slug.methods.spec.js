@@ -76,15 +76,22 @@ describe('pages/groups/_id/_slug.vue — methods', () => {
       next({
         data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 2, removed: true } },
       })
-      // The first answer, older than the push, arrives after it.
+      // The first answer, older than the push, arrives after it: vue-apollo takes its count
+      // through update, then calls result.
       query.loading = false
-      apollo.videoCallParticipantCount.result.call(ctx, { data: { videoCallRemoved: false } })
+      const stale = { videoCallParticipantCount: 0, videoCallRemoved: false }
+      ctx.videoCallParticipantCount = apollo.videoCallParticipantCount.update.call(ctx, stale)
+      apollo.videoCallParticipantCount.result.call(ctx, { data: stale })
       expect(ctx.refetchVideoCallParticipantCount).toHaveBeenCalledTimes(1)
       expect(ctx.reloadVideoCallCountAfterLoad).toBe(false)
-      // That second answer includes the push, and asks for nothing more.
-      apollo.videoCallParticipantCount.result.call(ctx, { data: { videoCallRemoved: true } })
+      // The pushed state stays while asking again — and so if that fails.
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 2, videoCallRemoved: true })
+      // That second answer includes the push, is taken, and asks for nothing more.
+      const fresh = { videoCallParticipantCount: 3, videoCallRemoved: true }
+      ctx.videoCallParticipantCount = apollo.videoCallParticipantCount.update.call(ctx, fresh)
+      apollo.videoCallParticipantCount.result.call(ctx, { data: fresh })
       expect(ctx.refetchVideoCallParticipantCount).toHaveBeenCalledTimes(1)
-      expect(ctx.videoCallRemoved).toBe(true)
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 3, videoCallRemoved: true })
     })
 
     it('follows every count pushed, and is forgotten with the subscription', () => {

@@ -979,14 +979,19 @@ export default {
         return { groupId: this.$route.params.id }
       },
       update({ videoCallParticipantCount }) {
+        // An answer older than a count pushed meanwhile is not taken (see result).
+        if (this.reloadVideoCallCountAfterLoad) return this.videoCallParticipantCount
         return videoCallParticipantCount || 0
       },
       result({ data }) {
-        this.videoCallRemoved = !!(data && data.videoCallRemoved)
         if (this.reloadVideoCallCountAfterLoad) {
+          // Older than the push: neither its count nor its removal is taken, the pushed ones
+          // stay — also should asking again fail.
           this.reloadVideoCallCountAfterLoad = false
           this.refetchVideoCallParticipantCount()
+          return
         }
+        this.videoCallRemoved = !!(data && data.videoCallRemoved)
       },
       skip() {
         return !this.canShowVideoCallButton || !this.$route.params.id

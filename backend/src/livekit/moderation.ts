@@ -204,10 +204,18 @@ export const markRemoved = async (driver: Driver, sessionId: string, userId: str
     `
       // The group's lock, as joining the call's chat takes it (see joinCallSession): a join
       // asked for before the removal cannot let them back into the chat after it.
-      MATCH (session:VideoCallSession { id: $sessionId })-[:CALL_IN]->(group:Group)
+      MATCH (read:VideoCallSession { id: $sessionId })-[:CALL_IN]->(group:Group)
       SET group.callSessionLock = true
       REMOVE group.callSessionLock
-      WITH session
+      // A new chat may have started in the same media-server room since the session was read
+      // (see joinCallSession). It is the same call, so the removal goes to that session too —
+      // where it was written to the ended one alone, the new chat would let them back in.
+      WITH read, group
+      OPTIONAL MATCH (current:VideoCallSession)-[:CALL_IN]->(group)
+        WHERE current.endedAt IS NULL AND current.livekitSid = read.livekitSid
+          AND current <> read
+      WITH [read] + collect(current) AS sessions
+      UNWIND sessions AS session
       MATCH (user:User { id: $userId })
       MERGE (user)-[:REMOVED_FROM_CALL]->(session)
       WITH user, session

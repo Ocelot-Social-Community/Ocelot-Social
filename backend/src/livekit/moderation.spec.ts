@@ -221,6 +221,19 @@ describe(markRemoved, () => {
     expect(Number(chats.records[0].get('n'))).toBe(0)
   })
 
+  it('reaches a new chat started in the same room after the session was read', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    // Meanwhile all seem gone to the media server, and Adam starts a new chat in the room.
+    await open('adam')
+    await markRemoved(driver, sessionId, 'udo')
+
+    expect(await state()).toMatchObject({ removedIds: ['udo'] })
+    expect(sessionId).not.toBe((await state()).sessionId)
+    expect(await open('udo', ['adam', 'udo'])).toBeNull()
+  })
+
   it('lets them into the next call, a media-server room of another sid', async () => {
     await open('ute')
     await open('udo', ['ute', 'udo'])
