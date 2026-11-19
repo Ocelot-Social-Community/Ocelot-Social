@@ -954,6 +954,15 @@ describe('Editor.vue', () => {
         })
       })
 
+      it('does nothing with the link input once the editor is destroyed', () => {
+        const focus = jest.spyOn(wrapper.vm.editor, 'focus')
+        const { vm } = wrapper
+        wrapper.destroy()
+        // the focused input's blur on removal
+        expect(() => vm.toggleLinkInput()).not.toThrow()
+        expect(focus).not.toHaveBeenCalled()
+      })
+
       it('measures the end of a selection on the selected side of a wrap point', () => {
         const { view } = wrapper.vm.editor
         const sides = []

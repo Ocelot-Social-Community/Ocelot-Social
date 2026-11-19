@@ -242,6 +242,9 @@ export default {
     this.editor.view.dom.addEventListener('mouseout', this.hideUnfinishedTooltip)
   },
   beforeDestroy() {
+    // Removing the focused link input fires its blur, which closes the input and would focus the
+    // editor and bring a suggestion list back after the teardown: see toggleLinkInput.
+    this._isDestroying = true
     this.editor.view.dom.removeEventListener('mouseover', this.showUnfinishedTooltip)
     this.editor.view.dom.removeEventListener('mouseout', this.hideUnfinishedTooltip)
     this.hideUnfinishedTooltip()
@@ -571,6 +574,7 @@ export default {
       this.linkUrl = null
     },
     toggleLinkInput(attrs, element) {
+      if (this._isDestroying) return
       // Opening the link input, by the shortcut or by the toolbar button, while a mention or
       // hashtag list is open (or suspended because the focus left for the button): the list steps
       // aside and comes back when the input closes, whichever way it was opened.
