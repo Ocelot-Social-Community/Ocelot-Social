@@ -7611,8 +7611,12 @@ describe('VideoCall — the people in the call and their moderation', () => {
       // A range a screen reader can place the handle in, in the same units.
       wrapper.setData({ sidebarWidth: 300 })
       await wrapper.vm.$nextTick()
-      expect(Number(handle.attributes('aria-valuemax'))).toBeGreaterThanOrEqual(280)
-      expect(handle.attributes('aria-valuenow')).toBe('300')
+      const [min, max, now] = ['aria-valuemin', 'aria-valuemax', 'aria-valuenow'].map((name) =>
+        Number(handle.attributes(name)),
+      )
+      expect(max).toBeGreaterThanOrEqual(min)
+      expect(now).toBeGreaterThanOrEqual(min)
+      expect(now).toBeLessThanOrEqual(max)
     })
   })
 
@@ -7661,6 +7665,9 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(wrapper.vm.sidebarBounds()).toEqual({ min: 280, max: 500 })
       // Not pulled: where the stylesheet put it.
       expect(wrapper.vm.sidebarValueNow()).toBe(360)
+      // Remembered on a larger window: as far as it goes in this one, as it is shown.
+      wrapper.setData({ sidebarWidth: 600 })
+      expect(wrapper.vm.sidebarValueNow()).toBe(500)
       const below = {
         mobileChatOpen: true,
         $el: wrapper.vm.$el,

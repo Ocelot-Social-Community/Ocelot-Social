@@ -2292,10 +2292,11 @@ export default {
       return Math.round(Math.min(Math.max(size, min), max))
     },
     // Where the separator stands, for a screen reader, in the units of its bounds: as pulled,
-    // or as the stylesheet sized it.
+    // or as the stylesheet sized it — within the bounds, as it is shown; a size remembered on a
+    // larger window is capped there (sidebarStyle).
     sidebarValueNow() {
       const pulled = this.mobileChatOpen ? this.sidebarHeight : this.sidebarWidth
-      return Math.round(pulled || this.currentSidebarSize())
+      return this.clampSidebarSize(pulled || this.currentSidebarSize())
     },
     currentSidebarSize() {
       const sidebar = this.$el && this.$el.querySelector('.video-call__sidebar')

@@ -810,15 +810,18 @@ describe('CallParticipants', () => {
       expect(wrapper.vm.muting).toBe(false)
     })
 
-    it('switches off the own microphone too when oneself is not spared', async () => {
+    it('leaves the own microphone to the server, which may have spared one meanwhile', async () => {
+      // Ticked to be muted, then given the floor by another moderator before the request
+      // arrives: the server spares them, and tells their devices only when it does mute them.
       wrapper = Wrapper({ moderation: moderatedByMe })
       wrapper.vm.openMuteAll()
       wrapper.vm.spared = []
       await wrapper.vm.muteAll()
-      expect(wrapper.emitted('switch-off')).toEqual([['mic']])
+      expect(sent()).toEqual([{ mutation: 'muteAllInVideoCall', groupId: 'g1', exceptUserIds: [] }])
+      expect(wrapper.emitted('switch-off')).toBeUndefined()
     })
 
-    it('decides about the own microphone by what was sent, not by what is ticked meanwhile', async () => {
+    it('sends what was ticked when asked, not what is ticked meanwhile', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       wrapper.vm.openMuteAll()
       mocks.$apollo.mutate.mockImplementationOnce(async () => {
@@ -827,7 +830,6 @@ describe('CallParticipants', () => {
       })
       await wrapper.vm.muteAll()
       expect(mocks.$apollo.mutate.mock.calls[0][0].variables.exceptUserIds).toContain('me')
-      expect(wrapper.emitted('switch-off')).toBeUndefined()
     })
 
     it('keeps the tick of whoever is given the floor locked until it is taken back', async () => {

@@ -865,14 +865,13 @@ export default {
       // What was sent counts, not what is ticked while it is on its way. Who has the floor is
       // not sent: the server spares whoever has it when the request arrives, as given and taken
       // at once (toggleFloor) — by this moderator or by another one meanwhile.
-      const spared = [...this.spared]
-      const floor = [...this.floor]
-      const done = await this.mutate(muteAllInVideoCallMutation(), { exceptUserIds: spared })
+      // Whether oneself is muted along with the others is the server's to say, too: given the
+      // floor meanwhile, one is spared. It tells one's own devices as it tells everybody else's,
+      // and the buttons follow (VideoCall: microphoneMuted, self).
+      const done = await this.mutate(muteAllInVideoCallMutation(), {
+        exceptUserIds: [...this.spared],
+      })
       if (!done) return
-      // Muted along with the others: the own button follows, as nobody tells us about ourselves.
-      if (!spared.includes(this.meId) && !floor.includes(this.meId)) {
-        this.$emit('switch-off', 'mic')
-      }
       this.stopMuting()
     },
     closeDialog() {
