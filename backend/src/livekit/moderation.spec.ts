@@ -109,6 +109,7 @@ describe(readModeration, () => {
       speakerIds: [],
       revokedIds: [],
       removedIds: [],
+      revision: 0,
     })
   })
 })
@@ -160,22 +161,28 @@ describe(setModerator, () => {
   })
 })
 
-// Takes the moderation from `userId` just before the next write of the moderation, after
-// whatever was read before it: as a moderator revoking it at that very moment would.
-const revokeBeforeNextWrite = (userId: string) => {
+// Runs `meanwhile` just before the next write of the moderation, after whatever was read before:
+// as another moderator acting at that very moment would.
+const beforeNextWrite = (meanwhile: (sessionId: string) => Promise<void>) => {
   const real = driver.session.bind(driver)
   const spy = vi.spyOn(driver, 'session')
-  // Reading goes through; the first write finds the revocation made just before it.
+  // Reading goes through; the first write finds what was done just before it.
   spy.mockImplementation((...args) => {
     const session = real(...args)
     const writeTransaction = session.writeTransaction.bind(session)
     session.writeTransaction = (async (work: Parameters<typeof writeTransaction>[0]) => {
       spy.mockRestore()
-      const { sessionId } = await state()
-      await setModerator(driver, sessionId, userId, { moderator: false, revoked: true })
+      await meanwhile((await state()).sessionId)
       return writeTransaction(work)
     }) as typeof session.writeTransaction
     return session
+  })
+}
+
+// Takes the moderation from `userId` that way.
+const revokeBeforeNextWrite = (userId: string) => {
+  beforeNextWrite(async (sessionId) => {
+    await setModerator(driver, sessionId, userId, { moderator: false, revoked: true })
   })
 }
 
@@ -365,9 +372,9 @@ describe(settleModeration, () => {
     await run(`MATCH (:User { id: 'ute' })-[m:MODERATES_CALL]->() DELETE m`)
     revokeBeforeNextWrite('ute')
 
-    // Read anew, the starter is passed over for whoever else is there.
-    expect(await settleModeration(driver, 'g1', ['ute', 'udo'])).toBe('udo')
-    expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: ['ute'] })
+    // Nobody now: the next settling, with whoever is there by then, decides.
+    expect(await settleModeration(driver, 'g1', ['ute', 'udo'])).toBeNull()
+    expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['ute'] })
   })
 
   it('does not give a successor back what was taken from them after the state was read', async () => {
@@ -375,8 +382,55 @@ describe(settleModeration, () => {
     await setModerator(driver, (await state()).sessionId, 'ute', { moderator: false })
     revokeBeforeNextWrite('adam')
 
+    expect(await settleModeration(driver, 'g1', ['adam', 'udo'])).toBeNull()
+    expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['adam'] })
+    // The next settling finds the revocation and passes them over.
     expect(await settleModeration(driver, 'g1', ['adam', 'udo'])).toBe('udo')
-    expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: ['adam'] })
+  })
+
+  it('does not give a revoked one back what was given and taken again after the state was read', async () => {
+    await open('ute')
+    const { sessionId } = await state()
+    await setModerator(driver, sessionId, 'udo', { moderator: false, revoked: true })
+    await setModerator(driver, sessionId, 'ute', { moderator: false })
+    // Udo alone is there and would get it back; meanwhile Olga comes in, gives it back to him
+    // and takes it again.
+    beforeNextWrite(async (current) => {
+      await setModerator(driver, current, 'olga', { moderator: true, restore: true })
+      await setModerator(driver, current, 'udo', { moderator: true, restore: true })
+      await setModerator(driver, current, 'udo', { moderator: false, revoked: true })
+    })
+
+    expect(await settleModeration(driver, 'g1', ['udo'])).toBeNull()
+    expect(await state()).toMatchObject({ moderatorIds: ['olga'], revokedIds: ['udo'] })
+  })
+
+  it('counts every change of the moderation', async () => {
+    await open('ute')
+    const { sessionId } = await state()
+    await setModerator(driver, sessionId, 'udo', { moderator: true })
+    await setModerator(driver, sessionId, 'udo', { moderator: false, revoked: true })
+    // Refused: no change, nothing counted.
+    await setModerator(driver, sessionId, 'udo', { moderator: true })
+
+    expect((await state()).revision).toBe(2)
+    expect(
+      await setModerator(driver, sessionId, 'udo', {
+        moderator: true,
+        restore: { unchangedSince: 1 },
+      }),
+    ).toBe(false)
+    expect(
+      await setModerator(driver, sessionId, 'udo', {
+        moderator: true,
+        restore: { unchangedSince: 2 },
+      }),
+    ).toBe(true)
+    expect(await state()).toMatchObject({
+      moderatorIds: ['udo', 'ute'],
+      revokedIds: [],
+      revision: 3,
+    })
   })
 
   it('finds nobody in an empty call', async () => {

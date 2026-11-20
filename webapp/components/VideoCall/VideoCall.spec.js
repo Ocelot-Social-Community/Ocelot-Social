@@ -1481,6 +1481,29 @@ describe('VideoCall', () => {
       expect(sync).not.toHaveBeenCalled()
     })
 
+    it('stays off and switches on again when our own mute reports itself before it is done', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      await wrapper.vm.connect()
+      const room = wrapper.vm.room
+      const { Track } = jest.requireMock('livekit-client')
+      const local = room.localParticipant
+      // As LiveKit does: the track reports itself muted while setMicrophoneEnabled is still on
+      // its way, before the button has changed.
+      local.setMicrophoneEnabled.mockImplementation(async (enabled) => {
+        if (!enabled) room.handlers.TrackMuted({ source: Track.Source.Microphone }, local)
+      })
+      wrapper.vm.micEnabled = true
+      await wrapper.vm.toggleMic()
+      await flushPromises()
+      expect(wrapper.vm.micEnabled).toBe(false)
+      expect(wrapper.vm.micProblem).toBe(false)
+      await wrapper.vm.toggleMic()
+      await flushPromises()
+      expect(wrapper.vm.micEnabled).toBe(true)
+      expect(local.setMicrophoneEnabled).toHaveBeenLastCalledWith(true)
+    })
+
     it('holds the speaking highlight across the pauses between words', () => {
       jest.useFakeTimers()
       const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })

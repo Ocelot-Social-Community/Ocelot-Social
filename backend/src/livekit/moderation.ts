@@ -48,6 +48,11 @@ export interface ModerationState {
   speakerIds: string[]
   revokedIds: string[]
   removedIds: string[]
+  /**
+   * Counts every change of who moderates or lost it (setModerator), so a write can tell whether
+   * anything changed since this state was read — also a change that was undone again.
+   */
+  revision: number
 }
 
 /** Whether the user moderates the call: named as a moderator, or everybody does. */
@@ -80,7 +85,8 @@ export const readModeration = async (
                  [(user:User)-[:MODERATES_CALL]->(session) | user.id] AS moderatorIds,
                  [(user:User)-[:HAS_CALL_FLOOR]->(session) | user.id] AS speakerIds,
                  [(user:User)-[:LOST_CALL_MODERATION]->(session) | user.id] AS revokedIds,
-                 [(user:User)-[:REMOVED_FROM_CALL]->(session) | user.id] AS removedIds
+                 [(user:User)-[:REMOVED_FROM_CALL]->(session) | user.id] AS removedIds,
+                 coalesce(session.moderationRevision, 0) AS revision
         `,
         { groupId },
       ),
@@ -99,6 +105,7 @@ export const readModeration = async (
       speakerIds: [...(record.get('speakerIds') as string[])].sort(),
       revokedIds: [...(record.get('revokedIds') as string[])].sort(),
       removedIds: [...(record.get('removedIds') as string[])].sort(),
+      revision: Number(record.get('revision')),
     }
   } finally {
     await session.close()
@@ -123,6 +130,10 @@ const write = async (driver: Driver, query: string, variables: Record<string, un
  * whether it was taken is asked when writing, not of a state read before. A revocation made
  * meanwhile then holds, also against an appointment decided on the earlier state. Returns
  * whether the user moderates now (for taking it away: always true).
+ *
+ * `restore: true` is for whoever may give it back in any case. `restore: { unchangedSince }`
+ * gives it back only if the moderation has not changed since the state of that `revision` was
+ * read — for a decision that holds only for that state (see settleModeration).
  */
 export const setModerator = async (
   driver: Driver,
@@ -132,7 +143,11 @@ export const setModerator = async (
     moderator,
     revoked = false,
     restore = false,
-  }: { moderator: boolean; revoked?: boolean; restore?: boolean },
+  }: {
+    moderator: boolean
+    revoked?: boolean
+    restore?: boolean | { unchangedSince: number }
+  },
 ): Promise<boolean> => {
   const session = driver.session()
   try {
@@ -153,6 +168,8 @@ export const setModerator = async (
           `
             MATCH (session:VideoCallSession { id: $sessionId })
             MATCH (user:User { id: $userId })
+            SET session.moderationRevision = coalesce(session.moderationRevision, 0) + 1
+            WITH user, session
             OPTIONAL MATCH (user)-[moderation:MODERATES_CALL]->(session)
             DELETE moderation
             WITH user, session
@@ -170,15 +187,24 @@ export const setModerator = async (
         `
           MATCH (session:VideoCallSession { id: $sessionId })
           MATCH (user:User { id: $userId })
-          WHERE $restore OR NOT (user)-[:LOST_CALL_MODERATION]->(session)
+          WHERE $restore = true
+             OR NOT (user)-[:LOST_CALL_MODERATION]->(session)
+             OR coalesce(session.moderationRevision, 0) = $unchangedSince
           MERGE (user)-[:MODERATES_CALL]->(session)
           WITH user, session
           OPTIONAL MATCH (user)-[revocation:LOST_CALL_MODERATION]->(session)
           DELETE revocation
-          WITH DISTINCT user
+          WITH DISTINCT user, session
+          SET session.moderationRevision = coalesce(session.moderationRevision, 0) + 1
           RETURN count(user) AS appointed
         `,
-        { sessionId, userId, restore },
+        {
+          sessionId,
+          userId,
+          restore: restore === true,
+          // No revision is negative: without one, this never matches.
+          unchangedSince: typeof restore === 'object' ? restore.unchangedSince : -1,
+        },
       )
       return Number(appointed.records[0].get('appointed')) > 0
     })
@@ -367,11 +393,11 @@ export const settleModeration = async (
     !state.moderatorIds.includes(state.starterId) &&
     present.includes(state.starterId)
   ) {
-    // Had it taken away meanwhile: then the state is read anew, and that counts.
-    if (await setModerator(driver, state.sessionId, state.starterId, { moderator: true })) {
-      return state.starterId
-    }
-    return settleModeration(driver, groupId, presentUserIds)
+    // Had it taken away meanwhile: nothing now (see below).
+    const restored = await setModerator(driver, state.sessionId, state.starterId, {
+      moderator: true,
+    })
+    return restored ? state.starterId : null
   }
   if (present.some((userId) => state.moderatorIds.includes(userId))) {
     return null
@@ -381,16 +407,17 @@ export const settleModeration = async (
   if (!successor) {
     return null
   }
-  // Somebody it was taken from gets it back only when nobody else is left.
-  if (
-    await setModerator(driver, state.sessionId, successor, {
-      moderator: true,
-      restore: eligible.length === 0,
-    })
-  ) {
-    return successor
-  }
-  return settleModeration(driver, groupId, presentUserIds)
+  // Somebody it was taken from gets it back only when nobody else is left — as far as this state
+  // knows: so only while the moderation is as it was read. Given back and taken again meanwhile,
+  // somebody else moderated in between, who may still be there.
+  const appointed = await setModerator(driver, state.sessionId, successor, {
+    moderator: true,
+    restore: eligible.length === 0 ? { unchangedSince: state.revision } : false,
+  })
+  // Refused because the moderation changed meanwhile: not tried again on the participants given,
+  // who may be out of date by now. The next settling asks the media server afresh — the poller
+  // does on every poll of a room with people in it, and every act of moderation settles.
+  return appointed ? successor : null
 }
 
 // --- The media server's side ---------------------------------------------------------------

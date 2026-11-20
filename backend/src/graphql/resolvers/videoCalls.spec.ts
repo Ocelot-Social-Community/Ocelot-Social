@@ -775,6 +775,31 @@ describe('joinGroupVideoCallChat', () => {
     expect(second.data.joinGroupVideoCallChat).not.toBe(first.data.joinGroupVideoCallChat)
   })
 
+  it('opens no chat when the call is over by the time the lock is held', async () => {
+    listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+    // Running when asked first; gone when asked again under the lock.
+    listRoomsMock
+      .mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_1' }])
+      .mockResolvedValueOnce([])
+
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+
+    expect(errors).toBeUndefined()
+    expect(data.joinGroupVideoCallChat).toBeNull()
+
+    const session = database.driver.session()
+    try {
+      const sessions = await session.run('MATCH (call:VideoCallSession) RETURN count(call) AS n')
+
+      expect(Number(sessions.records[0].get('n'))).toBe(0)
+    } finally {
+      await session.close()
+    }
+  })
+
   // The media server keeps a room for a while after the last participant has left. Whoever
   // walks in then was not part of what was written there, and must not be shown it.
   describe('in a room everybody else has left', () => {
