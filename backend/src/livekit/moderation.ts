@@ -20,6 +20,8 @@
 // moderates without a subscription of their own. What concerns one person only (muted by whom,
 // removed, made a moderator) goes to that person as a data message.
 
+import { TwirpError } from 'livekit-server-sdk'
+
 import { allGroupPermissionKeys } from '@src/groupPermission'
 import { dominatesInGroup } from '@src/groupRole/authority'
 import { OWNER_ROLE } from '@src/groupRole/types'
@@ -427,12 +429,20 @@ export const muteTracks = async (
   }
 }
 
+// A connection the media server no longer knows: gone already.
+const isGone = (err: unknown) =>
+  err instanceof TwirpError && (err.status === 404 || err.code === 'not_found')
+
+/**
+ * Takes these connections out of the room, each on its own: one that cannot be removed does not
+ * keep the others in, nor fail the act it is part of. One already gone is what was wanted.
+ */
 export const removeConnections = async (
   client: RoomServiceClient,
   roomName: string,
   connections: Connection[],
 ): Promise<void> => {
-  await Promise.all(
+  const results = await Promise.allSettled(
     connections.map(async (connection) =>
       withTimeout(
         client.removeParticipant(roomName, connection.identity),
@@ -441,6 +451,11 @@ export const removeConnections = async (
       ),
     ),
   )
+  for (const result of results) {
+    if (result.status === 'rejected' && !isGone(result.reason)) {
+      logger.warn(`A connection in ${roomName} could not be removed:`, result.reason)
+    }
+  }
 }
 
 /** What every participant reads from the room's metadata. */

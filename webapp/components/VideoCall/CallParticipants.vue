@@ -76,15 +76,18 @@
             type="checkbox"
             :checked="moderation.everyone"
             :disabled="busy || !mayToggleEveryone"
-            @change="setEveryone($event.target.checked)"
+            @change="setEveryone($event.target.checked, $event.target)"
           />
           {{ $t('videoCall.participants.everyoneModerates') }}
         </label>
       </div>
     </div>
 
+    <!-- Focusable for the keyboard to land on where what it was on is gone. -->
     <ul
+      ref="list"
       class="call-participants__list"
+      tabindex="-1"
       @pointermove="noteActivity"
       @pointerdown="noteActivity"
       @keydown="noteActivity"
@@ -259,7 +262,7 @@
           type="checkbox"
           class="call-participants__pick"
           :checked="!spared.includes(person.userId)"
-          :disabled="floor.includes(person.userId)"
+          :disabled="busy || floor.includes(person.userId)"
           :aria-label="$t('videoCall.participants.muteName', { name: person.name })"
           :data-test="'mute-all-pick-' + person.userId"
           @change="spare(person.userId, !$event.target.checked)"
@@ -358,7 +361,8 @@ export default {
   emits: ['spotlight', 'local-mute', 'switch-off', 'switch-on'],
   data() {
     return {
-      busy: false,
+      // The requests to the server still on their way: while any is, the controls wait.
+      pending: 0,
       // The heavier rights over the person whose menu is open, as the server answered them.
       rights: {},
       dialog: null,
@@ -378,11 +382,16 @@ export default {
   },
   created() {
     this.icons = iconRegistry
+    // Not shown, only compared: which question about somebody's rights is the latest.
+    this.rightsAsked = {}
   },
   beforeDestroy() {
     clearTimeout(this.restTimer)
   },
   computed: {
+    busy() {
+      return this.pending > 0
+    },
     removalOpen() {
       return this.dialog === 'remove' && !!this.removing
     },
@@ -447,8 +456,10 @@ export default {
         this.$nextTick(() => {
           // Gone again before it was drawn: nothing to take the focus to.
           if (!this.$refs.dialog) return
-          this.giveRemovalFocusBack = takeFocus(this.$refs.dialog, () =>
-            this.$el.querySelector(menu),
+          // Removed, their row and menu may be gone as well: then the list.
+          this.giveRemovalFocusBack = takeFocus(
+            this.$refs.dialog,
+            () => this.$el.querySelector(menu) || this.$refs.list,
           )
         })
         return
@@ -549,6 +560,13 @@ export default {
     async openMenu(person, toggleMenu) {
       toggleMenu()
       if (person.isMe || !this.isModerator) return
+      // What was allowed last time may no longer be: the heavier entries wait for the new answer,
+      // and stay away without one. Only the latest question about somebody counts.
+      this.rights = Object.fromEntries(
+        Object.entries(this.rights).filter(([userId]) => userId !== person.userId),
+      )
+      const asked = {}
+      this.rightsAsked = { ...this.rightsAsked, [person.userId]: asked }
       try {
         const {
           data: { videoCallModerationRights },
@@ -557,6 +575,7 @@ export default {
           variables: { groupId: this.groupId, userId: person.userId },
           fetchPolicy: 'no-cache',
         })
+        if (this.rightsAsked[person.userId] !== asked) return
         this.rights = { ...this.rights, [person.userId]: videoCallModerationRights }
       } catch {
         // Without an answer the heavier entries stay away; the light ones need none.
@@ -744,7 +763,7 @@ export default {
       action.callback()
     },
     async mutate(mutation, variables) {
-      this.busy = true
+      this.pending++
       try {
         await this.$apollo.mutate({
           mutation,
@@ -755,7 +774,7 @@ export default {
         this.$toastBackendError(error)
         return false
       } finally {
-        this.busy = false
+        this.pending--
       }
     },
     moderate(person, action) {
@@ -767,14 +786,20 @@ export default {
     setModerator(person, moderator) {
       return this.mutate(setVideoCallModeratorMutation(), { userId: person.userId, moderator })
     },
-    setEveryone(enabled) {
-      return this.mutate(setVideoCallEveryoneModeratesMutation(), { enabled })
+    // Failed, the box shows what holds again. Vue would not: the value bound to it has not
+    // changed, only the box, by the click.
+    async setEveryone(enabled, checkbox) {
+      const done = await this.mutate(setVideoCallEveryoneModeratesMutation(), { enabled })
+      if (!done && checkbox) checkbox.checked = this.moderation.everyone
+      return done
     },
     takeOver() {
       return this.mutate(takeOverVideoCallModerationMutation(), {})
     },
+    // Closes its own question only: dismissed meanwhile, and another one asked, that one stays.
     async remove(person) {
-      if (await this.moderate(person, 'REMOVE')) this.closeDialog()
+      const asked = this.removing
+      if ((await this.moderate(person, 'REMOVE')) && this.removing === asked) this.closeDialog()
     },
     // Spared from the start: oneself, and those with the floor; without anybody given the
     // floor, whoever is speaking right now — the one a moderator usually wants to go on.
@@ -786,10 +811,28 @@ export default {
         : this.people.filter((person) => person.speaking && !person.isMe).map((p) => p.userId)
       this.spared = [this.meId, ...this.floor, ...speaking].filter(Boolean)
       this.sparedForFloor = this.floor.filter((id) => id !== this.meId)
+      // A floor given in an earlier choice and answered only now must not change this one.
+      this.selection = (this.selection || 0) + 1
       this.muting = true
+      // The button that opened it is gone: the keyboard goes on to the harmless answer.
+      this.$nextTick(() => {
+        const cancel = this.$el.querySelector('[data-test="mute-all-cancel"]')
+        if (cancel) cancel.focus()
+      })
     },
     stopMuting() {
+      if (!this.muting) return
+      // Back to the button that opens it again, or to the list where it is gone — but only for
+      // a keyboard that was here: ended by the moderation passing on, focus elsewhere stays put.
+      const here =
+        this.$el.contains(document.activeElement) || document.activeElement === document.body
       this.muting = false
+      this.$nextTick(() => {
+        if (!here) return
+        const target =
+          this.$el.querySelector('[data-test="call-participants-mute-all"]') || this.$refs.list
+        if (target) target.focus()
+      })
     },
     spare(userId, spared) {
       this.spared = spared ? [...this.spared, userId] : this.spared.filter((id) => id !== userId)
@@ -799,7 +842,11 @@ export default {
     // tick set before.
     async toggleFloor(userId) {
       const giving = !this.floor.includes(userId)
+      const selection = this.selection
       if (!(await this.mutate(setVideoCallFloorMutation(), { userId, floor: giving }))) return
+      // Closed or opened anew meanwhile: given or taken all the same, which the room's metadata
+      // shows; the choice it was made in is gone.
+      if (!this.muting || this.selection !== selection) return
       if (!giving) {
         this.floor = this.floor.filter((id) => id !== userId)
         if (this.sparedForFloor.includes(userId)) {
@@ -815,13 +862,12 @@ export default {
       }
     },
     async muteAll() {
-      // What was sent counts, not what is ticked while it is on its way.
+      // What was sent counts, not what is ticked while it is on its way. Who has the floor is
+      // not sent: the server spares whoever has it when the request arrives, as given and taken
+      // at once (toggleFloor) — by this moderator or by another one meanwhile.
       const spared = [...this.spared]
       const floor = [...this.floor]
-      const done = await this.mutate(muteAllInVideoCallMutation(), {
-        exceptUserIds: spared,
-        floorUserIds: floor,
-      })
+      const done = await this.mutate(muteAllInVideoCallMutation(), { exceptUserIds: spared })
       if (!done) return
       // Muted along with the others: the own button follows, as nobody tells us about ourselves.
       if (!spared.includes(this.meId) && !floor.includes(this.meId)) {
@@ -871,6 +917,12 @@ export default {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Focused only as a landing place for the keyboard (see the removal and "mute all"), not a
+   control: no ring around the whole list. */
+.call-participants__list:focus {
+  outline: none;
 }
 .call-participants__row {
   display: flex;

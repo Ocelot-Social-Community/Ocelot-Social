@@ -1,4 +1,4 @@
-import { takeFocus, trapFocus } from './dialogFocus'
+import { inertAround, takeFocus, trapFocus } from './dialogFocus'
 
 const tab = (shiftKey = false) => ({ key: 'Tab', shiftKey, preventDefault: jest.fn() })
 
@@ -111,5 +111,21 @@ describe('takeFocus', () => {
     document.activeElement.blur()
     takeFocus(container)()
     expect(document.activeElement).toBe(button)
+  })
+})
+
+describe('inertAround', () => {
+  it('puts everything beside the dialog out of reach, and brings back only what it put', () => {
+    const around = document.createElement('div')
+    around.innerHTML =
+      '<header></header><main></main><aside inert></aside><div class="question"></div>'
+    document.body.appendChild(around)
+    const question = around.querySelector('.question')
+    const release = inertAround(question)
+    const inert = () => [...around.children].map((element) => element.hasAttribute('inert'))
+    expect(inert()).toEqual([true, true, true, false])
+    release()
+    // What was out of reach before stays so.
+    expect(inert()).toEqual([false, false, true, false])
   })
 })

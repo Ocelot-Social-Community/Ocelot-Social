@@ -374,8 +374,9 @@
               :aria-orientation="mobileChatOpen ? 'horizontal' : 'vertical'"
               :aria-label="$t('videoCall.resizeSidebar')"
               aria-controls="video-call-sidebar"
-              :aria-valuemin="mobileChatOpen ? 200 : sidebarMinWidth"
-              :aria-valuenow="mobileChatOpen ? sidebarHeight : sidebarWidth"
+              :aria-valuemin="sidebarBounds().min"
+              :aria-valuemax="sidebarBounds().max"
+              :aria-valuenow="sidebarValueNow()"
               @pointerdown="startSidebarResize"
               @dblclick="resetSidebarSize"
               @keydown="onSidebarResizeKey"
@@ -737,9 +738,20 @@ import CallNotice from './CallNotice.vue'
 
 // The narrowest the sidebar beside the videos may be pulled: its three tabs still fit.
 const SIDEBAR_MIN_WIDTH = 280
+
+// How long leaving waits for the server about the moderation (whom to suggest, the handover):
+// an answer that never comes must not keep anybody in the call they are leaving.
+export const LEAVE_REQUEST_DEADLINE_MS = 10000
+const withDeadline = (request) => {
+  let timer
+  const deadline = new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('deadline')), LEAVE_REQUEST_DEADLINE_MS)
+  })
+  return Promise.race([request, deadline]).finally(() => clearTimeout(timer))
+}
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
-import { takeFocus, trapFocus } from './dialogFocus'
+import { inertAround, takeFocus, trapFocus } from './dialogFocus'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -1496,10 +1508,16 @@ export default {
       if (now) {
         this.$nextTick(() => {
           // Gone again before it was drawn: nothing to take the focus to.
-          if (this.$refs.handover) this.giveHandoverFocusBack = takeFocus(this.$refs.handover)
+          if (!this.$refs.handover) return
+          this.releaseHandoverBackground = inertAround(this.$refs.handover)
+          this.giveHandoverFocusBack = takeFocus(this.$refs.handover)
         })
         return
       }
+      // Released first: the focus goes back to something in it.
+      const release = this.releaseHandoverBackground
+      this.releaseHandoverBackground = null
+      if (release) release()
       const giveBack = this.giveHandoverFocusBack
       this.giveHandoverFocusBack = null
       if (giveBack) giveBack()
@@ -1969,11 +1987,14 @@ export default {
       // On a phone the open list keeps the stage to one tile, the one speaking: closed, the
       // person shows.
       if (this.isMobile && this.participantsShown) this.closeInCallChat()
-      const tile = this.tiles.find(
+      // Of their devices, one that shows them: the camera that is on rather than the phone
+      // without one. Without any, the first — their avatar.
+      const theirs = this.tiles.filter(
         (candidate) =>
           !candidate.isScreen &&
           ((candidate.profile && candidate.profile.id) || candidate.identity) === userId,
       )
+      const tile = theirs.find((candidate) => candidate.videoTrack) || theirs[0]
       if (tile) this.spotlightKey = tile.key
     },
     // Mutes a person for the viewer alone, on every device they are in the call with.
@@ -2101,10 +2122,13 @@ export default {
       try {
         if (kind === 'mic') {
           this.micEnabled = false
+          // Silent on purpose now: a warning of no signal would offer to restart it.
+          this.micProblem = false
           // While a dtx switch has the microphone unpublished, LiveKit finds nothing to mute and
           // the track would go out again open: muted on the track itself, as toggleMic does.
           if (this.dtxSwitch && this.dtxTrack) await this.dtxTrack.mute()
           else if (local) await local.setMicrophoneEnabled(false)
+          this.refreshMicMeter()
         } else if (kind === 'camera') {
           this.cameraEnabled = false
           if (local) await local.setCameraEnabled(false)
@@ -2147,16 +2171,19 @@ export default {
       }
     },
     // Hanging up as the last moderator while others stay asks who moderates on.
-    async requestLeave() {
+    isLastModerator() {
       const me = this.currentUser && this.currentUser.id
-      const lastModerator =
+      return (
         this.phase === 'in-call' &&
         !this.moderation.everyone &&
         this.moderation.moderators.includes(me) &&
         !this.people.some(
           (person) => !person.isMe && this.moderation.moderators.includes(person.userId),
         )
-      if (!lastModerator || this.handoverCandidates.length === 0) {
+      )
+    },
+    async requestLeave() {
+      if (!this.isLastModerator() || this.handoverCandidates.length === 0) {
         await this.leave()
         return
       }
@@ -2165,19 +2192,22 @@ export default {
       try {
         const {
           data: { videoCallModerationSuccessor },
-        } = await this.$apollo.query({
-          query: videoCallModerationSuccessorQuery(),
-          variables: { groupId: this.groupId },
-          fetchPolicy: 'no-cache',
-        })
+        } = await withDeadline(
+          this.$apollo.query({
+            query: videoCallModerationSuccessorQuery(),
+            variables: { groupId: this.groupId },
+            fetchPolicy: 'no-cache',
+          }),
+        )
         suggested = videoCallModerationSuccessor
       } catch (_e) {
-        /* no suggestion: the first of the others is picked */
+        /* no suggestion, also when the answer takes too long: the first of the others is picked */
       }
-      // Meanwhile the call may be over, or everybody else gone.
+      // Meanwhile the call may be over, or everybody else gone — or somebody else moderates
+      // now, and there is nothing to hand over.
       if (this.room !== room) return
       const candidates = this.handoverCandidates
-      if (candidates.length === 0) {
+      if (candidates.length === 0 || !this.isLastModerator()) {
         await this.leave()
         return
       }
@@ -2198,16 +2228,19 @@ export default {
       const dialog = this.handover
       dialog.busy = true
       try {
-        await this.$apollo.mutate({
-          mutation: handOverVideoCallModerationMutation(),
-          variables: {
-            groupId: this.groupId,
-            toUserId: choice && choice !== 'everyone' ? choice : null,
-            everyone: choice === 'everyone',
-          },
-        })
+        await withDeadline(
+          this.$apollo.mutate({
+            mutation: handOverVideoCallModerationMutation(),
+            variables: {
+              groupId: this.groupId,
+              toUserId: choice && choice !== 'everyone' ? choice : null,
+              everyone: choice === 'everyone',
+            },
+          }),
+        )
       } catch (_e) {
-        // Leaving is what was asked for; the server hands the moderation on by itself then.
+        // Leaving is what was asked for, also when the answer takes too long; the server hands
+        // the moderation on by itself then.
       }
       if (this.handover === dialog) this.handover = null
       // A call joined meanwhile is not the one to leave.
@@ -2240,18 +2273,29 @@ export default {
     // What the sidebar may measure: wide enough for its tabs and at most half the body beside
     // the videos; on a phone, below them, room for the message field and a few messages, and
     // never so high that not even the small tile is left.
-    clampSidebarSize(size) {
+    sidebarBounds() {
       // The maximized call takes its body out of the box tree (display: contents), which then
       // measures nothing: the call itself is as wide there.
-      const body = this.$el && this.$el.querySelector('.video-call__body')
+      const body = this.$el && this.$el.querySelector && this.$el.querySelector('.video-call__body')
       let rect = body ? body.getBoundingClientRect() : { width: 1000, height: 800 }
       if (body && !rect.width && !rect.height) rect = this.$el.getBoundingClientRect()
       if (this.mobileChatOpen) {
-        return Math.round(Math.min(Math.max(size, 200), Math.max(rect.height - 110, 200)))
+        return { min: 200, max: Math.round(Math.max(rect.height - 110, 200)) }
       }
-      return Math.round(
-        Math.min(Math.max(size, SIDEBAR_MIN_WIDTH), Math.max(rect.width / 2, SIDEBAR_MIN_WIDTH)),
-      )
+      return {
+        min: SIDEBAR_MIN_WIDTH,
+        max: Math.round(Math.max(rect.width / 2, SIDEBAR_MIN_WIDTH)),
+      }
+    },
+    clampSidebarSize(size) {
+      const { min, max } = this.sidebarBounds()
+      return Math.round(Math.min(Math.max(size, min), max))
+    },
+    // Where the separator stands, for a screen reader, in the units of its bounds: as pulled,
+    // or as the stylesheet sized it.
+    sidebarValueNow() {
+      const pulled = this.mobileChatOpen ? this.sidebarHeight : this.sidebarWidth
+      return Math.round(pulled || this.currentSidebarSize())
     },
     currentSidebarSize() {
       const sidebar = this.$el && this.$el.querySelector('.video-call__sidebar')
@@ -4319,7 +4363,16 @@ export default {
   padding: var(--space-small);
   /*  As dim as the backdrop behind the device setup. */
   background: rgba(0, 0, 0, 0.5);
-  z-index: 2;
+  /*  Over the call's header and control bar too, where they lie on the videos. */
+  z-index: 5;
+}
+
+/*  Where the maximized call is a grid, over all of its cells, the chat beside the videos */
+/*  included — not only in the videos' cell, where every other child of the call goes. */
+.video-call--bars-manual > .video-call__handover,
+.video-call--bars-overlay > .video-call__handover {
+  grid-row: 1 / -1;
+  grid-column: 1 / -1;
 }
 
 .video-call__handover-box {

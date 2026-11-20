@@ -86,6 +86,9 @@ export default {
     }
     if (this.isPopoverOpen) {
       this.isPopoverOpen = false
+      // Told here: the watcher above no longer runs once the component is being destroyed, and
+      // whoever held still for the open menu would wait for good.
+      this.$emit('open-change', false)
       if (typeof document !== 'undefined') {
         document.body.classList.remove('dropdown-open')
       }

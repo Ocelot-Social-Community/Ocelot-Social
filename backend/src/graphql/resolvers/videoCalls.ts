@@ -317,12 +317,22 @@ export const mayJoinCall = async (context: Context, groupId: string): Promise<bo
 // Whether the viewer was removed from the group's call running now, which keeps them out of it
 // until it is over: until the media server has closed its room and its session has ended (see
 // joinGroupVideoCall). Asked per viewer, also of a count pushed to every subscriber alike.
+//
+// Only a hint for the button: should it not be readable, it says "not removed" rather than fail.
+// A field that cannot be null and fails takes everything around it down — the count, the other
+// calls of the dock. Whether they get in is decided on joining anyway.
 const removedFromCall = async (context: Context, groupId: string): Promise<boolean> => {
   if (!context.user) {
     return false
   }
-  const moderation = await readModeration(context.driver, groupId)
-  return !!moderation?.removedIds.includes(context.user.id)
+  try {
+    const moderation = await readModeration(context.driver, groupId)
+    return !!moderation?.removedIds.includes(context.user.id)
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch (err: unknown) {
+    logger.warn(`Reading whether a user was removed from the call of ${groupId} failed:`, err)
+    return false
+  }
 }
 
 // The videoConference policy is the single runtime switch, and it is enforced where every

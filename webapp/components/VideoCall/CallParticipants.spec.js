@@ -58,6 +58,13 @@ describe('CallParticipants', () => {
 
   const moderatedByMe = { moderators: ['me'], everyone: false, speakers: [] }
   const names = (actions) => actions.map((action) => action.name)
+  // What was sent: which mutation (by the field it asks for) and with what — a wrong document
+  // with the right variables would pass unnoticed otherwise.
+  const sent = () =>
+    mocks.$apollo.mutate.mock.calls.map(([{ mutation, variables }]) => ({
+      mutation: mutation.definitions[0].selectionSet.selections[0].name.value,
+      ...variables,
+    }))
 
   afterEach(() => {
     wrapper.destroy()
@@ -219,13 +226,13 @@ describe('CallParticipants', () => {
         actions.find((action) => action.name === name).callback()
         await flushPromises()
       }
-      const sent = mocks.$apollo.mutate.mock.calls.map(([{ variables }]) => variables)
-      expect(sent).toEqual([
-        { groupId: 'g1', userId: 'bob', action: 'MUTE_MICROPHONE' },
-        { groupId: 'g1', userId: 'bob', action: 'DISABLE_CAMERA' },
-        { groupId: 'g1', userId: 'bob', action: 'STOP_SCREEN_SHARE' },
-        { groupId: 'g1', userId: 'bob', floor: true },
-        { groupId: 'g1', userId: 'bob', moderator: true },
+      const moderate = 'moderateVideoCallParticipant'
+      expect(sent()).toEqual([
+        { mutation: moderate, groupId: 'g1', userId: 'bob', action: 'MUTE_MICROPHONE' },
+        { mutation: moderate, groupId: 'g1', userId: 'bob', action: 'DISABLE_CAMERA' },
+        { mutation: moderate, groupId: 'g1', userId: 'bob', action: 'STOP_SCREEN_SHARE' },
+        { mutation: 'setVideoCallFloor', groupId: 'g1', userId: 'bob', floor: true },
+        { mutation: 'setVideoCallModerator', groupId: 'g1', userId: 'bob', moderator: true },
       ])
     })
 
@@ -248,9 +255,9 @@ describe('CallParticipants', () => {
       actions.find((action) => action.name === 'floor').callback()
       actions.find((action) => action.name === 'revoke').callback()
       await flushPromises()
-      expect(mocks.$apollo.mutate.mock.calls.map(([{ variables }]) => variables)).toEqual([
-        { groupId: 'g1', userId: 'bob', floor: false },
-        { groupId: 'g1', userId: 'bob', moderator: false },
+      expect(sent()).toEqual([
+        { mutation: 'setVideoCallFloor', groupId: 'g1', userId: 'bob', floor: false },
+        { mutation: 'setVideoCallModerator', groupId: 'g1', userId: 'bob', moderator: false },
       ])
     })
 
@@ -326,6 +333,89 @@ describe('CallParticipants', () => {
       expect(wrapper.vm.dialog).toBe('remove')
       wrapper.vm.closeDialog()
       expect(wrapper.vm.dialog).toBeNull()
+    })
+
+    it('forgets what the ranks allowed until the server answers again, and takes its latest answer only', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      const bob = person('bob')
+      await wrapper.vm.openMenu(bob, jest.fn())
+      expect(names(wrapper.vm.actionsFor(bob))).toContain('remove')
+      // Asked again, twice: the first answer arrives last and is out of date.
+      let answerFirst
+      mocks.$apollo.query
+        .mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              answerFirst = resolve
+            }),
+        )
+        .mockResolvedValueOnce({
+          data: { videoCallModerationRights: { userId: 'bob', remove: false } },
+        })
+      const first = wrapper.vm.openMenu(bob, jest.fn())
+      expect(names(wrapper.vm.actionsFor(bob))).not.toContain('remove')
+      await wrapper.vm.openMenu(bob, jest.fn())
+      answerFirst({ data: { videoCallModerationRights: { userId: 'bob', remove: true } } })
+      await first
+      expect(names(wrapper.vm.actionsFor(bob))).not.toContain('remove')
+    })
+
+    it('closes only its own question once the removal is through', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      let removed
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            removed = resolve
+          }),
+      )
+      wrapper.vm.removing = person('bob')
+      wrapper.vm.dialog = 'remove'
+      const removal = wrapper.vm.remove(person('bob'))
+      // Dismissed, and Anna asked about meanwhile.
+      wrapper.vm.closeDialog()
+      wrapper.vm.removing = person('anna')
+      wrapper.vm.dialog = 'remove'
+      removed({ data: {} })
+      await removal
+      expect(wrapper.vm.removing.userId).toBe('anna')
+      expect(wrapper.vm.dialog).toBe('remove')
+    })
+
+    it('gives the keyboard to the list once the row of the one removed is gone', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      await wrapper.vm.openMenu(person('bob'), jest.fn())
+      wrapper.vm
+        .actionsFor(person('bob'))
+        .find((action) => action.name === 'remove')
+        .callback()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      // Bob is gone from the call before the answer is.
+      await wrapper.setProps({ people: [person('me', { isMe: true }), person('anna')] })
+      await wrapper.find('[data-test="remove-confirm"]').trigger('click')
+      await flushPromises()
+      expect(document.activeElement).toBe(wrapper.find('.call-participants__list').element)
+    })
+
+    it('stays busy until every request on its way is answered', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      const answers = []
+      mocks.$apollo.mutate.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            answers.push(resolve)
+          }),
+      )
+      const floor = wrapper.vm.setFloor(person('bob'), true)
+      const mute = wrapper.vm.moderate(person('anna'), 'MUTE_MICROPHONE')
+      expect(wrapper.vm.busy).toBe(true)
+      answers[0]({ data: {} })
+      await floor
+      expect(wrapper.vm.busy).toBe(true)
+      answers[1]({ data: {} })
+      await mute
+      expect(wrapper.vm.busy).toBe(false)
     })
 
     it('lets a moderator named as such give it up', async () => {
@@ -618,11 +708,9 @@ describe('CallParticipants', () => {
       expect(wrapper.find('[data-test="call-participant-menu-bob"]').exists()).toBe(false)
       await wrapper.find('[data-test="mute-all-confirm"]').trigger('click')
       await flushPromises()
-      expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual({
-        groupId: 'g1',
-        exceptUserIds: ['me', 'loud'],
-        floorUserIds: [],
-      })
+      expect(sent()).toEqual([
+        { mutation: 'muteAllInVideoCall', groupId: 'g1', exceptUserIds: ['me', 'loud'] },
+      ])
       expect(wrapper.vm.muting).toBe(false)
       expect(wrapper.find('[data-test="mute-all-pick-bob"]').exists()).toBe(false)
       expect(wrapper.find('[data-test="call-participant-menu-bob"]').exists()).toBe(true)
@@ -640,6 +728,77 @@ describe('CallParticipants', () => {
       await wrapper.find('section').trigger('keydown.esc')
       expect(wrapper.vm.muting).toBe(false)
       expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+    })
+
+    it('takes the keyboard to the choice and back to the button that opened it', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      await wrapper.find('[data-test="call-participants-mute-all"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(document.activeElement).toBe(wrapper.find('[data-test="mute-all-cancel"]').element)
+      // Escape reaches the list's handler from there.
+      await wrapper.find('[data-test="mute-all-cancel"]').trigger('keydown.esc')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.muting).toBe(false)
+      expect(document.activeElement).toBe(
+        wrapper.find('[data-test="call-participants-mute-all"]').element,
+      )
+    })
+
+    it('leaves the keyboard where it is when the choice ends while it is elsewhere', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      const elsewhere = document.createElement('button')
+      document.body.appendChild(elsewhere)
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      elsewhere.focus()
+      wrapper.vm.stopMuting()
+      await wrapper.vm.$nextTick()
+      expect(document.activeElement).toBe(elsewhere)
+      elsewhere.remove()
+    })
+
+    it('locks the ticks while the choice is on its way, and frees them again when it fails', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      let answer
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve, reject) => {
+            answer = reject
+          }),
+      )
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      const pick = () => wrapper.find('[data-test="mute-all-pick-bob"]')
+      const muting = wrapper.vm.muteAll()
+      await wrapper.vm.$nextTick()
+      expect(pick().attributes('disabled')).toBe('disabled')
+      answer(new Error('offline'))
+      await muting
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.muting).toBe(true)
+      expect(pick().attributes('disabled')).toBeUndefined()
+    })
+
+    it('does not let a floor answered late change a choice opened anew', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob')],
+        moderation: moderatedByMe,
+      })
+      let answer
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      wrapper.vm.openMuteAll()
+      const giving = wrapper.vm.toggleFloor('bob')
+      wrapper.vm.stopMuting()
+      wrapper.vm.openMuteAll()
+      answer({ data: {} })
+      await giving
+      expect(wrapper.vm.floor).toEqual([])
+      expect(wrapper.vm.spared).toEqual(['me'])
     })
 
     it('ends the choice when one no longer moderates', async () => {
@@ -795,7 +954,7 @@ describe('CallParticipants', () => {
       wrapper = Wrapper({ mayTakeOver: true })
       await wrapper.find('[data-test="call-participants-take-over"]').trigger('click')
       await flushPromises()
-      expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+      expect(sent()).toEqual([{ mutation: 'takeOverVideoCallModeration', groupId: 'g1' }])
     })
 
     it('lets a moderator let everybody moderate', async () => {
@@ -805,10 +964,23 @@ describe('CallParticipants', () => {
       box.element.checked = true
       await box.trigger('change')
       await flushPromises()
-      expect(mocks.$apollo.mutate.mock.calls[0][0].variables).toEqual({
-        groupId: 'g1',
-        enabled: true,
-      })
+      expect(sent()).toEqual([
+        { mutation: 'setVideoCallEveryoneModerates', groupId: 'g1', enabled: true },
+      ])
+    })
+
+    it('shows the box as it was when the change fails, so a second click asks the same again', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      mocks.$apollo.mutate.mockRejectedValueOnce(new Error('offline'))
+      const box = wrapper.find('[data-test="call-participants-everyone"] input')
+      box.element.checked = true
+      await box.trigger('change')
+      await flushPromises()
+      expect(box.element.checked).toBe(false)
+      box.element.checked = true
+      await box.trigger('change')
+      await flushPromises()
+      expect(sent().map(({ enabled }) => enabled)).toEqual([true, true])
     })
 
     it('does not let whoever moderates only because everybody does end it', () => {

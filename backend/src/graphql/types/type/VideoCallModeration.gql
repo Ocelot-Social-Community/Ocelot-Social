@@ -25,8 +25,8 @@ type Query {
 type Mutation {
   "Mute, switch off the camera of, end the screen share of, or remove somebody in the group's running call. Requires moderating the call; removing also needs to rank high enough in the group, and never reaches the group's owner. Returns true."
   moderateVideoCallParticipant(groupId: ID!, userId: ID!, action: VideoCallModerationAction!): Boolean!
-  "Mute everybody in the group's running call except those named, and give exactly the users named in floorUserIds the floor (they are spared as well). Requires moderating the call. Returns how many people were muted."
-  muteAllInVideoCall(groupId: ID!, exceptUserIds: [ID!]!, floorUserIds: [ID!]!): Int!
+  "Mute everybody in the group's running call except those named and those who have the floor. Requires moderating the call. Returns how many people were muted."
+  muteAllInVideoCall(groupId: ID!, exceptUserIds: [ID!]!): Int!
   "Make somebody in the group's running call a moderator, or not. Any moderator may make another; taking it from somebody else needs to outrank them in the group, and one who had it taken gets it back only from a holder of group.videoCall.moderate. Anybody may give up their own. Returns true."
   setVideoCallModerator(groupId: ID!, userId: ID!, moderator: Boolean!): Boolean!
   "Let everybody in the group's running call moderate it, or only its moderators again. Any moderator may switch it on; switching it off takes a moderator named as such, or a holder of group.videoCall.moderate. Returns true."

@@ -1319,9 +1319,9 @@ type Mutation {
   moderateVideoCallParticipant(action: VideoCallModerationAction!, groupId: ID!, userId: ID!): Boolean!
 
   """
-  Mute everybody in the group's running call except those named, and give exactly the users named in floorUserIds the floor (they are spared as well). Requires moderating the call. Returns how many people were muted.
+  Mute everybody in the group's running call except those named and those who have the floor. Requires moderating the call. Returns how many people were muted.
   """
-  muteAllInVideoCall(exceptUserIds: [ID!]!, floorUserIds: [ID!]!, groupId: ID!): Int!
+  muteAllInVideoCall(exceptUserIds: [ID!]!, groupId: ID!): Int!
 
   """
   Mute a group so its posts no longer appear in the current user's feed. Requires membership.

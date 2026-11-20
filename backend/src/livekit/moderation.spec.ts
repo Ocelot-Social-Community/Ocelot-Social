@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { TrackSource } from 'livekit-server-sdk'
+import { TrackSource, TwirpError } from 'livekit-server-sdk'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
+import logger from '@src/logger'
 
 import { joinCallSession } from './callSession'
 import {
@@ -420,6 +421,37 @@ describe('the media server', () => {
     await removeConnections(service, 'group-g1', [{ identity: 'a#1', userId: 'a', tracks: [] }])
 
     expect(service.removeParticipant).toHaveBeenCalledWith('group-g1', 'a#1')
+  })
+
+  it('removes every other connection when one cannot be removed, and does not fail', async () => {
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined)
+    const removeParticipant = vi
+      .fn()
+      // Gone meanwhile: what was wanted, not worth a word.
+      .mockRejectedValueOnce(new TwirpError('Not Found', 'participant not found', 404, 'not_found'))
+      // Told by its code alone, whatever the status.
+      .mockRejectedValueOnce(new TwirpError('Not Found', 'participant not found', 400, 'not_found'))
+      .mockRejectedValueOnce(new Error('media server down'))
+      .mockResolvedValue(undefined)
+    const service = client({ removeParticipant })
+    const connection = (identity: string) => ({ identity, userId: 'a', tracks: [] })
+
+    await expect(
+      removeConnections(service, 'group-g1', [
+        connection('a#1'),
+        connection('a#2'),
+        connection('a#3'),
+        connection('a#4'),
+      ]),
+    ).resolves.toBeUndefined()
+    expect(removeParticipant).toHaveBeenCalledWith('group-g1', 'a#4')
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('could not be removed'),
+      expect.objectContaining({ message: 'media server down' }),
+    )
+
+    warn.mockRestore()
   })
 
   it('publishes the state for every participant, and carries on when it cannot', async () => {

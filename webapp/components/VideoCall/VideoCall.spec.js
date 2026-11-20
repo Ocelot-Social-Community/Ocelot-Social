@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import VTooltip from 'v-tooltip'
 import { mount, createLocalVue } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
-import VideoCall from './VideoCall.vue'
+import VideoCall, { LEAVE_REQUEST_DEADLINE_MS } from './VideoCall.vue'
 import CallNotice from './CallNotice.vue'
 import { createAudioWatchdog } from './audioWatchdog'
 import { TextDecoder, TextEncoder } from 'util'
@@ -6926,6 +6926,16 @@ describe('VideoCall — the people in the call and their moderation', () => {
   })
 
   describe('notices of the moderation', () => {
+    it('drops a warning about the microphone once a moderator has switched it off', async () => {
+      const { wrapper } = factory({ show: true })
+      const refreshMicMeter = jest.spyOn(wrapper.vm, 'refreshMicMeter').mockImplementation(() => {})
+      wrapper.setData({ micEnabled: true, micProblem: true })
+      await wrapper.vm.syncSwitchedOff('mic')
+      expect(wrapper.vm.micEnabled).toBe(false)
+      expect(wrapper.vm.micProblem).toBe(false)
+      expect(refreshMicMeter).toHaveBeenCalled()
+    })
+
     const setup = () => {
       const { wrapper } = factory({ show: true })
       wrapper.vm.$toast = { info: jest.fn(), error: jest.fn() }
@@ -7222,6 +7232,22 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(wrapper.vm.spotlightKey).toBe('bob#1/main')
     })
 
+    it('shows somebody large on the device whose camera is on, else on the first', () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [
+          tile('bob#1', 'bob'),
+          { ...tile('bob#2', 'bob', { videoTrack: {} }), key: 'bob#2/screen', isScreen: true },
+          tile('bob#3', 'bob', { videoTrack: {} }),
+          tile('anna#1', 'anna'),
+        ],
+      })
+      wrapper.vm.spotlightPerson('bob')
+      expect(wrapper.vm.spotlightKey).toBe('bob#3/main')
+      wrapper.vm.spotlightPerson('anna')
+      expect(wrapper.vm.spotlightKey).toBe('anna#1/main')
+    })
+
     it('closes the list on a phone to show somebody large, where it keeps the stage to one tile', () => {
       const closeInCallChat = jest.fn()
       const ctx = (isMobile, participantsShown) => ({
@@ -7256,19 +7282,25 @@ describe('VideoCall — the people in the call and their moderation', () => {
       const { wrapper } = factory({ show: true })
       const setVolume = jest.fn()
       const other = jest.fn()
+      const second = jest.fn()
+      const bob = JSON.stringify({ userId: 'bob' })
       wrapper.vm.room = {
         remoteParticipants: new Map([
-          ['bob#1', { identity: 'bob#1', metadata: JSON.stringify({ userId: 'bob' }), setVolume }],
-          ['bob#2', { identity: 'bob#2', metadata: 'broken', setVolume: other }],
+          ['bob#1', { identity: 'bob#1', metadata: bob, setVolume }],
+          ['bob#2', { identity: 'bob#2', metadata: bob, setVolume: second }],
+          ['x#1', { identity: 'x#1', metadata: 'broken', setVolume: other }],
           ['old', { identity: 'old' }],
         ]),
       }
       wrapper.vm.muteForMe('bob', true)
       expect(setVolume).toHaveBeenLastCalledWith(0)
+      expect(second).toHaveBeenLastCalledWith(0)
       expect(other).toHaveBeenLastCalledWith(1)
       wrapper.vm.muteForMe('bob', false)
       expect(wrapper.vm.locallyMuted).toEqual({})
       expect(setVolume).toHaveBeenLastCalledWith(1)
+      expect(second).toHaveBeenLastCalledWith(1)
+      expect(other).not.toHaveBeenCalledWith(0)
       wrapper.vm.room = null
       expect(() => wrapper.vm.applyLocalVolumes()).not.toThrow()
     })
@@ -7333,6 +7365,71 @@ describe('VideoCall — the people in the call and their moderation', () => {
       await wrapper.vm.requestLeave()
       expect(wrapper.vm.handover).toBeNull()
       expect(leave).toHaveBeenCalled()
+    })
+
+    it('just leaves when somebody else moderates by the time the server has answered', async () => {
+      const { wrapper, leave } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      wrapper.vm.$apollo.query = jest.fn().mockImplementation(async () => {
+        wrapper.setData({
+          moderation: { moderators: ['u1', 'bob'], everyone: false, speakers: [] },
+        })
+        return { data: { videoCallModerationSuccessor: 'bob' } }
+      })
+      await wrapper.vm.requestLeave()
+      expect(wrapper.vm.handover).toBeNull()
+      expect(leave).toHaveBeenCalled()
+    })
+
+    describe('a server that does not answer', () => {
+      // The deadline's timer, run at once instead of waiting for it.
+      const passDeadline = (setTimeoutSpy) => {
+        const [run] = setTimeoutSpy.mock.calls.find(([, ms]) => ms === LEAVE_REQUEST_DEADLINE_MS)
+        run()
+      }
+      afterEach(() => {
+        jest.restoreAllMocks()
+      })
+
+      it('asks without a suggestion once the deadline has passed', async () => {
+        const { wrapper, leave } = inCall(
+          { moderators: ['u1'], everyone: false, speakers: [] },
+          { query: jest.fn(() => new Promise(() => {})) },
+        )
+        const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
+        const asking = wrapper.vm.requestLeave()
+        passDeadline(setTimeoutSpy)
+        await asking
+        expect(wrapper.vm.handover).toEqual({ suggested: null, choice: 'bob', busy: false })
+        expect(leave).not.toHaveBeenCalled()
+      })
+
+      it('leaves once the deadline of the handover has passed', async () => {
+        const { wrapper, leave } = inCall(
+          { moderators: ['u1'], everyone: false, speakers: [] },
+          { mutate: jest.fn(() => new Promise(() => {})) },
+        )
+        await wrapper.vm.requestLeave()
+        const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
+        const going = wrapper.vm.leaveAfterHandover('bob')
+        passDeadline(setTimeoutSpy)
+        await going
+        expect(wrapper.vm.handover).toBeNull()
+        expect(leave).toHaveBeenCalled()
+      })
+    })
+
+    it('puts the rest of the call out of reach while it asks', async () => {
+      const { wrapper } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      await wrapper.vm.requestLeave()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      const question = wrapper.find('[data-test="video-call-handover"]').element
+      const others = [...question.parentElement.children].filter((el) => el !== question)
+      expect(others.length).toBeGreaterThan(0)
+      expect(others.every((el) => el.hasAttribute('inert'))).toBe(true)
+      wrapper.vm.cancelHandover()
+      await wrapper.vm.$nextTick()
+      expect(others.some((el) => el.hasAttribute('inert'))).toBe(false)
     })
 
     it('suggests nobody who has gone meanwhile', async () => {
@@ -7511,6 +7608,11 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(handle.attributes('aria-controls')).toBe('video-call-sidebar')
       expect(wrapper.find('#video-call-sidebar').exists()).toBe(true)
       expect(handle.attributes('aria-valuemin')).toBe('280')
+      // A range a screen reader can place the handle in, in the same units.
+      wrapper.setData({ sidebarWidth: 300 })
+      await wrapper.vm.$nextTick()
+      expect(Number(handle.attributes('aria-valuemax'))).toBeGreaterThanOrEqual(280)
+      expect(handle.attributes('aria-valuenow')).toBe('300')
     })
   })
 
@@ -7552,6 +7654,18 @@ describe('VideoCall — the people in the call and their moderation', () => {
         // Remembered on a larger screen, it is capped all the same.
         maxWidth: '50vw',
       })
+    })
+
+    it('tells its bounds and where it stands, beside the videos and below them', () => {
+      const wrapper = sized()
+      expect(wrapper.vm.sidebarBounds()).toEqual({ min: 280, max: 500 })
+      // Not pulled: where the stylesheet put it.
+      expect(wrapper.vm.sidebarValueNow()).toBe(360)
+      const below = {
+        mobileChatOpen: true,
+        $el: wrapper.vm.$el,
+      }
+      expect(VideoCall.methods.sidebarBounds.call(below)).toEqual({ min: 200, max: 690 })
     })
 
     it('is pulled within its bounds and remembered', () => {

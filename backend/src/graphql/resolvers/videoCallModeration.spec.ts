@@ -420,6 +420,20 @@ describe('moderateVideoCallParticipant', () => {
       ),
     ).toBe(false)
 
+    // Unreadable, it is no reason to lose the count or the dock: "not removed" — joining decides.
+    const unreadable = {
+      user: { id: 'udo' },
+      driver: {
+        session: () => {
+          throw new Error('database down')
+        },
+      },
+    } as unknown as Context
+
+    expect(
+      await videoCallResolvers.VideoCallParticipantCount.removed({ groupId: 'g1' }, {}, unreadable),
+    ).toBe(false)
+
     // Over once the session has ended.
     await endCallSession(database.driver, 'RM_1')
 
@@ -478,29 +492,24 @@ describe('moderateVideoCallParticipant', () => {
 })
 
 describe('muteAllInVideoCall', () => {
-  it('mutes everybody not spared, gives the floor and says so to the new speakers', async () => {
+  it('mutes everybody not spared, nor whoever has the floor now, and leaves the floor alone', async () => {
     inCall('ute', 'udo', 'adam', 'olga')
     const sessionId = await open('ute')
+    // Given to Olga by another moderator while Ute was choosing, who did not see it yet.
     await setSpeakersFor(sessionId, ['olga'])
     as('ute')
     const result = await mutate({
       mutation: MuteAll,
-      variables: {
-        groupId: 'g1',
-        exceptUserIds: ['ute'],
-        floorUserIds: ['adam', 'olga', 'ute', 'gone'],
-      },
+      variables: { groupId: 'g1', exceptUserIds: ['ute'] },
     })
 
-    expect(result.data?.muteAllInVideoCall).toBe(1)
+    expect(result.data?.muteAllInVideoCall).toBe(2)
     expect(room.mutePublishedTrack.mock.calls.map((call) => (call as unknown[])[2])).toEqual([
       'udo-mic',
+      'adam-mic',
     ])
-    expect((await state())?.speakerIds).toEqual(['adam', 'olga', 'ute'])
-    expect(told()).toEqual([
-      { type: 'microphoneMuted', by: 'Ute', to: ['udo'] },
-      { type: 'floor', by: 'Ute', to: ['adam'] },
-    ])
+    expect((await state())?.speakerIds).toEqual(['olga'])
+    expect(told()).toEqual([{ type: 'microphoneMuted', by: 'Ute', to: ['udo', 'adam'] }])
   })
 
   it('mutes the moderator too when they are not spared', async () => {
@@ -509,7 +518,7 @@ describe('muteAllInVideoCall', () => {
     as('ute')
     const result = await mutate({
       mutation: MuteAll,
-      variables: { groupId: 'g1', exceptUserIds: [], floorUserIds: [] },
+      variables: { groupId: 'g1', exceptUserIds: [] },
     })
 
     expect(result.data?.muteAllInVideoCall).toBe(2)
@@ -529,7 +538,7 @@ describe('muteAllInVideoCall', () => {
       errorOf(
         await mutate({
           mutation: MuteAll,
-          variables: { groupId: 'g1', exceptUserIds: [], floorUserIds: [] },
+          variables: { groupId: 'g1', exceptUserIds: [] },
         }),
       ),
     ).toBe('Only a moderator of the video call can do this.')

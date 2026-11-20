@@ -119,12 +119,8 @@ export const moderateVideoCallParticipantMutation = () => gql`
 `
 
 export const muteAllInVideoCallMutation = () => gql`
-  mutation ($groupId: ID!, $exceptUserIds: [ID!]!, $floorUserIds: [ID!]!) {
-    muteAllInVideoCall(
-      groupId: $groupId
-      exceptUserIds: $exceptUserIds
-      floorUserIds: $floorUserIds
-    )
+  mutation ($groupId: ID!, $exceptUserIds: [ID!]!) {
+    muteAllInVideoCall(groupId: $groupId, exceptUserIds: $exceptUserIds)
   }
 `
 

@@ -28,7 +28,6 @@ import {
   setEveryoneModerates,
   setModerator,
   setSpeaker,
-  setSpeakers,
   successorOf,
 } from '@src/livekit/moderation'
 import { connectionsOf, settleAndPublishModeration } from '@src/livekit/moderationService'
@@ -243,24 +242,21 @@ export default {
     },
     muteAllInVideoCall: async (
       _root,
-      {
-        groupId,
-        exceptUserIds,
-        floorUserIds,
-      }: { groupId: string; exceptUserIds: string[]; floorUserIds: string[] },
+      { groupId, exceptUserIds }: { groupId: string; exceptUserIds: string[] },
       context: Context,
     ) => {
       const me = userOf(context)
       const { client, roomName, connections, present, state } = await callFor(context, groupId)
       requireModerator(state, me.id)
-      const speakers = floorUserIds.filter((userId) => present.includes(userId))
-      const spared = new Set([...exceptUserIds, ...speakers])
+      // Those with the floor keep their word: as it is now, not as the moderator saw it when
+      // choosing — another moderator may have given or taken it meanwhile. The floor itself is
+      // left alone; giving and taking it is setVideoCallFloor's.
+      const spared = new Set([...exceptUserIds, ...state.speakerIds])
       const muted = present.filter((userId) => !spared.has(userId))
       const affected = connections.filter(
         (connection) => connection.userId && muted.includes(connection.userId),
       )
       await muteTracks(client, roomName, affected, SOURCES.microphone)
-      await setSpeakers(context.driver, state.sessionId, speakers)
       const others = muted.filter((userId) => userId !== me.id)
       await notify(
         client,
@@ -278,15 +274,6 @@ export default {
           connections,
           muted.filter((userId) => userId === me.id),
         ),
-      )
-      const newSpeakers = speakers.filter(
-        (userId) => userId !== me.id && !state.speakerIds.includes(userId),
-      )
-      await notify(
-        client,
-        roomName,
-        { type: 'floor', by: me.name },
-        identitiesOf(connections, newSpeakers),
       )
       await settleAndPublishModeration(context, groupId)
       return muted.length

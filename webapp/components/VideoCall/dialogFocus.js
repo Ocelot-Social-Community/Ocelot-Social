@@ -46,3 +46,16 @@ export const takeFocus = (container, fallback = () => null) => {
     if (back && back.isConnected) back.focus()
   }
 }
+
+/**
+ * Puts everything beside `dialog` out of reach — no click, no Tab, nothing for a screen reader —
+ * for a dialog that does not cover all of it. Returns a function that brings it back; only what
+ * this put out of reach.
+ */
+export const inertAround = (dialog) => {
+  const others = [...dialog.parentElement.children].filter(
+    (element) => element !== dialog && !element.hasAttribute('inert'),
+  )
+  others.forEach((element) => element.setAttribute('inert', ''))
+  return () => others.forEach((element) => element.removeAttribute('inert'))
+}

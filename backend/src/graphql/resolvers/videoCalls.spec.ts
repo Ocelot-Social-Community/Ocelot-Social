@@ -655,7 +655,7 @@ describe('joinGroupVideoCall', () => {
         userId: 'bare-1',
         avatarUrl: null,
         // For the link to their profile in the call's list of participants.
-        slug: expect.any(String),
+        slug: (authenticatedUser as { slug: string }).slug,
       })
     })
 
