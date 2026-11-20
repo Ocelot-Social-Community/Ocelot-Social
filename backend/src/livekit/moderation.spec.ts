@@ -66,16 +66,22 @@ beforeEach(async () => {
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:admin', name: 'admin', permissions: $admin })
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:usual', name: 'usual', permissions: $usual })
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:broken', name: 'broken', permissions: 'nonsense' })
+      CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:shaped', name: 'shaped', permissions: $shaped })
+      CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:flag', name: 'flag', permissions: 'true' })
       CREATE (:User { id: 'olga' })-[:MEMBER_OF { role: 'owner' }]->(g)
       CREATE (:User { id: 'adam' })-[:MEMBER_OF { role: 'admin' }]->(g)
       CREATE (:User { id: 'ute' })-[:MEMBER_OF { role: 'usual' }]->(g)
       CREATE (:User { id: 'udo' })-[:MEMBER_OF { role: 'usual' }]->(g)
       CREATE (:User { id: 'bert' })-[:MEMBER_OF { role: 'broken' }]->(g)
+      CREATE (:User { id: 'bea' })-[:MEMBER_OF { role: 'shaped' }]->(g)
+      CREATE (:User { id: 'flo' })-[:MEMBER_OF { role: 'flag' }]->(g)
       CREATE (:User { id: 'guest' })
     `,
     {
       admin: JSON.stringify(['group.read', 'group.post.pin', 'group.member.remove']),
       usual: JSON.stringify(['group.read']),
+      // Valid JSON, but no list of keys: malformed all the same.
+      shaped: JSON.stringify({ 'group.read': true }),
     },
   )
 })
@@ -141,12 +147,37 @@ describe(setModerator, () => {
 
     expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['udo'] })
 
+    // Not given back without being asked to: the revocation holds.
+    expect(await setModerator(driver, sessionId, 'udo', { moderator: true })).toBe(false)
+    expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['udo'] })
+
     // Given back: the revocation goes with it.
-    await setModerator(driver, sessionId, 'udo', { moderator: true })
+    expect(await setModerator(driver, sessionId, 'udo', { moderator: true, restore: true })).toBe(
+      true,
+    )
 
     expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: [] })
   })
 })
+
+// Takes the moderation from `userId` just before the next write of the moderation, after
+// whatever was read before it: as a moderator revoking it at that very moment would.
+const revokeBeforeNextWrite = (userId: string) => {
+  const real = driver.session.bind(driver)
+  const spy = vi.spyOn(driver, 'session')
+  // Reading goes through; the first write finds the revocation made just before it.
+  spy.mockImplementation((...args) => {
+    const session = real(...args)
+    const writeTransaction = session.writeTransaction.bind(session)
+    session.writeTransaction = (async (work: Parameters<typeof writeTransaction>[0]) => {
+      spy.mockRestore()
+      const { sessionId } = await state()
+      await setModerator(driver, sessionId, userId, { moderator: false, revoked: true })
+      return writeTransaction(work)
+    }) as typeof session.writeTransaction
+    return session
+  })
+}
 
 describe('the floor', () => {
   it('is given to exactly those named, and one by one', async () => {
@@ -266,6 +297,11 @@ describe(successorOf, () => {
     expect(await successorOf(driver, 'g1', ['guest', 'bert'])).toBe('guest')
   })
 
+  it('counts a role whose rights are valid JSON but no list of keys as holding nothing', async () => {
+    expect(await successorOf(driver, 'g1', ['bea', 'flo', 'ute'])).toBe('ute')
+    expect(await successorOf(driver, 'g1', ['flo', 'bea'])).toBe('flo')
+  })
+
   it('finds nobody among nobody', async () => {
     expect(await successorOf(driver, 'g1', [])).toBeNull()
   })
@@ -322,6 +358,25 @@ describe(settleModeration, () => {
     await setModerator(driver, sessionId, 'ute', { moderator: false })
 
     expect(await settleModeration(driver, 'g1', ['adam', 'udo'])).toBe('udo')
+  })
+
+  it('does not give the starter back what was taken from them after the state was read', async () => {
+    await open('ute')
+    await run(`MATCH (:User { id: 'ute' })-[m:MODERATES_CALL]->() DELETE m`)
+    revokeBeforeNextWrite('ute')
+
+    // Read anew, the starter is passed over for whoever else is there.
+    expect(await settleModeration(driver, 'g1', ['ute', 'udo'])).toBe('udo')
+    expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: ['ute'] })
+  })
+
+  it('does not give a successor back what was taken from them after the state was read', async () => {
+    await open('ute')
+    await setModerator(driver, (await state()).sessionId, 'ute', { moderator: false })
+    revokeBeforeNextWrite('adam')
+
+    expect(await settleModeration(driver, 'g1', ['adam', 'udo'])).toBe('udo')
+    expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: ['adam'] })
   })
 
   it('finds nobody in an empty call', async () => {

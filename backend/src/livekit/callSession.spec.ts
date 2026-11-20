@@ -242,6 +242,40 @@ describe(joinCallSession, () => {
     ])
   })
 
+  it('lets an admission to a call over by now neither end the running one nor open a chat', async () => {
+    await run(`CREATE (:User { id: 'carl' })`)
+    const running = await join('anna', 'RM_2', ['anna', 'carl'])
+    await removeCarl()
+    // Asked for while RM_1 still ran; by the time the lock is held, RM_2 does.
+    const stale = await joinCallSession(driver, {
+      groupId: 'group-1',
+      userId: 'ben',
+      livekitRoom: 'group-group-1',
+      livekitSid: 'RM_1',
+      presentUserIds: ['ben'],
+      currentSid: async () => Promise.resolve('RM_2'),
+    })
+
+    expect(stale).toBeNull()
+    expect(await sessions()).toEqual([
+      { roomId: running, sid: 'RM_2', running: true, users: ['anna'] },
+    ])
+    expect(await removedFrom()).toEqual(['RM_2'])
+  })
+
+  it('admits when the media server, asked again, still runs that room', async () => {
+    const roomId = await joinCallSession(driver, {
+      groupId: 'group-1',
+      userId: 'anna',
+      livekitRoom: 'group-group-1',
+      livekitSid: 'RM_1',
+      presentUserIds: ['anna'],
+      currentSid: async () => Promise.resolve('RM_1'),
+    })
+
+    expect(roomId).toEqual(expect.any(String))
+  })
+
   it('keeps the calls of different groups apart', async () => {
     const one = await join('anna', 'RM_1', ['anna'], 'group-1')
     const two = await join('anna', 'RM_2', ['anna'], 'group-2')

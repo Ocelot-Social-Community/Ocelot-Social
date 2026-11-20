@@ -760,12 +760,13 @@ describe('joinGroupVideoCallChat', () => {
 
   it('returns another room for the next call of the group', async () => {
     listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
-    listRoomsMock.mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_1' }])
+    // Asked twice per admission: once before, once under the lock (see joinCallSession).
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_1' }])
     const first = await mutate({
       mutation: JoinGroupVideoCallChat,
       variables: { groupId: 'chat-1' },
     })
-    listRoomsMock.mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_2' }])
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_2' }])
     const second = await mutate({
       mutation: JoinGroupVideoCallChat,
       variables: { groupId: 'chat-1' },

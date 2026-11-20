@@ -144,6 +144,28 @@ const setSpeakersFor = async (sessionId: string, userIds: string[]) => {
   await setSpeakers(database.driver, sessionId, userIds)
 }
 
+// Takes the moderation from `userId` just before the next write to the database, after whatever
+// was read before it: as another moderator revoking it at that very moment would.
+const revokeBeforeNextWrite = (userId: string) => {
+  const { driver } = database
+  const real = driver.session.bind(driver)
+  const spy = vi.spyOn(driver, 'session')
+  spy.mockImplementation((...args) => {
+    const session = real(...args)
+    const writeTransaction = session.writeTransaction.bind(session)
+    session.writeTransaction = (async (work: Parameters<typeof writeTransaction>[0]) => {
+      spy.mockRestore()
+      const current = await readModeration(driver, 'g1')
+      await setModerator(driver, current?.sessionId as string, userId, {
+        moderator: false,
+        revoked: true,
+      })
+      return writeTransaction(work)
+    }) as typeof session.writeTransaction
+    return session
+  })
+}
+
 const errorOf = (result: { errors?: readonly { message: string }[] }) => result.errors?.[0]?.message
 
 beforeAll(async () => {
@@ -549,6 +571,32 @@ describe('setVideoCallModerator', () => {
   const set = async (userId: string, moderator: boolean) =>
     mutate({ mutation: SetModerator, variables: { groupId: 'g1', userId, moderator } })
 
+  it('does not give back what another moderator took away after the state was read', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    revokeBeforeNextWrite('udo')
+
+    expect(errorOf(await set('udo', true))).toBe(
+      'You do not rank high enough in the group to do this to them.',
+    )
+    expect(await state()).toMatchObject({ moderatorIds: ['ute'], revokedIds: ['udo'] })
+    expect(told()).toEqual([])
+  })
+
+  it('is not for the moderation of an earlier room whose session is still open', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    // The media server runs a new room of the same name; nobody has joined its chat yet.
+    room.listRooms.mockResolvedValueOnce([{ name: 'group-g1', sid: 'RM_2' }])
+    as('ute')
+
+    expect(errorOf(await set('udo', true))).toBe(
+      'Only those taking part in the video call can moderate it.',
+    )
+    expect((await state())?.moderatorIds).toEqual(['ute'])
+  })
+
   it('lets anybody give up their own, and changes nothing otherwise for oneself', async () => {
     inCall('ute', 'udo')
     await open('ute')
@@ -741,6 +789,18 @@ describe('handOverVideoCallModeration', () => {
 
     expect(await state()).toMatchObject({ moderatorIds: ['udo'], starterHandedOver: true })
     expect(told()).toEqual([{ type: 'moderator', reason: 'handedOver', by: 'Ute', to: ['udo'] }])
+  })
+
+  it('does not hand it to one it was taken from after the state was read', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    revokeBeforeNextWrite('udo')
+    await handOver({ toUserId: 'udo' })
+
+    expect(await state()).toMatchObject({ revokedIds: ['udo'], starterHandedOver: true })
+    expect((await state())?.moderatorIds).not.toContain('udo')
+    expect(told()).not.toContainEqual(expect.objectContaining({ reason: 'handedOver' }))
   })
 
   it('hands it to the successor without a name, or with one not in the call', async () => {

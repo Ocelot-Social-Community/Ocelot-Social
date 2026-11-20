@@ -369,33 +369,99 @@ describe('CallParticipants', () => {
             removed = resolve
           }),
       )
-      wrapper.vm.removing = person('bob')
-      wrapper.vm.dialog = 'remove'
+      const ask = (who) =>
+        wrapper.vm
+          .actionsFor(who)
+          .find((action) => action.name === 'remove')
+          .callback()
+      wrapper.vm.rights = { bob: { remove: true }, anna: { remove: true } }
+      ask(person('bob'))
       const removal = wrapper.vm.remove(person('bob'))
       // Dismissed, and Anna asked about meanwhile.
       wrapper.vm.closeDialog()
-      wrapper.vm.removing = person('anna')
-      wrapper.vm.dialog = 'remove'
+      ask(person('anna'))
       removed({ data: {} })
       await removal
       expect(wrapper.vm.removing.userId).toBe('anna')
       expect(wrapper.vm.dialog).toBe('remove')
     })
 
-    it('gives the keyboard to the list once the row of the one removed is gone', async () => {
+    describe('once the row of the one removed is gone', () => {
+      // Removes `userId` as a moderator does, the row going before the answer comes.
+      const removeAndLose = async (people, userId) => {
+        wrapper = Wrapper({ people, moderation: moderatedByMe })
+        await wrapper.vm.openMenu(person(userId), jest.fn())
+        wrapper.vm
+          .actionsFor(person(userId))
+          .find((action) => action.name === 'remove')
+          .callback()
+        await wrapper.vm.$nextTick()
+        await wrapper.vm.$nextTick()
+        let removed
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              removed = resolve
+            }),
+        )
+        await wrapper.find('[data-test="remove-confirm"]').trigger('click')
+        // Gone from the call, by the removal, before its answer is.
+        await wrapper.setProps({ people: people.filter((p) => p.userId !== userId) })
+        removed({ data: {} })
+        await flushPromises()
+        expect(sent()).toEqual([
+          { mutation: 'moderateVideoCallParticipant', groupId: 'g1', userId, action: 'REMOVE' },
+        ])
+      }
+      const menuOf = (userId) =>
+        wrapper.find(`[data-test="call-participant-menu-${userId}"]`).element
+
+      it('gives the keyboard to the row that took its place', async () => {
+        // In order: me, anna, bob, carl.
+        await removeAndLose(
+          [person('me', { isMe: true }), person('bob'), person('anna'), person('carl')],
+          'bob',
+        )
+        expect(document.activeElement).toBe(menuOf('carl'))
+      })
+
+      it('gives it to the row before when it was the last one', async () => {
+        await removeAndLose([person('me', { isMe: true }), person('bob'), person('anna')], 'bob')
+        expect(document.activeElement).toBe(menuOf('anna'))
+      })
+
+      it('gives it to the list when nobody else is left in it', async () => {
+        await removeAndLose([person('bob')], 'bob')
+        const list = wrapper.find('.call-participants__list').element
+        expect(document.activeElement).toBe(list)
+      })
+    })
+
+    it('does not close a question asked anew about the same one by the answer to the first', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
-      await wrapper.vm.openMenu(person('bob'), jest.fn())
-      wrapper.vm
-        .actionsFor(person('bob'))
-        .find((action) => action.name === 'remove')
-        .callback()
-      await wrapper.vm.$nextTick()
-      await wrapper.vm.$nextTick()
-      // Bob is gone from the call before the answer is.
-      await wrapper.setProps({ people: [person('me', { isMe: true }), person('anna')] })
-      await wrapper.find('[data-test="remove-confirm"]').trigger('click')
-      await flushPromises()
-      expect(document.activeElement).toBe(wrapper.find('.call-participants__list').element)
+      const bob = person('bob')
+      await wrapper.vm.openMenu(bob, jest.fn())
+      const ask = () =>
+        wrapper.vm
+          .actionsFor(bob)
+          .find((action) => action.name === 'remove')
+          .callback()
+      ask()
+      let removed
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            removed = resolve
+          }),
+      )
+      const removal = wrapper.vm.remove(wrapper.vm.removing)
+      // Dismissed, and asked again about Bob — the very same person — meanwhile.
+      wrapper.vm.closeDialog()
+      ask()
+      removed({ data: {} })
+      await removal
+      expect(wrapper.vm.dialog).toBe('remove')
+      expect(wrapper.vm.removing.userId).toBe('bob')
     })
 
     it('stays busy until every request on its way is answered', async () => {
@@ -637,6 +703,17 @@ describe('CallParticipants', () => {
       expect(order()).toEqual(['bob', 'carl', 'anna'])
     })
 
+    it('keeps whoever joins meanwhile where they came, also when they start to speak', async () => {
+      wrapper = Wrapper({ people: [person('anna')] })
+      wrapper.vm.holdOrder(true)
+      await wrapper.setProps({ people: [person('anna'), person('carl'), person('dana')] })
+      expect(order()).toEqual(['anna', 'carl', 'dana'])
+      await wrapper.setProps({
+        people: [person('anna'), person('carl'), person('dana', { speaking: true })],
+      })
+      expect(order()).toEqual(['anna', 'carl', 'dana'])
+    })
+
     it('holds it when a row menu opens', async () => {
       wrapper = Wrapper({ people: [person('anna'), person('bob')] })
       await wrapper.findComponent(Dropdown).vm.$emit('open-change', true)
@@ -830,6 +907,59 @@ describe('CallParticipants', () => {
       })
       await wrapper.vm.muteAll()
       expect(mocks.$apollo.mutate.mock.calls[0][0].variables.exceptUserIds).toContain('me')
+    })
+
+    it('does not close a choice opened anew by the answer to the one cancelled', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      let muted
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            muted = resolve
+          }),
+      )
+      wrapper.vm.openMuteAll()
+      const muting = wrapper.vm.muteAll()
+      wrapper.vm.stopMuting()
+      wrapper.vm.openMuteAll()
+      muted({ data: {} })
+      await muting
+      expect(wrapper.vm.muting).toBe(true)
+    })
+
+    it('frees the tick of whoever another moderator takes the floor back from meanwhile', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('speaker'), person('bob')],
+        moderation: { moderators: ['me'], everyone: false, speakers: ['speaker'] },
+      })
+      wrapper.vm.openMuteAll()
+      wrapper.vm.spare('bob', true)
+      await wrapper.vm.$nextTick()
+      const pick = (userId) => wrapper.find(`[data-test="mute-all-pick-${userId}"]`)
+      expect(pick('speaker').attributes('disabled')).toBe('disabled')
+      // Taken back from the speaker, and given to Bob, ticked by hand before, by somebody else.
+      await wrapper.setProps({
+        moderation: { moderators: ['me'], everyone: false, speakers: ['bob'] },
+      })
+      expect(pick('speaker').attributes('disabled')).toBeUndefined()
+      expect(pick('speaker').element.checked).toBe(true)
+      expect(wrapper.vm.floor).toEqual(['bob'])
+      // Taken back from Bob as well: the tick set by hand stays.
+      await wrapper.setProps({ moderation: { moderators: ['me'], everyone: false, speakers: [] } })
+      expect(wrapper.vm.floor).toEqual([])
+      expect(wrapper.vm.spared).toEqual(['me', 'bob'])
+      await wrapper.vm.muteAll()
+      expect(sent()).toEqual([
+        { mutation: 'muteAllInVideoCall', groupId: 'g1', exceptUserIds: ['me', 'bob'] },
+      ])
+    })
+
+    it('leaves the floor of the room as it is while not choosing', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      await wrapper.setProps({
+        moderation: { moderators: ['me'], everyone: false, speakers: ['bob'] },
+      })
+      expect(wrapper.vm.floor).toEqual([])
     })
 
     it('keeps the tick of whoever is given the floor locked until it is taken back', async () => {

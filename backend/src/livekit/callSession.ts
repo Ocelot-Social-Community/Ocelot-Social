@@ -34,6 +34,12 @@ interface JoinCallSessionInput {
   livekitSid: string
   /** Everybody the media server lists in that room right now, the joining user included. */
   presentUserIds: readonly string[]
+  /**
+   * Asks the media server again, once the group's lock is held, which room runs now (its sid;
+   * null for none). The room may have changed since `livekitSid` was asked for: an admission to
+   * a call over by now must not end the session of the one running.
+   */
+  currentSid?: () => Promise<string | null>
 }
 
 /**
@@ -52,7 +58,7 @@ interface JoinCallSessionInput {
  */
 export const joinCallSession = async (
   driver: Driver,
-  { groupId, userId, livekitRoom, livekitSid, presentUserIds }: JoinCallSessionInput,
+  { groupId, userId, livekitRoom, livekitSid, presentUserIds, currentSid }: JoinCallSessionInput,
 ): Promise<string | null> => {
   const session = driver.session()
   try {
@@ -74,6 +80,10 @@ export const joinCallSession = async (
         { groupId, userId },
       )
       if (locked.records.length === 0) {
+        return null
+      }
+      // Asked again under the lock: no other admission changes the sessions meanwhile.
+      if (currentSid && (await currentSid()) !== livekitSid) {
         return null
       }
       const open = await transaction.run(

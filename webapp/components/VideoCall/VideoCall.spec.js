@@ -1459,6 +1459,28 @@ describe('VideoCall', () => {
       expect(refreshTiles).toHaveBeenCalled()
     })
 
+    it('follows the server muting our own microphone, also without its notice', async () => {
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      await wrapper.vm.connect()
+      const room = wrapper.vm.room
+      const sync = jest.spyOn(wrapper.vm, 'syncSwitchedOff')
+      const { Track } = jest.requireMock('livekit-client')
+      const mic = { source: Track.Source.Microphone }
+      // Somebody else's microphone, or our own camera: not ours to follow.
+      room.handlers.TrackMuted(mic, { identity: 'bob#1' })
+      room.handlers.TrackMuted({ source: Track.Source.Camera }, room.localParticipant)
+      expect(sync).not.toHaveBeenCalled()
+      wrapper.vm.micEnabled = true
+      room.handlers.TrackMuted(mic, room.localParticipant)
+      expect(sync).toHaveBeenCalledWith('mic')
+      // Muted by ourselves, it is off already: nothing to follow.
+      sync.mockClear()
+      wrapper.vm.micEnabled = false
+      room.handlers.TrackMuted(mic, room.localParticipant)
+      expect(sync).not.toHaveBeenCalled()
+    })
+
     it('holds the speaking highlight across the pauses between words', () => {
       jest.useFakeTimers()
       const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
@@ -7429,6 +7451,43 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(others.every((el) => el.hasAttribute('inert'))).toBe(true)
       wrapper.vm.cancelHandover()
       await wrapper.vm.$nextTick()
+      expect(others.some((el) => el.hasAttribute('inert'))).toBe(false)
+    })
+
+    it('neither asks nor leaves again once the call is being left meanwhile', async () => {
+      for (const teardown of [{ leaving: true }, { closingRoom: { name: 'room' } }]) {
+        const { wrapper, leave } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+        wrapper.vm.$apollo.query = jest.fn().mockImplementation(async () => {
+          Object.assign(wrapper.vm, teardown)
+          return { data: { videoCallModerationSuccessor: 'bob' } }
+        })
+        await wrapper.vm.requestLeave()
+        expect(wrapper.vm.handover).toBeNull()
+        expect(leave).not.toHaveBeenCalled()
+      }
+    })
+
+    it('does not leave a second time when the handover is answered while the call is left', async () => {
+      const { wrapper, leave } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      await wrapper.vm.requestLeave()
+      wrapper.vm.$apollo.mutate = jest.fn().mockImplementation(async () => {
+        wrapper.vm.leaving = true
+        return { data: {} }
+      })
+      await wrapper.vm.leaveAfterHandover('bob')
+      expect(wrapper.vm.handover).toBeNull()
+      expect(leave).not.toHaveBeenCalled()
+    })
+
+    it('brings the page back in reach when it goes with the question open', async () => {
+      const { wrapper } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      await wrapper.vm.requestLeave()
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+      const question = wrapper.find('[data-test="video-call-handover"]').element
+      const others = [...question.parentElement.children].filter((el) => el !== question)
+      expect(others.every((el) => el.hasAttribute('inert'))).toBe(true)
+      wrapper.destroy()
       expect(others.some((el) => el.hasAttribute('inert'))).toBe(false)
     })
 

@@ -60,17 +60,26 @@ const callFor = async (context: Context, groupId: string) => {
   if (!config) {
     throw new AppError(Errors.VIDEO_CALL_MODERATION_NOT_IN_CALL)
   }
-  const connections = await connectionsOf(config, groupId)
+  const client = roomServiceFor(config)
+  const roomName = roomNameForGroup(groupId)
+  const [connections, rooms] = await Promise.all([
+    connectionsOf(config, groupId),
+    client.listRooms([roomName]),
+  ])
   const present = presentUsers(connections)
   const state = present.includes(me.id) ? await readModeration(context.driver, groupId) : null
+  // The session is the moderation of the room running now only if it is that room's: one left
+  // over from an earlier room of the same name, its chat not yet replaced, moderates nothing of
+  // this call. Its moderation comes with its own session, once somebody joins its chat.
+  const sid = rooms.find((room) => room.name === roomName)?.sid
   // Removed, but still connected for a moment (or a device whose disconnecting failed): out of
   // the call all the same.
-  if (!state || state.removedIds.includes(me.id)) {
+  if (!state || state.livekitSid !== sid || state.removedIds.includes(me.id)) {
     throw new AppError(Errors.VIDEO_CALL_MODERATION_NOT_IN_CALL)
   }
   return {
-    client: roomServiceFor(config),
-    roomName: roomNameForGroup(groupId),
+    client,
+    roomName,
     connections,
     present,
     state,
@@ -140,7 +149,14 @@ const handOn = async (
   if (!successor || state.moderatorIds.includes(successor)) {
     return
   }
-  await setModerator(context.driver, state.sessionId, successor, { moderator: true })
+  // Given back only to whom it was taken from as far as known when deciding: taken away
+  // meanwhile, it is not given — then the automatic decides, after the caller has given it up.
+  const restore = named ? state.revokedIds.includes(successor) : eligible.length === 0
+  if (
+    !(await setModerator(context.driver, state.sessionId, successor, { moderator: true, restore }))
+  ) {
+    return
+  }
   await notify(
     client,
     roomName,
@@ -305,7 +321,15 @@ export default {
           throw new AppError(Errors.VIDEO_CALL_MODERATION_OUTRANKED)
         }
         if (!state.moderatorIds.includes(userId)) {
-          await setModerator(context.driver, state.sessionId, userId, { moderator: true })
+          // Taken away meanwhile — after the state above was read — it is given back only by
+          // somebody who may: asked again when writing.
+          const appointed = await setModerator(context.driver, state.sessionId, userId, {
+            moderator: true,
+            restore: position.mayModerateGroupCalls,
+          })
+          if (!appointed) {
+            throw new AppError(Errors.VIDEO_CALL_MODERATION_OUTRANKED)
+          }
           await notify(
             client,
             roomName,
@@ -364,7 +388,11 @@ export default {
       const me = userOf(context)
       const { client, roomName, connections, state } = await callFor(context, groupId)
       if (!state.moderatorIds.includes(me.id)) {
-        await setModerator(context.driver, state.sessionId, me.id, { moderator: true })
+        // Who may step in may do so also after the moderation was taken from them.
+        await setModerator(context.driver, state.sessionId, me.id, {
+          moderator: true,
+          restore: true,
+        })
         await notify(
           client,
           roomName,

@@ -452,14 +452,20 @@ export default {
     // or, as the menu that asked is gone by then, to the menu of whoever it was about.
     removalOpen(open) {
       if (open) {
-        const menu = `[data-test="call-participant-menu-${this.removing.userId}"]`
+        // Removed, their row and menu may be gone as well: then the row that took its place —
+        // the next one, else the one before — as in the list of chats; the list only once
+        // nobody else is left in it.
+        const order = this.ordered.map((person) => person.userId)
+        const at = order.indexOf(this.removing.userId)
+        const candidates = [order[at], ...order.slice(at + 1), ...order.slice(0, at).reverse()]
+        const menuOf = (userId) =>
+          this.$el.querySelector(`[data-test="call-participant-menu-${userId}"]`)
         this.$nextTick(() => {
           // Gone again before it was drawn: nothing to take the focus to.
           if (!this.$refs.dialog) return
-          // Removed, their row and menu may be gone as well: then the list.
           this.giveRemovalFocusBack = takeFocus(
             this.$refs.dialog,
-            () => this.$el.querySelector(menu) || this.$refs.list,
+            () => candidates.map(menuOf).find(Boolean) || this.$refs.list,
           )
         })
         return
@@ -471,6 +477,24 @@ export default {
     // Whoever no longer moderates has nothing left to choose.
     isModerator(moderating) {
       if (!moderating) this.stopMuting()
+    },
+    // The floor given or taken back by another moderator while "mute all" is being chosen
+    // counts here as well, as if given or taken here: a tick it locked is free again.
+    'moderation.speakers'(speakers) {
+      if (!this.muting) return
+      this.floor.filter((id) => !speakers.includes(id)).forEach(this.floorTaken)
+      speakers.filter((id) => !this.floor.includes(id)).forEach(this.floorGiven)
+    },
+    // Whoever joins while the order is held comes last, in the order they came, and stays
+    // there until the order is live again.
+    people(people) {
+      if (!this.heldOrder) return
+      const newcomers = people
+        .map((person) => person.userId)
+        .filter(
+          (userId, index, all) => !this.heldOrder.includes(userId) && all.indexOf(userId) === index,
+        )
+      if (newcomers.length) this.heldOrder = [...this.heldOrder, ...newcomers]
     },
   },
   methods: {
@@ -750,6 +774,8 @@ export default {
             this.$t('videoCall.participants.removeEllipsis'),
             this.icons.userTimes,
             () => {
+              // Each question counts on its own, also when asked again about the same person.
+              this.removalAsked = (this.removalAsked || 0) + 1
               this.removing = person
               this.dialog = 'remove'
             },
@@ -796,10 +822,13 @@ export default {
     takeOver() {
       return this.mutate(takeOverVideoCallModerationMutation(), {})
     },
-    // Closes its own question only: dismissed meanwhile, and another one asked, that one stays.
+    // Closes its own question only: dismissed meanwhile, and another one asked — about somebody
+    // else or the same one again — that one stays.
     async remove(person) {
-      const asked = this.removing
-      if ((await this.moderate(person, 'REMOVE')) && this.removing === asked) this.closeDialog()
+      const asked = this.removalAsked
+      if ((await this.moderate(person, 'REMOVE')) && this.removalAsked === asked && this.removing) {
+        this.closeDialog()
+      }
     },
     // Spared from the start: oneself, and those with the floor; without anybody given the
     // floor, whoever is speaking right now — the one a moderator usually wants to go on.
@@ -847,21 +876,28 @@ export default {
       // Closed or opened anew meanwhile: given or taken all the same, which the room's metadata
       // shows; the choice it was made in is gone.
       if (!this.muting || this.selection !== selection) return
-      if (!giving) {
-        this.floor = this.floor.filter((id) => id !== userId)
-        if (this.sparedForFloor.includes(userId)) {
-          this.spared = this.spared.filter((id) => id !== userId)
-          this.sparedForFloor = this.sparedForFloor.filter((id) => id !== userId)
-        }
-        return
-      }
+      if (giving) this.floorGiven(userId)
+      else this.floorTaken(userId)
+    },
+    floorGiven(userId) {
+      if (this.floor.includes(userId)) return
       this.floor = [...this.floor, userId]
       if (!this.spared.includes(userId)) {
         this.spared = [...this.spared, userId]
         this.sparedForFloor = [...this.sparedForFloor, userId]
       }
     },
+    floorTaken(userId) {
+      if (!this.floor.includes(userId)) return
+      this.floor = this.floor.filter((id) => id !== userId)
+      if (this.sparedForFloor.includes(userId)) {
+        this.spared = this.spared.filter((id) => id !== userId)
+        this.sparedForFloor = this.sparedForFloor.filter((id) => id !== userId)
+      }
+    },
     async muteAll() {
+      // Closes its own choice only: cancelled meanwhile and opened anew, that one stays.
+      const selection = this.selection
       // What was sent counts, not what is ticked while it is on its way. Who has the floor is
       // not sent: the server spares whoever has it when the request arrives, as given and taken
       // at once (toggleFloor) — by this moderator or by another one meanwhile.
@@ -871,7 +907,7 @@ export default {
       const done = await this.mutate(muteAllInVideoCallMutation(), {
         exceptUserIds: [...this.spared],
       })
-      if (!done) return
+      if (!done || this.selection !== selection) return
       this.stopMuting()
     },
     closeDialog() {
@@ -919,9 +955,14 @@ export default {
 }
 
 /* Focused only as a landing place for the keyboard (see the removal and "mute all"), not a
-   control: no ring around the whole list. */
+   control: no ring around the whole list for a click; for the keyboard a fine one inside, so
+   it is seen where it went, without moving anything. */
 .call-participants__list:focus {
   outline: none;
+}
+.call-participants__list:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
 }
 .call-participants__row {
   display: flex;

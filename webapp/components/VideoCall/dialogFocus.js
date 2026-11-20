@@ -49,13 +49,20 @@ export const takeFocus = (container, fallback = () => null) => {
 
 /**
  * Puts everything beside `dialog` out of reach — no click, no Tab, nothing for a screen reader —
- * for a dialog that does not cover all of it. Returns a function that brings it back; only what
- * this put out of reach.
+ * for a dialog that does not cover all of it: what is beside it, and beside each of the elements
+ * around it, up to the page itself. Returns a function that brings it back; only what this put
+ * out of reach.
  */
 export const inertAround = (dialog) => {
-  const others = [...dialog.parentElement.children].filter(
-    (element) => element !== dialog && !element.hasAttribute('inert'),
-  )
+  const others = []
+  for (let inside = dialog; inside.parentElement; inside = inside.parentElement) {
+    if (inside === document.body) break
+    others.push(
+      ...[...inside.parentElement.children].filter(
+        (element) => element !== inside && !element.hasAttribute('inert'),
+      ),
+    )
+  }
   others.forEach((element) => element.setAttribute('inert', ''))
   return () => others.forEach((element) => element.removeAttribute('inert'))
 }

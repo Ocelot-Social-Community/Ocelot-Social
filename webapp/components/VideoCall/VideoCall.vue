@@ -1712,6 +1712,9 @@ export default {
   beforeDestroy() {
     document.removeEventListener('fullscreenchange', this.onFullscreenChange)
     this.unmounting = true
+    // Gone with the handover question open: the page around it is in reach again.
+    if (this.releaseHandoverBackground) this.releaseHandoverBackground()
+    this.releaseHandoverBackground = null
     this.exitFullscreen()
     this.watchBarActivity(false)
     this.setPageBars('normal')
@@ -2204,8 +2207,8 @@ export default {
         /* no suggestion, also when the answer takes too long: the first of the others is picked */
       }
       // Meanwhile the call may be over, or everybody else gone — or somebody else moderates
-      // now, and there is nothing to hand over.
-      if (this.room !== room) return
+      // now, and there is nothing to hand over. Or it is being left already, the connection gone.
+      if (this.room !== room || this.leaving || this.closingRoom) return
       const candidates = this.handoverCandidates
       if (candidates.length === 0 || !this.isLastModerator()) {
         await this.leave()
@@ -2243,8 +2246,8 @@ export default {
         // the moderation on by itself then.
       }
       if (this.handover === dialog) this.handover = null
-      // A call joined meanwhile is not the one to leave.
-      if (this.room !== room) return
+      // A call joined meanwhile is not the one to leave; one being left already is left once.
+      if (this.room !== room || this.leaving || this.closingRoom) return
       await this.leave()
     },
     // --- The sidebar's size ---------------------------------------------------------------
@@ -2745,7 +2748,21 @@ export default {
         room.on(RoomEvent.TrackUnpublished, onAny)
         // LiveKit's setCameraEnabled(false) mutes the track instead of
         // unpublishing it. Re-render so the avatar fallback kicks in.
-        room.on(RoomEvent.TrackMuted, onAny)
+        // Our own microphone muted by the server (a moderator, "mute all"): the buttons follow,
+        // also when its notice does not come through. Muted by ourselves, it is off already.
+        room.on(RoomEvent.TrackMuted, (pub, participant) => {
+          if (
+            this.room === room &&
+            participant === room.localParticipant &&
+            pub &&
+            pub.source === Track.Source.Microphone &&
+            this.micEnabled &&
+            !this.dtxSwitch
+          ) {
+            this.syncSwitchedOff('mic')
+          }
+          onAny()
+        })
         room.on(RoomEvent.TrackUnmuted, onAny)
         // Token metadata carries the avatar URL — re-render tiles when it
         // changes so the avatar updates without a reconnect.

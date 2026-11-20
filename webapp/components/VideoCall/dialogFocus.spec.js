@@ -109,8 +109,12 @@ describe('takeFocus', () => {
     const button = container.querySelector('button')
     button.focus()
     document.activeElement.blur()
-    takeFocus(container)()
+    const giveBack = takeFocus(container)
     expect(document.activeElement).toBe(button)
+    // Given back to nothing: the focus is not taken anywhere, it stays where it went.
+    button.blur()
+    giveBack()
+    expect(document.activeElement).toBe(document.body)
   })
 })
 
@@ -127,5 +131,22 @@ describe('inertAround', () => {
     release()
     // What was out of reach before stays so.
     expect(inert()).toEqual([false, false, true, false])
+  })
+
+  it('puts the page around the element it is in out of reach as well, up to the body', () => {
+    const outside = document.createElement('button')
+    const call = document.createElement('div')
+    call.innerHTML = '<div class="stage"></div><div class="wrap"><div class="question"></div></div>'
+    document.body.append(outside, call)
+    const release = inertAround(call.querySelector('.question'))
+    expect(outside.hasAttribute('inert')).toBe(true)
+    expect(call.querySelector('.stage').hasAttribute('inert')).toBe(true)
+    // What holds the dialog stays in reach, and so does the body.
+    expect(call.hasAttribute('inert')).toBe(false)
+    expect(call.querySelector('.wrap').hasAttribute('inert')).toBe(false)
+    expect(document.body.hasAttribute('inert')).toBe(false)
+    release()
+    expect(outside.hasAttribute('inert')).toBe(false)
+    expect(call.querySelector('.stage').hasAttribute('inert')).toBe(false)
   })
 })

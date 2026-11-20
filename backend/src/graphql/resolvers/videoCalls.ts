@@ -494,6 +494,7 @@ export default {
         livekitRoom: roomName,
         livekitSid: call.sid,
         presentUserIds: [...call.userIds],
+        currentSid: async () => (await getLiveCall(context.config, roomName))?.sid ?? null,
       })
       // The session is where the moderation lives: whoever opened it moderates, whoever
       // started the call gets it back on returning. Every participant learns of it from the

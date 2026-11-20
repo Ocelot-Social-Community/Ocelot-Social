@@ -118,38 +118,74 @@ const write = async (driver: Driver, query: string, variables: Record<string, un
  * Makes the user a moderator, or not. Taking it away from somebody else is a revocation: they
  * cannot take it back themselves. Whoever gives it up, or has it taken, and started the call,
  * does not get it back on returning either.
+ *
+ * Making somebody a moderator whose moderation was taken away gives it back only with `restore`:
+ * whether it was taken is asked when writing, not of a state read before. A revocation made
+ * meanwhile then holds, also against an appointment decided on the earlier state. Returns
+ * whether the user moderates now (for taking it away: always true).
  */
 export const setModerator = async (
   driver: Driver,
   sessionId: string,
   userId: string,
-  { moderator, revoked = false }: { moderator: boolean; revoked?: boolean },
-) =>
-  write(
-    driver,
-    moderator
-      ? `
+  {
+    moderator,
+    revoked = false,
+    restore = false,
+  }: { moderator: boolean; revoked?: boolean; restore?: boolean },
+): Promise<boolean> => {
+  const session = driver.session()
+  try {
+    return await session.writeTransaction(async (transaction) => {
+      // The group's lock, as joining the call's chat and removing somebody take it: giving and
+      // taking the moderation happen one after the other, so the check below sees a
+      // revocation made before it. A statement of its own, so the lock is surely held first.
+      await transaction.run(
+        `
+          MATCH (:VideoCallSession { id: $sessionId })-[:CALL_IN]->(group:Group)
+          SET group.callSessionLock = true
+          REMOVE group.callSessionLock
+        `,
+        { sessionId },
+      )
+      if (!moderator) {
+        await transaction.run(
+          `
+            MATCH (session:VideoCallSession { id: $sessionId })
+            MATCH (user:User { id: $userId })
+            OPTIONAL MATCH (user)-[moderation:MODERATES_CALL]->(session)
+            DELETE moderation
+            WITH user, session
+            OPTIONAL MATCH (user)-[started:STARTED_CALL]->(session)
+            SET started.handedOver = true
+            FOREACH (_ IN CASE WHEN $revoked THEN [1] ELSE [] END |
+              MERGE (user)-[:LOST_CALL_MODERATION]->(session)
+            )
+          `,
+          { sessionId, userId, revoked },
+        )
+        return true
+      }
+      const appointed = await transaction.run(
+        `
           MATCH (session:VideoCallSession { id: $sessionId })
           MATCH (user:User { id: $userId })
+          WHERE $restore OR NOT (user)-[:LOST_CALL_MODERATION]->(session)
           MERGE (user)-[:MODERATES_CALL]->(session)
           WITH user, session
           OPTIONAL MATCH (user)-[revocation:LOST_CALL_MODERATION]->(session)
           DELETE revocation
-        `
-      : `
-          MATCH (session:VideoCallSession { id: $sessionId })
-          MATCH (user:User { id: $userId })
-          OPTIONAL MATCH (user)-[moderation:MODERATES_CALL]->(session)
-          DELETE moderation
-          WITH user, session
-          OPTIONAL MATCH (user)-[started:STARTED_CALL]->(session)
-          SET started.handedOver = true
-          FOREACH (_ IN CASE WHEN $revoked THEN [1] ELSE [] END |
-            MERGE (user)-[:LOST_CALL_MODERATION]->(session)
-          )
+          WITH DISTINCT user
+          RETURN count(user) AS appointed
         `,
-    { sessionId, userId, revoked },
-  )
+        { sessionId, userId, restore },
+      )
+      return Number(appointed.records[0].get('appointed')) > 0
+    })
+  } finally {
+    await session.close()
+  }
+}
 
 export const setEveryoneModerates = async (driver: Driver, sessionId: string, enabled: boolean) =>
   write(
@@ -260,9 +296,11 @@ const rolePermissionsOf = async (
         permissions = allGroupPermissionKeys()
       } else {
         try {
-          permissions = JSON.parse(
-            (record.get('permissions') as string | null) ?? '[]',
-          ) as GroupPermissionKey[]
+          const parsed: unknown = JSON.parse((record.get('permissions') as string | null) ?? '[]')
+          // Valid JSON, but not a list of keys (an object, `true`): malformed all the same.
+          if (Array.isArray(parsed) && parsed.every((key) => typeof key === 'string')) {
+            permissions = parsed as GroupPermissionKey[]
+          }
           // eslint-disable-next-line no-catch-all/no-catch-all
         } catch {
           // A malformed role grants nothing here, as everywhere else.
@@ -329,18 +367,30 @@ export const settleModeration = async (
     !state.moderatorIds.includes(state.starterId) &&
     present.includes(state.starterId)
   ) {
-    await setModerator(driver, state.sessionId, state.starterId, { moderator: true })
-    return state.starterId
+    // Had it taken away meanwhile: then the state is read anew, and that counts.
+    if (await setModerator(driver, state.sessionId, state.starterId, { moderator: true })) {
+      return state.starterId
+    }
+    return settleModeration(driver, groupId, presentUserIds)
   }
   if (present.some((userId) => state.moderatorIds.includes(userId))) {
     return null
   }
   const eligible = present.filter((userId) => !state.revokedIds.includes(userId))
   const successor = await successorOf(driver, groupId, eligible.length > 0 ? eligible : present)
-  if (successor) {
-    await setModerator(driver, state.sessionId, successor, { moderator: true })
+  if (!successor) {
+    return null
   }
-  return successor
+  // Somebody it was taken from gets it back only when nobody else is left.
+  if (
+    await setModerator(driver, state.sessionId, successor, {
+      moderator: true,
+      restore: eligible.length === 0,
+    })
+  ) {
+    return successor
+  }
+  return settleModeration(driver, groupId, presentUserIds)
 }
 
 // --- The media server's side ---------------------------------------------------------------
