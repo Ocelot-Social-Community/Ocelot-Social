@@ -47,6 +47,8 @@ import { HASHTAG, MENTION } from '../../constants/editor'
 import defaultExtensions from './defaultExtensions'
 import EventHandler from './plugins/eventHandler'
 import LinkShortcut from './plugins/linkShortcut'
+import { getMarkRange } from 'tiptap-utils'
+import LinkSelection, { markLinkSelection } from './plugins/linkSelection'
 import UnfinishedSuggestions, {
   UNFINISHED_CLASS,
   UNFINISHED_TYPE_ATTRIBUTE,
@@ -147,6 +149,20 @@ export default {
     },
   },
   watch: {
+    // The editor loses the focus to the input, and with it the browser's drawing of the selection:
+    // the selected text is marked meanwhile, so it can be seen what the link is for.
+    isLinkInputActive(active) {
+      if (!this.editor) return
+      const { selection, schema } = this.editor.state
+      let { from, to } = selection
+      // Only a cursor, inside a link: the link is what is edited, so it is the whole link that
+      // is marked.
+      if (from === to) {
+        const link = getMarkRange(selection.$from, schema.marks.link)
+        if (link) ({ from, to } = link)
+      }
+      markLinkSelection(this.editor.view, active && from < to ? { from, to } : null)
+    },
     placeholder: {
       immediate: true,
       handler: function (val) {
@@ -181,6 +197,8 @@ export default {
         // Only here, not in defaultExtensions: the read-only ContentViewer shares those.
         new LinkShortcut({ onShortcut: () => this.toggleLinkInputByShortcut() }),
         // Also only here: a mention or hashtag typed and not chosen from the list is framed.
+        // Keeps the text a link is made for marked while the link input has the focus.
+        new LinkSelection(),
         new UnfinishedSuggestions({
           types: [this.mentionSuggestions && MENTION, this.hashtagSuggestions && HASHTAG].filter(
             Boolean,
@@ -224,6 +242,9 @@ export default {
     this.editor.view.dom.addEventListener('mouseout', this.hideUnfinishedTooltip)
   },
   beforeDestroy() {
+    // Removing the focused link input fires its blur, which closes the input and would focus the
+    // editor and bring a suggestion list back after the teardown: see toggleLinkInput.
+    this._isDestroying = true
     this.editor.view.dom.removeEventListener('mouseover', this.showUnfinishedTooltip)
     this.editor.view.dom.removeEventListener('mouseout', this.hideUnfinishedTooltip)
     this.hideUnfinishedTooltip()
@@ -259,6 +280,56 @@ export default {
           return rect
         },
         // An inline span has no client box; popper falls back to the rect's size for 0.
+        clientWidth: 0,
+        clientHeight: 0,
+      }
+    },
+    // Anchors the link input at the selected text, below it, so it does not cover what is being
+    // linked. It is a virtual reference, measured anew every time popper asks (on scroll, on every
+    // change of the text), like the suggestion anchor above:
+    // • a cursor only: at the cursor;
+    // • a selection within one line: under the whole selection;
+    // • a selection over several lines: under its end, where the cursor is after selecting.
+    selectionAnchor(view) {
+      // Until the first measurement succeeds: an empty box, which popper can place (null it cannot).
+      let rect = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 }
+      return {
+        getBoundingClientRect() {
+          const { doc, selection } = view.state
+          const { from } = selection
+          let { to } = selection
+          // A selection that takes a line break along, a hard one or the end of a paragraph, ends at
+          // the start of the NEXT line, and that is the only line the browser reports for it. The
+          // input belongs under the last selected word, so the end is measured before the break.
+          while (to - 1 > from) {
+            const $to = doc.resolve(to)
+            const afterBreak =
+              $to.nodeBefore?.type.name === 'hard_break' ||
+              !$to.parent.inlineContent ||
+              $to.parentOffset === 0
+            if (!afterBreak) break
+            to -= 1
+          }
+          try {
+            const start = view.coordsAtPos(from)
+            // For a nonempty selection `to` is exclusive: measure the last selected character
+            // (side -1), so a wrap point does not put the input under the next, unselected line.
+            const end = view.coordsAtPos(to, from < to ? -1 : 1)
+            const oneLine = start.top === end.top
+            const left = oneLine ? start.left : end.left
+            rect = {
+              left,
+              right: end.right,
+              top: end.top,
+              bottom: end.bottom,
+              width: end.right - left,
+              height: end.bottom - end.top,
+            }
+          } catch (e) {
+            // The position is not in the view (anymore): stay where we were.
+          }
+          return rect
+        },
         clientWidth: 0,
         clientHeight: 0,
       }
@@ -503,6 +574,7 @@ export default {
       this.linkUrl = null
     },
     toggleLinkInput(attrs, element) {
+      if (this._isDestroying) return
       // Opening the link input, by the shortcut or by the toolbar button, while a mention or
       // hashtag list is open (or suspended because the focus left for the button): the list steps
       // aside and comes back when the input closes, whichever way it was opened.
@@ -519,7 +591,11 @@ export default {
         this.linkUrl = attrs.href
         this.isLinkInputActive = true
         this.$nextTick(() => {
-          this.$refs.contextMenu.displayContextMenu(element, this.$refs.linkInput, 'link')
+          this.$refs.contextMenu.displayContextMenu(
+            this.selectionAnchor(this.editor.view),
+            this.$refs.linkInput,
+            'link',
+          )
         })
       } else {
         this.isLinkInputActive = false
@@ -592,7 +668,7 @@ export default {
       if (!resume || this.suggestionType) return
       this.openSuggestionList(resume.props, resume.suggestionType)
     },
-    // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored to that button.
+    // Ctrl+K / Cmd+K: the same link input as the toolbar's link button, anchored at the selection.
     toggleLinkInputByShortcut() {
       this.toggleLinkInput(
         this.editor.getMarkAttrs('link'),
@@ -659,6 +735,12 @@ li > p {
   .unfinished-suggestion {
     outline: 1px solid var(--border-color-base);
     outline-offset: 1px;
+    border-radius: var(--border-radius-base);
+  }
+
+  /* The text the link input is open for, while the editor itself has no focus. */
+  .link-selection {
+    background-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
     border-radius: var(--border-radius-base);
   }
 

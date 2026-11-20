@@ -14,13 +14,20 @@ async function rewriteAdminPermissions(transform: (permissions: string[]) => str
   const transaction = session.beginTransaction()
   try {
     const result = await transaction.run(
+      // Each role is locked before its permissions are read — writing to it takes its write
+      // lock, held until the transaction ends; the property is removed again at once. A role
+      // edited meanwhile then waits, and is not overwritten with what was read before it.
       `MATCH (r) WHERE (r:GroupRole OR r:GroupRoleTemplate) AND r.name = $role
-       RETURN r.id AS id, r.permissions AS permissions`,
+       SET r.migrationLock = true
+       REMOVE r.migrationLock
+       RETURN id(r) AS node, r.id AS id, r.permissions AS permissions`,
       { role: ROLE },
     )
     const now = new Date().toISOString()
     for (const record of result.records) {
       const id = record.get('id') as string
+      // Handed back as the driver read it: a Neo4j integer, exact also beyond JavaScript's.
+      const node: unknown = record.get('node')
       let parsed: unknown
       try {
         parsed = JSON.parse((record.get('permissions') as string | null) ?? '[]')
@@ -41,11 +48,12 @@ async function rewriteAdminPermissions(transform: (permissions: string[]) => str
         continue
       }
       await transaction.run(
-        // A group role's id is `<groupId>:<name>`, a template role's `<template>:<name>`: unique
-        // across both labels.
-        `MATCH (r) WHERE (r:GroupRole OR r:GroupRoleTemplate) AND r.id = $id
+        // The very node read, not every one of that id: ids are unique only within each label.
+        // A group may be given its id by the client, so `<groupId>:admin` can be a template's
+        // `<template>:admin` as well.
+        `MATCH (r) WHERE id(r) = $node
          SET r.permissions = $permissions, r.updatedAt = $now`,
-        { id, permissions: JSON.stringify(next), now },
+        { node, permissions: JSON.stringify(next), now },
       )
     }
     await transaction.commit()

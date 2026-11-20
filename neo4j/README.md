@@ -1,6 +1,6 @@
 # Neo4j 4.4
 
-Human Connection is a social network. Using a graph based database which can
+ocelot.social is a social network. Using a graph based database which can
 model nodes and edges natively - a network - feels like an obvious choice. We
 decided to use [Neo4j](https://neo4j.com/), the currently most used graph
 database available. The community edition of Neo4J is Free and Open Source and

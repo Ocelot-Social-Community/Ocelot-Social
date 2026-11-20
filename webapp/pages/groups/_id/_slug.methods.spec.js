@@ -44,6 +44,92 @@ describe('pages/groups/_id/_slug.vue — methods', () => {
     })
   })
 
+  describe('whether the viewer was removed from the call running now', () => {
+    it('is taken from the first answer', () => {
+      const ctx = { videoCallRemoved: false }
+      apollo.videoCallParticipantCount.result.call(ctx, { data: { videoCallRemoved: true } })
+      expect(ctx.videoCallRemoved).toBe(true)
+      apollo.videoCallParticipantCount.result.call(ctx, { data: null })
+      expect(ctx.videoCallRemoved).toBe(false)
+    })
+
+    it('asks again once loaded when a push arrived while the first answer was on its way', () => {
+      let next
+      const query = { loading: true }
+      const ctx = {
+        $route: { params: { id: 'g1' } },
+        $apollo: {
+          queries: { videoCallParticipantCount: query },
+          subscribe: () => ({
+            subscribe: (handlers) => {
+              next = handlers.next
+              return { unsubscribe: jest.fn() }
+            },
+          }),
+        },
+        refetchVideoCallParticipantCount: jest.fn(),
+        reloadVideoCallCountAfterLoad: false,
+        videoCallParticipantCount: 0,
+        videoCallRemoved: false,
+      }
+      methods.setupVideoCallCountSubscription.call(ctx)
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 2, removed: true } },
+      })
+      // The first answer, older than the push, arrives after it: vue-apollo takes its count
+      // through update, then calls result.
+      query.loading = false
+      const stale = { videoCallParticipantCount: 0, videoCallRemoved: false }
+      ctx.videoCallParticipantCount = apollo.videoCallParticipantCount.update.call(ctx, stale)
+      apollo.videoCallParticipantCount.result.call(ctx, { data: stale })
+      expect(ctx.refetchVideoCallParticipantCount).toHaveBeenCalledTimes(1)
+      expect(ctx.reloadVideoCallCountAfterLoad).toBe(false)
+      // The pushed state stays while asking again — and so if that fails.
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 2, videoCallRemoved: true })
+      // That second answer includes the push, is taken, and asks for nothing more.
+      const fresh = { videoCallParticipantCount: 3, videoCallRemoved: true }
+      ctx.videoCallParticipantCount = apollo.videoCallParticipantCount.update.call(ctx, fresh)
+      apollo.videoCallParticipantCount.result.call(ctx, { data: fresh })
+      expect(ctx.refetchVideoCallParticipantCount).toHaveBeenCalledTimes(1)
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 3, videoCallRemoved: true })
+    })
+
+    it('follows every count pushed, and is forgotten with the subscription', () => {
+      let next
+      const unsubscribe = jest.fn()
+      const ctx = {
+        $route: { params: { id: 'g1' } },
+        $apollo: {
+          queries: {},
+          subscribe: () => ({
+            subscribe: (handlers) => {
+              next = handlers.next
+              return { unsubscribe }
+            },
+          }),
+        },
+        videoCallParticipantCount: 0,
+        videoCallRemoved: false,
+      }
+      methods.setupVideoCallCountSubscription.call(ctx)
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 2, removed: true } },
+      })
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 2, videoCallRemoved: true })
+      // The count of a call that is over frees them again.
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 0, removed: false } },
+      })
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 0, videoCallRemoved: false })
+      next({
+        data: { videoCallParticipantCountChanged: { groupId: 'g1', count: 1, removed: true } },
+      })
+      methods.teardownVideoCallCountSubscription.call(ctx)
+      expect(unsubscribe).toHaveBeenCalled()
+      expect(ctx).toMatchObject({ videoCallParticipantCount: 0, videoCallRemoved: false })
+    })
+  })
+
   describe('apollo.profilePagePosts.error', () => {
     it('ends the spinner of a list that never loaded with "no posts"', () => {
       const ctx = { posts: null }

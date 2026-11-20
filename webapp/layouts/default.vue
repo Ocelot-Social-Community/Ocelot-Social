@@ -97,6 +97,7 @@
           @spotlight="callAction('spotlightPerson', $event)"
           @local-mute="(userId, muted) => callAction('muteForMe', userId, muted)"
           @switch-off="callAction('syncSwitchedOff', $event)"
+          @switch-on="callAction('switchOn', $event)"
         />
       </div>
       <client-only v-else>
@@ -203,10 +204,11 @@ export default {
         !!this.participantsView
       )
     },
-    // Which chat is asked for, as one value to watch.
+    // Which chat is asked for, as one value to watch — anew with every opening, the same chat
+    // opened again included.
     openChatTarget() {
-      const { showChat, chatUserId, groupId, roomId } = this.getShowChat
-      return showChat ? [chatUserId, groupId, roomId].join('|') : null
+      const { showChat, chatUserId, groupId, roomId, openings } = this.getShowChat
+      return showChat ? [chatUserId, groupId, roomId, openings].join('|') : null
     },
     // As high as the chat it stands for (Chat.vue's chatHeight beside a parked call).
     participantsHeight() {

@@ -772,11 +772,15 @@ export default {
       if (this.hideNavbar && event.clientY < 50) {
         this.hideNavbar = false
         this.navbarRevealedByHover = true
+        // Whatever sticks below the header (the editor's toolbar, say) moves down with it, as it
+        // does when the header comes back by scrolling; else the header lies over it.
+        this.$nextTick(() => this.updateHeaderOffset())
       } else if (this.navbarRevealedByHover && !this.hideNavbar) {
         const rect = this.$el.getBoundingClientRect()
         if (event.clientY > rect.bottom + 50) {
           this.hideNavbar = true
           this.navbarRevealedByHover = false
+          this.$nextTick(() => this.updateHeaderOffset())
         }
       }
     },

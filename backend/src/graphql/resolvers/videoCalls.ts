@@ -314,13 +314,40 @@ export const mayJoinCall = async (context: Context, groupId: string): Promise<bo
   return !!authorization?.has('group.videoCall.join')
 }
 
+// Whether the viewer was removed from the group's call running now, which keeps them out of it
+// until it is over: until the media server has closed its room and its session has ended (see
+// joinGroupVideoCall). Asked per viewer, also of a count pushed to every subscriber alike.
+//
+// Only a hint for the button: should it not be readable, it says "not removed" rather than fail.
+// A field that cannot be null and fails takes everything around it down — the count, the other
+// calls of the dock. Whether they get in is decided on joining anyway.
+const removedFromCall = async (context: Context, groupId: string): Promise<boolean> => {
+  if (!context.user) {
+    return false
+  }
+  try {
+    const moderation = await readModeration(context.driver, groupId)
+    return !!moderation?.removedIds.includes(context.user.id)
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch (err: unknown) {
+    logger.warn(`Reading whether a user was removed from the call of ${groupId} failed:`, err)
+    return false
+  }
+}
+
 // The videoConference policy is the single runtime switch, and it is enforced where every
 // other right is: the two group rights these resolvers sit behind carry it as their catalog
 // gate (`gatedBy: videoConference`), so the shield denies a disabled call before it arrives.
 // This file used to re-check it on the way in, which became unreachable — and an unreachable
 // guard is a claim nobody can verify. The one exception is activeVideoCalls, see there.
 export default {
+  VideoCallParticipantCount: {
+    removed: async (count: { groupId: string }, _args, context: Context) =>
+      removedFromCall(context, count.groupId),
+  },
   ActiveVideoCall: {
+    removed: async (call: ActiveVideoCallSource, _args, context: Context) =>
+      removedFromCall(context, call.groupId),
     participants: async (call: ActiveVideoCallSource, _args, context: Context) => {
       if (call.users) {
         return call.users
@@ -394,6 +421,8 @@ export default {
       noteCountTold(roomName, count)
       return count
     },
+    videoCallRemoved: async (_root, params: { groupId: string }, context: Context) =>
+      removedFromCall(context, params.groupId),
     activeVideoCalls: async (_root, _args, context: Context) => {
       // The exception to the rule above: a list, not an act, so it sits behind no right the
       // shield could gate — a dock with the feature off is empty, not an error. The rights
@@ -465,7 +494,12 @@ export default {
         livekitRoom: roomName,
         livekitSid: call.sid,
         presentUserIds: [...call.userIds],
+        currentSid: async () => (await getLiveCall(context.config, roomName))?.sid ?? null,
       })
+      // Not let in (removed, or the call over meanwhile): nothing of the moderation to settle.
+      if (!chatRoomId) {
+        return null
+      }
       // The session is where the moderation lives: whoever opened it moderates, whoever
       // started the call gets it back on returning. Every participant learns of it from the
       // room's metadata.
@@ -481,18 +515,20 @@ export default {
       // otherwise start one network-wide. The group right is itself capped by the network
       // `videoCall.create_<type>` (catalog: requiresNetworkPermission), which is why asking
       // the group side alone is strictly stronger than the per-type check this replaces.
+      // Removed from the running call: not again while it lasts. It lasts, its session with it,
+      // until the media server has closed its room — some seconds after the last one left; an
+      // empty room still is that call, and whoever came in would be disconnected as one removed
+      // (see moderationService.ts). The next call is a new session and lets them in; keeping
+      // somebody out for good is leaving the group.
+      const moderation = await readModeration(context.driver, params.groupId)
+      if (moderation?.removedIds.includes(context.user.id)) {
+        throw new AppError(Errors.VIDEO_CALL_REMOVED_FROM_CALL)
+      }
       const participantCount = await getLiveParticipantCount(context.config, roomName)
       if (participantCount === 0) {
         const authorization = await context.groupAuthorization.forGroup(params.groupId)
         if (!authorization?.has('group.videoCall.create')) {
           throw new AppError(Errors.VIDEO_CALL_START_NOT_PERMITTED)
-        }
-      } else {
-        // Removed from the running call: not again while it lasts. The next call is a new
-        // session and lets them in; keeping somebody out for good is leaving the group.
-        const moderation = await readModeration(context.driver, params.groupId)
-        if (moderation?.removedIds.includes(context.user.id)) {
-          throw new AppError(Errors.VIDEO_CALL_REMOVED_FROM_CALL)
         }
       }
       // LiveKit treats `identity` as a unique key in a room; two connections

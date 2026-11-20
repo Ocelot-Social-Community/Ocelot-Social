@@ -238,12 +238,45 @@ describe('HeaderMenu', () => {
   })
 
   describe('mouse move reveal/hide', () => {
+    const flush = async (wrapper) => {
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+    }
+
     it('reveals a hidden navbar near the top edge', () => {
       const wrapper = Wrapper()
       wrapper.vm.hideNavbar = true
       wrapper.vm.handleMouseMove({ clientY: 10 })
       expect(wrapper.vm.hideNavbar).toBe(false)
       expect(wrapper.vm.navbarRevealedByHover).toBe(true)
+    })
+
+    it('tells what sticks below the header, when the navbar is revealed by hovering', async () => {
+      const wrapper = Wrapper()
+      // jsdom has no layout: give the header a height.
+      Object.defineProperty(wrapper.vm.$el, 'offsetHeight', { value: 66 })
+      // The update queued by mounted() runs first, or it could be what writes the height below.
+      await flush(wrapper)
+      wrapper.vm.hideNavbar = true
+      wrapper.vm.updateHeaderOffset()
+      expect(document.documentElement.style.getPropertyValue('--header-height')).toBe('0px')
+      wrapper.vm.handleMouseMove({ clientY: 10 })
+      await flush(wrapper)
+      expect(document.documentElement.style.getPropertyValue('--header-height')).toBe('66px')
+    })
+
+    it('tells it again when the hover-revealed navbar hides', async () => {
+      const wrapper = Wrapper()
+      Object.defineProperty(wrapper.vm.$el, 'offsetHeight', { value: 66 })
+      await flush(wrapper)
+      wrapper.vm.hideNavbar = false
+      wrapper.vm.navbarRevealedByHover = true
+      wrapper.vm.updateHeaderOffset()
+      // Starts at the header's height, so a zero afterwards is the hide callback's doing.
+      expect(document.documentElement.style.getPropertyValue('--header-height')).toBe('66px')
+      wrapper.vm.handleMouseMove({ clientY: 500 })
+      await flush(wrapper)
+      expect(document.documentElement.style.getPropertyValue('--header-height')).toBe('0px')
     })
 
     it('re-hides a hover-revealed navbar when the cursor leaves it', () => {

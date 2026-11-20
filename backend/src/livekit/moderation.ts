@@ -20,8 +20,11 @@
 // moderates without a subscription of their own. What concerns one person only (muted by whom,
 // removed, made a moderator) goes to that person as a data message.
 
+import { TwirpError } from 'livekit-server-sdk'
+
 import { allGroupPermissionKeys } from '@src/groupPermission'
 import { dominatesInGroup } from '@src/groupRole/authority'
+import { parseStoredPermissions } from '@src/groupRole/storedPermissions'
 import { OWNER_ROLE } from '@src/groupRole/types'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -37,6 +40,8 @@ export const MODERATION_TOPIC = 'moderation'
 
 export interface ModerationState {
   sessionId: string
+  /** The id of the media-server room the session runs in; it tells this call from the next. */
+  livekitSid: string | null
   starterId: string | null
   starterHandedOver: boolean
   moderatorIds: string[]
@@ -44,6 +49,11 @@ export interface ModerationState {
   speakerIds: string[]
   revokedIds: string[]
   removedIds: string[]
+  /**
+   * Counts every change of who moderates or lost it (setModerator), so a write can tell whether
+   * anything changed since this state was read — also a change that was undone again.
+   */
+  revision: number
 }
 
 /** Whether the user moderates the call: named as a moderator, or everybody does. */
@@ -69,13 +79,15 @@ export const readModeration = async (
           ${OPEN_SESSION}
           OPTIONAL MATCH (starter:User)-[started:STARTED_CALL]->(session)
           RETURN session.id AS sessionId,
+                 session.livekitSid AS livekitSid,
                  starter.id AS starterId,
                  coalesce(started.handedOver, false) AS starterHandedOver,
                  coalesce(session.everyoneModerates, false) AS everyoneModerates,
                  [(user:User)-[:MODERATES_CALL]->(session) | user.id] AS moderatorIds,
                  [(user:User)-[:HAS_CALL_FLOOR]->(session) | user.id] AS speakerIds,
                  [(user:User)-[:LOST_CALL_MODERATION]->(session) | user.id] AS revokedIds,
-                 [(user:User)-[:REMOVED_FROM_CALL]->(session) | user.id] AS removedIds
+                 [(user:User)-[:REMOVED_FROM_CALL]->(session) | user.id] AS removedIds,
+                 coalesce(session.moderationRevision, 0) AS revision
         `,
         { groupId },
       ),
@@ -86,6 +98,7 @@ export const readModeration = async (
     }
     return {
       sessionId: record.get('sessionId') as string,
+      livekitSid: record.get('livekitSid') as string | null,
       starterId: record.get('starterId') as string | null,
       starterHandedOver: record.get('starterHandedOver') === true,
       everyoneModerates: record.get('everyoneModerates') === true,
@@ -93,6 +106,7 @@ export const readModeration = async (
       speakerIds: [...(record.get('speakerIds') as string[])].sort(),
       revokedIds: [...(record.get('revokedIds') as string[])].sort(),
       removedIds: [...(record.get('removedIds') as string[])].sort(),
+      revision: Number(record.get('revision')),
     }
   } finally {
     await session.close()
@@ -112,38 +126,95 @@ const write = async (driver: Driver, query: string, variables: Record<string, un
  * Makes the user a moderator, or not. Taking it away from somebody else is a revocation: they
  * cannot take it back themselves. Whoever gives it up, or has it taken, and started the call,
  * does not get it back on returning either.
+ *
+ * Making somebody a moderator whose moderation was taken away gives it back only with `restore`:
+ * whether it was taken is asked when writing, not of a state read before. A revocation made
+ * meanwhile then holds, also against an appointment decided on the earlier state. Returns
+ * whether the user moderates now (for taking it away: always true).
+ *
+ * `restore: true` is for whoever may give it back in any case. `restore: { unchangedSince }`
+ * gives it back only if the moderation has not changed since the state of that `revision` was
+ * read — for a decision that holds only for that state (see settleModeration).
  */
 export const setModerator = async (
   driver: Driver,
   sessionId: string,
   userId: string,
-  { moderator, revoked = false }: { moderator: boolean; revoked?: boolean },
-) =>
-  write(
-    driver,
-    moderator
-      ? `
+  {
+    moderator,
+    revoked = false,
+    restore = false,
+  }: {
+    moderator: boolean
+    revoked?: boolean
+    restore?: boolean | { unchangedSince: number }
+  },
+): Promise<boolean> => {
+  const session = driver.session()
+  try {
+    return await session.writeTransaction(async (transaction) => {
+      // The group's lock, as joining the call's chat and removing somebody take it: giving and
+      // taking the moderation happen one after the other, so the check below sees a
+      // revocation made before it. A statement of its own, so the lock is surely held first.
+      await transaction.run(
+        `
+          MATCH (:VideoCallSession { id: $sessionId })-[:CALL_IN]->(group:Group)
+          SET group.callSessionLock = true
+          REMOVE group.callSessionLock
+        `,
+        { sessionId },
+      )
+      if (!moderator) {
+        await transaction.run(
+          `
+            MATCH (session:VideoCallSession { id: $sessionId })
+            MATCH (user:User { id: $userId })
+            SET session.moderationRevision = coalesce(session.moderationRevision, 0) + 1
+            WITH user, session
+            OPTIONAL MATCH (user)-[moderation:MODERATES_CALL]->(session)
+            DELETE moderation
+            WITH user, session
+            OPTIONAL MATCH (user)-[started:STARTED_CALL]->(session)
+            SET started.handedOver = true
+            FOREACH (_ IN CASE WHEN $revoked THEN [1] ELSE [] END |
+              MERGE (user)-[:LOST_CALL_MODERATION]->(session)
+            )
+          `,
+          { sessionId, userId, revoked },
+        )
+        return true
+      }
+      const appointed = await transaction.run(
+        `
           MATCH (session:VideoCallSession { id: $sessionId })
           MATCH (user:User { id: $userId })
+          // Removed from the call meanwhile: no moderator, whatever else holds.
+          WHERE NOT (user)-[:REMOVED_FROM_CALL]->(session)
+            AND ($restore = true
+              OR NOT (user)-[:LOST_CALL_MODERATION]->(session)
+              OR coalesce(session.moderationRevision, 0) = $unchangedSince)
           MERGE (user)-[:MODERATES_CALL]->(session)
           WITH user, session
           OPTIONAL MATCH (user)-[revocation:LOST_CALL_MODERATION]->(session)
           DELETE revocation
-        `
-      : `
-          MATCH (session:VideoCallSession { id: $sessionId })
-          MATCH (user:User { id: $userId })
-          OPTIONAL MATCH (user)-[moderation:MODERATES_CALL]->(session)
-          DELETE moderation
-          WITH user, session
-          OPTIONAL MATCH (user)-[started:STARTED_CALL]->(session)
-          SET started.handedOver = true
-          FOREACH (_ IN CASE WHEN $revoked THEN [1] ELSE [] END |
-            MERGE (user)-[:LOST_CALL_MODERATION]->(session)
-          )
+          WITH DISTINCT user, session
+          SET session.moderationRevision = coalesce(session.moderationRevision, 0) + 1
+          RETURN count(user) AS appointed
         `,
-    { sessionId, userId, revoked },
-  )
+        {
+          sessionId,
+          userId,
+          restore: restore === true,
+          // No revision is negative: without one, this never matches.
+          unchangedSince: typeof restore === 'object' ? restore.unchangedSince : -1,
+        },
+      )
+      return Number(appointed.records[0].get('appointed')) > 0
+    })
+  } finally {
+    await session.close()
+  }
+}
 
 export const setEveryoneModerates = async (driver: Driver, sessionId: string, enabled: boolean) =>
   write(
@@ -198,7 +269,20 @@ export const markRemoved = async (driver: Driver, sessionId: string, userId: str
   write(
     driver,
     `
-      MATCH (session:VideoCallSession { id: $sessionId })
+      // The group's lock, as joining the call's chat takes it (see joinCallSession): a join
+      // asked for before the removal cannot let them back into the chat after it.
+      MATCH (read:VideoCallSession { id: $sessionId })-[:CALL_IN]->(group:Group)
+      SET group.callSessionLock = true
+      REMOVE group.callSessionLock
+      // A new chat may have started in the same media-server room since the session was read
+      // (see joinCallSession). It is the same call, so the removal goes to that session too —
+      // where it was written to the ended one alone, the new chat would let them back in.
+      WITH read, group
+      OPTIONAL MATCH (current:VideoCallSession)-[:CALL_IN]->(group)
+        WHERE current.endedAt IS NULL AND current.livekitSid = read.livekitSid
+          AND current <> read
+      WITH [read] + collect(current) AS sessions
+      UNWIND sessions AS session
       MATCH (user:User { id: $userId })
       MERGE (user)-[:REMOVED_FROM_CALL]->(session)
       WITH user, session
@@ -236,19 +320,12 @@ const rolePermissionsOf = async (
     const rights = new Map<string, Set<GroupPermissionKey>>()
     for (const record of result.records) {
       const roleName = record.get('roleName') as string
-      let permissions: GroupPermissionKey[] = []
-      if (roleName === OWNER_ROLE) {
-        permissions = allGroupPermissionKeys()
-      } else {
-        try {
-          permissions = JSON.parse(
-            (record.get('permissions') as string | null) ?? '[]',
-          ) as GroupPermissionKey[]
-          // eslint-disable-next-line no-catch-all/no-catch-all
-        } catch {
-          // A malformed role grants nothing here, as everywhere else.
-        }
-      }
+      // Read as every other path reads a role: a malformed list grants nothing, and keys the
+      // catalog does not know count for nothing — they would only make ranks incomparable.
+      const permissions =
+        roleName === OWNER_ROLE
+          ? allGroupPermissionKeys()
+          : parseStoredPermissions(record.get('permissions') as string | null)
       rights.set(record.get('userId') as string, new Set(permissions))
     }
     return rights
@@ -310,18 +387,31 @@ export const settleModeration = async (
     !state.moderatorIds.includes(state.starterId) &&
     present.includes(state.starterId)
   ) {
-    await setModerator(driver, state.sessionId, state.starterId, { moderator: true })
-    return state.starterId
+    // Had it taken away meanwhile: nothing now (see below).
+    const restored = await setModerator(driver, state.sessionId, state.starterId, {
+      moderator: true,
+    })
+    return restored ? state.starterId : null
   }
   if (present.some((userId) => state.moderatorIds.includes(userId))) {
     return null
   }
   const eligible = present.filter((userId) => !state.revokedIds.includes(userId))
   const successor = await successorOf(driver, groupId, eligible.length > 0 ? eligible : present)
-  if (successor) {
-    await setModerator(driver, state.sessionId, successor, { moderator: true })
+  if (!successor) {
+    return null
   }
-  return successor
+  // Somebody it was taken from gets it back only when nobody else is left — as far as this state
+  // knows: so only while the moderation is as it was read. Given back and taken again meanwhile,
+  // somebody else moderated in between, who may still be there.
+  const appointed = await setModerator(driver, state.sessionId, successor, {
+    moderator: true,
+    restore: eligible.length === 0 ? { unchangedSince: state.revision } : false,
+  })
+  // Refused because the moderation changed meanwhile: not tried again on the participants given,
+  // who may be out of date by now. The next settling asks the media server afresh — the poller
+  // does on every poll of a room with people in it, and every act of moderation settles.
+  return appointed ? successor : null
 }
 
 // --- The media server's side ---------------------------------------------------------------
@@ -378,6 +468,11 @@ export const SOURCES = {
 /**
  * Mutes what these connections publish from those sources. Unmuting is left to the person
  * themselves: nobody gets somebody else's microphone opened.
+ *
+ * Every track is tried on its own: one that fails does not hold back the others, nor what is
+ * done after them. A track can be gone since the connections were listed — a client switching
+ * DTX publishes its microphone anew, under another SID (#10792). Whoever it belongs to is told
+ * all the same (see notify), and their client then switches it off itself.
  */
 export const muteTracks = async (
   client: RoomServiceClient,
@@ -385,7 +480,7 @@ export const muteTracks = async (
   connections: Connection[],
   sources: readonly number[],
 ): Promise<void> => {
-  await Promise.all(
+  const results = await Promise.allSettled(
     connections.flatMap((connection) =>
       connection.tracks
         .filter((track) => sources.includes(track.source) && !track.muted)
@@ -398,14 +493,27 @@ export const muteTracks = async (
         ),
     ),
   )
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      logger.warn(`A track in ${roomName} could not be muted:`, result.reason)
+    }
+  }
 }
 
+// A connection the media server no longer knows: gone already.
+const isGone = (err: unknown) =>
+  err instanceof TwirpError && (err.status === 404 || err.code === 'not_found')
+
+/**
+ * Takes these connections out of the room, each on its own: one that cannot be removed does not
+ * keep the others in, nor fail the act it is part of. One already gone is what was wanted.
+ */
 export const removeConnections = async (
   client: RoomServiceClient,
   roomName: string,
   connections: Connection[],
 ): Promise<void> => {
-  await Promise.all(
+  const results = await Promise.allSettled(
     connections.map(async (connection) =>
       withTimeout(
         client.removeParticipant(roomName, connection.identity),
@@ -414,6 +522,11 @@ export const removeConnections = async (
       ),
     ),
   )
+  for (const result of results) {
+    if (result.status === 'rejected' && !isGone(result.reason)) {
+      logger.warn(`A connection in ${roomName} could not be removed:`, result.reason)
+    }
+  }
 }
 
 /** What every participant reads from the room's metadata. */
@@ -465,6 +578,8 @@ export interface ModerationNotice {
   by?: string
   /** For `moderator`: how it came about. */
   reason?: 'appointed' | 'handedOver' | 'automatic'
+  /** Done by the user themselves, for their other devices: their buttons follow, nothing told. */
+  self?: true
 }
 
 /** Tells these connections — or everybody, without any — what was done. */

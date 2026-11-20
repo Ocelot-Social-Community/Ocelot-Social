@@ -38,10 +38,11 @@ vi.mock('livekit-server-sdk', async (importOriginal) => {
 const { TrackSource } = await import('livekit-server-sdk')
 const { default: Factory, cleanDatabase } = await import('@db/factories')
 const { createApolloTestSetup } = await import('@root/test/helpers')
-const { joinCallSession } = await import('@src/livekit/callSession')
+const { endCallSession, joinCallSession } = await import('@src/livekit/callSession')
 const { readModeration, setEveryoneModerates, setModerator, markRemoved } =
   await import('@src/livekit/moderation')
 const { standing } = await import('./videoCallModeration')
+const { default: videoCallResolvers } = await import('./videoCalls')
 const q = async (name: string) => (await import(`@graphql/queries/videoCalls/${name}.gql`)).default
 const [
   Moderate,
@@ -54,6 +55,7 @@ const [
   Rights,
   Successor,
   JoinGroupVideoCall,
+  VideoCallRemoved,
 ] = await Promise.all(
   [
     'ModerateVideoCallParticipant',
@@ -66,6 +68,7 @@ const [
     'VideoCallModerationRights',
     'VideoCallModerationSuccessor',
     'JoinGroupVideoCall',
+    'VideoCallRemoved',
   ].map(q),
 )
 
@@ -139,6 +142,34 @@ const told = () =>
 const setSpeakersFor = async (sessionId: string, userIds: string[]) => {
   const { setSpeakers } = await import('@src/livekit/moderation')
   await setSpeakers(database.driver, sessionId, userIds)
+}
+
+// Takes the moderation from `userId` just before the next write to the database, after whatever
+// was read before it: as another moderator revoking it at that very moment would.
+// Runs `meanwhile` just before the next write to the database, after whatever was read before it:
+// as another moderator acting at that very moment would.
+const beforeNextWrite = (meanwhile: (sessionId: string) => Promise<void>) => {
+  const { driver } = database
+  const real = driver.session.bind(driver)
+  const spy = vi.spyOn(driver, 'session')
+  spy.mockImplementation((...args) => {
+    const session = real(...args)
+    const writeTransaction = session.writeTransaction.bind(session)
+    session.writeTransaction = (async (work: Parameters<typeof writeTransaction>[0]) => {
+      spy.mockRestore()
+      const current = await readModeration(driver, 'g1')
+      await meanwhile(current?.sessionId as string)
+      return writeTransaction(work)
+    }) as typeof session.writeTransaction
+    return session
+  })
+}
+
+// Takes the moderation from `userId` that way.
+const revokeBeforeNextWrite = (userId: string) => {
+  beforeNextWrite(async (sessionId) => {
+    await setModerator(database.driver, sessionId, userId, { moderator: false, revoked: true })
+  })
 }
 
 const errorOf = (result: { errors?: readonly { message: string }[] }) => result.errors?.[0]?.message
@@ -303,6 +334,19 @@ describe('moderateVideoCallParticipant', () => {
     )
   })
 
+  it('is not for one removed, even while still connected and everybody moderates', async () => {
+    inCall('ute', 'udo')
+    const sessionId = await open('ute')
+    await setEveryoneModerates(database.driver, sessionId, true)
+    await markRemoved(database.driver, sessionId, 'udo')
+    as('udo')
+
+    expect(errorOf(await moderate('ute', 'MUTE_MICROPHONE'))).toBe(
+      'Only those taking part in the video call can moderate it.',
+    )
+    expect(room.mutePublishedTrack).not.toHaveBeenCalled()
+  })
+
   it('mutes, switches off and ends a share, and says who did it', async () => {
     inCall('ute', 'udo')
     await open('ute')
@@ -325,7 +369,7 @@ describe('moderateVideoCallParticipant', () => {
     ])
   })
 
-  it('reaches somebody above, and tells nobody when it is oneself', async () => {
+  it("reaches somebody above, and tells one's own devices without naming anybody", async () => {
     inCall('ute', 'olga')
     await open('ute')
     as('ute')
@@ -333,7 +377,10 @@ describe('moderateVideoCallParticipant', () => {
     await moderate('ute', 'MUTE_MICROPHONE')
 
     expect(room.mutePublishedTrack).toHaveBeenCalledTimes(2)
-    expect(told()).toEqual([{ type: 'microphoneMuted', by: 'Ute', to: ['olga'] }])
+    expect(told()).toEqual([
+      { type: 'microphoneMuted', by: 'Ute', to: ['olga'] },
+      { type: 'microphoneMuted', self: true, to: ['ute'] },
+    ])
   })
 
   it('removes a peer, who cannot join again while the call lasts', async () => {
@@ -360,6 +407,101 @@ describe('moderateVideoCallParticipant', () => {
     ).toBeUndefined()
   })
 
+  it('tells the one removed, and only them, that they cannot join until the call is over', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    await moderate('udo', 'REMOVE')
+    const removed = async () =>
+      (await query({ query: VideoCallRemoved, variables: { groupId: 'g1' } })).data
+        ?.videoCallRemoved
+
+    expect(await removed()).toBe(false)
+
+    as('udo')
+
+    expect(await removed()).toBe(true)
+
+    // Pushed alike to everybody, the count and the call in the dock are answered per viewer.
+    const viewer = (userId: string | null) =>
+      ({ user: userId ? { id: userId } : null, driver: database.driver }) as unknown as Context
+
+    expect(
+      await videoCallResolvers.VideoCallParticipantCount.removed(
+        { groupId: 'g1' },
+        {},
+        viewer('udo'),
+      ),
+    ).toBe(true)
+    expect(
+      await videoCallResolvers.ActiveVideoCall.removed(
+        { groupId: 'g1' } as never,
+        {},
+        viewer('ute'),
+      ),
+    ).toBe(false)
+    expect(
+      await videoCallResolvers.VideoCallParticipantCount.removed(
+        { groupId: 'g1' },
+        {},
+        viewer(null),
+      ),
+    ).toBe(false)
+
+    // Unreadable, it is no reason to lose the count or the dock: "not removed" — joining decides.
+    const unreadable = {
+      user: { id: 'udo' },
+      driver: {
+        session: () => {
+          throw new Error('database down')
+        },
+      },
+    } as unknown as Context
+
+    expect(
+      await videoCallResolvers.VideoCallParticipantCount.removed({ groupId: 'g1' }, {}, unreadable),
+    ).toBe(false)
+
+    // Over once the session has ended.
+    await endCallSession(database.driver, 'RM_1')
+
+    expect(await removed()).toBe(false)
+  })
+
+  it('keeps one removed out of the room everybody has left, until the call is over', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    await moderate('udo', 'REMOVE')
+    // Everybody has gone; the media server keeps the empty room a while, the session runs on.
+    inCall()
+    as('udo')
+
+    expect(
+      errorOf(await mutate({ mutation: JoinGroupVideoCall, variables: { groupId: 'g1' } })),
+    ).toBe('You were removed from this video call. You can join the next one.')
+  })
+
+  it('keeps one removed out when somebody new opens a chat of their own in the emptied room', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    await moderate('udo', 'REMOVE')
+    // Everybody has gone; Adam, who was not in the call, walks into the room the media server
+    // still keeps, and gets a new session with a new chat — in the same call.
+    inCall('adam')
+    await open('adam')
+    as('udo')
+
+    expect(
+      errorOf(await mutate({ mutation: JoinGroupVideoCall, variables: { groupId: 'g1' } })),
+    ).toBe('You were removed from this video call. You can join the next one.')
+    expect(
+      (await query({ query: VideoCallRemoved, variables: { groupId: 'g1' } })).data
+        ?.videoCallRemoved,
+    ).toBe(true)
+  })
+
   it('removes neither oneself, nor the owner, nor somebody above, nor a moderating peer', async () => {
     inCall('ute', 'udo', 'olga', 'adam')
     const sessionId = await open('ute')
@@ -378,29 +520,24 @@ describe('moderateVideoCallParticipant', () => {
 })
 
 describe('muteAllInVideoCall', () => {
-  it('mutes everybody not spared, gives the floor and says so to the new speakers', async () => {
+  it('mutes everybody not spared, nor whoever has the floor now, and leaves the floor alone', async () => {
     inCall('ute', 'udo', 'adam', 'olga')
     const sessionId = await open('ute')
+    // Given to Olga by another moderator while Ute was choosing, who did not see it yet.
     await setSpeakersFor(sessionId, ['olga'])
     as('ute')
     const result = await mutate({
       mutation: MuteAll,
-      variables: {
-        groupId: 'g1',
-        exceptUserIds: ['ute'],
-        floorUserIds: ['adam', 'olga', 'ute', 'gone'],
-      },
+      variables: { groupId: 'g1', exceptUserIds: ['ute'] },
     })
 
-    expect(result.data?.muteAllInVideoCall).toBe(1)
+    expect(result.data?.muteAllInVideoCall).toBe(2)
     expect(room.mutePublishedTrack.mock.calls.map((call) => (call as unknown[])[2])).toEqual([
       'udo-mic',
+      'adam-mic',
     ])
-    expect((await state())?.speakerIds).toEqual(['adam', 'olga', 'ute'])
-    expect(told()).toEqual([
-      { type: 'microphoneMuted', by: 'Ute', to: ['udo'] },
-      { type: 'floor', by: 'Ute', to: ['adam'] },
-    ])
+    expect((await state())?.speakerIds).toEqual(['olga'])
+    expect(told()).toEqual([{ type: 'microphoneMuted', by: 'Ute', to: ['udo', 'adam'] }])
   })
 
   it('mutes the moderator too when they are not spared', async () => {
@@ -409,11 +546,15 @@ describe('muteAllInVideoCall', () => {
     as('ute')
     const result = await mutate({
       mutation: MuteAll,
-      variables: { groupId: 'g1', exceptUserIds: [], floorUserIds: [] },
+      variables: { groupId: 'g1', exceptUserIds: [] },
     })
 
     expect(result.data?.muteAllInVideoCall).toBe(2)
-    expect(told()).toEqual([{ type: 'microphoneMuted', by: 'Ute', to: ['udo'] }])
+    // Their own devices follow as well, without being told who did it.
+    expect(told()).toEqual([
+      { type: 'microphoneMuted', by: 'Ute', to: ['udo'] },
+      { type: 'microphoneMuted', self: true, to: ['ute'] },
+    ])
   })
 
   it('is for moderators', async () => {
@@ -425,7 +566,7 @@ describe('muteAllInVideoCall', () => {
       errorOf(
         await mutate({
           mutation: MuteAll,
-          variables: { groupId: 'g1', exceptUserIds: [], floorUserIds: [] },
+          variables: { groupId: 'g1', exceptUserIds: [] },
         }),
       ),
     ).toBe('Only a moderator of the video call can do this.')
@@ -435,6 +576,32 @@ describe('muteAllInVideoCall', () => {
 describe('setVideoCallModerator', () => {
   const set = async (userId: string, moderator: boolean) =>
     mutate({ mutation: SetModerator, variables: { groupId: 'g1', userId, moderator } })
+
+  it('does not give back what another moderator took away after the state was read', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    revokeBeforeNextWrite('udo')
+
+    expect(errorOf(await set('udo', true))).toBe(
+      'You do not rank high enough in the group to do this to them.',
+    )
+    expect(await state()).toMatchObject({ moderatorIds: ['ute'], revokedIds: ['udo'] })
+    expect(told()).toEqual([])
+  })
+
+  it('is not for the moderation of an earlier room whose session is still open', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    // The media server runs a new room of the same name; nobody has joined its chat yet.
+    room.listRooms.mockResolvedValueOnce([{ name: 'group-g1', sid: 'RM_2' }])
+    as('ute')
+
+    expect(errorOf(await set('udo', true))).toBe(
+      'Only those taking part in the video call can moderate it.',
+    )
+    expect((await state())?.moderatorIds).toEqual(['ute'])
+  })
 
   it('lets anybody give up their own, and changes nothing otherwise for oneself', async () => {
     inCall('ute', 'udo')
@@ -630,6 +797,35 @@ describe('handOverVideoCallModeration', () => {
     expect(told()).toEqual([{ type: 'moderator', reason: 'handedOver', by: 'Ute', to: ['udo'] }])
   })
 
+  it('does not hand it to one it was taken from after the state was read', async () => {
+    inCall('ute', 'udo')
+    await open('ute')
+    as('ute')
+    revokeBeforeNextWrite('udo')
+    await handOver({ toUserId: 'udo' })
+
+    expect(await state()).toMatchObject({ revokedIds: ['udo'], starterHandedOver: true })
+    expect((await state())?.moderatorIds).not.toContain('udo')
+    expect(told()).not.toContainEqual(expect.objectContaining({ reason: 'handedOver' }))
+  })
+
+  it('does not hand it without a name to a revoked one given it back and taken it again meanwhile', async () => {
+    inCall('ute', 'udo')
+    const sessionId = await open('ute')
+    await setModerator(database.driver, sessionId, 'udo', { moderator: false, revoked: true })
+    as('ute')
+    // Nobody else is left but Udo; meanwhile Adam gives it back to him and takes it again.
+    beforeNextWrite(async (current) => {
+      await setModerator(database.driver, current, 'udo', { moderator: true, restore: true })
+      await setModerator(database.driver, current, 'udo', { moderator: false, revoked: true })
+    })
+    await handOver()
+
+    expect(await state()).toMatchObject({ revokedIds: ['udo'], starterHandedOver: true })
+    expect((await state())?.moderatorIds).not.toContain('udo')
+    expect(told()).not.toContainEqual(expect.objectContaining({ reason: 'handedOver' }))
+  })
+
   it('hands it to the successor without a name, or with one not in the call', async () => {
     inCall('ute', 'udo', 'adam')
     await open('ute')
@@ -648,6 +844,22 @@ describe('handOverVideoCallModeration', () => {
 
     expect((await state())?.moderatorIds).toEqual(['udo'])
     expect(told()).toEqual([])
+  })
+
+  it('gives it to a revoked one named only if the giver may give it back', async () => {
+    inCall('ute', 'udo', 'adam')
+    const sessionId = await open('ute')
+    await setModerator(database.driver, sessionId, 'udo', { moderator: false, revoked: true })
+    as('ute')
+    await handOver({ toUserId: 'udo' })
+
+    expect(await state()).toMatchObject({ moderatorIds: ['adam'], revokedIds: ['udo'] })
+
+    // An admin, who may step into calls, can.
+    as('adam')
+    await handOver({ toUserId: 'udo' })
+
+    expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: [] })
   })
 
   it('passes over a revoked one, unless nobody else is there', async () => {

@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { TrackSource } from 'livekit-server-sdk'
+import { TrackSource, TwirpError } from 'livekit-server-sdk'
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
+import logger from '@src/logger'
 
 import { joinCallSession } from './callSession'
 import {
@@ -65,16 +66,26 @@ beforeEach(async () => {
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:admin', name: 'admin', permissions: $admin })
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:usual', name: 'usual', permissions: $usual })
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:broken', name: 'broken', permissions: 'nonsense' })
+      CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:shaped', name: 'shaped', permissions: $shaped })
+      CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:flag', name: 'flag', permissions: 'true' })
+      CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:retired', name: 'retired', permissions: $retired })
       CREATE (:User { id: 'olga' })-[:MEMBER_OF { role: 'owner' }]->(g)
       CREATE (:User { id: 'adam' })-[:MEMBER_OF { role: 'admin' }]->(g)
       CREATE (:User { id: 'ute' })-[:MEMBER_OF { role: 'usual' }]->(g)
       CREATE (:User { id: 'udo' })-[:MEMBER_OF { role: 'usual' }]->(g)
       CREATE (:User { id: 'bert' })-[:MEMBER_OF { role: 'broken' }]->(g)
+      CREATE (:User { id: 'bea' })-[:MEMBER_OF { role: 'shaped' }]->(g)
+      CREATE (:User { id: 'flo' })-[:MEMBER_OF { role: 'flag' }]->(g)
+      CREATE (:User { id: 'rita' })-[:MEMBER_OF { role: 'retired' }]->(g)
       CREATE (:User { id: 'guest' })
     `,
     {
       admin: JSON.stringify(['group.read', 'group.post.pin', 'group.member.remove']),
       usual: JSON.stringify(['group.read']),
+      // Valid JSON, but no list of keys: malformed all the same.
+      shaped: JSON.stringify({ 'group.read': true }),
+      // A key the catalog no longer knows.
+      retired: JSON.stringify(['group.read', 'group.retired']),
     },
   )
 })
@@ -94,6 +105,7 @@ describe(readModeration, () => {
 
     expect(await state()).toEqual({
       sessionId: expect.any(String),
+      livekitSid: 'RM_1',
       starterId: 'ute',
       starterHandedOver: false,
       moderatorIds: ['ute'],
@@ -101,6 +113,7 @@ describe(readModeration, () => {
       speakerIds: [],
       revokedIds: [],
       removedIds: [],
+      revision: 0,
     })
   })
 })
@@ -139,12 +152,43 @@ describe(setModerator, () => {
 
     expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['udo'] })
 
+    // Not given back without being asked to: the revocation holds.
+    expect(await setModerator(driver, sessionId, 'udo', { moderator: true })).toBe(false)
+    expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['udo'] })
+
     // Given back: the revocation goes with it.
-    await setModerator(driver, sessionId, 'udo', { moderator: true })
+    expect(await setModerator(driver, sessionId, 'udo', { moderator: true, restore: true })).toBe(
+      true,
+    )
 
     expect(await state()).toMatchObject({ moderatorIds: ['udo'], revokedIds: [] })
   })
 })
+
+// Runs `meanwhile` just before the next write of the moderation, after whatever was read before:
+// as another moderator acting at that very moment would.
+const beforeNextWrite = (meanwhile: (sessionId: string) => Promise<void>) => {
+  const real = driver.session.bind(driver)
+  const spy = vi.spyOn(driver, 'session')
+  // Reading goes through; the first write finds what was done just before it.
+  spy.mockImplementation((...args) => {
+    const session = real(...args)
+    const writeTransaction = session.writeTransaction.bind(session)
+    session.writeTransaction = (async (work: Parameters<typeof writeTransaction>[0]) => {
+      spy.mockRestore()
+      await meanwhile((await state()).sessionId)
+      return writeTransaction(work)
+    }) as typeof session.writeTransaction
+    return session
+  })
+}
+
+// Takes the moderation from `userId` that way.
+const revokeBeforeNextWrite = (userId: string) => {
+  beforeNextWrite(async (sessionId) => {
+    await setModerator(driver, sessionId, userId, { moderator: false, revoked: true })
+  })
+}
 
 describe('the floor', () => {
   it('is given to exactly those named, and one by one', async () => {
@@ -191,6 +235,65 @@ describe(markRemoved, () => {
 
     expect(Number(chats.records[0].get('n'))).toBe(0)
   })
+
+  it('does not let them back into the chat by a join asked for before', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    expect(await open('udo', ['ute', 'udo'])).toBeNull()
+
+    const chats = await run(`MATCH (:User { id: 'udo' })-[c:CHATS_IN]->() RETURN count(c) AS n`)
+
+    expect(Number(chats.records[0].get('n'))).toBe(0)
+  })
+
+  it('does not let them open a session of their own once the others have gone', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    // Ute has left; Udo is still connected, the disconnecting not through yet.
+    expect(await open('udo', ['udo'])).toBeNull()
+    expect(await state()).toMatchObject({ sessionId, removedIds: ['udo'] })
+
+    const chats = await run(`MATCH (:User { id: 'udo' })-[c:CHATS_IN]->() RETURN count(c) AS n`)
+
+    expect(Number(chats.records[0].get('n'))).toBe(0)
+  })
+
+  it('reaches a new chat started in the same room after the session was read', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    // Meanwhile all seem gone to the media server, and Adam starts a new chat in the room.
+    await open('adam')
+    await markRemoved(driver, sessionId, 'udo')
+
+    expect(await state()).toMatchObject({ removedIds: ['udo'] })
+    expect(sessionId).not.toBe((await state()).sessionId)
+    expect(await open('udo', ['adam', 'udo'])).toBeNull()
+  })
+
+  it('lets them into the next call, a media-server room of another sid', async () => {
+    await open('ute')
+    await open('udo', ['ute', 'udo'])
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    const roomId = await joinCallSession(driver, {
+      groupId: 'g1',
+      userId: 'udo',
+      livekitRoom: 'group-g1',
+      livekitSid: 'RM_2',
+      presentUserIds: ['udo'],
+    })
+
+    expect(roomId).toEqual(expect.any(String))
+    expect(await state()).toMatchObject({ removedIds: [] })
+  })
 })
 
 describe(successorOf, () => {
@@ -203,6 +306,16 @@ describe(successorOf, () => {
   it('counts a malformed role, and somebody not in the group, as holding nothing', async () => {
     expect(await successorOf(driver, 'g1', ['bert', 'guest', 'ute'])).toBe('ute')
     expect(await successorOf(driver, 'g1', ['guest', 'bert'])).toBe('guest')
+  })
+
+  it('counts a role whose rights are valid JSON but no list of keys as holding nothing', async () => {
+    expect(await successorOf(driver, 'g1', ['bea', 'flo', 'ute'])).toBe('ute')
+    expect(await successorOf(driver, 'g1', ['flo', 'bea'])).toBe('flo')
+  })
+
+  it('counts no key the catalog does not know, which would make ranks incomparable', async () => {
+    // Rita has been in the call longer, but the owner outranks her all the same.
+    expect(await successorOf(driver, 'g1', ['rita', 'olga'])).toBe('olga')
   })
 
   it('finds nobody among nobody', async () => {
@@ -261,6 +374,83 @@ describe(settleModeration, () => {
     await setModerator(driver, sessionId, 'ute', { moderator: false })
 
     expect(await settleModeration(driver, 'g1', ['adam', 'udo'])).toBe('udo')
+  })
+
+  it('does not give the starter back what was taken from them after the state was read', async () => {
+    await open('ute')
+    await run(`MATCH (:User { id: 'ute' })-[m:MODERATES_CALL]->() DELETE m`)
+    revokeBeforeNextWrite('ute')
+
+    // Nobody now: the next settling, with whoever is there by then, decides.
+    expect(await settleModeration(driver, 'g1', ['ute', 'udo'])).toBeNull()
+    expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['ute'] })
+  })
+
+  it('does not give a successor back what was taken from them after the state was read', async () => {
+    await open('ute')
+    await setModerator(driver, (await state()).sessionId, 'ute', { moderator: false })
+    revokeBeforeNextWrite('adam')
+
+    expect(await settleModeration(driver, 'g1', ['adam', 'udo'])).toBeNull()
+    expect(await state()).toMatchObject({ moderatorIds: [], revokedIds: ['adam'] })
+    // The next settling finds the revocation and passes them over.
+    expect(await settleModeration(driver, 'g1', ['adam', 'udo'])).toBe('udo')
+  })
+
+  it('does not give a revoked one back what was given and taken again after the state was read', async () => {
+    await open('ute')
+    const { sessionId } = await state()
+    await setModerator(driver, sessionId, 'udo', { moderator: false, revoked: true })
+    await setModerator(driver, sessionId, 'ute', { moderator: false })
+    // Udo alone is there and would get it back; meanwhile Olga comes in, gives it back to him
+    // and takes it again.
+    beforeNextWrite(async (current) => {
+      await setModerator(driver, current, 'olga', { moderator: true, restore: true })
+      await setModerator(driver, current, 'udo', { moderator: true, restore: true })
+      await setModerator(driver, current, 'udo', { moderator: false, revoked: true })
+    })
+
+    expect(await settleModeration(driver, 'g1', ['udo'])).toBeNull()
+    expect(await state()).toMatchObject({ moderatorIds: ['olga'], revokedIds: ['udo'] })
+  })
+
+  it('makes nobody a moderator who was removed from the call meanwhile', async () => {
+    await open('ute')
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    expect(await setModerator(driver, sessionId, 'udo', { moderator: true, restore: true })).toBe(
+      false,
+    )
+    expect((await state()).moderatorIds).toEqual(['ute'])
+  })
+
+  it('counts every change of the moderation', async () => {
+    await open('ute')
+    const { sessionId } = await state()
+    await setModerator(driver, sessionId, 'udo', { moderator: true })
+    await setModerator(driver, sessionId, 'udo', { moderator: false, revoked: true })
+    // Refused: no change, nothing counted.
+    await setModerator(driver, sessionId, 'udo', { moderator: true })
+
+    expect((await state()).revision).toBe(2)
+    expect(
+      await setModerator(driver, sessionId, 'udo', {
+        moderator: true,
+        restore: { unchangedSince: 1 },
+      }),
+    ).toBe(false)
+    expect(
+      await setModerator(driver, sessionId, 'udo', {
+        moderator: true,
+        restore: { unchangedSince: 2 },
+      }),
+    ).toBe(true)
+    expect(await state()).toMatchObject({
+      moderatorIds: ['udo', 'ute'],
+      revokedIds: [],
+      revision: 3,
+    })
   })
 
   it('finds nobody in an empty call', async () => {
@@ -330,11 +520,67 @@ describe('the media server', () => {
     expect(service.mutePublishedTrack).toHaveBeenCalledWith('group-g1', 'a#1', 'mic', true)
   })
 
+  it('mutes every other track when one cannot be muted, and does not fail', async () => {
+    const mutePublishedTrack = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('track not found'))
+      .mockResolvedValue(undefined)
+    const service = client({ mutePublishedTrack })
+    const connections: Connection[] = [
+      {
+        identity: 'a#1',
+        userId: 'a',
+        tracks: [{ sid: 'gone', source: TrackSource.MICROPHONE, muted: false }],
+      },
+      {
+        identity: 'b#1',
+        userId: 'b',
+        tracks: [{ sid: 'mic', source: TrackSource.MICROPHONE, muted: false }],
+      },
+    ]
+
+    await expect(
+      muteTracks(service, 'group-g1', connections, SOURCES.microphone),
+    ).resolves.toBeUndefined()
+    expect(mutePublishedTrack).toHaveBeenCalledWith('group-g1', 'b#1', 'mic', true)
+  })
+
   it('removes connections', async () => {
     const service = client()
     await removeConnections(service, 'group-g1', [{ identity: 'a#1', userId: 'a', tracks: [] }])
 
     expect(service.removeParticipant).toHaveBeenCalledWith('group-g1', 'a#1')
+  })
+
+  it('removes every other connection when one cannot be removed, and does not fail', async () => {
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined)
+    const removeParticipant = vi
+      .fn()
+      // Gone meanwhile: what was wanted, not worth a word.
+      .mockRejectedValueOnce(new TwirpError('Not Found', 'participant not found', 404, 'not_found'))
+      // Told by its code alone, whatever the status.
+      .mockRejectedValueOnce(new TwirpError('Not Found', 'participant not found', 400, 'not_found'))
+      .mockRejectedValueOnce(new Error('media server down'))
+      .mockResolvedValue(undefined)
+    const service = client({ removeParticipant })
+    const connection = (identity: string) => ({ identity, userId: 'a', tracks: [] })
+
+    await expect(
+      removeConnections(service, 'group-g1', [
+        connection('a#1'),
+        connection('a#2'),
+        connection('a#3'),
+        connection('a#4'),
+      ]),
+    ).resolves.toBeUndefined()
+    expect(removeParticipant).toHaveBeenCalledWith('group-g1', 'a#4')
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('could not be removed'),
+      expect.objectContaining({ message: 'media server down' }),
+    )
+
+    warn.mockRestore()
   })
 
   it('publishes the state for every participant, and carries on when it cannot', async () => {

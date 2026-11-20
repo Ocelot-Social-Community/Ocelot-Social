@@ -38,6 +38,7 @@
     <p v-if="joined" class="active-video-call__joined" data-test="call-joined">
       {{ $t('dock.activeVideoCalls.joined') }}
     </p>
+    <!-- Removed from this call: said on the button, not only on hover, until the call is over. -->
     <os-button
       v-else
       data-test="call-join"
@@ -45,9 +46,16 @@
       appearance="outline"
       size="sm"
       full-width
+      :class="{ 'permission-denied': call.removed }"
+      :aria-disabled="!!call.removed"
+      v-tooltip="call.removed ? $t('backendErrors.VIDEO_CALL_REMOVED_FROM_CALL') : null"
       @click="join"
     >
-      {{ $t('dock.activeVideoCalls.join') }}
+      {{
+        call.removed
+          ? $t('videoCall.groupVideoCallButton.removed')
+          : $t('dock.activeVideoCalls.join')
+      }}
     </os-button>
   </article>
 </template>
@@ -99,6 +107,10 @@ export default {
         : user.name
     },
     async join() {
+      if (this.call.removed) {
+        this.$toast.error(this.$t('backendErrors.VIDEO_CALL_REMOVED_FROM_CALL'))
+        return
+      }
       // The call is running and listed because the viewer may join it — no "may I open it"
       // check like on the group page.
       if (this.showVideoCall) {

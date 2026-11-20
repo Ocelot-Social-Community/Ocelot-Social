@@ -268,12 +268,19 @@ describe('poll tick', () => {
     // Second tick with identical counts: no new publishes
     mockPublish.mockClear()
     mockListRooms.mockResolvedValueOnce([
-      { name: 'group-a', numParticipants: 2 },
+      { name: 'group-a', sid: 'RM_a', numParticipants: 2 },
       { name: 'group-b', numParticipants: 0 },
     ])
+    mockSettle.mockClear()
     await vi.advanceTimersByTimeAsync(15_000)
 
     expect(mockPublish).not.toHaveBeenCalled()
+    // The moderation is kept in step all the same, told what the room has published.
+    expect(mockSettle).toHaveBeenCalledTimes(1)
+    expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
+      published: '',
+      leftoversIn: 'RM_a',
+    })
   })
 
   it('publishes count: 0 for rooms that disappeared from the list', async () => {
@@ -419,12 +426,31 @@ describe('poll tick', () => {
     )
   })
 
-  it('does not emit a duplicate zero when the disappeared room was already at 0', async () => {
+  // The count is answered per subscriber with whether they were removed from the call
+  // (`removed`), which ends with the session: one more zero tells them they may join again.
+  it('emits one more zero once the session of a room already at 0 has ended', async () => {
     mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
     startLiveKitPoller()
     await vi.advanceTimersByTimeAsync(5_000)
     mockPublish.mockClear()
 
+    mockListRooms.mockResolvedValueOnce([])
+    await vi.advanceTimersByTimeAsync(15_000)
+
+    expect(mockPublish).toHaveBeenCalledTimes(1)
+    expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+      groupId: 'a',
+      count: 0,
+    })
+  })
+
+  it('emits no duplicate zero for a room already at 0 while its session is spared', async () => {
+    mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 0 }])
+    startLiveKitPoller()
+    await vi.advanceTimersByTimeAsync(5_000)
+    mockPublish.mockClear()
+
+    mockEndOfMissingRoom.mockResolvedValueOnce(false)
     mockListRooms.mockResolvedValueOnce([])
     await vi.advanceTimersByTimeAsync(15_000)
 
@@ -521,14 +547,36 @@ describe('poll tick', () => {
       expect(mockPublish).not.toHaveBeenCalled()
     })
 
+    it('keeps the moderation in step by the participants of one the list has empty', async () => {
+      startLiveKitPoller()
+      await vi.advanceTimersByTimeAsync(5_000)
+      mockSettle.mockClear()
+
+      // The list lags the other way: somebody is there, the list has nobody yet.
+      noteCountTold('group-a', 1)
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', sid: 'RM_a', numParticipants: 0 }])
+      mockListParticipants.mockResolvedValueOnce([{ identity: 'u1' }])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
+        published: '',
+        leftoversIn: 'RM_a',
+      })
+    })
+
     it('asks only for told rooms, and trusts the list for the others', async () => {
       startLiveKitPoller()
-      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 2 }])
+      mockListRooms.mockResolvedValueOnce([
+        { name: 'group-a', sid: 'RM_a', numParticipants: 2, metadata: '{"moderation":null}' },
+      ])
       await vi.advanceTimersByTimeAsync(5_000)
 
       expect(mockListParticipants).not.toHaveBeenCalled()
       // Somebody came: the moderation is checked for the room.
-      expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a')
+      expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
+        published: '{"moderation":null}',
+        leftoversIn: 'RM_a',
+      })
       expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
         groupId: 'a',
         count: 2,

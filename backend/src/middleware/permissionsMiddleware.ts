@@ -807,6 +807,7 @@ export default shield(
       UnreadRooms: isAuthenticated,
       videoCallConfig: allow,
       videoCallParticipantCount: and(isAuthenticated, hasGroupPermission('group.videoCall.join')),
+      videoCallRemoved: and(isAuthenticated, hasGroupPermission('group.videoCall.join')),
       // Taking part in the call is checked in the resolvers (livekit/moderation.ts): only the
       // media server knows who is in it.
       videoCallModerationRights: and(

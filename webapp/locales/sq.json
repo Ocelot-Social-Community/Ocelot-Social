@@ -2040,12 +2040,13 @@
     "gotoGroup": "Shko te grupi „{name}“",
     "groupVideoCallButton": {
       "label": "Video grupi",
+      "removed": "U hoqe nga kjo thirrje",
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
     "handover": {
       "confirm": "Kaloje dhe largohu",
       "skip": "Largohu pa zgjedhur",
-      "suggested": "propozim",
+      "suggestedName": "{name} (propozim)",
       "text": "Je i fundit që moderon këtë thirrje. Kaloje moderimin para se të largohesh.",
       "title": "Kush moderon tani e tutje?"
     },
@@ -2131,7 +2132,7 @@
       "showLarge": "Shfaq të madh",
       "speaking": "po flet",
       "stopSharing": "Përfundo ndarjen e ekranit",
-      "takeFloor": "Merre fjalën",
+      "takeFloor": "Hiqja fjalën",
       "takeOver": "Merr moderimin",
       "unmuteForMe": "Dëgjo sërish"
     },

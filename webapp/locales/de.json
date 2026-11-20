@@ -2040,12 +2040,13 @@
     "gotoGroup": "Zur Gruppe „{name}“",
     "groupVideoCallButton": {
       "label": "Gruppen-Video",
+      "removed": "Aus diesem Anruf entfernt",
       "tooltip": "Videoanruf in der Gruppe „{name}“"
     },
     "handover": {
       "confirm": "Weitergeben und verlassen",
       "skip": "Ohne Auswahl verlassen",
-      "suggested": "Vorschlag",
+      "suggestedName": "{name} (Vorschlag)",
       "text": "Du moderierst diesen Anruf als Letzter. Gib die Moderation weiter, bevor du gehst.",
       "title": "Wer moderiert ab jetzt?"
     },

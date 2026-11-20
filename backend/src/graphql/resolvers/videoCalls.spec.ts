@@ -655,7 +655,7 @@ describe('joinGroupVideoCall', () => {
         userId: 'bare-1',
         avatarUrl: null,
         // For the link to their profile in the call's list of participants.
-        slug: expect.any(String),
+        slug: (authenticatedUser as { slug: string }).slug,
       })
     })
 
@@ -760,18 +760,46 @@ describe('joinGroupVideoCallChat', () => {
 
   it('returns another room for the next call of the group', async () => {
     listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
-    listRoomsMock.mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_1' }])
+    // Asked twice per admission: once before, once under the lock (see joinCallSession).
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_1' }])
     const first = await mutate({
       mutation: JoinGroupVideoCallChat,
       variables: { groupId: 'chat-1' },
     })
-    listRoomsMock.mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_2' }])
+    listRoomsMock.mockResolvedValue([{ name: 'group-chat-1', sid: 'RM_2' }])
     const second = await mutate({
       mutation: JoinGroupVideoCallChat,
       variables: { groupId: 'chat-1' },
     })
 
     expect(second.data.joinGroupVideoCallChat).not.toBe(first.data.joinGroupVideoCallChat)
+  })
+
+  it('opens no chat when the call is over by the time the lock is held', async () => {
+    listParticipantsMock.mockResolvedValue([{ identity: 'member-1#abcd1234' }])
+    // Running when asked first; gone when asked again under the lock.
+    listRoomsMock
+      .mockResolvedValueOnce([{ name: 'group-chat-1', sid: 'RM_1' }])
+      .mockResolvedValueOnce([])
+
+    const { data, errors } = await mutate({
+      mutation: JoinGroupVideoCallChat,
+      variables: { groupId: 'chat-1' },
+    })
+
+    expect(errors).toBeUndefined()
+    expect(data.joinGroupVideoCallChat).toBeNull()
+    // Asked who is in it twice, for the admission; not a third time to settle a moderation.
+    expect(listParticipantsMock).toHaveBeenCalledTimes(2)
+
+    const session = database.driver.session()
+    try {
+      const sessions = await session.run('MATCH (call:VideoCallSession) RETURN count(call) AS n')
+
+      expect(Number(sessions.records[0].get('n'))).toBe(0)
+    } finally {
+      await session.close()
+    }
   })
 
   // The media server keeps a room for a while after the last participant has left. Whoever

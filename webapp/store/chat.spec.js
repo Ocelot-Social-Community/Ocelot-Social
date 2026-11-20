@@ -14,6 +14,7 @@ describe('chat store', () => {
         chatUserId: null,
         groupId: null,
         roomId: null,
+        openings: 0,
         unreadRoomCount: 0,
         dismissedHints: [],
       })
@@ -24,6 +25,14 @@ describe('chat store', () => {
     it('stores the open flag and target ids', () => {
       mutations.SET_OPEN_CHAT(state, { showChat: true, chatUserId: 'u1', groupId: 'g1' })
       expect(state).toMatchObject({ showChat: true, chatUserId: 'u1', groupId: 'g1' })
+    })
+
+    it('counts every opening, the same chat again included, but not a closing', () => {
+      state.openings = 0
+      mutations.SET_OPEN_CHAT(state, { showChat: true, chatUserId: 'u1' })
+      mutations.SET_OPEN_CHAT(state, { showChat: true, chatUserId: 'u1' })
+      mutations.SET_OPEN_CHAT(state, { showChat: false })
+      expect(state.openings).toBe(2)
     })
 
     it('stores a room opened by its id', () => {

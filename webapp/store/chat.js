@@ -6,6 +6,9 @@ export const state = () => {
     // A room opened by its id: the conference chat of a video call, which belongs to
     // neither one user nor the group as a whole.
     roomId: null,
+    // Counts every opening, so that opening the chat that is open already is noticed too: it
+    // brings it in front of the call's participants (layouts/default.vue).
+    openings: 0,
     unreadRoomCount: 0,
     // Keys of the chat hints dismissed with their X. Kept in the store only, so a reload
     // brings them back: many users are not at home with settings, and a hint that is gone
@@ -20,6 +23,7 @@ export const mutations = {
     state.chatUserId = ctx.chatUserId || null
     state.groupId = ctx.groupId || null
     state.roomId = ctx.roomId || null
+    if (state.showChat) state.openings += 1
   },
   UPDATE_ROOM_COUNT(state, count) {
     state.unreadRoomCount = count

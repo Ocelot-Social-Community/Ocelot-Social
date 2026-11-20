@@ -1,0 +1,3 @@
+query VideoCallRemoved($groupId: ID!) {
+  videoCallRemoved(groupId: $groupId)
+}
