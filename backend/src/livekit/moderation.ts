@@ -24,6 +24,7 @@ import { TwirpError } from 'livekit-server-sdk'
 
 import { allGroupPermissionKeys } from '@src/groupPermission'
 import { dominatesInGroup } from '@src/groupRole/authority'
+import { parseStoredPermissions } from '@src/groupRole/storedPermissions'
 import { OWNER_ROLE } from '@src/groupRole/types'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -187,9 +188,11 @@ export const setModerator = async (
         `
           MATCH (session:VideoCallSession { id: $sessionId })
           MATCH (user:User { id: $userId })
-          WHERE $restore = true
-             OR NOT (user)-[:LOST_CALL_MODERATION]->(session)
-             OR coalesce(session.moderationRevision, 0) = $unchangedSince
+          // Removed from the call meanwhile: no moderator, whatever else holds.
+          WHERE NOT (user)-[:REMOVED_FROM_CALL]->(session)
+            AND ($restore = true
+              OR NOT (user)-[:LOST_CALL_MODERATION]->(session)
+              OR coalesce(session.moderationRevision, 0) = $unchangedSince)
           MERGE (user)-[:MODERATES_CALL]->(session)
           WITH user, session
           OPTIONAL MATCH (user)-[revocation:LOST_CALL_MODERATION]->(session)
@@ -317,21 +320,12 @@ const rolePermissionsOf = async (
     const rights = new Map<string, Set<GroupPermissionKey>>()
     for (const record of result.records) {
       const roleName = record.get('roleName') as string
-      let permissions: GroupPermissionKey[] = []
-      if (roleName === OWNER_ROLE) {
-        permissions = allGroupPermissionKeys()
-      } else {
-        try {
-          const parsed: unknown = JSON.parse((record.get('permissions') as string | null) ?? '[]')
-          // Valid JSON, but not a list of keys (an object, `true`): malformed all the same.
-          if (Array.isArray(parsed) && parsed.every((key) => typeof key === 'string')) {
-            permissions = parsed as GroupPermissionKey[]
-          }
-          // eslint-disable-next-line no-catch-all/no-catch-all
-        } catch {
-          // A malformed role grants nothing here, as everywhere else.
-        }
-      }
+      // Read as every other path reads a role: a malformed list grants nothing, and keys the
+      // catalog does not know count for nothing — they would only make ranks incomparable.
+      const permissions =
+        roleName === OWNER_ROLE
+          ? allGroupPermissionKeys()
+          : parseStoredPermissions(record.get('permissions') as string | null)
       rights.set(record.get('userId') as string, new Set(permissions))
     }
     return rights

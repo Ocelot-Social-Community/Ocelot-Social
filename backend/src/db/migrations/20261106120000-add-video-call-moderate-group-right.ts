@@ -14,7 +14,12 @@ async function rewriteAdminPermissions(transform: (permissions: string[]) => str
   const transaction = session.beginTransaction()
   try {
     const result = await transaction.run(
+      // Each role is locked before its permissions are read — writing to it takes its write
+      // lock, held until the transaction ends; the property is removed again at once. A role
+      // edited meanwhile then waits, and is not overwritten with what was read before it.
       `MATCH (r) WHERE (r:GroupRole OR r:GroupRoleTemplate) AND r.name = $role
+       SET r.migrationLock = true
+       REMOVE r.migrationLock
        RETURN id(r) AS node, r.id AS id, r.permissions AS permissions`,
       { role: ROLE },
     )

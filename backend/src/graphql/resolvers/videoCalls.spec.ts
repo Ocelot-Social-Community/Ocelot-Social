@@ -789,6 +789,8 @@ describe('joinGroupVideoCallChat', () => {
 
     expect(errors).toBeUndefined()
     expect(data.joinGroupVideoCallChat).toBeNull()
+    // Asked who is in it twice, for the admission; not a third time to settle a moderation.
+    expect(listParticipantsMock).toHaveBeenCalledTimes(2)
 
     const session = database.driver.session()
     try {

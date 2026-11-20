@@ -1491,15 +1491,19 @@ describe('VideoCall', () => {
       // As LiveKit does: the track reports itself muted while setMicrophoneEnabled is still on
       // its way, before the button has changed.
       local.setMicrophoneEnabled.mockImplementation(async (enabled) => {
+        local.isMicrophoneEnabled = enabled
         if (!enabled) room.handlers.TrackMuted({ source: Track.Source.Microphone }, local)
       })
       wrapper.vm.micEnabled = true
       await wrapper.vm.toggleMic()
       await flushPromises()
+      // The device and the button agree, each time.
+      expect(local.isMicrophoneEnabled).toBe(false)
       expect(wrapper.vm.micEnabled).toBe(false)
       expect(wrapper.vm.micProblem).toBe(false)
       await wrapper.vm.toggleMic()
       await flushPromises()
+      expect(local.isMicrophoneEnabled).toBe(true)
       expect(wrapper.vm.micEnabled).toBe(true)
       expect(local.setMicrophoneEnabled).toHaveBeenLastCalledWith(true)
     })
@@ -6849,7 +6853,13 @@ describe('VideoCall — the people in the call and their moderation', () => {
         activeSpeakerIds: ['bob#2'],
       })
       expect(wrapper.vm.people).toEqual([
-        expect.objectContaining({ userId: 'u1', isMe: true, micOn: false, devices: 1 }),
+        expect.objectContaining({
+          userId: 'u1',
+          isMe: true,
+          micOn: false,
+          devices: 1,
+          here: { mic: false, camera: false },
+        }),
         expect.objectContaining({
           userId: 'bob',
           slug: 'bob-slug',
@@ -6861,6 +6871,27 @@ describe('VideoCall — the people in the call and their moderation', () => {
         }),
       ])
       expect(wrapper.vm.handoverCandidates.map((p) => p.userId)).toEqual(['bob'])
+      // Only one's own devices tell this one apart from the others.
+      expect(wrapper.vm.people[1].here).toBeUndefined()
+    })
+
+    it("keeps what this device has on apart from one's other devices", () => {
+      const { wrapper } = factory({ show: true })
+      wrapper.setData({
+        tiles: [
+          tile('me#1', 'u1', { isLocal: true, micEnabled: false }),
+          tile('me#2', 'u1', { micEnabled: true, videoTrack: {} }),
+        ],
+      })
+      expect(wrapper.vm.people).toEqual([
+        expect.objectContaining({
+          userId: 'u1',
+          micOn: true,
+          cameraOn: true,
+          devices: 2,
+          here: { mic: false, camera: false },
+        }),
+      ])
     })
   })
 
@@ -7503,15 +7534,23 @@ describe('VideoCall — the people in the call and their moderation', () => {
     })
 
     it('brings the page back in reach when it goes with the question open', async () => {
+      // A control of the page outside the call.
+      const outside = document.createElement('button')
+      document.body.appendChild(outside)
       const { wrapper } = inCall({ moderators: ['u1'], everyone: false, speakers: [] })
+      // In the page beside it, as the call is in the layout.
+      document.body.appendChild(wrapper.element)
       await wrapper.vm.requestLeave()
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
       const question = wrapper.find('[data-test="video-call-handover"]').element
       const others = [...question.parentElement.children].filter((el) => el !== question)
-      expect(others.every((el) => el.hasAttribute('inert'))).toBe(true)
+      expect([outside, ...others].every((el) => el.hasAttribute('inert'))).toBe(true)
+      const call = wrapper.element
       wrapper.destroy()
-      expect(others.some((el) => el.hasAttribute('inert'))).toBe(false)
+      expect([outside, ...others].some((el) => el.hasAttribute('inert'))).toBe(false)
+      outside.remove()
+      call.remove()
     })
 
     it('suggests nobody who has gone meanwhile', async () => {

@@ -496,6 +496,10 @@ export default {
         presentUserIds: [...call.userIds],
         currentSid: async () => (await getLiveCall(context.config, roomName))?.sid ?? null,
       })
+      // Not let in (removed, or the call over meanwhile): nothing of the moderation to settle.
+      if (!chatRoomId) {
+        return null
+      }
       // The session is where the moderation lives: whoever opened it moderates, whoever
       // started the call gets it back on returning. Every participant learns of it from the
       // room's metadata.

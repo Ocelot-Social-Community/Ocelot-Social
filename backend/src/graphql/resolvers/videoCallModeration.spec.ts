@@ -146,7 +146,9 @@ const setSpeakersFor = async (sessionId: string, userIds: string[]) => {
 
 // Takes the moderation from `userId` just before the next write to the database, after whatever
 // was read before it: as another moderator revoking it at that very moment would.
-const revokeBeforeNextWrite = (userId: string) => {
+// Runs `meanwhile` just before the next write to the database, after whatever was read before it:
+// as another moderator acting at that very moment would.
+const beforeNextWrite = (meanwhile: (sessionId: string) => Promise<void>) => {
   const { driver } = database
   const real = driver.session.bind(driver)
   const spy = vi.spyOn(driver, 'session')
@@ -156,13 +158,17 @@ const revokeBeforeNextWrite = (userId: string) => {
     session.writeTransaction = (async (work: Parameters<typeof writeTransaction>[0]) => {
       spy.mockRestore()
       const current = await readModeration(driver, 'g1')
-      await setModerator(driver, current?.sessionId as string, userId, {
-        moderator: false,
-        revoked: true,
-      })
+      await meanwhile(current?.sessionId as string)
       return writeTransaction(work)
     }) as typeof session.writeTransaction
     return session
+  })
+}
+
+// Takes the moderation from `userId` that way.
+const revokeBeforeNextWrite = (userId: string) => {
+  beforeNextWrite(async (sessionId) => {
+    await setModerator(database.driver, sessionId, userId, { moderator: false, revoked: true })
   })
 }
 
@@ -797,6 +803,23 @@ describe('handOverVideoCallModeration', () => {
     as('ute')
     revokeBeforeNextWrite('udo')
     await handOver({ toUserId: 'udo' })
+
+    expect(await state()).toMatchObject({ revokedIds: ['udo'], starterHandedOver: true })
+    expect((await state())?.moderatorIds).not.toContain('udo')
+    expect(told()).not.toContainEqual(expect.objectContaining({ reason: 'handedOver' }))
+  })
+
+  it('does not hand it without a name to a revoked one given it back and taken it again meanwhile', async () => {
+    inCall('ute', 'udo')
+    const sessionId = await open('ute')
+    await setModerator(database.driver, sessionId, 'udo', { moderator: false, revoked: true })
+    as('ute')
+    // Nobody else is left but Udo; meanwhile Adam gives it back to him and takes it again.
+    beforeNextWrite(async (current) => {
+      await setModerator(database.driver, current, 'udo', { moderator: true, restore: true })
+      await setModerator(database.driver, current, 'udo', { moderator: false, revoked: true })
+    })
+    await handOver()
 
     expect(await state()).toMatchObject({ revokedIds: ['udo'], starterHandedOver: true })
     expect((await state())?.moderatorIds).not.toContain('udo')

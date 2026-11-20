@@ -388,7 +388,7 @@ describe('CallParticipants', () => {
 
     describe('once the row of the one removed is gone', () => {
       // Removes `userId` as a moderator does, the row going before the answer comes.
-      const removeAndLose = async (people, userId) => {
+      const removeAndLose = async (people, userId, after = people) => {
         wrapper = Wrapper({ people, moderation: moderatedByMe })
         await wrapper.vm.openMenu(person(userId), jest.fn())
         wrapper.vm
@@ -406,7 +406,7 @@ describe('CallParticipants', () => {
         )
         await wrapper.find('[data-test="remove-confirm"]').trigger('click')
         // Gone from the call, by the removal, before its answer is.
-        await wrapper.setProps({ people: people.filter((p) => p.userId !== userId) })
+        await wrapper.setProps({ people: after.filter((p) => p.userId !== userId) })
         removed({ data: {} })
         await flushPromises()
         expect(sent()).toEqual([
@@ -422,6 +422,16 @@ describe('CallParticipants', () => {
           [person('me', { isMe: true }), person('bob'), person('anna'), person('carl')],
           'bob',
         )
+        expect(document.activeElement).toBe(menuOf('carl'))
+      })
+
+      it('asks the rows shown by then, not those there when the question opened', async () => {
+        // Carl joins behind Bob while the removal is on its way, and takes his place.
+        await removeAndLose([person('me', { isMe: true }), person('bob')], 'bob', [
+          person('me', { isMe: true }),
+          person('bob'),
+          person('carl'),
+        ])
         expect(document.activeElement).toBe(menuOf('carl'))
       })
 
@@ -551,6 +561,25 @@ describe('CallParticipants', () => {
         await wrapper.find(`[data-test="call-participant-switch-${kind}-me"]`).trigger('click')
       }
       expect(wrapper.emitted('switch-off')).toEqual([['screen'], ['mic'], ['camera']])
+    })
+
+    it("switches this device in one's own row, whatever one's other devices have on", async () => {
+      // On on the other device, off on this one: the row offers switching it on here.
+      wrapper = Wrapper({
+        people: [
+          person('me', {
+            isMe: true,
+            micOn: true,
+            cameraOn: true,
+            devices: 2,
+            here: { mic: false, camera: false },
+          }),
+        ],
+      })
+      await wrapper.find('[data-test="call-participant-switch-mic-me"]').trigger('click')
+      await wrapper.find('[data-test="call-participant-switch-camera-me"]').trigger('click')
+      expect(wrapper.emitted('switch-on')).toEqual([['mic'], ['camera']])
+      expect(wrapper.emitted('switch-off')).toBeUndefined()
     })
 
     it('lets everybody switch their own microphone and camera on again right in the row', async () => {
@@ -712,6 +741,19 @@ describe('CallParticipants', () => {
         people: [person('anna'), person('carl'), person('dana', { speaking: true })],
       })
       expect(order()).toEqual(['anna', 'carl', 'dana'])
+    })
+
+    it('gives up the place of whoever leaves meanwhile; back again, they come last', async () => {
+      wrapper = Wrapper({ people: [person('anna'), person('bob'), person('carl')] })
+      wrapper.vm.holdOrder(true)
+      await wrapper.setProps({ people: [person('anna'), person('carl')] })
+      await wrapper.setProps({ people: [person('anna'), person('bob'), person('carl')] })
+      expect(order()).toEqual(['anna', 'carl', 'bob'])
+      // A second device of somebody there moves nobody.
+      await wrapper.setProps({
+        people: [person('anna'), person('bob'), person('carl', { devices: 2 })],
+      })
+      expect(order()).toEqual(['anna', 'carl', 'bob'])
     })
 
     it('holds it when a row menu opens', async () => {
@@ -925,6 +967,43 @@ describe('CallParticipants', () => {
       muted({ data: {} })
       await muting
       expect(wrapper.vm.muting).toBe(true)
+    })
+
+    it('names only the deliberate exceptions, not those spared only for having the floor', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('speaker'), person('bob')],
+        moderation: { moderators: ['me'], everyone: false, speakers: ['speaker'] },
+      })
+      wrapper.vm.openMuteAll()
+      wrapper.vm.spare('bob', true)
+      await wrapper.vm.muteAll()
+      expect(sent()).toEqual([
+        { mutation: 'muteAllInVideoCall', groupId: 'g1', exceptUserIds: ['me', 'bob'] },
+      ])
+    })
+
+    it('lets the room have the last word over a floor answered after it told', async () => {
+      wrapper = Wrapper({
+        people: [person('me', { isMe: true }), person('bob')],
+        moderation: moderatedByMe,
+      })
+      let answer
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      wrapper.vm.openMuteAll()
+      const giving = wrapper.vm.toggleFloor('bob')
+      // The room tells of the floor given, then of another moderator taking it back — both before
+      // the answer to giving it arrives.
+      await wrapper.setProps({ moderation: { ...moderatedByMe, speakers: ['bob'] } })
+      await wrapper.setProps({ moderation: { ...moderatedByMe, speakers: [] } })
+      answer({ data: {} })
+      await giving
+      expect(wrapper.vm.floor).toEqual([])
+      expect(wrapper.vm.spared).toEqual(['me'])
     })
 
     it('frees the tick of whoever another moderator takes the floor back from meanwhile', async () => {

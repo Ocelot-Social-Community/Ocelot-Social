@@ -151,7 +151,11 @@ const handOn = async (
   }
   // Given back only to whom it was taken from as far as known when deciding: taken away
   // meanwhile, it is not given — then the automatic decides, after the caller has given it up.
-  const restore = named ? state.revokedIds.includes(successor) : eligible.length === 0
+  // Named by one who may give it back, it goes back; picked only because nobody else is left,
+  // only while the moderation is as it was read (see settleModeration).
+  const restore = named
+    ? state.revokedIds.includes(successor)
+    : eligible.length === 0 && { unchangedSince: state.revision }
   if (
     !(await setModerator(context.driver, state.sessionId, successor, { moderator: true, restore }))
   ) {

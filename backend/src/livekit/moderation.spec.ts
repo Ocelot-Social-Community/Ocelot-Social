@@ -68,6 +68,7 @@ beforeEach(async () => {
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:broken', name: 'broken', permissions: 'nonsense' })
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:shaped', name: 'shaped', permissions: $shaped })
       CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:flag', name: 'flag', permissions: 'true' })
+      CREATE (g)-[:HAS_GROUP_ROLE]->(:GroupRole { id: 'g1:retired', name: 'retired', permissions: $retired })
       CREATE (:User { id: 'olga' })-[:MEMBER_OF { role: 'owner' }]->(g)
       CREATE (:User { id: 'adam' })-[:MEMBER_OF { role: 'admin' }]->(g)
       CREATE (:User { id: 'ute' })-[:MEMBER_OF { role: 'usual' }]->(g)
@@ -75,6 +76,7 @@ beforeEach(async () => {
       CREATE (:User { id: 'bert' })-[:MEMBER_OF { role: 'broken' }]->(g)
       CREATE (:User { id: 'bea' })-[:MEMBER_OF { role: 'shaped' }]->(g)
       CREATE (:User { id: 'flo' })-[:MEMBER_OF { role: 'flag' }]->(g)
+      CREATE (:User { id: 'rita' })-[:MEMBER_OF { role: 'retired' }]->(g)
       CREATE (:User { id: 'guest' })
     `,
     {
@@ -82,6 +84,8 @@ beforeEach(async () => {
       usual: JSON.stringify(['group.read']),
       // Valid JSON, but no list of keys: malformed all the same.
       shaped: JSON.stringify({ 'group.read': true }),
+      // A key the catalog no longer knows.
+      retired: JSON.stringify(['group.read', 'group.retired']),
     },
   )
 })
@@ -309,6 +313,11 @@ describe(successorOf, () => {
     expect(await successorOf(driver, 'g1', ['flo', 'bea'])).toBe('flo')
   })
 
+  it('counts no key the catalog does not know, which would make ranks incomparable', async () => {
+    // Rita has been in the call longer, but the owner outranks her all the same.
+    expect(await successorOf(driver, 'g1', ['rita', 'olga'])).toBe('olga')
+  })
+
   it('finds nobody among nobody', async () => {
     expect(await successorOf(driver, 'g1', [])).toBeNull()
   })
@@ -403,6 +412,17 @@ describe(settleModeration, () => {
 
     expect(await settleModeration(driver, 'g1', ['udo'])).toBeNull()
     expect(await state()).toMatchObject({ moderatorIds: ['olga'], revokedIds: ['udo'] })
+  })
+
+  it('makes nobody a moderator who was removed from the call meanwhile', async () => {
+    await open('ute')
+    const { sessionId } = await state()
+    await markRemoved(driver, sessionId, 'udo')
+
+    expect(await setModerator(driver, sessionId, 'udo', { moderator: true, restore: true })).toBe(
+      false,
+    )
+    expect((await state()).moderatorIds).toEqual(['ute'])
   })
 
   it('counts every change of the moderation', async () => {

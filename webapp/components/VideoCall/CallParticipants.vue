@@ -384,6 +384,8 @@ export default {
     this.icons = iconRegistry
     // Not shown, only compared: which question about somebody's rights is the latest.
     this.rightsAsked = {}
+    // Not shown either: how often the room has told of somebody's floor changing, by userId.
+    this.floorTold = {}
   },
   beforeDestroy() {
     clearTimeout(this.restTimer)
@@ -455,17 +457,26 @@ export default {
         // Removed, their row and menu may be gone as well: then the row that took its place —
         // the next one, else the one before — as in the list of chats; the list only once
         // nobody else is left in it.
-        const order = this.ordered.map((person) => person.userId)
-        const at = order.indexOf(this.removing.userId)
-        const candidates = [order[at], ...order.slice(at + 1), ...order.slice(0, at).reverse()]
+        // Who took it is asked of the rows shown by then, which may have changed meanwhile;
+        // only the place is kept from now.
+        const removed = this.removing.userId
+        const at = Math.max(
+          this.ordered.findIndex((person) => person.userId === removed),
+          0,
+        )
         const menuOf = (userId) =>
           this.$el.querySelector(`[data-test="call-participant-menu-${userId}"]`)
+        const replacement = () => {
+          const rows = this.ordered.map((person) => person.userId)
+          if (rows.includes(removed)) return menuOf(removed)
+          return rows.length ? menuOf(rows[Math.min(at, rows.length - 1)]) : null
+        }
         this.$nextTick(() => {
           // Gone again before it was drawn: nothing to take the focus to.
           if (!this.$refs.dialog) return
           this.giveRemovalFocusBack = takeFocus(
             this.$refs.dialog,
-            () => candidates.map(menuOf).find(Boolean) || this.$refs.list,
+            () => replacement() || this.$refs.list,
           )
         })
         return
@@ -480,21 +491,27 @@ export default {
     },
     // The floor given or taken back by another moderator while "mute all" is being chosen
     // counts here as well, as if given or taken here: a tick it locked is free again.
-    'moderation.speakers'(speakers) {
+    'moderation.speakers'(speakers, before = []) {
+      ;[...speakers, ...before]
+        .filter((id) => speakers.includes(id) !== before.includes(id))
+        .forEach((id) => {
+          this.floorTold[id] = (this.floorTold[id] || 0) + 1
+        })
       if (!this.muting) return
       this.floor.filter((id) => !speakers.includes(id)).forEach(this.floorTaken)
       speakers.filter((id) => !this.floor.includes(id)).forEach(this.floorGiven)
     },
     // Whoever joins while the order is held comes last, in the order they came, and stays
-    // there until the order is live again.
+    // there until the order is live again. Whoever leaves gives up their place: back again,
+    // they come last as well. A second device of somebody there changes nothing.
     people(people) {
       if (!this.heldOrder) return
-      const newcomers = people
-        .map((person) => person.userId)
-        .filter(
-          (userId, index, all) => !this.heldOrder.includes(userId) && all.indexOf(userId) === index,
-        )
-      if (newcomers.length) this.heldOrder = [...this.heldOrder, ...newcomers]
+      const present = [...new Set(people.map((person) => person.userId))]
+      const kept = this.heldOrder.filter((userId) => present.includes(userId))
+      const newcomers = present.filter((userId) => !kept.includes(userId))
+      if (kept.length !== this.heldOrder.length || newcomers.length) {
+        this.heldOrder = [...kept, ...newcomers]
+      }
     },
   },
   methods: {
@@ -609,6 +626,12 @@ export default {
     // switched off right there, as from the menu: one's own by everybody, anybody's by a moderator.
     // One's own can be switched on again there too.
     devicesOf(person) {
+      // One's own row switches this device: with another one of one's own on, the row would say
+      // "on" for a microphone that is off here, and offer switching off what is off already.
+      const own = (kind, all) => {
+        const here = person.here && person.here[kind]
+        return person.isMe && typeof here === 'boolean' ? here : all
+      }
       const device = (kind, on, icon, iconOff, label, action, labelOn) => {
         let toggle = null
         if (on && (person.isMe || this.isModerator)) toggle = this.switchOff(person, kind, action)
@@ -633,7 +656,7 @@ export default {
           ),
         device(
           'mic',
-          person.micOn,
+          own('mic', person.micOn),
           this.icons.microphone,
           this.icons.microphoneSlash,
           this.$t('videoCall.participants.muteMicrophone'),
@@ -642,7 +665,7 @@ export default {
         ),
         device(
           'camera',
-          person.cameraOn,
+          own('camera', person.cameraOn),
           this.icons.videoCamera,
           this.icons.videoCameraSlash,
           this.$t('videoCall.participants.cameraOffAction'),
@@ -872,10 +895,15 @@ export default {
     async toggleFloor(userId) {
       const giving = !this.floor.includes(userId)
       const selection = this.selection
+      const told = this.floorTold[userId] || 0
       if (!(await this.mutate(setVideoCallFloorMutation(), { userId, floor: giving }))) return
       // Closed or opened anew meanwhile: given or taken all the same, which the room's metadata
       // shows; the choice it was made in is gone.
       if (!this.muting || this.selection !== selection) return
+      // The room has told of this floor since it was asked for — this answer, or another
+      // moderator after it, also one undoing it again: the room is newer than this answer, and
+      // already counted (see the watcher of moderation.speakers).
+      if ((this.floorTold[userId] || 0) !== told) return
       if (giving) this.floorGiven(userId)
       else this.floorTaken(userId)
     },
@@ -904,8 +932,10 @@ export default {
       // Whether oneself is muted along with the others is the server's to say, too: given the
       // floor meanwhile, one is spared. It tells one's own devices as it tells everybody else's,
       // and the buttons follow (VideoCall: microphoneMuted, self).
+      // Those spared only for having the floor are not named either: taken back meanwhile, the
+      // server would spare them all the same.
       const done = await this.mutate(muteAllInVideoCallMutation(), {
-        exceptUserIds: [...this.spared],
+        exceptUserIds: this.spared.filter((userId) => !this.sparedForFloor.includes(userId)),
       })
       if (!done || this.selection !== selection) return
       this.stopMuting()

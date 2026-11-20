@@ -1093,6 +1093,13 @@ export default {
           person.micOn = person.micOn || !!tile.micEnabled
           // A camera that is on but not received here (audio only, videos off) is on all the same.
           person.cameraOn = person.cameraOn || !!tile.videoTrack || !!tile.cameraHidden
+          // This device's own, apart from one's others: what one's own row switches.
+          if (tile.isLocal) {
+            person.here = {
+              mic: !!tile.micEnabled,
+              camera: !!tile.videoTrack || !!tile.cameraHidden,
+            }
+          }
         }
         if (this.activeSpeakerSet.has(tile.identity)) person.speaking = true
       }
