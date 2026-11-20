@@ -150,6 +150,55 @@ $ docker compose rm -sf minio
 $ docker volume rm ocelot-social_minio_data
 ```
 
+### MinIO Storage Full
+
+Uploads (seeding included) can fail with:
+
+```text
+XMinioStorageFull: Storage backend has reached its minimum free drive threshold.
+Please delete a few objects to proceed.
+```
+
+MinIO refuses to write once the drive under its volume is almost full. With Docker
+Desktop, that drive is the disk of Docker's virtual machine, which all images,
+containers, volumes and the build cache share. MinIO's own data is usually a small
+part of it. See where the space actually goes:
+
+```bash
+# in main folder
+$ docker system df
+$ docker compose exec minio df -h /data
+```
+
+**Free Docker's disk.** This is usually what helps. The build cache can always go;
+the next build only takes longer:
+
+```bash
+$ docker builder prune -af
+```
+
+`docker system df` also lists volumes as reclaimable. Do not reach for
+`docker volume prune -a` without looking first: it deletes every volume no running
+container uses, including the databases of other projects and of stacks that are
+just stopped. Check `docker volume ls` and remove what you are sure of one by one.
+Docker Desktop can also give its VM a larger disk (Settings → Resources).
+
+**Empty MinIO completely.** `db:reset` clears Neo4j but not MinIO, so the files of
+every seeding pile up there. To start with an empty bucket, remove the volume and let
+`minio-mc` create the `ocelot` bucket again. All uploaded images and files are gone
+afterwards, so seed the database again to keep the two in step. As above, look up
+the real volume name first, and remove only that one volume:
+
+```bash
+# in main folder
+$ docker volume ls --filter name=minio_data
+$ docker compose rm -sf minio minio-mc
+$ docker volume rm ocelot-social_minio_data
+$ docker compose up -d minio minio-mc
+$ docker compose exec backend npm run db:reset
+$ docker compose exec backend npm run db:seed
+```
+
 ## Local Installation
 
 For a full documentation of the local installation see [summary](./SUMMARY.md).

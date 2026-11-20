@@ -87,6 +87,9 @@ If MinIO refuses to start with `Unable to write to the backend`, your
 `minio_data` volume was written by the old MinIO image — see
 [One-time MinIO Volume Migration](../installation.md#one-time-minio-volume-migration).
 
+If uploads or seeding fail with `XMinioStorageFull`, Docker's disk is full — see
+[MinIO Storage Full](../installation.md#minio-storage-full).
+
 If you run Neo4j yourself instead, make sure a
 [local Neo4J](http://localhost:7474) instance is up and running.
 
