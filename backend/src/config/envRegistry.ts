@@ -182,6 +182,8 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
   { name: 'LIVEKIT_URL', secret: false, category: 'video', softwareDefault: null },
   { name: 'LIVEKIT_API_KEY', secret: true, category: 'video', softwareDefault: null },
   { name: 'LIVEKIT_API_SECRET', secret: true, category: 'video', softwareDefault: null },
+  // Set it where several instances share one LiveKit server; see config/index.ts.
+  { name: 'LIVEKIT_ROOM_PREFIX', secret: false, category: 'video', softwareDefault: null },
 
   // --- Redis --------------------------------------------------------------
   { name: 'REDIS_DOMAIN', secret: false, category: 'redis', softwareDefault: null },

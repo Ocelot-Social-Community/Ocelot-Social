@@ -2,11 +2,15 @@
 // the moderation of a call, the poller and the webhook.
 import { RoomServiceClient } from 'livekit-server-sdk'
 
-const ROOM_PREFIX = 'group-'
+import CONFIG from '@config/index'
 
-export const roomNameForGroup = (groupId: string) => `${ROOM_PREFIX}${groupId}`
+// `group-<id>`, behind the instance's own prefix if it has one (LIVEKIT_ROOM_PREFIX). A room
+// without that prefix is another instance's: no group of this one, so this one leaves it alone.
+export const roomPrefix = () => `${CONFIG.LIVEKIT_ROOM_PREFIX ?? ''}group-`
+
+export const roomNameForGroup = (groupId: string) => `${roomPrefix()}${groupId}`
 export const groupIdFromRoomName = (roomName: string | null | undefined): string | null =>
-  roomName?.startsWith(ROOM_PREFIX) ? roomName.slice(ROOM_PREFIX.length) : null
+  roomName?.startsWith(roomPrefix()) ? roomName.slice(roomPrefix().length) || null : null
 
 const httpUrlFor = (livekitUrl: string) =>
   livekitUrl.startsWith('wss://')
