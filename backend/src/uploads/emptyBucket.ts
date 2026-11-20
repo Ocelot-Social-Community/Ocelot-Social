@@ -1,14 +1,19 @@
-import { DeleteObjectsCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
+import { DeleteObjectsCommand, ListObjectVersionsCommand, S3Client } from '@aws-sdk/client-s3'
 
 import type { S3Config } from '@config/index'
 
 /**
- * Deletes every object in the configured bucket and returns how many went. The bucket itself
- * stays, with its policy: what the instance uploads next lands there as before.
+ * Deletes every object in the configured bucket for good and returns how many versions went —
+ * without versioning, how many files. The bucket
+ * itself stays, with its policy: what the instance uploads next lands there as before.
  *
  * For `db:reset --with-uploads`, after the database is wiped: `db:reset` alone leaves the files
  * behind, and every seeding adds its own, until the drive is full (XMinioStorageFull). Through the
  * S3 API rather than by removing the MinIO volume, so it works the same against a real S3.
+ *
+ * Every version and delete marker is deleted by its version id: in a bucket with versioning on,
+ * deleting by key alone only adds a delete marker and keeps the data, and with it the space. A
+ * bucket without versioning lists each object once, with the version id "null".
  */
 export const emptyBucket = async (config: S3Config): Promise<number> => {
   const { AWS_BUCKET: Bucket } = config
@@ -23,14 +28,20 @@ export const emptyBucket = async (config: S3Config): Promise<number> => {
     forcePathStyle: true,
   })
   let deleted = 0
-  let ContinuationToken: string | undefined
+  let KeyMarker: string | undefined
+  let VersionIdMarker: string | undefined
   do {
-    // At most 1000 keys per page, and DeleteObjects takes at most 1000: one request per page.
-    const page = await s3.send(new ListObjectsV2Command({ Bucket, ContinuationToken }))
-    const keys = (page.Contents ?? []).flatMap(({ Key }) => (Key ? [{ Key }] : []))
-    if (keys.length > 0) {
+    // At most 1000 versions and markers together per page, and DeleteObjects takes at most 1000:
+    // one request per page.
+    const page = await s3.send(
+      new ListObjectVersionsCommand({ Bucket, KeyMarker, VersionIdMarker }),
+    )
+    const objects = [...(page.Versions ?? []), ...(page.DeleteMarkers ?? [])].flatMap(
+      ({ Key, VersionId }) => (Key ? [{ Key, VersionId }] : []),
+    )
+    if (objects.length > 0) {
       const result = await s3.send(
-        new DeleteObjectsCommand({ Bucket, Delete: { Objects: keys, Quiet: true } }),
+        new DeleteObjectsCommand({ Bucket, Delete: { Objects: objects, Quiet: true } }),
       )
       // Quiet: only what could not be deleted is reported, and that must not pass for done.
       if (result.Errors && result.Errors.length > 0) {
@@ -39,9 +50,12 @@ export const emptyBucket = async (config: S3Config): Promise<number> => {
           `Could not delete ${String(result.Errors.length)} file(s) from bucket ${Bucket}, e.g. ${Key}: ${Message}`,
         )
       }
-      deleted += keys.length
+      // Counted is what held data — every version, not the markers. Without versioning, that is
+      // every file.
+      deleted += (page.Versions ?? []).filter(({ Key }) => Key).length
     }
-    ContinuationToken = page.IsTruncated ? page.NextContinuationToken : undefined
-  } while (ContinuationToken)
+    KeyMarker = page.IsTruncated ? page.NextKeyMarker : undefined
+    VersionIdMarker = page.IsTruncated ? page.NextVersionIdMarker : undefined
+  } while (KeyMarker)
   return deleted
 }

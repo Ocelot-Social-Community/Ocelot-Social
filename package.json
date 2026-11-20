@@ -28,7 +28,7 @@
   },
   "scripts": {
     "db:seed": "cd backend && npm run db:seed",
-    "db:reset": "cd backend && npm run db:reset",
+    "db:reset": "cd backend && npm run db:reset --",
     "docs:api": "cd backend && npm run schema:print && ./node_modules/.bin/spectaql --target-dir ../.vuepress/public/api spectaql.yml",
     "docs:build": "NODE_OPTIONS=--openssl-legacy-provider vuepress build .",
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider vuepress dev .",

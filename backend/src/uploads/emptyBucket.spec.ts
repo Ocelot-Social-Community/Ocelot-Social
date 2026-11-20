@@ -16,7 +16,7 @@ vi.mock('@aws-sdk/client-s3', async (importOriginal) => ({
     clients.push(options)
     return { send: sendMock }
   }),
-  ListObjectsV2Command: vi.fn().mockImplementation(function (input: unknown) {
+  ListObjectVersionsCommand: vi.fn().mockImplementation(function (input: unknown) {
     return { list: input }
   }),
   DeleteObjectsCommand: vi.fn().mockImplementation(function (input: unknown) {
@@ -36,29 +36,43 @@ const config = {
 
 const sent = () => sendMock.mock.calls.map(([command]) => command as unknown)
 
+const firstPage = { Bucket: 'ocelot', KeyMarker: undefined, VersionIdMarker: undefined }
+
 describe('emptyBucket', () => {
-  it('deletes every page of the bucket and counts what went', async () => {
+  it('deletes every page of a bucket without versioning, and counts its files', async () => {
     sendMock
       .mockResolvedValueOnce({
-        Contents: [{ Key: 'a.jpg' }, { Key: 'b.jpg' }, {}],
+        Versions: [{ Key: 'a.jpg', VersionId: 'null' }, { Key: 'b.jpg', VersionId: 'null' }, {}],
         IsTruncated: true,
-        NextContinuationToken: 'next',
+        NextKeyMarker: 'b.jpg',
+        NextVersionIdMarker: 'null',
       })
       .mockResolvedValueOnce({})
-      .mockResolvedValueOnce({ Contents: [{ Key: 'c.jpg' }], IsTruncated: false })
+      .mockResolvedValueOnce({ Versions: [{ Key: 'c.jpg', VersionId: 'null' }] })
       .mockResolvedValueOnce({ Errors: [] })
 
     await expect(emptyBucket(config)).resolves.toBe(3)
     expect(sent()).toEqual([
-      { list: { Bucket: 'ocelot', ContinuationToken: undefined } },
+      { list: firstPage },
       {
         delete: {
           Bucket: 'ocelot',
-          Delete: { Objects: [{ Key: 'a.jpg' }, { Key: 'b.jpg' }], Quiet: true },
+          Delete: {
+            Objects: [
+              { Key: 'a.jpg', VersionId: 'null' },
+              { Key: 'b.jpg', VersionId: 'null' },
+            ],
+            Quiet: true,
+          },
         },
       },
-      { list: { Bucket: 'ocelot', ContinuationToken: 'next' } },
-      { delete: { Bucket: 'ocelot', Delete: { Objects: [{ Key: 'c.jpg' }], Quiet: true } } },
+      { list: { Bucket: 'ocelot', KeyMarker: 'b.jpg', VersionIdMarker: 'null' } },
+      {
+        delete: {
+          Bucket: 'ocelot',
+          Delete: { Objects: [{ Key: 'c.jpg', VersionId: 'null' }], Quiet: true },
+        },
+      },
     ])
     expect(clients.at(-1)).toEqual({
       credentials: { accessKeyId: 'minio', secretAccessKey: '12341234' },
@@ -68,16 +82,53 @@ describe('emptyBucket', () => {
     })
   })
 
+  it('deletes every version and delete marker of a versioned bucket for good', async () => {
+    sendMock
+      .mockResolvedValueOnce({
+        Versions: [
+          { Key: 'a.jpg', VersionId: 'v2', IsLatest: true },
+          { Key: 'a.jpg', VersionId: 'v1', IsLatest: false },
+        ],
+        DeleteMarkers: [{ Key: 'b.jpg', VersionId: 'm1' }, {}],
+        IsTruncated: false,
+      })
+      .mockResolvedValueOnce({})
+
+    // The versions held data; the marker did not.
+    await expect(emptyBucket(config)).resolves.toBe(2)
+    expect(sent()[1]).toEqual({
+      delete: {
+        Bucket: 'ocelot',
+        Delete: {
+          Objects: [
+            { Key: 'a.jpg', VersionId: 'v2' },
+            { Key: 'a.jpg', VersionId: 'v1' },
+            { Key: 'b.jpg', VersionId: 'm1' },
+          ],
+          Quiet: true,
+        },
+      },
+    })
+  })
+
   it('sends no deletion for an empty bucket', async () => {
     sendMock.mockResolvedValueOnce({ IsTruncated: false })
 
     await expect(emptyBucket(config)).resolves.toBe(0)
-    expect(sent()).toEqual([{ list: { Bucket: 'ocelot', ContinuationToken: undefined } }])
+    expect(sent()).toEqual([{ list: firstPage }])
+  })
+
+  it('counts nothing for a page of delete markers alone', async () => {
+    sendMock
+      .mockResolvedValueOnce({ DeleteMarkers: [{ Key: 'b.jpg', VersionId: 'm1' }] })
+      .mockResolvedValueOnce({})
+
+    await expect(emptyBucket(config)).resolves.toBe(0)
   })
 
   it('fails when files could not be deleted, instead of reporting them gone', async () => {
     sendMock
-      .mockResolvedValueOnce({ Contents: [{ Key: 'a.jpg' }, { Key: 'b.jpg' }] })
+      .mockResolvedValueOnce({ Versions: [{ Key: 'a.jpg' }, { Key: 'b.jpg' }] })
       .mockResolvedValueOnce({
         Errors: [
           { Key: 'a.jpg', Message: 'Access Denied' },
@@ -92,7 +143,7 @@ describe('emptyBucket', () => {
 
   it('still says that it failed when the storage names neither the file nor the reason', async () => {
     sendMock
-      .mockResolvedValueOnce({ Contents: [{ Key: 'a.jpg' }] })
+      .mockResolvedValueOnce({ Versions: [{ Key: 'a.jpg' }] })
       .mockResolvedValueOnce({ Errors: [{}] })
 
     await expect(emptyBucket(config)).rejects.toThrow(
