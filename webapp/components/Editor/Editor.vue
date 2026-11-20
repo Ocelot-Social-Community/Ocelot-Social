@@ -687,7 +687,10 @@ export default {
       if (normalizedLinks) {
         // add valid link
         const { text, url: href } = normalizedLinks.pop()
-        if (this.editor.state.selection.empty && !this.editor.getMarkAttrs('link').href) {
+        const { selection, schema } = this.editor.state
+        // The same test as for the marked link (see the watcher): at the very start of a link the
+        // cursor belongs to it too, though the marks before the cursor do not include it.
+        if (selection.empty && !getMarkRange(selection.$from, schema.marks.link)) {
           this.insertLink(text, href)
         } else {
           command({ href })

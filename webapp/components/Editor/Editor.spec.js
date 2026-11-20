@@ -857,9 +857,6 @@ describe('Editor.vue', () => {
         },
         $toast: { success: jest.fn(), error: jest.fn() },
       }
-      propsData = {
-        value: '<p>Before</p><a href="https://example.org/page" class="embed"></a><p>After</p>',
-      }
       // The embed is drawn by a view of its own, made with the global Vue: what it needs (store,
       // translation, toasts) has to be on that one.
       Vue.prototype.$store = new Vuex.Store({
@@ -868,9 +865,16 @@ describe('Editor.vue', () => {
       Vue.prototype.$t = mocks.$t
       Vue.prototype.$apollo = mocks.$apollo
       Vue.prototype.$toast = mocks.$toast
+      await mountWithEmbed('https://example.org/page')
+    })
+
+    // A fresh editor: an embed is drawn by a view that is made once, so it is not set afterwards.
+    const mountWithEmbed = async (href) => {
+      if (wrapper) wrapper.destroy()
+      propsData = { value: `<p>Before</p><a href="${href}" class="embed"></a><p>After</p>` }
       wrapper = mount(Editor, { mocks, propsData, localVue, sync: false, stubs })
       await flushPromises()
-    })
+    }
 
     afterEach(() => {
       wrapper.destroy()
@@ -884,6 +888,18 @@ describe('Editor.vue', () => {
       expect(wrapper.vm.editor.getHTML()).toBe(
         '<p>Before</p><p><a href="https://example.org/page" rel="noopener noreferrer nofollow" target="_blank">https://example.org/page</a></p><p>After</p>',
       )
+    })
+
+    it('just takes out an embed that has no address, and the editor goes on', async () => {
+      await mountWithEmbed('')
+      expect(wrapper.vm.editor.getHTML()).toContain('class="embed"')
+      wrapper.find('.close-button').trigger('click')
+      await flushPromises()
+      // What is left is the line the embed stood in, with the cursor in it.
+      expect(wrapper.vm.editor.getHTML()).toBe('<p>Before</p><p></p><p>After</p>')
+      const { view } = wrapper.vm.editor
+      view.dispatch(view.state.tr.insertText('X'))
+      expect(wrapper.vm.editor.getHTML()).toBe('<p>Before</p><p>X</p><p>After</p>')
     })
 
     it('puts the cursor behind the link, so writing goes on after it, not inside it', async () => {
@@ -1104,11 +1120,43 @@ describe('Editor.vue', () => {
       )
 
       it('takes the link off with nothing entered, without a toast', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>See <a href="https://example.org">the link</a> now</p>')
+        await settle()
+        const { state, dispatch } = wrapper.vm.editor.view
+        dispatch(state.tr.setSelection(TextSelection.create(state.doc, 7)))
+        await Vue.nextTick()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
         linkInput().value = ''
         linkInput().dispatchEvent(new Event('input'))
         pressKey(linkInput(), 'Enter', {})
         await settle()
         expect(mocks.$toast.error).not.toHaveBeenCalled()
+        expect(wrapper.vm.editor.getHTML()).toBe('<p>See the link now</p>')
+      })
+
+      it('replaces the address of a link when the cursor stands at its very start', async () => {
+        pressKey(linkInput(), 'Escape', {})
+        await settle()
+        wrapper.vm.editor.setContent('<p>See <a href="https://example.org">the link</a> now</p>')
+        await settle()
+        const { state, dispatch } = wrapper.vm.editor.view
+        // 5 is right before "the link", where the marks before the cursor are not the link's.
+        dispatch(state.tr.setSelection(TextSelection.create(state.doc, 5)))
+        await Vue.nextTick()
+        pressKey(editorElement(), 'k', { ctrlKey: true })
+        await settle()
+        linkInput().value = 'https://example.com'
+        linkInput().dispatchEvent(new Event('input'))
+        pressKey(linkInput(), 'Enter', {})
+        await settle()
+        const html = wrapper.vm.editor.getHTML()
+        expect(html).toContain('<a href="https://example.com"')
+        expect(html).toContain('>the link</a>')
+        expect(html).not.toContain('example.org')
+        expect(html).not.toContain('https://example.com</a>')
       })
 
       // Nothing selected: Ctrl+K opens the input as well, and what is entered is put in at the
