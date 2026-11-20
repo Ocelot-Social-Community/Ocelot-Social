@@ -152,6 +152,10 @@ $ docker volume rm ocelot-social_minio_data
 
 ### MinIO Storage Full
 
+This is for development and test setups only, never for production: the steps below
+wipe the database and all uploaded files, and the production image has neither the
+reset nor the seed scripts.
+
 Uploads (seeding included) can fail with:
 
 ```text
@@ -183,21 +187,44 @@ container uses, including the databases of other projects and of stacks that are
 just stopped. Check `docker volume ls` and remove what you are sure of one by one.
 Docker Desktop can also give its VM a larger disk (Settings → Resources).
 
-**Empty MinIO completely.** `db:reset` clears Neo4j but not MinIO, so the files of
-every seeding pile up there. To start with an empty bucket, remove the volume and let
-`minio-mc` create the `ocelot` bucket again. All uploaded images and files are gone
-afterwards, so seed the database again to keep the two in step. As above, look up
-the real volume name first, and remove only that one volume:
+**Empty MinIO with the database.** `db:reset` clears Neo4j but leaves the uploaded
+files where they are, so the files of every seeding pile up in MinIO. Add
+`--with-uploads` to empty the bucket as well. Every object in `AWS_BUCKET` is deleted;
+the bucket and its policy stay. It works through the S3 API, so it also works against
+a real S3, and like `db:reset` itself it runs only where `DB_WIPE_ALLOWED=true`. Seed
+again afterwards:
+
+```bash
+# in main folder while docker compose is up, the backend in a container
+$ docker compose exec backend npm run db:reset -- --with-uploads
+$ docker compose exec backend npm run db:seed
+
+# in folder backend/, the backend run on the host
+$ npm run db:reset -- --with-uploads
+$ npm run db:seed
+```
+
+Without `--with-uploads`, `db:reset` leaves the files alone, on purpose: on staging the
+bucket is a real S3, and wiping the database should not take its files by surprise.
+
+If MinIO itself does not start any more, the bucket cannot be reached this way.
+Remove its volume instead and let `minio-mc` create the `ocelot` bucket again. As
+above, look up the real volume name first, and remove only that one volume:
 
 ```bash
 # in main folder
 $ docker volume ls --filter name=minio_data
 $ docker compose rm -sf minio minio-mc
 $ docker volume rm ocelot-social_minio_data
-$ docker compose up -d minio minio-mc
-$ docker compose exec backend npm run db:reset
-$ docker compose exec backend npm run db:seed
+$ docker compose up -d minio
+# creates the bucket in the foreground: done, with exit code 0, once the bucket is there
+$ docker compose run --rm minio-mc
 ```
+
+`minio-mc` creates the bucket only a few seconds after it starts. Run in the
+foreground as above, the command returns once that is done; seed only after it: an
+upload before the bucket exists fails, and the seed stops with it. As the files are gone, reset and seed the database afterwards
+(with or without `--with-uploads`, the bucket is empty either way).
 
 ## Local Installation
 

@@ -222,11 +222,14 @@ In order to reset the database you can run:
 ```sh
 # in backend with database running (In docker or local)
 npm run db:reset
+# or emptying the uploads' bucket (MinIO / S3) as well
+npm run db:reset -- --with-uploads
 # or deleting the migrations as well
 npm run db:reset:withmigrations
 
 # for docker
 docker exec ocelot-social-backend-1 npm run db:reset
+docker exec ocelot-social-backend-1 npm run db:reset -- --with-uploads
 # or deleting the migrations as well
 docker exec ocelot-social-backend-1 npm run db:reset:withmigrations
 # you could also wipe out your neo4j database and delete all volumes with:
