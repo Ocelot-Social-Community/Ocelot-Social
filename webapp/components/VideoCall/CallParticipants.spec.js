@@ -187,6 +187,22 @@ describe('CallParticipants', () => {
       )
     })
 
+    it('shows everybody while "mute all" is chosen, and filters again afterwards', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      await find('filter-toggle').trigger('click')
+      await find('filter-name').setValue('an')
+      expect(shown()).toEqual(['anna'])
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      // Bob, whom it would mute, has his row and his tick.
+      expect(shown()).toEqual(['me', 'anna', 'bob'])
+      expect(wrapper.find('[data-test="mute-all-pick-bob"]').exists()).toBe(true)
+      wrapper.vm.stopMuting()
+      await wrapper.vm.$nextTick()
+      expect(shown()).toEqual(['anna'])
+      expect(find('filter-name').element.value).toBe('an')
+    })
+
     it('filters no more once closed, and keeps the name for when it opens again', async () => {
       wrapper = Wrapper()
       await find('filter-toggle').trigger('click')

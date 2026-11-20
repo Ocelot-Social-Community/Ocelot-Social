@@ -426,7 +426,7 @@
               :locally-muted="locallyMuted"
               @spotlight="spotlightPerson"
               @local-mute="muteForMe"
-              @switch-off="syncSwitchedOff"
+              @switch-off="switchOff"
               @switch-on="switchOn"
             />
             <client-only v-else>
@@ -2126,6 +2126,14 @@ export default {
     switchOn(kind) {
       if (kind === 'mic' && !this.micEnabled) this.toggleMic()
       if (kind === 'camera' && !this.cameraEnabled) this.toggleCamera()
+    },
+    // One's own microphone, camera or screen share, switched off from the participant list: as
+    // the buttons below do it, with what they do when it fails. Not syncSwitchedOff — that one
+    // follows what the server has switched off already, and shows "off" whatever happens.
+    switchOff(kind) {
+      if (kind === 'mic' && this.micEnabled) this.toggleMic()
+      if (kind === 'camera' && this.cameraEnabled) this.toggleCamera()
+      if (kind === 'screen' && this.screenShareEnabled) this.toggleScreenShare()
     },
     async syncSwitchedOff(kind) {
       const local = this.room && this.room.localParticipant

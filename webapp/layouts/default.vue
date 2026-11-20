@@ -96,7 +96,7 @@
           :locally-muted="participantsView.locallyMuted"
           @spotlight="callAction('spotlightPerson', $event)"
           @local-mute="(userId, muted) => callAction('muteForMe', userId, muted)"
-          @switch-off="callAction('syncSwitchedOff', $event)"
+          @switch-off="callAction('switchOff', $event)"
           @switch-on="callAction('switchOn', $event)"
         />
       </div>

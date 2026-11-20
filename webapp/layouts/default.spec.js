@@ -90,13 +90,13 @@ describe('default.vue', () => {
           participantsView: () => ({ people: [], moderation: {}, locallyMuted: {} }),
         },
       })
-      const call = { switchOn: jest.fn(), syncSwitchedOff: jest.fn() }
+      const call = { switchOn: jest.fn(), switchOff: jest.fn() }
       parked.vm.$refs.videoCall = call
       const list = parked.findComponent({ name: 'CallParticipants' })
       list.vm.$emit('switch-on', 'mic')
       list.vm.$emit('switch-off', 'camera')
       expect(call.switchOn).toHaveBeenCalledWith('mic')
-      expect(call.syncSwitchedOff).toHaveBeenCalledWith('camera')
+      expect(call.switchOff).toHaveBeenCalledWith('camera')
     })
 
     describe('header and footer beside a maximized video call', () => {

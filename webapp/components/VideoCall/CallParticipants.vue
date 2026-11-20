@@ -659,8 +659,14 @@ export default {
       return this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
     },
     // Only while its field is open: closed, the filter keeps name and chips but filters no more.
+    // Not while "mute all" is being chosen: whoever it mutes is to be seen, with their tick. The
+    // name and the chips stay, and filter again once the choice is over.
     filtering() {
-      return this.filterOpen && (fold(this.filterName) !== '' || this.filterKeys.length > 0)
+      return (
+        !this.muting &&
+        this.filterOpen &&
+        (fold(this.filterName) !== '' || this.filterKeys.length > 0)
+      )
     },
     shown() {
       if (!this.filtering) return this.ordered
