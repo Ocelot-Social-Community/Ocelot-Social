@@ -1,10 +1,10 @@
 // eslint-disable-next-line import-x/no-namespace -- needed for dynamic component registration
 import * as components from './components'
 
-import type { App, Component, Plugin } from 'vue-demi'
+import type { App, Component, Directive, Plugin } from 'vue-demi'
 
 /**
- * Vue plugin for global component registration
+ * Vue plugin for global component registration, and the `v-os-tooltip` directive
  *
  * Usage:
  * ```ts
@@ -20,6 +20,7 @@ const OcelotUI: Plugin = {
         app.component(name, component as Component)
       }
     }
+    app.directive('os-tooltip', components.vOsTooltip as Directive)
   },
 }
 
