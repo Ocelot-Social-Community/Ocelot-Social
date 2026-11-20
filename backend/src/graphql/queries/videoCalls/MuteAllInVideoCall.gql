@@ -1,0 +1,3 @@
+mutation MuteAllInVideoCall($groupId: ID!, $exceptUserIds: [ID!]!) {
+  muteAllInVideoCall(groupId: $groupId, exceptUserIds: $exceptUserIds)
+}

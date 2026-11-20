@@ -550,6 +550,12 @@
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Este usuario no está bloqueado.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "El chat de una videollamada solo está abierto a quienes participan en ella. Únete primero a la llamada.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No se ha encontrado ninguna membresía activa en este grupo para la videollamada.",
+    "VIDEO_CALL_MODERATION_NOT_IN_CALL": "Solo quien participa en la videollamada puede moderarla.",
+    "VIDEO_CALL_MODERATION_NOT_MODERATOR": "Solo la moderación de la videollamada puede hacer esto.",
+    "VIDEO_CALL_MODERATION_OUTRANKED": "Tu rol en el grupo no es lo bastante alto para esto.",
+    "VIDEO_CALL_MODERATION_OWNER": "El propietario del grupo no puede ser expulsado de su videollamada.",
+    "VIDEO_CALL_MODERATION_PARTICIPANT_NOT_IN_CALL": "Esta persona no está en la videollamada.",
+    "VIDEO_CALL_REMOVED_FROM_CALL": "Te han expulsado de esta videollamada. Podrás unirte a la próxima.",
     "VIDEO_CALL_START_NOT_PERMITTED": "No puedes iniciar una videollamada en este grupo."
   },
   "chat": {
@@ -1130,7 +1136,8 @@
         "group_role_manage": "Editar los roles del grupo y sus derechos.",
         "group_settings_manage": "Cambiar la configuración del grupo: nombre, descripción, imagen, ubicación y categorías.",
         "group_videoCall_create": "Iniciar una videollamada en el grupo.",
-        "group_videoCall_join": "Unirse a una videollamada en curso del grupo."
+        "group_videoCall_join": "Unirse a una videollamada en curso del grupo.",
+        "group_videoCall_moderate": "Asumir la moderación de una videollamada del grupo."
       },
       "resultingType": "Con estos permisos el grupo es:",
       "roleManageWarning": {
@@ -1961,7 +1968,7 @@
       "groupTitle": "Chat del grupo",
       "label": "Elegir chat",
       "participants": "Personas",
-      "participantsHint": "Quién está en la llamada"
+      "participantsHint": "Quién está en la llamada y qué se puede hacer"
     },
     "closeChat": "Cerrar chat",
     "connecting": "Conectando…",
@@ -2033,7 +2040,15 @@
     "gotoGroup": "Ir al grupo «{name}»",
     "groupVideoCallButton": {
       "label": "Vídeo del grupo",
+      "removed": "Expulsado de esta llamada",
       "tooltip": "Videollamada en el grupo «{name}»"
+    },
+    "handover": {
+      "confirm": "Pasar y salir",
+      "skip": "Salir sin elegir",
+      "suggestedName": "{name} (sugerencia)",
+      "text": "Eres el último moderador de esta llamada. Pasa la moderación antes de salir.",
+      "title": "¿Quién modera a partir de ahora?"
     },
     "hideBars": "Ocultar las barras",
     "hideNotices": "Ocultar avisos",
@@ -2044,18 +2059,64 @@
     "micNoSignal": "Tu micrófono no transmite sonido: los demás no te oyen.",
     "micUnmuted": "Micrófono encendido",
     "minimize": "Minimizar",
+    "moderation": {
+      "cameraOff": "{name} ha apagado tu cámara.",
+      "everyone": "{name} deja que todos moderen la llamada.",
+      "everyoneOff": "{name} ha terminado que todos moderen la llamada.",
+      "floor": "{name} te ha dado la palabra.",
+      "floorMicOff": "{name} te ha dado la palabra. Activa tu micrófono para que te oigan.",
+      "microphoneMuted": "{name} ha silenciado tu micrófono.",
+      "moderatorAppointed": "{name} te ha hecho moderador de esta llamada.",
+      "moderatorAutomatic": "Ahora moderas esta llamada.",
+      "moderatorHandedOver": "{name} te ha pasado la moderación de esta llamada.",
+      "removed": "{name} te ha expulsado de la llamada.",
+      "removedPlain": "Te han expulsado de la llamada.",
+      "revoked": "{name} te ha quitado la moderación.",
+      "screenShareStopped": "{name} ha terminado tu pantalla compartida.",
+      "switchMicOn": "Activar micrófono",
+      "takenOver": "{name} ha asumido la moderación."
+    },
     "openChat": "Abrir chat",
     "participants": {
+      "actionsFor": "Acciones para {name}",
       "cameraOff": "cámara desactivada",
+      "cameraOffAction": "Apagar cámara",
       "cameraOn": "cámara activada",
+      "cameraOnAction": "Encender cámara",
       "close": "Ocultar las personas de la llamada",
       "countWithDevices": "Personas: {people} · Dispositivos: {devices}",
+      "devices": "{count} dispositivos",
+      "everyoneModerates": "Todos moderan",
+      "giveFloor": "Dar la palabra",
+      "hasFloor": "Tiene la palabra",
       "label": "Personas en la llamada",
+      "leadModerator": "Moderación principal",
+      "makeModerator": "Hacer moderador",
       "micOff": "micrófono desactivado",
       "micOn": "micrófono activado",
+      "micOnAction": "Activar micrófono",
+      "moderator": "Moderación",
+      "muteAll": "Silenciar a todos",
+      "muteCount": "Silenciar a {count}",
+      "muteForMe": "Silenciar para mí",
+      "muteMicrophone": "Silenciar micrófono",
+      "muteName": "Silenciar a {name}",
+      "muteWhom": "¿A quién silenciar?",
       "open": "Mostrar las personas de la llamada",
+      "openProfile": "Abrir perfil",
+      "remove": "Expulsar",
+      "removeEllipsis": "Expulsar de la llamada …",
+      "removeExplanation": "No podrá volver a unirse mientras dure esta llamada. En la próxima, sí.",
+      "removeQuestion": "¿Expulsar a {name} de la llamada?",
+      "resign": "Dejar la moderación",
+      "revokeModerator": "Quitar la moderación",
       "sharing": "comparte la pantalla",
-      "speaking": "está hablando"
+      "showLarge": "Mostrar en grande",
+      "speaking": "está hablando",
+      "stopSharing": "Terminar la pantalla compartida",
+      "takeFloor": "Quitar la palabra",
+      "takeOver": "Asumir la moderación",
+      "unmuteForMe": "Volver a escuchar"
     },
     "prejoin": {
       "camera": "Cámara",

@@ -98,7 +98,7 @@
             size="sm"
             circle
             :aria-label="closeLabel"
-            @click="leave"
+            @click="requestLeave"
           >
             <template #icon>
               <os-icon :icon="icons.close" />
@@ -354,6 +354,7 @@
           </div>
           <aside
             v-if="showChatSidebar"
+            id="video-call-sidebar"
             class="video-call__sidebar"
             :style="sidebarStyle"
             :aria-label="$t('videoCall.openChat')"
@@ -372,7 +373,10 @@
               data-test="video-call-sidebar-resizer"
               :aria-orientation="mobileChatOpen ? 'horizontal' : 'vertical'"
               :aria-label="$t('videoCall.resizeSidebar')"
-              :aria-valuenow="mobileChatOpen ? sidebarHeight : sidebarWidth"
+              aria-controls="video-call-sidebar"
+              :aria-valuemin="sidebarBounds().min"
+              :aria-valuemax="sidebarBounds().max"
+              :aria-valuenow="sidebarValueNow()"
               @pointerdown="startSidebarResize"
               @dblclick="resetSidebarSize"
               @keydown="onSidebarResizeKey"
@@ -414,7 +418,17 @@
                 </os-button>
               </div>
             </div>
-            <call-participants v-if="participantsOpen" :people="people" />
+            <call-participants
+              v-if="participantsOpen"
+              :people="people"
+              :moderation="moderation"
+              :may-take-over="mayTakeOverModeration"
+              :locally-muted="locallyMuted"
+              @spotlight="spotlightPerson"
+              @local-mute="muteForMe"
+              @switch-off="syncSwitchedOff"
+              @switch-on="switchOn"
+            />
             <client-only v-else>
               <chat
                 ref="inCallChat"
@@ -581,7 +595,7 @@
           :circle="iconOnly"
           class="video-call__leave"
           :aria-label="controlName(leaveLabel, leaveAction)"
-          @click="leave"
+          @click="requestLeave"
         >
           <template #icon>
             <os-icon :icon="icons.phone" />
@@ -616,16 +630,101 @@
           </os-button>
         </div>
       </div>
+
+      <!--
+        The last moderator hangs up while others stay: who moderates from now on. Skipped, the
+        server decides by the same rule the suggestion follows.
+      -->
+      <div
+        v-if="handover"
+        ref="handover"
+        class="video-call__handover"
+        role="dialog"
+        aria-modal="true"
+        tabindex="-1"
+        :aria-label="$t('videoCall.handover.title')"
+        data-test="video-call-handover"
+        @keydown.esc="cancelHandover"
+        @keydown="trapFocus($refs.handover, $event)"
+      >
+        <div class="video-call__handover-box">
+          <h3 class="video-call__handover-title">{{ $t('videoCall.handover.title') }}</h3>
+          <p class="video-call__handover-text">{{ $t('videoCall.handover.text') }}</p>
+          <!--
+            Everybody at once, or anybody in the call; of them the suggestion comes first and is
+            marked.
+          -->
+          <select
+            v-model="handover.choice"
+            class="video-call__handover-select"
+            :aria-label="$t('videoCall.handover.title')"
+            data-test="handover-select"
+            data-autofocus
+          >
+            <option value="everyone" data-test="handover-everyone">
+              {{ $t('videoCall.participants.everyoneModerates') }}
+            </option>
+            <option
+              v-for="person in handoverOptions"
+              :key="person.userId"
+              :value="person.userId"
+              :data-test="'handover-to-' + person.userId"
+            >
+              {{
+                person.userId === handover.suggested
+                  ? $t('videoCall.handover.suggestedName', { name: person.name })
+                  : person.name
+              }}
+            </option>
+          </select>
+          <div class="video-call__handover-actions">
+            <!-- Once on its way, the handover is not to be called back: it reaches the server. -->
+            <os-button
+              appearance="outline"
+              variant="primary"
+              data-test="handover-cancel"
+              :disabled="handover.busy"
+              @click="cancelHandover"
+            >
+              {{ $t('actions.cancel') }}
+            </os-button>
+            <os-button
+              appearance="outline"
+              variant="danger"
+              data-test="handover-skip"
+              :disabled="handover.busy"
+              @click="leaveAfterHandover(null)"
+            >
+              {{ $t('videoCall.handover.skip') }}
+            </os-button>
+            <os-button
+              variant="danger"
+              data-test="handover-confirm"
+              :loading="handover.busy"
+              @click="leaveAfterHandover(handover.choice)"
+            >
+              {{ $t('videoCall.handover.confirm') }}
+            </os-button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import escapeHtml from 'lodash/escape'
 import { mapGetters, mapMutations } from 'vuex'
 import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import mobile from '~/mixins/mobile'
-import { joinGroupVideoCallMutation, joinGroupVideoCallChatMutation } from '~/graphql/VideoCalls'
+import {
+  handOverVideoCallModerationMutation,
+  joinGroupVideoCallMutation,
+  joinGroupVideoCallChatMutation,
+  videoCallGroupPermissionsQuery,
+  videoCallModerationSuccessorQuery,
+} from '~/graphql/VideoCalls'
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
@@ -639,8 +738,20 @@ import CallNotice from './CallNotice.vue'
 
 // The narrowest the sidebar beside the videos may be pulled: its three tabs still fit.
 const SIDEBAR_MIN_WIDTH = 280
+
+// How long leaving waits for the server about the moderation (whom to suggest, the handover):
+// an answer that never comes must not keep anybody in the call they are leaving.
+export const LEAVE_REQUEST_DEADLINE_MS = 10000
+const withDeadline = (request) => {
+  let timer
+  const deadline = new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('deadline')), LEAVE_REQUEST_DEADLINE_MS)
+  })
+  return Promise.race([request, deadline]).finally(() => clearTimeout(timer))
+}
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
+import { inertAround, takeFocus, trapFocus } from './dialogFocus'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -702,6 +813,8 @@ const SEND_RESOLUTIONS = {
 const MIC_SILENCE_RECHECKS = 5
 const MIC_SILENCE_RECHECK_MS = 400
 const STRONG_QUALITIES = ['excellent', 'good']
+// How long the request to switch the microphone on stays, given the floor with it off.
+const FLOOR_TOAST_TIMEOUT = 15000
 
 // The call's header and control bar on a desktop with the call maximized, and the page's
 // header and footer with them: how long the mouse has to rest before they move out of the
@@ -857,6 +970,15 @@ export default {
       // had their labels (see controlsCrowded).
       controlsWidth: 0,
       labeledControlsWidth: 0,
+      // Who moderates the call, who has the floor, and whether everybody moderates: the
+      // server's word, from the room's metadata (backend: livekit/moderation.ts).
+      moderation: { moderators: [], everyone: false, speakers: [] },
+      // Whether the viewer may step into the moderation (group.videoCall.moderate).
+      mayTakeOverModeration: false,
+      // The people muted for the viewer alone: userId -> true.
+      locallyMuted: {},
+      // The question who moderates on, while the last moderator hangs up.
+      handover: null,
       // How wide the sidebar is beside the videos, and how high below them on a phone. Null
       // until the user pulls it: the stylesheet's size then.
       sidebarWidth: null,
@@ -952,30 +1074,61 @@ export default {
           person = {
             userId,
             name: tile.name,
+            slug: tile.profile && tile.profile.slug,
             profile: tile.profile,
             isMe: !!tile.isLocal,
             micOn: false,
             cameraOn: false,
             screenSharing: false,
             speaking: false,
+            identities: new Set(),
           }
           byUser.set(userId, person)
         }
         if (tile.isLocal) person.isMe = true
+        person.identities.add(tile.identity)
         if (tile.isScreen) {
           person.screenSharing = true
         } else {
           person.micOn = person.micOn || !!tile.micEnabled
           // A camera that is on but not received here (audio only, videos off) is on all the same.
           person.cameraOn = person.cameraOn || !!tile.videoTrack || !!tile.cameraHidden
+          // This device's own, apart from one's others: what one's own row switches.
+          if (tile.isLocal) {
+            person.here = {
+              mic: !!tile.micEnabled,
+              camera: !!tile.videoTrack || !!tile.cameraHidden,
+            }
+          }
         }
         if (this.activeSpeakerSet.has(tile.identity)) person.speaking = true
       }
-      return [...byUser.values()]
+      return [...byUser.values()].map(({ identities, ...person }) => ({
+        ...person,
+        devices: identities.size,
+      }))
     },
     // What the participant list shows, for the floating window beside the parked call too.
     participantsView() {
-      return { people: this.people }
+      return {
+        people: this.people,
+        moderation: this.moderation,
+        mayTakeOver: this.mayTakeOverModeration,
+        locallyMuted: this.locallyMuted,
+      }
+    },
+    // Whom the moderation may be handed to: everybody else in the call.
+    handoverCandidates() {
+      return this.people.filter((person) => !person.isMe)
+    },
+    // The same for the menu: the suggestion first, then everybody else by name.
+    handoverOptions() {
+      const suggested = this.handover && this.handover.suggested
+      return [...this.handoverCandidates].sort(
+        (a, b) =>
+          (b.userId === suggested) - (a.userId === suggested) ||
+          (a.name || '').localeCompare(b.name || ''),
+      )
     },
     sidebarStyle() {
       // A size remembered on a larger screen, or before the window was made smaller, is capped
@@ -993,6 +1146,9 @@ export default {
     },
     // On a phone there is no room for the chat beside the videos: it goes below,
     // and the stage shrinks to one small tile, the person speaking.
+    sidebarMinWidth() {
+      return SIDEBAR_MIN_WIDTH
+    },
     mobileChatOpen() {
       return this.isMobile && this.showChatSidebar
     },
@@ -1353,6 +1509,26 @@ export default {
     },
   },
   watch: {
+    // The keyboard goes with the question who moderates on, and comes back once it is answered.
+    handover(now, before) {
+      if (!now === !before) return
+      if (now) {
+        this.$nextTick(() => {
+          // Gone again before it was drawn: nothing to take the focus to.
+          if (!this.$refs.handover) return
+          this.releaseHandoverBackground = inertAround(this.$refs.handover)
+          this.giveHandoverFocusBack = takeFocus(this.$refs.handover)
+        })
+        return
+      }
+      // Released first: the focus goes back to something in it.
+      const release = this.releaseHandoverBackground
+      this.releaseHandoverBackground = null
+      if (release) release()
+      const giveBack = this.giveHandoverFocusBack
+      this.giveHandoverFocusBack = null
+      if (giveBack) giveBack()
+    },
     participantsView: {
       handler(view) {
         this.setParticipantsView(view)
@@ -1521,6 +1697,8 @@ export default {
     // overtaken by a push gives way to it (loadConferenceUnread, loadGroupChatUnread).
     this.conferenceUnreadPushes = 0
     this.groupChatUnreadPushes = 0
+    // A notice of being removed has been shown; the disconnect that follows says it no more.
+    this.removalTold = false
     this.sidebarDrag = null
   },
   mounted() {
@@ -1541,6 +1719,9 @@ export default {
   beforeDestroy() {
     document.removeEventListener('fullscreenchange', this.onFullscreenChange)
     this.unmounting = true
+    // Gone with the handover question open: the page around it is in reach again.
+    if (this.releaseHandoverBackground) this.releaseHandoverBackground()
+    this.releaseHandoverBackground = null
     this.exitFullscreen()
     this.watchBarActivity(false)
     this.setPageBars('normal')
@@ -1809,6 +1990,273 @@ export default {
       // In the parked window there is no sidebar: the list needs the call maximized.
       if (this.minimized && !this.isMobile) this.toggleMinimize()
     },
+    // Shows that person large, as a click on their tile does — in the call brought up from the
+    // corner, where it was parked.
+    spotlightPerson(userId) {
+      if (this.minimized && !this.isMobile) this.toggleMinimize()
+      // On a phone the open list keeps the stage to one tile, the one speaking: closed, the
+      // person shows.
+      if (this.isMobile && this.participantsShown) this.closeInCallChat()
+      // Of their devices, one that shows them: the camera that is on rather than the phone
+      // without one. Without any, the first — their avatar.
+      const theirs = this.tiles.filter(
+        (candidate) =>
+          !candidate.isScreen &&
+          ((candidate.profile && candidate.profile.id) || candidate.identity) === userId,
+      )
+      const tile = theirs.find((candidate) => candidate.videoTrack) || theirs[0]
+      if (tile) this.spotlightKey = tile.key
+    },
+    // Mutes a person for the viewer alone, on every device they are in the call with.
+    muteForMe(userId, muted) {
+      this.locallyMuted = { ...this.locallyMuted, [userId]: muted }
+      if (!muted) delete this.locallyMuted[userId]
+      this.applyLocalVolumes()
+    },
+    applyLocalVolumes() {
+      const room = this.room
+      if (!room) return
+      for (const participant of room.remoteParticipants.values()) {
+        const userId = this.userIdOfParticipant(participant)
+        if (typeof participant.setVolume === 'function') {
+          const volume = this.locallyMuted[userId] ? 0 : 1
+          // The sound of a shared screen is theirs too.
+          if (this.Track) {
+            participant.setVolume(volume, this.Track.Source.Microphone)
+            participant.setVolume(volume, this.Track.Source.ScreenShareAudio)
+          } else {
+            participant.setVolume(volume)
+          }
+        }
+      }
+    },
+    userIdOfParticipant(participant) {
+      try {
+        const meta = JSON.parse(participant.metadata || '')
+        if (meta && meta.userId) return meta.userId
+      } catch (_e) {
+        /* fall through to the identity */
+      }
+      return participant.identity
+    },
+    // What the server keeps in the room's metadata (backend: moderationMetadata).
+    applyRoomMetadata(metadata) {
+      let moderation = null
+      try {
+        moderation = JSON.parse(metadata || '{}').moderation || null
+      } catch (_e) {
+        /* not ours, or not yet: nobody moderates as far as we know */
+      }
+      this.moderation = {
+        moderators: Array.isArray(moderation && moderation.moderators) ? moderation.moderators : [],
+        everyone: !!(moderation && moderation.everyone),
+        speakers: Array.isArray(moderation && moderation.speakers) ? moderation.speakers : [],
+      }
+    },
+    // A notice from the server about what the moderation did to us (backend: notify).
+    onModerationNotice(payload) {
+      let notice
+      try {
+        notice = JSON.parse(new TextDecoder().decode(payload))
+      } catch (_e) {
+        return
+      }
+      if (!notice || typeof notice.type !== 'string') return
+      // iziToast puts its message in as HTML: a name must not bring any along.
+      const by = escapeHtml(notice.by || '')
+      // Each key spelled out, so the check for unused translations sees it used.
+      const messages = {
+        microphoneMuted: () => this.$t('videoCall.moderation.microphoneMuted', { name: by }),
+        cameraOff: () => this.$t('videoCall.moderation.cameraOff', { name: by }),
+        screenShareStopped: () => this.$t('videoCall.moderation.screenShareStopped', { name: by }),
+        removed: () => this.$t('videoCall.moderation.removed', { name: by }),
+        moderationTakenOver: () => this.$t('videoCall.moderation.takenOver', { name: by }),
+        moderationRevoked: () => this.$t('videoCall.moderation.revoked', { name: by }),
+        everyoneModerates: () => this.$t('videoCall.moderation.everyone', { name: by }),
+        everyoneModeratesOff: () => this.$t('videoCall.moderation.everyoneOff', { name: by }),
+        floor: () => this.$t('videoCall.moderation.floor', { name: by }),
+        moderator: () =>
+          notice.reason === 'automatic'
+            ? this.$t('videoCall.moderation.moderatorAutomatic')
+            : notice.reason === 'handedOver'
+              ? this.$t('videoCall.moderation.moderatorHandedOver', { name: by })
+              : this.$t('videoCall.moderation.moderatorAppointed', { name: by }),
+      }
+      const message = messages[notice.type]
+      if (!message) return
+      // What was switched off for us is off: the buttons say so, and switching it on again is
+      // ours to do.
+      if (notice.type === 'microphoneMuted') this.syncSwitchedOff('mic')
+      if (notice.type === 'cameraOff') this.syncSwitchedOff('camera')
+      if (notice.type === 'screenShareStopped') this.syncSwitchedOff('screen')
+      // Done by oneself, on another device: the buttons follow, nothing to be told.
+      if (notice.self) return
+      if (notice.type === 'removed') {
+        this.tellRemoved(message())
+        return
+      }
+      if (notice.type === 'floor' && !this.micEnabled) {
+        this.askForMicrophone(by)
+        return
+      }
+      if (this.$toast && typeof this.$toast.info === 'function') this.$toast.info(message())
+    },
+    // Given the floor with the microphone off: asked to switch it on, with a button that does.
+    // The toast stays a while longer than others, as it asks for something.
+    askForMicrophone(by) {
+      if (!this.$toast || typeof this.$toast.info !== 'function') return
+      const label = escapeHtml(this.$t('videoCall.moderation.switchMicOn'))
+      // Only for the call that asked: in one joined since, it would open the microphone there.
+      const room = this.room
+      this.$toast.info(this.$t('videoCall.moderation.floorMicOff', { name: by }), '', {
+        timeout: FLOOR_TOAST_TIMEOUT,
+        buttons: [
+          [
+            `<button type="button">${label}</button>`,
+            (instance, toast) => {
+              instance.hide({}, toast, 'button')
+              if (this.isLive(room) && !this.micEnabled) this.toggleMic()
+            },
+            true,
+          ],
+        ],
+      })
+    },
+    // One's own microphone or camera, switched on again from the participant list.
+    switchOn(kind) {
+      if (kind === 'mic' && !this.micEnabled) this.toggleMic()
+      if (kind === 'camera' && !this.cameraEnabled) this.toggleCamera()
+    },
+    async syncSwitchedOff(kind) {
+      const local = this.room && this.room.localParticipant
+      try {
+        if (kind === 'mic') {
+          this.micEnabled = false
+          // Silent on purpose now: a warning of no signal would offer to restart it.
+          this.micProblem = false
+          // While a dtx switch has the microphone unpublished, LiveKit finds nothing to mute and
+          // the track would go out again open: muted on the track itself, as toggleMic does.
+          if (this.dtxSwitch && this.dtxTrack) await this.dtxTrack.mute()
+          else if (local) await local.setMicrophoneEnabled(false)
+          this.refreshMicMeter()
+        } else if (kind === 'camera') {
+          this.cameraEnabled = false
+          if (local) await local.setCameraEnabled(false)
+        } else {
+          this.screenShareEnabled = false
+          this.screenShareSurface = null
+          if (local) await local.setScreenShareEnabled(false)
+        }
+      } catch (_e) {
+        /* the server has muted it already; the button is right either way */
+      }
+      this.refreshTiles()
+    },
+    tellRemoved(message) {
+      if (this.removalTold) return
+      this.removalTold = true
+      const text = message || this.$t('videoCall.moderation.removedPlain')
+      if (this.$toast && typeof this.$toast.error === 'function') this.$toast.error(text)
+    },
+    // Whether the viewer may step into the moderation: asked of the group once per call.
+    async loadModerationPermission() {
+      this.mayTakeOverModeration = false
+      if (!this.groupId) return
+      // An answer for a call left meanwhile is not this one's.
+      const room = this.room
+      const groupId = this.groupId
+      try {
+        const {
+          data: { Group },
+        } = await this.$apollo.query({
+          query: videoCallGroupPermissionsQuery(),
+          variables: { id: this.groupId },
+          fetchPolicy: 'no-cache',
+        })
+        if (!this.isLive(room) || this.groupId !== groupId) return
+        const permissions = (Group && Group[0] && Group[0].myGroupPermissions) || []
+        this.mayTakeOverModeration = permissions.includes('group.videoCall.moderate')
+      } catch (_e) {
+        /* without the answer the list does not offer it */
+      }
+    },
+    // Hanging up as the last moderator while others stay asks who moderates on.
+    isLastModerator() {
+      const me = this.currentUser && this.currentUser.id
+      return (
+        this.phase === 'in-call' &&
+        !this.moderation.everyone &&
+        this.moderation.moderators.includes(me) &&
+        !this.people.some(
+          (person) => !person.isMe && this.moderation.moderators.includes(person.userId),
+        )
+      )
+    },
+    async requestLeave() {
+      if (!this.isLastModerator() || this.handoverCandidates.length === 0) {
+        await this.leave()
+        return
+      }
+      const room = this.room
+      let suggested = null
+      try {
+        const {
+          data: { videoCallModerationSuccessor },
+        } = await withDeadline(
+          this.$apollo.query({
+            query: videoCallModerationSuccessorQuery(),
+            variables: { groupId: this.groupId },
+            fetchPolicy: 'no-cache',
+          }),
+        )
+        suggested = videoCallModerationSuccessor
+      } catch (_e) {
+        /* no suggestion, also when the answer takes too long: the first of the others is picked */
+      }
+      // Meanwhile the call may be over, or everybody else gone — or somebody else moderates
+      // now, and there is nothing to hand over. Or it is being left already, the connection gone.
+      if (this.room !== room || this.leaving || this.closingRoom) return
+      const candidates = this.handoverCandidates
+      if (candidates.length === 0 || !this.isLastModerator()) {
+        await this.leave()
+        return
+      }
+      if (!candidates.some((person) => person.userId === suggested)) suggested = null
+      this.handover = {
+        suggested,
+        choice: suggested || candidates[0].userId,
+        busy: false,
+      }
+    },
+    trapFocus,
+    cancelHandover() {
+      if (this.handover && !this.handover.busy) this.handover = null
+    },
+    async leaveAfterHandover(choice) {
+      if (!this.handover || this.handover.busy) return
+      const room = this.room
+      const dialog = this.handover
+      dialog.busy = true
+      try {
+        await withDeadline(
+          this.$apollo.mutate({
+            mutation: handOverVideoCallModerationMutation(),
+            variables: {
+              groupId: this.groupId,
+              toUserId: choice && choice !== 'everyone' ? choice : null,
+              everyone: choice === 'everyone',
+            },
+          }),
+        )
+      } catch (_e) {
+        // Leaving is what was asked for, also when the answer takes too long; the server hands
+        // the moderation on by itself then.
+      }
+      if (this.handover === dialog) this.handover = null
+      // A call joined meanwhile is not the one to leave; one being left already is left once.
+      if (this.room !== room || this.leaving || this.closingRoom) return
+      await this.leave()
+    },
     // --- The sidebar's size ---------------------------------------------------------------
     sidebarStorageKey() {
       return this.mobileChatOpen ? 'videoCall.sidebarHeight' : 'videoCall.sidebarWidth'
@@ -1835,18 +2283,30 @@ export default {
     // What the sidebar may measure: wide enough for its tabs and at most half the body beside
     // the videos; on a phone, below them, room for the message field and a few messages, and
     // never so high that not even the small tile is left.
-    clampSidebarSize(size) {
+    sidebarBounds() {
       // The maximized call takes its body out of the box tree (display: contents), which then
       // measures nothing: the call itself is as wide there.
-      const body = this.$el && this.$el.querySelector('.video-call__body')
+      const body = this.$el && this.$el.querySelector && this.$el.querySelector('.video-call__body')
       let rect = body ? body.getBoundingClientRect() : { width: 1000, height: 800 }
       if (body && !rect.width && !rect.height) rect = this.$el.getBoundingClientRect()
       if (this.mobileChatOpen) {
-        return Math.round(Math.min(Math.max(size, 200), Math.max(rect.height - 110, 200)))
+        return { min: 200, max: Math.round(Math.max(rect.height - 110, 200)) }
       }
-      return Math.round(
-        Math.min(Math.max(size, SIDEBAR_MIN_WIDTH), Math.max(rect.width / 2, SIDEBAR_MIN_WIDTH)),
-      )
+      return {
+        min: SIDEBAR_MIN_WIDTH,
+        max: Math.round(Math.max(rect.width / 2, SIDEBAR_MIN_WIDTH)),
+      }
+    },
+    clampSidebarSize(size) {
+      const { min, max } = this.sidebarBounds()
+      return Math.round(Math.min(Math.max(size, min), max))
+    },
+    // Where the separator stands, for a screen reader, in the units of its bounds: as pulled,
+    // or as the stylesheet sized it — within the bounds, as it is shown; a size remembered on a
+    // larger window is capped there (sidebarStyle).
+    sidebarValueNow() {
+      const pulled = this.mobileChatOpen ? this.sidebarHeight : this.sidebarWidth
+      return this.clampSidebarSize(pulled || this.currentSidebarSize())
     },
     currentSidebarSize() {
       const sidebar = this.$el && this.$el.querySelector('.video-call__sidebar')
@@ -2174,6 +2634,11 @@ export default {
       this.phase = 'connecting'
       this.error = null
       this.tiles = []
+      // Each call starts without moderation known, nobody muted for us, nothing told.
+      this.moderation = { moderators: [], everyone: false, speakers: [] }
+      this.locallyMuted = {}
+      this.removalTold = false
+      this.handover = null
       this.audioBlocked = false
       this.micProblem = false
       this.reconnecting = false
@@ -2203,6 +2668,7 @@ export default {
           VideoQuality,
           DisconnectReason,
         } = livekit
+        this.DisconnectReason = DisconnectReason
         // Closed while the token or the client library was on its way: cleanup() found no
         // room to take down then, so nothing may join one now. Nor while hanging up still
         // navigates away, before its cleanup() has begun.
@@ -2289,7 +2755,21 @@ export default {
         room.on(RoomEvent.TrackUnpublished, onAny)
         // LiveKit's setCameraEnabled(false) mutes the track instead of
         // unpublishing it. Re-render so the avatar fallback kicks in.
-        room.on(RoomEvent.TrackMuted, onAny)
+        // Our own microphone muted by the server (a moderator, "mute all"): the buttons follow,
+        // also when its notice does not come through. Muted by ourselves, it is off already.
+        room.on(RoomEvent.TrackMuted, (pub, participant) => {
+          if (
+            this.room === room &&
+            participant === room.localParticipant &&
+            pub &&
+            pub.source === Track.Source.Microphone &&
+            this.micEnabled &&
+            !this.dtxSwitch
+          ) {
+            this.syncSwitchedOff('mic')
+          }
+          onAny()
+        })
         room.on(RoomEvent.TrackUnmuted, onAny)
         // Token metadata carries the avatar URL — re-render tiles when it
         // changes so the avatar updates without a reconnect.
@@ -2331,8 +2811,25 @@ export default {
         // would clobber the retry/leave flow.
         room.on(RoomEvent.Disconnected, (reason) => {
           if (reason === DisconnectReason.CLIENT_INITIATED) return
+          // Removed by a moderator: said, unless the notice before it already did.
+          if (reason === DisconnectReason.PARTICIPANT_REMOVED) this.tellRemoved()
           this.leave()
         })
+        // The moderation, as the server keeps it, changes with the room's metadata. What it is
+        // already is read once connected, below: before that the room has no metadata yet.
+        room.on(RoomEvent.RoomMetadataChanged, (metadata) => {
+          if (this.room === room) this.applyRoomMetadata(metadata)
+        })
+        // What the moderation did to us comes from the server, not from a participant.
+        // Without a sender: a participant's packet that comes before its sender is known has no
+        // participant object either, but its identity.
+        room.on(
+          RoomEvent.DataReceived,
+          (payload, participant, _kind, topic, _encryption, sender) => {
+            if (this.room !== room || participant || sender || topic !== 'moderation') return
+            this.onModerationNotice(payload)
+          },
+        )
 
         // LiveKit plays remote audio through the <audio> elements the tiles
         // attach. When the browser's autoplay policy rejects play() — Safari
@@ -2385,6 +2882,9 @@ export default {
         })
         // Hung up while connecting: no microphone, no camera — cleanup() takes the room down.
         if (!this.isLive(room)) return
+        // Joining a call that runs already, or coming back to it: nothing may change after
+        // this, so what the room says now is all there is to go by.
+        this.applyRoomMetadata(room.metadata)
         if (this.micEnabled) {
           await room.localParticipant.setMicrophoneEnabled(true)
         }
@@ -2408,6 +2908,7 @@ export default {
         this.audioWatchdog.start()
         this.startSenderStats()
         this.joinCallChat(room)
+        this.loadModerationPermission()
         this.watchCallChats(true)
         this.loadGroupChatUnread()
         this.refreshKnownDevices()
@@ -2455,6 +2956,7 @@ export default {
         if (isLocal && this.currentUser) {
           return {
             id: this.currentUser.id,
+            slug: this.currentUser.slug,
             name: this.currentUser.name,
             avatar: this.currentUser.avatar,
           }
@@ -2487,6 +2989,7 @@ export default {
         }
         return {
           id: (meta && meta.userId) || participant.identity,
+          slug: meta && typeof meta.slug === 'string' ? meta.slug : null,
           name: participant.name || participant.identity,
           // ResponsiveImage (used by AvatarImage) expects url + responsive
           // variants. We only have one URL from the metadata — reuse it for
@@ -2562,6 +3065,8 @@ export default {
       collect(room.localParticipant, true)
       for (const p of room.remoteParticipants.values()) collect(p, false)
       this.tiles = tiles
+      // Somebody muted for the viewer may have come in on another device.
+      if (Object.keys(this.locallyMuted).length) this.applyLocalVolumes()
       this.setParticipantCount(new Set(tiles.map((t) => t.identity)).size)
     },
     showDeviceErrorToast(kind, err) {
@@ -3515,6 +4020,8 @@ export default {
       }
     },
     async cleanup() {
+      // A dialog asking about this call is gone with it.
+      this.handover = null
       // A quality chosen holds for this call only.
       this.sendQuality = 'auto'
       this.receiveQuality = 'auto'
@@ -3869,6 +4376,68 @@ export default {
 .video-call__body--chat-below .video-call__sidebar > .video-call__sidebar-resizer::after {
   width: 32px;
   height: 4px;
+}
+
+/*  The question who moderates on, over the whole call. */
+.video-call__handover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-small);
+  /*  As dim as the backdrop behind the device setup. */
+  background: rgba(0, 0, 0, 0.5);
+  /*  Over the call's header and control bar too, where they lie on the videos. */
+  z-index: 5;
+}
+
+/*  Where the maximized call is a grid, over all of its cells, the chat beside the videos */
+/*  included — not only in the videos' cell, where every other child of the call goes. */
+.video-call--bars-manual > .video-call__handover,
+.video-call--bars-overlay > .video-call__handover {
+  grid-row: 1 / -1;
+  grid-column: 1 / -1;
+}
+
+.video-call__handover-box {
+  max-width: 420px;
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: var(--space-base);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+}
+
+.video-call__handover-title {
+  margin: 0 0 var(--space-x-small);
+  font-size: var(--font-size-large);
+}
+
+.video-call__handover-text {
+  margin: 0 0 var(--space-small);
+  color: var(--text-color-soft);
+}
+
+.video-call__handover-select {
+  width: 100%;
+  margin: 0 0 var(--space-small);
+  padding: var(--space-xx-small) var(--space-x-small);
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-base);
+  color: var(--text-color-base);
+  font-family: var(--font-family-text);
+  font-size: var(--font-size-base);
+}
+
+.video-call__handover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-x-small);
 }
 
 .video-call__sidebar > * {

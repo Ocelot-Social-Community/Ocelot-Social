@@ -34,6 +34,12 @@ interface JoinCallSessionInput {
   livekitSid: string
   /** Everybody the media server lists in that room right now, the joining user included. */
   presentUserIds: readonly string[]
+  /**
+   * Asks the media server again, once the group's lock is held, which room runs now (its sid;
+   * null for none). The room may have changed since `livekitSid` was asked for: an admission to
+   * a call over by now must not end the session of the one running.
+   */
+  currentSid?: () => Promise<string | null>
 }
 
 /**
@@ -52,7 +58,7 @@ interface JoinCallSessionInput {
  */
 export const joinCallSession = async (
   driver: Driver,
-  { groupId, userId, livekitRoom, livekitSid, presentUserIds }: JoinCallSessionInput,
+  { groupId, userId, livekitRoom, livekitSid, presentUserIds, currentSid }: JoinCallSessionInput,
 ): Promise<string | null> => {
   const session = driver.session()
   try {
@@ -76,6 +82,10 @@ export const joinCallSession = async (
       if (locked.records.length === 0) {
         return null
       }
+      // Asked again under the lock: no other admission changes the sessions meanwhile.
+      if (currentSid && (await currentSid()) !== livekitSid) {
+        return null
+      }
       const open = await transaction.run(
         `
           MATCH (group:Group { id: $groupId })
@@ -87,13 +97,23 @@ export const joinCallSession = async (
                  session.livekitSid = $livekitSid AND size([
                    (member:User)-[:CHATS_IN]->(room)
                      WHERE member.id IN $presentUserIds | member
-                 ]) > 0 AS carriedOn
+                 ]) > 0 AS carriedOn,
+                 session.livekitSid = $livekitSid AND size([
+                   (removed:User { id: $userId })-[:REMOVED_FROM_CALL]->(session) | removed
+                 ]) > 0 AS barred
           // Compared as datetimes, not as the stored strings: toString(datetime()) drops
           // trailing zeros of the fraction, so the strings do not sort chronologically.
           ORDER BY datetime(session.createdAt) DESC
         `,
-        { groupId, livekitSid, presentUserIds },
+        { groupId, livekitSid, userId, presentUserIds },
       )
+      // Whoever was removed from this very call is not let back into its chat (see markRemoved),
+      // and asking must not end its session either: were the others gone, the removed one would
+      // otherwise open a new session of their own, chat in it and moderate it. A new call in the
+      // group, a media-server room of another sid, is open to them again.
+      if (open.records.some((record) => record.get('barred') === true)) {
+        return null
+      }
       const sessions = open.records
         .map((record) => ({
           id: record.get('id') as string | null,
@@ -115,9 +135,15 @@ export const joinCallSession = async (
         )
       }
       if (!sessionId) {
+        // Whoever opens the session started the call, and moderates it (see moderation.ts).
+        // A new session in the same media-server room is a new chat, but still the same call:
+        // whoever was removed from it stays removed until the media server closes the room.
+        // So the removals of the sessions ended just now in this room carry over; those of
+        // another room, an earlier call, do not.
         const created = await transaction.run(
           `
             MATCH (group:Group { id: $groupId })
+            MATCH (starter:User { id: $userId })
             CREATE (room:Room { id: apoc.create.uuid(), createdAt: toString(datetime()) })
             CREATE (session:VideoCallSession {
               id: apoc.create.uuid(),
@@ -126,23 +152,30 @@ export const joinCallSession = async (
               createdAt: toString(datetime())
             })
             CREATE (room)-[:ROOM_FOR]->(session)-[:CALL_IN]->(group)
+            CREATE (starter)-[:STARTED_CALL { handedOver: false }]->(session)
+            CREATE (starter)-[:MODERATES_CALL]->(session)
+            WITH session
+            OPTIONAL MATCH (removed:User)-[:REMOVED_FROM_CALL]->(earlier:VideoCallSession)
+              WHERE earlier.id IN $over AND earlier.livekitSid = $livekitSid
+            WITH session, collect(DISTINCT removed) AS removed
+            FOREACH (user IN removed | MERGE (user)-[:REMOVED_FROM_CALL]->(session))
             RETURN session.id AS id
           `,
-          { groupId, livekitRoom, livekitSid },
+          { groupId, userId, livekitRoom, livekitSid, over },
         )
         sessionId = created.records[0].get('id') as string
       }
       const joined = await transaction.run(
         `
-          MATCH (room:Room)-[:ROOM_FOR]->(:VideoCallSession { id: $sessionId })
+          MATCH (room:Room)-[:ROOM_FOR]->(session:VideoCallSession { id: $sessionId })
           MATCH (user:User { id: $userId })
           MERGE (user)-[:CHATS_IN]->(room)
           RETURN room.id AS roomId
         `,
         { sessionId, userId },
       )
-      /* v8 ignore next -- unreachable: the lock above has found the user, and a session always has its room */
-      return (joined.records[0]?.get('roomId') as string | undefined) ?? null
+      // The lock above has found the user, and a session always has its room.
+      return joined.records[0].get('roomId') as string
     })
   } finally {
     await session.close()

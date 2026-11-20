@@ -47,6 +47,43 @@ export const chat: readonly RelationshipDefinition[] = [
     to: Group,
     cardinality: 'at-most-one',
   }),
+  // The moderation of a video call (livekit/moderation.ts), kept on its session and over with it.
+  // Who opened the call: they moderate it, and get it back on returning unless they handed it on.
+  defineRelationship({
+    type: 'STARTED_CALL',
+    from: User,
+    to: VideoCallSession,
+    cardinality: 'many',
+    properties: { handedOver: { type: 'boolean' } },
+  }),
+  defineRelationship({
+    type: 'MODERATES_CALL',
+    from: User,
+    to: VideoCallSession,
+    cardinality: 'many',
+  }),
+  // Taken away by somebody who outranks them; only a holder of group.videoCall.moderate gives it
+  // back.
+  defineRelationship({
+    type: 'LOST_CALL_MODERATION',
+    from: User,
+    to: VideoCallSession,
+    cardinality: 'many',
+  }),
+  // Given the floor: spared when a moderator mutes everybody.
+  defineRelationship({
+    type: 'HAS_CALL_FLOOR',
+    from: User,
+    to: VideoCallSession,
+    cardinality: 'many',
+  }),
+  // Removed from the call: no way back in while it lasts.
+  defineRelationship({
+    type: 'REMOVED_FROM_CALL',
+    from: User,
+    to: VideoCallSession,
+    cardinality: 'many',
+  }),
   defineRelationship({
     type: 'OWNED_BY',
     from: SocialMedia,

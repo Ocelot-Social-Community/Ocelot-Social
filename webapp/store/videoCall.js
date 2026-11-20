@@ -23,8 +23,9 @@ export const state = () => {
     // Whether the call's sidebar shows its participants rather than one of its chats. The
     // third tab beside the two chats; the chat store knows nothing of it.
     participantsOpen: false,
-    // What the participant list shows, as the call keeps it: { people }. Here for the floating
-    // window beside the parked call, which shows the list without being the call.
+    // What the participant list shows, as the call keeps it: { people, moderation,
+    // mayTakeOver, locallyMuted }. Here for the floating window beside the parked call, which
+    // shows the list without being the call.
     participantsView: null,
     // 'idle' | 'prejoin' | 'connecting' | 'in-call' — mirrors VideoCall's local
     // phase so the layout can decide where the chat lives.

@@ -14,7 +14,7 @@ describe('VideoCalls graphql documents', () => {
 
   it('builds the videoCallParticipantCount query', () => {
     expect(printOp(videoCallParticipantCountQuery())).toBe(
-      'query ($groupId: ID!) { videoCallParticipantCount(groupId: $groupId) }',
+      'query ($groupId: ID!) { videoCallParticipantCount(groupId: $groupId) videoCallRemoved(groupId: $groupId) }',
     )
   })
 
@@ -26,7 +26,7 @@ describe('VideoCalls graphql documents', () => {
 
   it('builds the videoCallParticipantCountChanged subscription', () => {
     expect(printOp(videoCallParticipantCountChangedSubscription())).toBe(
-      'subscription ($groupId: ID!) { videoCallParticipantCountChanged(groupId: $groupId) { groupId count } }',
+      'subscription ($groupId: ID!) { videoCallParticipantCountChanged(groupId: $groupId) { groupId count removed } }',
     )
   })
 })

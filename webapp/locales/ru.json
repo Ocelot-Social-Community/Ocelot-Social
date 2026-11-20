@@ -550,6 +550,12 @@
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Этот пользователь не заблокирован.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Чат видеозвонка открыт только его участникам. Сначала присоединись к звонку.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Для видеозвонка не найдено активное участие в этой группе.",
+    "VIDEO_CALL_MODERATION_NOT_IN_CALL": "Модерировать видеозвонок могут только его участники.",
+    "VIDEO_CALL_MODERATION_NOT_MODERATOR": "Это может только модерация видеозвонка.",
+    "VIDEO_CALL_MODERATION_OUTRANKED": "Твоя роль в группе для этого недостаточно высока.",
+    "VIDEO_CALL_MODERATION_OWNER": "Владельца группы нельзя удалить из её видеозвонка.",
+    "VIDEO_CALL_MODERATION_PARTICIPANT_NOT_IN_CALL": "Этого человека нет в видеозвонке.",
+    "VIDEO_CALL_REMOVED_FROM_CALL": "Ты удалён из этого видеозвонка. К следующему можно присоединиться.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Ты не можешь начать видеозвонок в этой группе."
   },
   "chat": {
@@ -1130,7 +1136,8 @@
         "group_role_manage": "Редактирование ролей группы и их прав.",
         "group_settings_manage": "Изменение настроек группы: названия, описания, изображения, местоположения и категорий.",
         "group_videoCall_create": "Начало видеозвонка в группе.",
-        "group_videoCall_join": "Участие в идущем видеозвонке группы."
+        "group_videoCall_join": "Участие в идущем видеозвонке группы.",
+        "group_videoCall_moderate": "Брать на себя модерацию видеозвонка группы."
       },
       "resultingType": "С этими разрешениями группа:",
       "roleManageWarning": {
@@ -1961,7 +1968,7 @@
       "groupTitle": "Чат группы",
       "label": "Выбрать чат",
       "participants": "Участники",
-      "participantsHint": "Кто в звонке"
+      "participantsHint": "Кто в звонке и что можно сделать"
     },
     "closeChat": "Закрыть чат",
     "connecting": "Подключение…",
@@ -2033,7 +2040,15 @@
     "gotoGroup": "Перейти к группе «{name}»",
     "groupVideoCallButton": {
       "label": "Видео группы",
+      "removed": "Удалён из этого звонка",
       "tooltip": "Видеозвонок в группе «{name}»"
+    },
+    "handover": {
+      "confirm": "Передать и выйти",
+      "skip": "Выйти без выбора",
+      "suggestedName": "{name} (предложение)",
+      "text": "Ты последний модератор этого звонка. Передай модерацию, прежде чем уйти.",
+      "title": "Кто теперь модерирует?"
     },
     "hideBars": "Скрыть панели",
     "hideNotices": "Скрыть уведомления",
@@ -2044,18 +2059,64 @@
     "micNoSignal": "Ваш микрофон не передаёт звук — другие вас не слышат.",
     "micUnmuted": "Микрофон включён",
     "minimize": "Свернуть",
+    "moderation": {
+      "cameraOff": "{name}: твоя камера выключена.",
+      "everyone": "{name}: теперь звонок модерируют все.",
+      "everyoneOff": "{name}: звонок больше не модерируют все.",
+      "floor": "{name}: тебе дано слово.",
+      "floorMicOff": "{name}: тебе дано слово. Включи микрофон, чтобы тебя было слышно.",
+      "microphoneMuted": "{name}: твой микрофон выключен.",
+      "moderatorAppointed": "{name}: ты назначен модератором этого звонка.",
+      "moderatorAutomatic": "Теперь ты модерируешь этот звонок.",
+      "moderatorHandedOver": "{name}: тебе передана модерация этого звонка.",
+      "removed": "{name}: ты удалён из звонка.",
+      "removedPlain": "Ты удалён из звонка.",
+      "revoked": "{name}: ты лишён модерации.",
+      "screenShareStopped": "{name}: твой показ экрана остановлен.",
+      "switchMicOn": "Включить микрофон",
+      "takenOver": "{name}: модерация взята на себя."
+    },
     "openChat": "Открыть чат",
     "participants": {
+      "actionsFor": "Действия: {name}",
       "cameraOff": "камера выключена",
+      "cameraOffAction": "Выключить камеру",
       "cameraOn": "камера включена",
+      "cameraOnAction": "Включить камеру",
       "close": "Скрыть участников",
       "countWithDevices": "Участники: {people} · Устройства: {devices}",
+      "devices": "Устройств: {count}",
+      "everyoneModerates": "Модерируют все",
+      "giveFloor": "Дать слово",
+      "hasFloor": "Имеет слово",
       "label": "Участники звонка",
+      "leadModerator": "Главная модерация",
+      "makeModerator": "Сделать модератором",
       "micOff": "микрофон выключен",
       "micOn": "микрофон включён",
+      "micOnAction": "Включить микрофон",
+      "moderator": "Модерация",
+      "muteAll": "Выключить микрофоны всем",
+      "muteCount": "Выключить: {count}",
+      "muteForMe": "Заглушить для меня",
+      "muteMicrophone": "Выключить микрофон",
+      "muteName": "Выключить микрофон: {name}",
+      "muteWhom": "Кому выключить микрофон?",
       "open": "Показать участников",
+      "openProfile": "Открыть профиль",
+      "remove": "Удалить",
+      "removeEllipsis": "Удалить из звонка …",
+      "removeExplanation": "Пока идёт этот звонок, вернуться нельзя. В следующий — можно.",
+      "removeQuestion": "Удалить {name} из звонка?",
+      "resign": "Отказаться от модерации",
+      "revokeModerator": "Лишить модерации",
       "sharing": "показывает экран",
-      "speaking": "говорит"
+      "showLarge": "Показать крупно",
+      "speaking": "говорит",
+      "stopSharing": "Остановить показ экрана",
+      "takeFloor": "Лишить слова",
+      "takeOver": "Взять модерацию на себя",
+      "unmuteForMe": "Снова слышать"
     },
     "prejoin": {
       "camera": "Камера",

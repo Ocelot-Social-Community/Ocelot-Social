@@ -550,6 +550,12 @@
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Questo utente non è bloccato.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "La chat di una videochiamata è aperta solo a chi vi partecipa. Entra prima nella chiamata.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Non è stata trovata alcuna iscrizione attiva a questo gruppo per la videochiamata.",
+    "VIDEO_CALL_MODERATION_NOT_IN_CALL": "Solo chi partecipa alla videochiamata può moderarla.",
+    "VIDEO_CALL_MODERATION_NOT_MODERATOR": "Solo la moderazione della videochiamata può farlo.",
+    "VIDEO_CALL_MODERATION_OUTRANKED": "Il tuo ruolo nel gruppo non è abbastanza alto per questo.",
+    "VIDEO_CALL_MODERATION_OWNER": "Il proprietario del gruppo non può essere rimosso dalla sua videochiamata.",
+    "VIDEO_CALL_MODERATION_PARTICIPANT_NOT_IN_CALL": "Questa persona non è nella videochiamata.",
+    "VIDEO_CALL_REMOVED_FROM_CALL": "Sei stato rimosso da questa videochiamata. Potrai partecipare alla prossima.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Non puoi avviare una videochiamata in questo gruppo."
   },
   "chat": {
@@ -1130,7 +1136,8 @@
         "group_role_manage": "Modificare i ruoli del gruppo e i loro diritti.",
         "group_settings_manage": "Modificare le impostazioni del gruppo: nome, descrizione, immagine, luogo e categorie.",
         "group_videoCall_create": "Avviare una videochiamata nel gruppo.",
-        "group_videoCall_join": "Partecipare a una videochiamata in corso nel gruppo."
+        "group_videoCall_join": "Partecipare a una videochiamata in corso nel gruppo.",
+        "group_videoCall_moderate": "Assumere la moderazione di una videochiamata del gruppo."
       },
       "resultingType": "Con questi permessi il gruppo è:",
       "roleManageWarning": {
@@ -1961,7 +1968,7 @@
       "groupTitle": "Chat del gruppo",
       "label": "Scegli la chat",
       "participants": "Persone",
-      "participantsHint": "Chi è nella chiamata"
+      "participantsHint": "Chi è nella chiamata e cosa si può fare"
     },
     "closeChat": "Chiudi chat",
     "connecting": "Connessione in corso…",
@@ -2033,7 +2040,15 @@
     "gotoGroup": "Vai al gruppo «{name}»",
     "groupVideoCallButton": {
       "label": "Video del gruppo",
+      "removed": "Rimosso da questa chiamata",
       "tooltip": "Videochiamata nel gruppo «{name}»"
+    },
+    "handover": {
+      "confirm": "Passa ed esci",
+      "skip": "Esci senza scegliere",
+      "suggestedName": "{name} (suggerimento)",
+      "text": "Sei l’ultimo a moderare questa chiamata. Passa la moderazione prima di uscire.",
+      "title": "Chi modera d’ora in poi?"
     },
     "hideBars": "Nascondi le barre",
     "hideNotices": "Nascondi avvisi",
@@ -2044,18 +2059,64 @@
     "micNoSignal": "Il tuo microfono non trasmette alcun suono: gli altri non ti sentono.",
     "micUnmuted": "Microfono acceso",
     "minimize": "Riduci",
+    "moderation": {
+      "cameraOff": "{name} ha spento la tua fotocamera.",
+      "everyone": "{name} lascia moderare la chiamata a tutti.",
+      "everyoneOff": "{name} ha fatto finire la moderazione da parte di tutti.",
+      "floor": "{name} ti ha dato la parola.",
+      "floorMicOff": "{name} ti ha dato la parola. Accendi il microfono perché ti si senta.",
+      "microphoneMuted": "{name} ha silenziato il tuo microfono.",
+      "moderatorAppointed": "{name} ti ha nominato moderatore di questa chiamata.",
+      "moderatorAutomatic": "Ora moderi questa chiamata.",
+      "moderatorHandedOver": "{name} ti ha passato la moderazione di questa chiamata.",
+      "removed": "{name} ti ha rimosso dalla chiamata.",
+      "removedPlain": "Sei stato rimosso dalla chiamata.",
+      "revoked": "{name} ti ha tolto la moderazione.",
+      "screenShareStopped": "{name} ha terminato la tua condivisione dello schermo.",
+      "switchMicOn": "Accendi il microfono",
+      "takenOver": "{name} ha assunto la moderazione."
+    },
     "openChat": "Apri chat",
     "participants": {
+      "actionsFor": "Azioni per {name}",
       "cameraOff": "fotocamera spenta",
+      "cameraOffAction": "Spegni fotocamera",
       "cameraOn": "fotocamera accesa",
+      "cameraOnAction": "Accendi fotocamera",
       "close": "Nascondi le persone nella chiamata",
       "countWithDevices": "Persone: {people} · Dispositivi: {devices}",
+      "devices": "{count} dispositivi",
+      "everyoneModerates": "Tutti moderano",
+      "giveFloor": "Dai la parola",
+      "hasFloor": "Ha la parola",
       "label": "Persone nella chiamata",
+      "leadModerator": "Moderazione principale",
+      "makeModerator": "Nomina moderatore",
       "micOff": "microfono spento",
       "micOn": "microfono acceso",
+      "micOnAction": "Accendi microfono",
+      "moderator": "Moderazione",
+      "muteAll": "Silenzia tutti",
+      "muteCount": "Silenzia {count}",
+      "muteForMe": "Silenzia per me",
+      "muteMicrophone": "Silenzia microfono",
+      "muteName": "Silenzia {name}",
+      "muteWhom": "Chi silenziare?",
       "open": "Mostra le persone nella chiamata",
+      "openProfile": "Apri profilo",
+      "remove": "Rimuovi",
+      "removeEllipsis": "Rimuovi dalla chiamata …",
+      "removeExplanation": "Non potrà rientrare finché dura questa chiamata. Alla prossima sì.",
+      "removeQuestion": "Rimuovere {name} dalla chiamata?",
+      "resign": "Lascia la moderazione",
+      "revokeModerator": "Togli la moderazione",
       "sharing": "condivide lo schermo",
-      "speaking": "sta parlando"
+      "showLarge": "Mostra in grande",
+      "speaking": "sta parlando",
+      "stopSharing": "Termina la condivisione dello schermo",
+      "takeFloor": "Togli la parola",
+      "takeOver": "Assumi la moderazione",
+      "unmuteForMe": "Riascolta"
     },
     "prejoin": {
       "camera": "Fotocamera",

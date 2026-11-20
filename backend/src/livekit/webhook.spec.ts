@@ -43,11 +43,9 @@ vi.mock('@src/graphql/resolvers/videoCalls', () => ({
 // Ending the call session is the database's business (callSession.spec.ts); here it only
 // has to be asked for, and must not reach a real database.
 const mockEndCallSession = vi.fn<(...args: unknown[]) => Promise<void>>()
-const mockEndOfMissingRoom = vi.fn<(...args: unknown[]) => Promise<boolean>>()
 vi.mock('@src/livekit/callSession', () => ({
   __esModule: true,
   endCallSession: async (...args: unknown[]) => mockEndCallSession(...args),
-  endCallSessionsOfMissingRoom: async (...args: unknown[]) => mockEndOfMissingRoom(...args),
 }))
 vi.mock('@src/db/neo4j', () => ({
   __esModule: true,
@@ -138,7 +136,6 @@ beforeEach(() => {
   mockGetCount.mockReset().mockResolvedValue(0)
   mockEndCallSession.mockReset().mockResolvedValue(undefined)
   // Settled at once, unless a test says otherwise.
-  mockEndOfMissingRoom.mockReset().mockResolvedValue(true)
   takeToldRooms()
   mockLogger.info.mockReset()
   mockLogger.warn.mockReset()
@@ -303,6 +300,35 @@ describe('registerLiveKitWebhook', () => {
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
+    it('publishes the zero only once the session has ended, so it frees the removed', async () => {
+      // Each receiver's `removed` is read when the zero reaches them: published while the
+      // session still ran, it would keep them out.
+      let ended: () => void = () => undefined
+      mockEndCallSession.mockReturnValueOnce(
+        // eslint-disable-next-line promise/avoid-new
+        new Promise<void>((resolve) => {
+          ended = resolve
+        }),
+      )
+      mockReceive.mockResolvedValueOnce({
+        event: 'room_finished',
+        room: { name: 'group-finished', sid: 'RM_finished' },
+      })
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+      await flushPromises()
+
+      expect(mockEndCallSession).toHaveBeenCalled()
+      expect(mockPublish).not.toHaveBeenCalled()
+
+      ended()
+      await flushPromises()
+
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'finished',
+        count: 0,
+      })
+    })
+
     it('ends the call session of a finished room by the sid of that room', async () => {
       mockReceive.mockResolvedValueOnce({
         event: 'room_finished',
@@ -312,10 +338,9 @@ describe('registerLiveKitWebhook', () => {
       await flushPromises()
 
       expect(mockEndCallSession).toHaveBeenCalledWith('driver', 'RM_finished')
-      expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
     })
 
-    it('falls back to the room name when the event carries no sid', async () => {
+    it('leaves a room reported without its sid to the poller, which can tell if it still runs', async () => {
       mockReceive.mockResolvedValueOnce({
         event: 'room_finished',
         room: { name: 'group-finished' },
@@ -323,29 +348,11 @@ describe('registerLiveKitWebhook', () => {
       handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
       await flushPromises()
 
-      expect(mockEndOfMissingRoom).toHaveBeenCalledWith('driver', 'group-finished')
       expect(mockEndCallSession).not.toHaveBeenCalled()
-    })
-
-    it('leaves a session spared by name to the poller', async () => {
-      mockReceive.mockResolvedValueOnce({
-        event: 'room_finished',
-        room: { name: 'group-finished' },
-      })
-      mockEndOfMissingRoom.mockResolvedValueOnce(false)
-      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
-      await flushPromises()
-
       expect([...takeToldRooms()]).toEqual(['group-finished'])
     })
 
-    it('does not bother the poller when the session is settled, by name or by sid', async () => {
-      mockReceive.mockResolvedValueOnce({
-        event: 'room_finished',
-        room: { name: 'group-finished' },
-      })
-      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
-      await flushPromises()
+    it('does not bother the poller when the session is ended by sid', async () => {
       mockReceive.mockResolvedValueOnce({
         event: 'room_finished',
         room: { name: 'group-finished', sid: 'RM_finished' },
@@ -365,7 +372,6 @@ describe('registerLiveKitWebhook', () => {
       await flushPromises()
 
       expect(mockEndCallSession).not.toHaveBeenCalled()
-      expect(mockEndOfMissingRoom).not.toHaveBeenCalled()
     })
 
     it('logs but still acknowledges when ending the call session fails', async () => {
@@ -385,24 +391,12 @@ describe('registerLiveKitWebhook', () => {
       expect(res.status).toHaveBeenCalledWith(204)
     })
 
-    it('leaves a session it failed to end to the poller, by sid', async () => {
+    it('leaves a session it failed to end to the poller', async () => {
       mockReceive.mockResolvedValueOnce({
         event: 'room_finished',
         room: { name: 'group-finished', sid: 'RM_finished' },
       })
       mockEndCallSession.mockRejectedValueOnce(new Error('database down'))
-      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
-      await flushPromises()
-
-      expect([...takeToldRooms()]).toEqual(['group-finished'])
-    })
-
-    it('leaves a session it failed to end to the poller, by name', async () => {
-      mockReceive.mockResolvedValueOnce({
-        event: 'room_finished',
-        room: { name: 'group-finished' },
-      })
-      mockEndOfMissingRoom.mockRejectedValueOnce(new Error('database down'))
       handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
       await flushPromises()
 

@@ -79,13 +79,26 @@
           />
         </div>
       </template>
-      <!-- The list of the call's participants, as in the call's own sidebar. -->
+      <!--
+        The list of the call's participants, as in the call's own sidebar; what is done there for
+        oneself (show somebody large, mute somebody for oneself, switch something off) is the
+        call's doing.
+      -->
       <div
         v-if="participantsInWindow"
         class="chat-modul__participants"
         :style="{ height: participantsHeight }"
       >
-        <call-participants :people="participantsView.people" />
+        <call-participants
+          :people="participantsView.people"
+          :moderation="participantsView.moderation"
+          :may-take-over="participantsView.mayTakeOver"
+          :locally-muted="participantsView.locallyMuted"
+          @spotlight="callAction('spotlightPerson', $event)"
+          @local-mute="(userId, muted) => callAction('muteForMe', userId, muted)"
+          @switch-off="callAction('syncSwitchedOff', $event)"
+          @switch-on="callAction('switchOn', $event)"
+        />
       </div>
       <client-only v-else>
         <chat
@@ -107,7 +120,7 @@
     <client-only>
       <dock side="left" />
       <dock side="right" />
-      <video-call v-if="showVideoCall" />
+      <video-call v-if="showVideoCall" ref="videoCall" />
     </client-only>
   </div>
 </template>
@@ -191,10 +204,11 @@ export default {
         !!this.participantsView
       )
     },
-    // Which chat is asked for, as one value to watch.
+    // Which chat is asked for, as one value to watch — anew with every opening, the same chat
+    // opened again included.
     openChatTarget() {
-      const { showChat, chatUserId, groupId, roomId } = this.getShowChat
-      return showChat ? [chatUserId, groupId, roomId].join('|') : null
+      const { showChat, chatUserId, groupId, roomId, openings } = this.getShowChat
+      return showChat ? [chatUserId, groupId, roomId, openings].join('|') : null
     },
     // As high as the chat it stands for (Chat.vue's chatHeight beside a parked call).
     participantsHeight() {
@@ -307,6 +321,11 @@ export default {
     closeSingleRoom() {
       this.setParticipantsOpen(false)
       this.showChat({ showChat: false, chatUserId: null, groupId: null })
+    },
+    // What the list asks of the call itself; the call is mounted while there is a list.
+    callAction(method, ...args) {
+      const call = this.$refs.videoCall
+      if (call) call[method](...args)
     },
     // The export is the chat's own doing; only its button sits in the header drawn here.
     async exportChat() {

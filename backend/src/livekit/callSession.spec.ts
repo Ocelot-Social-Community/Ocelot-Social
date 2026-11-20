@@ -73,6 +73,23 @@ const rooms = async () => {
   return result.records.map((record) => record.get('roomId') as string)
 }
 
+// Carl removed from the running session, as moderation does it (see markRemoved).
+const removeCarl = async () =>
+  run(`
+    MATCH (carl:User { id: 'carl' }), (session:VideoCallSession)
+    WHERE session.endedAt IS NULL
+    MERGE (carl)-[:REMOVED_FROM_CALL]->(session)
+  `)
+
+// The sids of the sessions Carl is removed from, one per session.
+const removedFrom = async () => {
+  const result = await run(`
+    MATCH (:User { id: 'carl' })-[:REMOVED_FROM_CALL]->(session:VideoCallSession)
+    RETURN session.livekitSid AS sid ORDER BY sid
+  `)
+  return result.records.map((record) => record.get('sid') as string)
+}
+
 beforeEach(async () => {
   await cleanDatabase()
   await run(`
@@ -191,6 +208,27 @@ describe(joinCallSession, () => {
       expect(anna).toBe(next)
       expect(anna).not.toBe(earlier)
     })
+
+    it('keeps whoever was removed from the call removed in the new chat', async () => {
+      await run(`CREATE (:User { id: 'carl' })`)
+      await join('anna', 'RM_1', ['anna', 'carl'])
+      await removeCarl()
+      // Everybody has gone; Ben starts a new chat in the same media-server room.
+      await join('ben', 'RM_1')
+
+      expect(await removedFrom()).toEqual(['RM_1', 'RM_1'])
+      expect(await join('carl', 'RM_1')).toBeNull()
+    })
+  })
+
+  it('does not keep whoever was removed from a call out of the next one', async () => {
+    await run(`CREATE (:User { id: 'carl' })`)
+    await join('anna', 'RM_1', ['anna', 'carl'])
+    await removeCarl()
+    await join('ben', 'RM_2')
+
+    expect(await removedFrom()).toEqual(['RM_1'])
+    expect(await join('carl', 'RM_2', ['ben', 'carl'])).not.toBeNull()
   })
 
   it('starts a new chat for the next call and ends the session the earlier one left running', async () => {
@@ -202,6 +240,40 @@ describe(joinCallSession, () => {
       { roomId: earlier, sid: 'RM_1', running: false, users: ['anna'] },
       { roomId: next, sid: 'RM_2', running: true, users: ['ben'] },
     ])
+  })
+
+  it('lets an admission to a call over by now neither end the running one nor open a chat', async () => {
+    await run(`CREATE (:User { id: 'carl' })`)
+    const running = await join('anna', 'RM_2', ['anna', 'carl'])
+    await removeCarl()
+    // Asked for while RM_1 still ran; by the time the lock is held, RM_2 does.
+    const stale = await joinCallSession(driver, {
+      groupId: 'group-1',
+      userId: 'ben',
+      livekitRoom: 'group-group-1',
+      livekitSid: 'RM_1',
+      presentUserIds: ['ben'],
+      currentSid: async () => Promise.resolve('RM_2'),
+    })
+
+    expect(stale).toBeNull()
+    expect(await sessions()).toEqual([
+      { roomId: running, sid: 'RM_2', running: true, users: ['anna'] },
+    ])
+    expect(await removedFrom()).toEqual(['RM_2'])
+  })
+
+  it('admits when the media server, asked again, still runs that room', async () => {
+    const roomId = await joinCallSession(driver, {
+      groupId: 'group-1',
+      userId: 'anna',
+      livekitRoom: 'group-group-1',
+      livekitSid: 'RM_1',
+      presentUserIds: ['anna'],
+      currentSid: async () => Promise.resolve('RM_1'),
+    })
+
+    expect(roomId).toEqual(expect.any(String))
   })
 
   it('keeps the calls of different groups apart', async () => {

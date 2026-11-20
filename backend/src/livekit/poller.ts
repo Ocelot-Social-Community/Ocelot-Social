@@ -18,6 +18,7 @@ import { serverPubsub } from '@src/context'
 import { getDriver } from '@src/db/neo4j'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import { endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
+import { settleAndPublishModeration } from '@src/livekit/moderationService'
 import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -95,8 +96,9 @@ const pollOnce = async () => {
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const listed = Number(room.numParticipants ?? 0) || 0
+      // Who is there: as listed, or as the participants themselves say for a told room.
+      let count = listed
       if (lastSeenCounts.get(room.name) !== listed || told.has(room.name)) {
-        let count = listed
         if (told.has(room.name)) {
           // The correction for a told room asks the participants themselves, as the count query
           // does: the room list can lag behind them, and its count, published as "the truth",
@@ -122,6 +124,18 @@ const pollOnce = async () => {
         // count, which the next poll compares with — a list still lagging behind the
         // participants then shows no change, instead of republishing its stale count.
         lastSeenCounts.set(room.name, listed)
+      }
+      // The moderation is kept in step on every poll, not only when the count changes: one coming
+      // as a moderator goes leaves it the same. If it was the last moderator, the call needs
+      // another one — nothing else notices a moderator who closed the tab. And whatever an act of
+      // moderation left undone is put right here (see moderationService.ts).
+      if (count > 0) {
+        const metadata: unknown = room.metadata
+        const sid: unknown = room.sid
+        await settleAndPublishModeration({ driver: getDriver(), config: CONFIG }, groupId, {
+          published: typeof metadata === 'string' ? metadata : '',
+          leftoversIn: typeof sid === 'string' ? sid : undefined,
+        })
       }
       owed.delete(room.name)
     }
@@ -151,7 +165,9 @@ const pollOnce = async () => {
         const message = err instanceof Error ? err.message : String(err)
         logger.warn(`Ending the call session of ${roomName} failed:`, message)
       }
-      if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName)) {
+      // Also for a room already seen empty, once its session has ended: whoever was removed from
+      // the call learns with the count that they may join again (`removed` on the count).
+      if ((lastSeenCounts.get(roomName) ?? 0) > 0 || told.has(roomName) || sessionsSettled) {
         const groupId = groupIdFromRoomName(roomName)
         // Always a group id here: only names that already yielded one are recorded in
         // lastSeenCounts (the loop above `continue`s on a falsy groupId), and the rooms a client

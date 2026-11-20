@@ -17,11 +17,13 @@ describe('ActiveVideoCallCard.vue', () => {
   let open
   let close
   let inCall
+  let toastError
 
   const Wrapper = (propsData, { showVideoCall = false } = {}) => {
     // The call window, as far as the card sees it: whether it is open, and the order of
     // what is done to it.
     inCall = []
+    toastError = jest.fn()
     open = jest.fn(() => inCall.push('open'))
     close = jest.fn(() => inCall.push('close'))
     const store = new Vuex.Store({
@@ -32,7 +34,10 @@ describe('ActiveVideoCallCard.vue', () => {
       localVue,
       store,
       propsData,
-      mocks: { $t: (key, args) => (args ? `${key} ${JSON.stringify(args)}` : key) },
+      mocks: {
+        $t: (key, args) => (args ? `${key} ${JSON.stringify(args)}` : key),
+        $toast: { error: toastError },
+      },
       stubs: { NuxtLink: RouterLinkStub, 'avatar-image': true },
     })
   }
@@ -121,6 +126,21 @@ describe('ActiveVideoCallCard.vue', () => {
 
     expect(inCall).toEqual(['close', 'open'])
     expect(open).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ groupId: 'g1' }))
+  })
+
+  it('says on the button that the viewer was removed from this call, and does not join it', async () => {
+    const wrapper = Wrapper({ call: callWith([user('u1')], { removed: true }) })
+    const button = wrapper.find('[data-test="call-join"]')
+
+    expect(button.text()).toBe('videoCall.groupVideoCallButton.removed')
+    expect(button.classes()).toContain('permission-denied')
+    expect(button.attributes('aria-disabled')).toBe('true')
+
+    await button.trigger('click')
+
+    expect(open).not.toHaveBeenCalled()
+    expect(toastError).toHaveBeenCalledWith('backendErrors.VIDEO_CALL_REMOVED_FROM_CALL')
+    expect(wrapper.emitted('joined')).toBeUndefined()
   })
 
   it('says the viewer is in the call instead of offering to join', () => {

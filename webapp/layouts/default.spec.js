@@ -79,6 +79,26 @@ describe('default.vue', () => {
       expect(wrapper.classes('layout-default')).toBe(true)
     })
 
+    it('hands the own microphone and camera, switched on or off in the parked list, to the call', () => {
+      const parked = shallowMount(Default, {
+        store,
+        mocks,
+        localVue,
+        stubs,
+        computed: {
+          participantsInWindow: () => true,
+          participantsView: () => ({ people: [], moderation: {}, locallyMuted: {} }),
+        },
+      })
+      const call = { switchOn: jest.fn(), syncSwitchedOff: jest.fn() }
+      parked.vm.$refs.videoCall = call
+      const list = parked.findComponent({ name: 'CallParticipants' })
+      list.vm.$emit('switch-on', 'mic')
+      list.vm.$emit('switch-off', 'camera')
+      expect(call.switchOn).toHaveBeenCalledWith('mic')
+      expect(call.syncSwitchedOff).toHaveBeenCalledWith('camera')
+    })
+
     describe('header and footer beside a maximized video call', () => {
       const classes = () =>
         ['movable', 'glass', 'away'].filter((name) =>
@@ -195,7 +215,12 @@ describe('default.vue', () => {
     })
 
     describe('participants of the parked call in the floating window', () => {
-      const view = { people: [{ userId: 'u1' }] }
+      const view = {
+        people: [{ userId: 'u1' }],
+        moderation: {},
+        mayTakeOver: false,
+        locallyMuted: {},
+      }
       const inWindow = (overrides = {}) =>
         Default.computed.participantsInWindow.call({
           showVideoCall: true,
@@ -252,15 +277,31 @@ describe('default.vue', () => {
         expect(setParticipantsOpen).toHaveBeenCalledWith(false)
         expect(
           Default.computed.openChatTarget.call({
-            getShowChat: { showChat: true, chatUserId: 'u2', groupId: null, roomId: null },
+            getShowChat: {
+              showChat: true,
+              chatUserId: 'u2',
+              groupId: null,
+              roomId: null,
+              openings: 3,
+            },
           }),
-        ).toBe('u2||')
+        ).toBe('u2|||3')
         expect(
           Default.computed.openChatTarget.call({ getShowChat: { showChat: false } }),
         ).toBeNull()
       })
 
-      it('close with the window', () => {
+      it('hand what is done for oneself to the call, and close with the window', () => {
+        const spotlightPerson = jest.fn()
+        Default.methods.callAction.call(
+          { $refs: { videoCall: { spotlightPerson } } },
+          'spotlightPerson',
+          'u1',
+        )
+        expect(spotlightPerson).toHaveBeenCalledWith('u1')
+        expect(() =>
+          Default.methods.callAction.call({ $refs: {} }, 'spotlightPerson'),
+        ).not.toThrow()
         const setParticipantsOpen = jest.fn()
         const showChat = jest.fn()
         Default.methods.closeSingleRoom.call({ setParticipantsOpen, showChat })
