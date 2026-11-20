@@ -149,8 +149,14 @@ export default {
         this.updateEmbedSettings(this.checkedAlwaysAllowEmbeds)
       }
     },
+    // In the editor (it listens for `remove`) the embed is taken out of the text and turned into a
+    // link there; a reader of the content can only hide the preview.
     removeEmbed() {
-      this.showLinkOnly = true
+      if (this.$listeners.remove) {
+        this.$emit('remove')
+      } else {
+        this.showLinkOnly = true
+      }
     },
     async updateEmbedSettings(allowEmbedIframes) {
       try {

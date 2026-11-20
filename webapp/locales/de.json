@@ -880,6 +880,7 @@
         "usedByMe": "Von mir verwendet"
       }
     },
+    "invalidLink": "Das ist kein gültiger Link. Gib eine Webadresse, eine E-Mail-Adresse oder einen anderen Link ein.",
     "legend": {
       "bold": "Fett",
       "heading3": "Überschrift 3",

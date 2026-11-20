@@ -161,7 +161,7 @@ export default {
         const link = getMarkRange(selection.$from, schema.marks.link)
         if (link) ({ from, to } = link)
       }
-      markLinkSelection(this.editor.view, active && from < to ? { from, to } : null)
+      markLinkSelection(this.editor.view, active ? { from, to } : null)
     },
     placeholder: {
       immediate: true,
@@ -570,8 +570,8 @@ export default {
       view.dispatch(view.state.tr.insertText(' '))
     },
     enterLink() {
-      this.setLinkUrl(this.linkUrl)
-      this.linkUrl = null
+      // What was typed and is no link stays in the field to be corrected.
+      if (this.setLinkUrl(this.linkUrl)) this.linkUrl = null
     },
     toggleLinkInput(attrs, element) {
       if (this._isDestroying) return
@@ -675,20 +675,39 @@ export default {
         this.$refs.menuBar.$refs.linkButton.$el,
       )
     },
+    // Returns false when something was entered that is no link: a toast says so, and nothing is
+    // changed. Nothing entered at all takes the link off.
     setLinkUrl(url) {
       const normalizedLinks = url ? linkify().match(url) : null
       const command = this.editor.commands.link
+      if (url && url.trim() && !normalizedLinks) {
+        this.$toast.error(this.$t('editor.invalidLink'))
+        return false
+      }
       if (normalizedLinks) {
         // add valid link
-        command({
-          href: normalizedLinks.pop().url,
-        })
+        const { text, url: href } = normalizedLinks.pop()
+        if (this.editor.state.selection.empty && !this.editor.getMarkAttrs('link').href) {
+          this.insertLink(text, href)
+        } else {
+          command({ href })
+        }
         this.toggleLinkInput()
         this.editor.focus()
       } else {
         // remove link
         command({ href: null })
       }
+      return true
+    },
+    // Nothing selected, so there is no text to link: the link itself goes in at the cursor, as
+    // plain text with the link mark. What is typed next goes on after it, not inside it.
+    insertLink(text, href) {
+      const { state, dispatch } = this.editor.view
+      const mark = state.schema.marks.link.create({ href })
+      dispatch(
+        state.tr.replaceSelectionWith(state.schema.text(text, [mark]), false).setStoredMarks([]),
+      )
     },
     clear() {
       this.editor.clearContent(true)
@@ -742,6 +761,17 @@ li > p {
   .link-selection {
     background-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
     border-radius: var(--border-radius-base);
+  }
+
+  /* The cursor, where nothing is selected, while the link input has the focus. */
+  .link-cursor {
+    display: inline-block;
+    width: 0;
+    height: 1.2em;
+    margin-left: -1px;
+    border-left: 2px solid var(--color-primary);
+    vertical-align: text-bottom;
+    pointer-events: none;
   }
 
   .hashtag {

@@ -880,6 +880,7 @@
         "usedByMe": "Door mij gebruikt"
       }
     },
+    "invalidLink": "Dit is geen geldige link. Voer een webadres, een e-mailadres of een andere link in.",
     "legend": {
       "bold": "Vet",
       "heading3": "Kop 3",

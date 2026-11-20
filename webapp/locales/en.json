@@ -880,6 +880,7 @@
         "usedByMe": "Used by me"
       }
     },
+    "invalidLink": "This is not a valid link. Enter a web address, an email address or another link.",
     "legend": {
       "bold": "Bold",
       "heading3": "Heading 3",

@@ -880,6 +880,7 @@
         "usedByMe": "Używane przeze mnie"
       }
     },
+    "invalidLink": "To nie jest prawidłowy link. Wpisz adres internetowy, adres e-mail lub inny link.",
     "legend": {
       "bold": "Pogrubienie",
       "heading3": "Nagłówek 3",

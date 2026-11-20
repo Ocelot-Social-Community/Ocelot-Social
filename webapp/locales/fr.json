@@ -880,6 +880,7 @@
         "usedByMe": "Utilisés par moi"
       }
     },
+    "invalidLink": "Ce n’est pas un lien valide. Saisissez une adresse web, une adresse e-mail ou un autre lien.",
     "legend": {
       "bold": "Gras",
       "heading3": "Titre 3",

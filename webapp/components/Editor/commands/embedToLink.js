@@ -1,0 +1,19 @@
+import { TextSelection } from 'prosemirror-state'
+
+// The close button of an embed's preview, in the editor: the embed is taken out of the text and
+// the address stays as a real link (text with the link mark, without the spaces around it that the
+// preview's own link has), with the cursor behind it, ready to go on writing.
+//
+// There are two embed nodes of that name: a block one and an inline one (LegacyEmbed, the one the
+// schema ends up with). A block gets a line of its own.
+export default ({ view, node, pos }) => {
+  const { state } = view
+  const { schema } = state
+  const url = node.attrs.dataEmbedUrl
+  const link = schema.text(url, [schema.marks.link.create({ href: url })])
+  const replacement = node.isBlock ? schema.nodes.paragraph.create(null, link) : link
+  const tr = state.tr.replaceWith(pos, pos + node.nodeSize, replacement)
+  const cursor = pos + url.length + (node.isBlock ? 1 : 0)
+  view.dispatch(tr.setSelection(TextSelection.create(tr.doc, cursor)).setStoredMarks([]))
+  view.focus()
+}
