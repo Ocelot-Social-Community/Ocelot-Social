@@ -19,6 +19,7 @@ import { getDriver } from '@src/db/neo4j'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import { endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
 import { settleAndPublishModeration } from '@src/livekit/moderationService'
+import { roomPrefix } from '@src/livekit/rooms'
 import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -85,7 +86,8 @@ const pollOnce = async () => {
     }
     const seen = new Set<string>()
     for (const room of rooms) {
-      if (!room.name?.startsWith('group-')) {
+      // Only this instance's rooms: another one sharing the media server looks after its own.
+      if (!room.name?.startsWith(roomPrefix())) {
         continue
       }
       seen.add(room.name)

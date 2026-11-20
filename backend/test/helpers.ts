@@ -49,6 +49,7 @@ export const TEST_CONFIG = {
   LIVEKIT_URL: undefined,
   LIVEKIT_API_KEY: undefined,
   LIVEKIT_API_SECRET: undefined,
+  LIVEKIT_ROOM_PREFIX: '',
   LIVEKIT_ENABLED: false,
 
   AWS_ACCESS_KEY_ID: 'minio',

@@ -84,8 +84,10 @@ export const settleAndPublishModeration = async (
     const appointed = await settleModeration(driver, groupId, presentUsers(connections))
     const state = await readModeration(driver, groupId)
     // Published again even when the state is unchanged: two backends acting on the same call at
-    // once can publish in the wrong order, and the older state would otherwise stay.
-    if (published === undefined || moderationMetadata(state) !== published) {
+    // once can publish in the wrong order, and the older state would otherwise stay. Nothing,
+    // though, without a session here: the room may be another instance's sharing the media
+    // server, and "nobody moderates" would overwrite its moderation on every poll.
+    if (state && (published === undefined || moderationMetadata(state) !== published)) {
       await publishModeration(client, roomName, state)
     }
     if (appointed) {

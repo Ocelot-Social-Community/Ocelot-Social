@@ -7176,6 +7176,30 @@ describe('VideoCall — the people in the call and their moderation', () => {
       expect(toggleCamera).not.toHaveBeenCalled()
     })
 
+    it("switches one's own off from the list as the buttons do, only what is on", () => {
+      const { wrapper } = setup()
+      const toggleMic = jest.spyOn(wrapper.vm, 'toggleMic').mockResolvedValue()
+      const toggleCamera = jest.spyOn(wrapper.vm, 'toggleCamera').mockResolvedValue()
+      const toggleScreenShare = jest.spyOn(wrapper.vm, 'toggleScreenShare').mockResolvedValue()
+      const sync = jest.spyOn(wrapper.vm, 'syncSwitchedOff')
+      wrapper.setData({ micEnabled: true, cameraEnabled: false, screenShareEnabled: true })
+      for (const kind of ['mic', 'camera', 'screen']) wrapper.vm.switchOff(kind)
+      expect(toggleMic).toHaveBeenCalledTimes(1)
+      expect(toggleCamera).not.toHaveBeenCalled()
+      expect(toggleScreenShare).toHaveBeenCalledTimes(1)
+      expect(sync).not.toHaveBeenCalled()
+    })
+
+    it('shows the microphone on still when switching it off from the list fails', async () => {
+      const { wrapper, local } = setup()
+      wrapper.setData({ micEnabled: true })
+      local.setMicrophoneEnabled.mockRejectedValue(new Error('busy'))
+      local.isMicrophoneEnabled = true
+      wrapper.vm.switchOff('mic')
+      await flushPromises()
+      expect(wrapper.vm.micEnabled).toBe(true)
+    })
+
     it('tells of a removal once, with or without a name', () => {
       const { wrapper } = setup()
       wrapper.vm.onModerationNotice(encode({ type: 'removed', by: 'Anna' }))

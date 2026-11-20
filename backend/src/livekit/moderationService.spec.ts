@@ -117,14 +117,13 @@ describe('settleAndPublishModeration', () => {
     })
   })
 
-  it('tells nobody when the moderation stays as it was', async () => {
+  it("publishes nothing for a room it has no session of, which may be another instance's", async () => {
+    // Somebody in a room of this name, but no session here: an instance sharing the media server
+    // may moderate it, and "nobody moderates" would overwrite that on every poll.
     service.listParticipants.mockResolvedValue([participant('udo', 1n)])
-    await settleAndPublishModeration({ driver, config }, 'g1')
+    await settleAndPublishModeration({ driver, config }, 'g1', { published: '{"moderation":{}}' })
 
-    expect(service.updateRoomMetadata).toHaveBeenCalledWith(
-      'group-g1',
-      JSON.stringify({ moderation: null }),
-    )
+    expect(service.updateRoomMetadata).not.toHaveBeenCalled()
     expect(service.sendData).not.toHaveBeenCalled()
   })
 

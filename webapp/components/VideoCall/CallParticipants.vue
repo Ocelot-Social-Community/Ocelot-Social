@@ -5,11 +5,14 @@
     @keydown.esc="muting && stopMuting()"
   >
     <!--
-      What concerns the whole call: the moderation's own controls. Somebody who may step into the
-      moderation is offered that instead. While "mute all" is being chosen, its question and
-      answers take the controls' place.
+      What concerns the whole call: the moderation's own controls, and the filter. Somebody who
+      may step into the moderation is offered that instead. While "mute all" is being chosen, its
+      question and answers take the controls' place; the filter stays.
     -->
-    <div v-if="hasToolbar" class="call-participants__toolbar" data-test="call-participants-toolbar">
+    <div
+      :class="['call-participants__toolbar', { 'call-participants__toolbar--slim': onlyFilter }]"
+      data-test="call-participants-toolbar"
+    >
       <h3
         v-if="muting"
         class="call-participants__muting-title"
@@ -17,7 +20,7 @@
       >
         {{ $t('videoCall.participants.muteWhom') }}
       </h3>
-      <!-- Its answers stand where the moderation's controls stood. -->
+      <!-- Its answers stand where the moderation's controls stood, the filter behind them. -->
       <div class="call-participants__toolbar-actions">
         <template v-if="muting">
           <os-button
@@ -80,6 +83,134 @@
           />
           {{ $t('videoCall.participants.everyoneModerates') }}
         </label>
+        <!--
+          The filter: its field opens to the left of its button, in the same line, with the
+          filter's symbol at its front. Closed, it filters no more, but keeps what was typed for
+          the next time.
+        -->
+        <span
+          :class="['call-participants__filter', { 'call-participants__filter--open': filterOpen }]"
+          data-test="call-participants-filter"
+        >
+          <span v-if="filterOpen" class="call-participants__filter-field">
+            <!--
+              The filter's symbol at the field's front opens, with the small arrow up at its side,
+              the rest of what the filter can look for, to tick in a menu: whoever matches all that
+              is ticked, and the name, stays. The menu stays open for ticking more than one.
+            -->
+            <dropdown class="call-participants__filter-more" placement="bottom-start" offset="5">
+              <template #default="{ toggleMenu, isOpen }">
+                <button
+                  v-tooltip="$t('videoCall.participants.filterBy')"
+                  type="button"
+                  class="call-participants__filter-more-toggle"
+                  data-test="call-participants-filter-more"
+                  :aria-label="$t('videoCall.participants.filterBy')"
+                  aria-haspopup="true"
+                  :aria-expanded="isOpen ? 'true' : 'false'"
+                  @click.prevent="toggleMenu"
+                >
+                  <os-icon :icon="icons.filter" class="call-participants__filter-symbol" />
+                  <os-icon
+                    :icon="isOpen ? icons.angleUp : icons.angleDown"
+                    class="call-participants__filter-more-arrow"
+                  />
+                </button>
+              </template>
+              <template #popover>
+                <div
+                  class="call-participants__filter-menu"
+                  role="group"
+                  :aria-label="$t('videoCall.participants.filterBy')"
+                  data-test="call-participants-filter-menu"
+                >
+                  <label
+                    v-for="chip in filterChips"
+                    :key="chip.key"
+                    class="call-participants__filter-option"
+                  >
+                    <input
+                      type="checkbox"
+                      :checked="filterKeys.includes(chip.key)"
+                      :data-test="'call-participants-filter-chip-' + chip.key"
+                      @change="toggleChip(chip.key)"
+                    />
+                    <os-icon :icon="chip.icon" aria-hidden="true" />
+                    {{ chip.label }}
+                  </label>
+                </div>
+              </template>
+            </dropdown>
+            <!--
+              What the filter looks for besides the name, at a glance, each as a badge with a cross:
+              a click on it lets go of it.
+            -->
+            <button
+              v-for="chip in chosenChips"
+              :key="chip.key"
+              v-tooltip="$t('videoCall.participants.filterChipRemove', { name: chip.label })"
+              type="button"
+              class="call-participants__filter-chosen"
+              :aria-label="$t('videoCall.participants.filterChipRemove', { name: chip.label })"
+              :data-test="'call-participants-filter-chosen-' + chip.key"
+              @click="toggleChip(chip.key)"
+            >
+              <os-badge variant="primary" class="call-participants__filter-chosen-badge">
+                <os-icon :icon="chip.icon" />
+                <os-icon :icon="icons.close" class="call-participants__filter-chosen-cross" />
+              </os-badge>
+            </button>
+            <input
+              ref="filterName"
+              v-model="filterName"
+              type="text"
+              class="call-participants__filter-name"
+              data-test="call-participants-filter-name"
+              :placeholder="$t('videoCall.participants.filterNamePlaceholder')"
+              :aria-label="$t('videoCall.participants.filterName')"
+              @keydown.esc.stop="clearFilterName"
+            />
+            <span
+              v-if="filtering"
+              class="call-participants__filter-count"
+              data-test="call-participants-filter-count"
+              aria-live="polite"
+            >
+              {{
+                $t('videoCall.participants.filterCount', {
+                  shown: shown.length,
+                  total: people.length,
+                })
+              }}
+            </span>
+            <button
+              v-if="filterName"
+              v-tooltip="$t('videoCall.participants.filterNameClear')"
+              type="button"
+              class="call-participants__filter-clear"
+              data-test="call-participants-filter-clear"
+              :aria-label="$t('videoCall.participants.filterNameClear')"
+              @click="clearFilterName"
+            >
+              <os-icon :icon="icons.close" />
+            </button>
+          </span>
+          <os-button
+            v-tooltip="$t('videoCall.participants.filter')"
+            data-test="call-participants-filter-toggle"
+            variant="primary"
+            :appearance="filterOpen ? 'filled' : 'ghost'"
+            circle
+            size="sm"
+            :aria-label="$t('videoCall.participants.filter')"
+            :aria-expanded="filterOpen ? 'true' : 'false'"
+            @click="toggleFilter"
+          >
+            <template #icon>
+              <os-icon :icon="icons.filter" />
+            </template>
+          </os-button>
+        </span>
       </div>
     </div>
 
@@ -96,7 +227,7 @@
       @focusout="!$el.contains($event.relatedTarget) && restOrder()"
     >
       <li
-        v-for="person in ordered"
+        v-for="person in shown"
         :key="person.userId"
         :class="['call-participants__row', { 'call-participants__row--speaking': person.speaking }]"
         :data-test="'call-participant-' + person.userId"
@@ -268,6 +399,22 @@
           @change="spare(person.userId, !$event.target.checked)"
         />
       </li>
+      <li
+        v-if="filtering && !shown.length"
+        class="call-participants__none"
+        data-test="call-participants-filter-none"
+      >
+        {{ $t('videoCall.participants.filterNone') }}
+        <os-button
+          data-test="call-participants-filter-reset"
+          variant="primary"
+          appearance="outline"
+          size="sm"
+          @click="resetFilter"
+        >
+          {{ $t('videoCall.participants.filterReset') }}
+        </os-button>
+      </li>
     </ul>
 
     <!--
@@ -317,7 +464,7 @@
 </template>
 
 <script>
-import { OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
+import { OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
 import { mapGetters } from 'vuex'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
@@ -333,6 +480,15 @@ import {
 } from '~/graphql/VideoCalls'
 import { takeFocus, trapFocus } from './dialogFocus'
 
+// A name as the filter compares it: whatever the case, and without accents, so that "jose"
+// finds José.
+const fold = (text) =>
+  (text || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+
 // How long the rows stay where they are after the last move, click or key in the list. Whoever
 // aims at a switch, or has just pressed one, is not to see the row jump away under the pointer.
 export const ORDER_REST = 5000
@@ -343,7 +499,7 @@ export const ORDER_REST = 5000
 // which decides it again (backend: videoCallModeration.ts).
 export default {
   name: 'CallParticipants',
-  components: { AvatarImage, Dropdown, OsButton, OsIcon, OsMenu, OsMenuItem },
+  components: { AvatarImage, Dropdown, OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem },
   props: {
     // One entry per person: { userId, name, slug, profile, isMe, micOn, cameraOn,
     // screenSharing, speaking, devices }.
@@ -363,6 +519,11 @@ export default {
     return {
       // The requests to the server still on their way: while any is, the controls wait.
       pending: 0,
+      // The filter: whether its row is unfolded, the part of a name it looks for, and the chips
+      // chosen, by key.
+      filterOpen: false,
+      filterName: '',
+      filterKeys: [],
       // The heavier rights over the person whose menu is open, as the server answered them.
       rights: {},
       dialog: null,
@@ -434,9 +595,87 @@ export default {
       }
       return live.sort((a, b) => place(a) - place(b))
     },
-    // Whether there is anything for the whole call to show above the list.
-    hasToolbar() {
-      return this.muting || this.isModerator || this.mayTakeOver || this.moderation.everyone
+    // What the filter can look for besides a name. "Speaking" comes and goes with every word, but
+    // shows where a background noise comes from.
+    filterChips() {
+      const chip = (key, icon, label, matches) => ({ key, icon, label, matches })
+      return [
+        chip(
+          'micOn',
+          this.icons.microphone,
+          this.$t('videoCall.participants.filterChip.micOn'),
+          (person) => person.micOn,
+        ),
+        chip(
+          'cameraOn',
+          this.icons.videoCamera,
+          this.$t('videoCall.participants.filterChip.cameraOn'),
+          (person) => person.cameraOn,
+        ),
+        chip(
+          'speaking',
+          this.icons.volumeUp,
+          this.$t('videoCall.participants.filterChip.speaking'),
+          (person) => person.speaking,
+        ),
+        chip(
+          'floor',
+          this.icons.comment,
+          this.$t('videoCall.participants.filterChip.floor'),
+          (person) => this.hasFloor(person.userId),
+        ),
+        chip(
+          'moderator',
+          this.icons.shield,
+          this.$t('videoCall.participants.filterChip.moderator'),
+          (person) => this.moderation.everyone || this.isNamedModerator(person.userId),
+        ),
+        chip(
+          'sharing',
+          this.icons.desktop,
+          this.$t('videoCall.participants.filterChip.sharing'),
+          (person) => person.screenSharing,
+        ),
+        chip(
+          'mutedForMe',
+          this.icons.volumeOff,
+          this.$t('videoCall.participants.filterChip.mutedForMe'),
+          (person) => !!this.locallyMuted[person.userId],
+        ),
+      ]
+    },
+    // Whether the toolbar holds nothing but the filter's button: then it takes less room. Its
+    // field open, it has its full height again.
+    onlyFilter() {
+      return (
+        !this.filterOpen &&
+        !this.muting &&
+        !this.isModerator &&
+        !this.mayTakeOver &&
+        !this.moderation.everyone
+      )
+    },
+    chosenChips() {
+      return this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
+    },
+    // Only while its field is open: closed, the filter keeps name and chips but filters no more.
+    // Not while "mute all" is being chosen: whoever it mutes is to be seen, with their tick. The
+    // name and the chips stay, and filter again once the choice is over.
+    filtering() {
+      return (
+        !this.muting &&
+        this.filterOpen &&
+        (fold(this.filterName) !== '' || this.filterKeys.length > 0)
+      )
+    },
+    shown() {
+      if (!this.filtering) return this.ordered
+      const needle = fold(this.filterName)
+      return this.ordered.filter(
+        (person) =>
+          fold(person.name).includes(needle) &&
+          this.chosenChips.every((chip) => chip.matches(person)),
+      )
     },
     // How many "mute all" would mute: everybody not spared and not given the floor whose
     // microphone is on.
@@ -458,16 +697,17 @@ export default {
         // the next one, else the one before — as in the list of chats; the list only once
         // nobody else is left in it.
         // Who took it is asked of the rows shown by then, which may have changed meanwhile;
-        // only the place is kept from now.
+        // only the place is kept from now. Shown: with the filter on, a row it hides is no
+        // place for the keyboard.
         const removed = this.removing.userId
         const at = Math.max(
-          this.ordered.findIndex((person) => person.userId === removed),
+          this.shown.findIndex((person) => person.userId === removed),
           0,
         )
         const menuOf = (userId) =>
           this.$el.querySelector(`[data-test="call-participant-menu-${userId}"]`)
         const replacement = () => {
-          const rows = this.ordered.map((person) => person.userId)
+          const rows = this.shown.map((person) => person.userId)
           if (rows.includes(removed)) return menuOf(removed)
           return rows.length ? menuOf(rows[Math.min(at, rows.length - 1)]) : null
         }
@@ -571,6 +811,26 @@ export default {
       ]
         .filter(Boolean)
         .join(', ')
+    },
+    // Closing the filter keeps the name for the next time it opens.
+    toggleFilter() {
+      this.filterOpen = !this.filterOpen
+      if (this.filterOpen)
+        this.$nextTick(() => this.$refs.filterName && this.$refs.filterName.focus())
+    },
+    // Esc empties the name, and folds the filter away once it is empty.
+    clearFilterName(event) {
+      if (event && event.type === 'keydown' && !this.filterName) this.filterOpen = false
+      this.filterName = ''
+    },
+    toggleChip(key) {
+      this.filterKeys = this.filterKeys.includes(key)
+        ? this.filterKeys.filter((chosen) => chosen !== key)
+        : [...this.filterKeys, key]
+    },
+    resetFilter() {
+      this.filterName = ''
+      this.filterKeys = []
     },
     // A menu holds the order for as long as it is open, and a moment longer, like a click does.
     holdOrder(open) {
@@ -964,11 +1224,144 @@ export default {
   padding: var(--space-x-small);
   border-bottom: 1px solid var(--border-color-softer);
 }
+/*  Nothing but the filter's button in it: no more room above and below than the button needs. */
+.call-participants__toolbar--slim {
+  padding-top: var(--space-xxx-small);
+  padding-bottom: var(--space-xxx-small);
+}
 .call-participants__toolbar-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-x-small);
+}
+.call-participants__filter {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xx-small);
+  min-width: 0;
+  margin-left: auto;
+}
+/*  Closed, only the button: it fits behind the moderation's controls. Open, the field wants room
+    and moves to a line of its own when that is too short. */
+.call-participants__filter--open {
+  flex: 1 1 12rem;
+}
+.call-participants__filter-field {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xx-small);
+  min-width: 0;
+  padding: var(--space-xx-small) var(--space-x-small);
+  border: 1px solid var(--border-color-soft);
+  border-radius: var(--border-radius-base);
+  background: var(--background-color-base);
+}
+.call-participants__filter-field:focus-within {
+  border-color: var(--border-color-active);
+}
+.call-participants__filter-symbol {
+  flex: 0 0 auto;
+}
+/*  The small arrow sits up at the symbol's side, like an exponent: both are the menu's button. */
+.call-participants__filter-more-toggle {
+  align-items: flex-start;
+}
+.call-participants__filter-more-arrow {
+  flex: 0 0 auto;
+  font-size: 0.45em;
+}
+.call-participants__filter-name {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--text-color-base);
+}
+.call-participants__filter-clear,
+.call-participants__filter-more-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  padding: 2px;
+  margin: -2px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-color-soft);
+  cursor: pointer;
+}
+/*  Under the pointer, both get a grey ground, the same as the menu's options. */
+.call-participants__filter-clear:hover,
+.call-participants__filter-clear:focus-visible,
+.call-participants__filter-more-toggle:hover,
+.call-participants__filter-more-toggle:focus-visible {
+  color: var(--text-color-base);
+  background: var(--background-color-softer);
+}
+.call-participants__filter-count {
+  flex: 0 0 auto;
+  font-size: var(--font-size-x-small);
+  color: var(--text-color-soft);
+  white-space: nowrap;
+}
+.call-participants__filter-chosen {
+  flex: 0 0 auto;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.call-participants__filter-chosen:focus-visible {
+  outline: none;
+}
+/*  The badge's own colours come as utilities that outweigh plain component rules: to turn it
+    to danger under the pointer, the override needs !important. */
+.call-participants__filter-chosen:hover .call-participants__filter-chosen-badge,
+.call-participants__filter-chosen:focus-visible .call-participants__filter-chosen-badge {
+  color: var(--color-danger-contrast) !important;
+  background: var(--color-danger-fill, var(--color-danger)) !important;
+}
+.call-participants__filter-chosen-cross {
+  font-size: 0.8em;
+}
+.call-participants__filter-more {
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+/*  The popover has its own padding: the options keep to it, only their hover reaches a little
+    beyond. */
+.call-participants__filter-menu {
+  display: flex;
+  flex-direction: column;
+  margin: 0 calc(-1 * var(--space-x-small));
+}
+.call-participants__filter-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-x-small);
+  padding: var(--space-xx-small) var(--space-x-small);
+  border-radius: var(--border-radius-base);
+  white-space: nowrap;
+  cursor: pointer;
+}
+.call-participants__filter-option:hover {
+  background: var(--background-color-softer);
+}
+.call-participants__none {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-x-small);
+  padding: var(--space-small);
+  color: var(--text-color-soft);
 }
 .call-participants__everyone {
   display: inline-flex;

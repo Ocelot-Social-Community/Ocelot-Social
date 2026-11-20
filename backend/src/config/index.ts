@@ -141,10 +141,14 @@ const LIVEKIT_URL = (() => {
 })()
 const LIVEKIT_API_KEY = env.LIVEKIT_API_KEY
 const LIVEKIT_API_SECRET = env.LIVEKIT_API_SECRET
+// Put in front of every room name, so that instances sharing one media server (a development
+// setup against staging's, say) never meet in a room of the same group id. Empty: as before.
+const LIVEKIT_ROOM_PREFIX = env.LIVEKIT_ROOM_PREFIX ?? ''
 const livekit = {
   LIVEKIT_URL,
   LIVEKIT_API_KEY,
   LIVEKIT_API_SECRET,
+  LIVEKIT_ROOM_PREFIX,
   LIVEKIT_ENABLED: !!(LIVEKIT_URL && LIVEKIT_API_KEY && LIVEKIT_API_SECRET),
 }
 
