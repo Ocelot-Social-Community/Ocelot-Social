@@ -1702,6 +1702,8 @@ export default {
     // current one was given up while it waited — for its token, say.
     this.connectAttempt = 0
     this.deviceSwitches = this.newDeviceSwitches()
+    // How often the camera has been switched, on or off (toggleCamera; see retryDevices).
+    this.cameraToggles = 0
     this.callChatsSub = null
     this.groupChatRoomId = null
     this.callChatRetryTimer = null
@@ -3817,13 +3819,23 @@ export default {
       // The call asked for: left, and another one joined, while the microphone came back, the
       // camera of that one is not this retry's to switch on.
       const room = this.room
+      // Nor is it this retry's once the user switched the camera meanwhile, on and off again
+      // say: off is what they chose last.
+      const cameraToggles = this.cameraToggles
       const { camera, mic } = this.deviceIssues
       this.deviceIssues = { camera: null, mic: null }
       if (mic) {
         if (this.micEnabled) await this.restartMic()
         else await this.toggleMic()
       }
-      if (camera && !this.cameraEnabled && this.isLive(room)) await this.toggleCamera()
+      if (
+        camera &&
+        !this.cameraEnabled &&
+        this.isLive(room) &&
+        cameraToggles === this.cameraToggles
+      ) {
+        await this.toggleCamera()
+      }
     },
     restartMic() {
       // A click and a device change can ask at the same time; one fresh
@@ -3857,14 +3869,15 @@ export default {
         await track.restartTrack()
         // A fresh capture of a call that ended meanwhile: nobody else would stop it.
         if (this.releaseIfLeft(room, [track])) return
+        // It runs again: whatever it had to say about not starting is over. Said before the
+        // check for silence, which waits: a failure meanwhile (a dtx switch) is to stay.
+        this.deviceIssues.mic = null
         // The new capture can be just as silent as the old one — only drop the
         // warning once it is shown to deliver a signal.
         const silent = await this.micStaysSilent(track)
         // The call may have ended (or been retried) while we waited; its
         // outcome must not leak into the next one.
         if (this.room !== room) return
-        // It runs again: whatever it had to say about not starting is over.
-        this.deviceIssues.mic = null
         this.micProblem = this.micEnabled && silent
         // The restart swapped the MediaStreamTrack under the publication.
         this.refreshMicMeter()
@@ -3988,6 +4001,8 @@ export default {
     },
     async toggleCamera() {
       if (!this.room) return
+      // Every switch of the camera counts: a retry waiting meanwhile leaves it to the user.
+      this.cameraToggles++
       const room = this.room
       const next = !this.cameraEnabled
       if (next) this.deviceStarts('videoinput')
