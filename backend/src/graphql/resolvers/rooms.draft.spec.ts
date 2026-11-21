@@ -105,6 +105,9 @@ const fileCount = async () => {
   return result.records[0].get('count').toNumber()
 }
 
+// Whether the storage still serves the file: it is uploaded readable for everybody.
+const stored = async (url: string) => (await fetch(url)).ok
+
 const draftIn = async (roomId: string) => {
   const { data, errors } = await setup.query({ query: roomDraft, variables: { id: roomId } })
 
@@ -216,6 +219,27 @@ describe('SaveRoomDraft', () => {
     await expect(draftIn(directRoomId)).resolves.toBe('x'.repeat(2000))
   })
 
+  it('keeps none of blanks only once cut to the length of a message', async () => {
+    as(anna)
+    await save({ roomId: directRoomId, text: 'Something' })
+
+    await save({ roomId: directRoomId, text: `${' '.repeat(2000)}x` })
+
+    await expect(draftIn(directRoomId)).resolves.toBeNull()
+  })
+
+  it('opens no direct conversation besides the room named', async () => {
+    as(anna)
+
+    const { data } = await save({ roomId: directRoomId, userId: 'carl', text: 'For Ben' })
+
+    expect(data.SaveRoomDraft.id).toBe(directRoomId)
+
+    const found = await setup.query({ query: roomWithUser, variables: { userId: 'carl' } })
+
+    expect(found.data.Room).toEqual([])
+  })
+
   it('ends with the message sent in the room', async () => {
     as(anna)
     await save({ roomId: directRoomId, text: 'Almost sent' })
@@ -289,6 +313,10 @@ describe('SaveRoomDraft', () => {
       const first = await attach({ roomId: directRoomId }, 'first.txt')
       await attach({ roomId: directRoomId }, 'second.txt')
 
+      const second = (
+        await setup.query({ query: roomDraftFiles, variables: { id: directRoomId } })
+      ).data.Room[0].draftFiles.find((file: { name: string }) => file.name === 'second.txt').url
+
       const { data, errors } = await detach({
         roomId: directRoomId,
         url: first.data.AddRoomDraftFile.url,
@@ -298,6 +326,9 @@ describe('SaveRoomDraft', () => {
       expect(data.RemoveRoomDraftFile).toBe(true)
       await expect(draftFilesIn(directRoomId)).resolves.toEqual(['second.txt'])
       await expect(fileCount()).resolves.toBe(1)
+      // In the storage as well: the first is gone, the second is still there.
+      await expect(stored(first.data.AddRoomDraftFile.url)).resolves.toBe(false)
+      await expect(stored(second)).resolves.toBe(true)
     })
 
     it("takes nobody else's away", async () => {
@@ -388,6 +419,26 @@ describe('SaveRoomDraft', () => {
         expect(sent.data.CreateMessage.files).toHaveLength(1)
       })
 
+      it('takes null as no draft files named, and as the draft ending', async () => {
+        as(anna)
+        await save({ roomId: directRoomId, text: 'Ends' })
+
+        const empty = await setup.mutate({
+          mutation: CreateMessage,
+          variables: { roomId: directRoomId, content: '', draftFiles: null },
+        })
+
+        expect(empty.errors?.[0].message).toBe('Message must have content or files.')
+
+        const sent = await setup.mutate({
+          mutation: CreateMessage,
+          variables: { roomId: directRoomId, content: 'Sent', endsDraft: null },
+        })
+
+        expect(sent.errors).toBeUndefined()
+        await expect(draftIn(directRoomId)).resolves.toBeNull()
+      })
+
       it('leaves the draft as it is when sent again after failing', async () => {
         as(anna)
         const earlier = await attach({ roomId: directRoomId }, 'earlier.txt')
@@ -435,6 +486,20 @@ describe('SaveRoomDraft', () => {
   })
 
   describe('for a direct conversation without a message yet', () => {
+    it('opens one room for the pair, however many drafts come at once', async () => {
+      as(anna)
+
+      await Promise.all([
+        save({ userId: 'carl', text: 'One' }),
+        save({ userId: 'carl', text: 'Two' }),
+        save({ userId: 'carl', text: 'Three' }),
+      ])
+
+      const found = await setup.query({ query: roomWithUser, variables: { userId: 'carl' } })
+
+      expect(found.data.Room).toHaveLength(1)
+    })
+
     it('opens the room for the draft, listed for the one writing only', async () => {
       as(anna)
 

@@ -6,7 +6,12 @@ const footerComponent = (overrides = {}) => ({
   type: { name: 'RoomFooter' },
   isUnmounted: false,
   props: { roomId: 'room-1' },
-  proxy: { files: ['a file'], selectedUsersTag: ['a user'], $watch: jest.fn(() => 'unwatch') },
+  proxy: {
+    message: 'Hi',
+    files: ['a file'],
+    selectedUsersTag: ['a user'],
+    $watch: jest.fn(() => 'unwatch'),
+  },
   ...overrides,
 })
 const hostOf = (footer) => ({
@@ -35,6 +40,7 @@ describe('findMessageField', () => {
     const field = findMessageField(hostOf(footer))
 
     expect(field.roomId).toBe('room-1')
+    expect(field.message).toBe('Hi')
     expect(field.files).toEqual(['a file'])
     expect(field.mentioned).toEqual(['a user'])
     expect(field.isUnmounted).toBe(false)

@@ -292,6 +292,11 @@ export default {
     this._draftSaves = {}
     // The files last seen in the field per room, kept with the draft or not.
     this._fieldFiles = {}
+    // Texts kept as a room's draft whose save failed, per room id: saved again with the next
+    // change, on leaving the room, closing the chat or leaving the page.
+    this._unsavedText = {}
+    // Set while the page is left: saves asked for then go out with `keepalive`.
+    this._leaving = false
     // The message field's inside (messageField.js), and the room whose draft it has been given:
     // until then, its changes are the library's own, emptying it for another room.
     this._field = null
@@ -381,12 +386,12 @@ export default {
     this._subscriptions.push(statusSub)
 
     // Leaving the page keeps what was typed, as far as the browser still lets the request go.
-    window.addEventListener('pagehide', this.keepAllDrafts)
+    window.addEventListener('pagehide', this.keepDraftsOnLeaving)
   },
   beforeDestroy() {
     // The chat is taken down — closed, or swapped for the participant list of a call: what
     // was typed is kept, to be there again when the room is opened anew.
-    window.removeEventListener('pagehide', this.keepAllDrafts)
+    window.removeEventListener('pagehide', this.keepDraftsOnLeaving)
     this.keepAllDrafts()
     this._subscriptions?.forEach((s) => s.unsubscribe())
     if (this._intersectionObserver) this._intersectionObserver.disconnect()
@@ -1065,8 +1070,9 @@ export default {
           this.$el?.shadowRoot?.querySelector('textarea#roomTextarea')?.focus()
         })
       }
-      // Virtual rooms have no messages on the server yet
+      // Virtual rooms have no messages on the server yet; only those that could not be sent.
       if (!room.id || room.id.startsWith('temp-')) {
+        this.mergeMessages([])
         // Toggle messagesLoaded to ensure vue-advanced-chat's watcher fires
         this.messagesLoaded = false
         this.$nextTick(() => {
@@ -1286,25 +1292,34 @@ export default {
         }
 
         if (isVirtualRoom && createdMessage?.room?.id) {
-          // Replace virtual room with real room by fetching the specific room
-          const realRoomId = createdMessage.room.id
-          this.rooms = this.rooms.filter((r) => r.id !== roomId)
-          const {
-            data: { Room },
-          } = await this.$apollo.query({
-            query: roomQuery(),
-            variables: { id: realRoomId },
-            fetchPolicy: 'no-cache',
-          })
-          if (Room?.length) {
-            const realRoom = this.fixRoomObject(Room[0])
-            this.bringRoomToTopAndSelect(realRoom)
-          }
+          await this.replaceVirtualRoom(roomId, createdMessage.room.id)
         }
       } catch (error) {
         this.markUnsent(roomId, localMessage, messageDetails)
         this.$toastBackendError(error)
         this.$toast.info(this.$t('chat.notSent'))
+      }
+    },
+
+    // The room a direct conversation begun here got with its first message takes the place of
+    // the one it was shown in until then. The message is sent by then: should fetching the room
+    // fail, that is no failed message — which, sent again, would arrive twice.
+    async replaceVirtualRoom(virtualRoomId, realRoomId) {
+      this.rooms = this.rooms.filter((r) => r.id !== virtualRoomId)
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: { id: realRoomId },
+          fetchPolicy: 'no-cache',
+        })
+        if (Room?.length) {
+          const realRoom = this.fixRoomObject(Room[0])
+          this.bringRoomToTopAndSelect(realRoom)
+        }
+      } catch (error) {
+        this.$toastBackendError(error)
       }
     },
 
@@ -1396,6 +1411,12 @@ export default {
       const field = findMessageField(this.$el)
       this._field = field
       field?.watch('files', (files) => this.draftFilesChanged(field, files), { deep: true })
+      // The text too, with the people picked to mention: a mention picked from the library's
+      // list is written into the field without `typing-message`.
+      field?.watch(
+        () => [field.message, field.mentioned.length],
+        () => this.draftTextChanged(field),
+      )
       return field
     },
 
@@ -1407,19 +1428,25 @@ export default {
       this.roomMessage = null
       const { text, mentioned } = this.untagged(roomId, this.draftOf(roomId))
       const files = this.draftFilesOf(roomId)
+      // Files attached when the room was left and not uploaded yet: they go back as they are,
+      // to be the draft's once uploaded — left out, the field would seem to have lost them.
+      const pending = (this._fieldFiles[roomId] || []).filter((file) => !file.draftUrl)
       this.$nextTick(() => {
         this.roomMessage = text || null
       })
       this.whenFieldShows(roomId, (field) => {
         field.mentioned = mentioned
-        field.files = files.map((file) => ({
-          name: file.name,
-          extension: file.extension,
-          type: file.type,
-          ...(file.duration != null && { duration: file.duration }),
-          localUrl: file.url,
-          draftUrl: file.url,
-        }))
+        field.files = [
+          ...files.map((file) => ({
+            name: file.name,
+            extension: file.extension,
+            type: file.type,
+            ...(file.duration != null && { duration: file.duration }),
+            localUrl: file.url,
+            draftUrl: file.url,
+          })),
+          ...pending,
+        ]
       })
     },
 
@@ -1457,6 +1484,16 @@ export default {
 
     // Files attached to the field or taken out of it are kept with the draft as typing is.
     // Not while the library empties the field for another room: that is no change of the draft.
+    // The text of the field and the people picked to mention in it, as the field holds them;
+    // kept as typing is. Not while the library empties the field for another room.
+    draftTextChanged(field) {
+      const roomId = field.roomId
+      if (!roomId || roomId !== this._fieldRoom || !this.selectedRoomWritable) return
+      this._typed[roomId] = field.message || ''
+      this._typedMentions[roomId] = [...field.mentioned]
+      this.keepSoon(roomId)
+    },
+
     draftFilesChanged(field, files) {
       const roomId = field.roomId
       if (!roomId || roomId !== this._fieldRoom || !this.selectedRoomWritable) return
@@ -1483,18 +1520,47 @@ export default {
       const typed = this._typed[roomId]
       const files = this._typedFiles[roomId]
       const mentioned = this._typedMentions[roomId]
-      if (typed === undefined && files === undefined) return
+      const unsaved = roomId in this._unsavedText
+      if (typed === undefined && files === undefined && !unsaved) return
       this.forgetTyped(roomId)
-      if (typed !== undefined) {
-        const text = this.tagged(typed, mentioned)
-        if (text !== this.draftOf(roomId)) {
-          this.$set(this.drafts, roomId, text)
-          this.queueDraftSave(roomId, (target) =>
-            this.$apollo.mutate({ mutation: saveRoomDraft(), variables: { ...target, text } }),
-          )
-        }
+      const text = typed !== undefined ? this.tagged(typed, mentioned) : this._unsavedText[roomId]
+      if (text !== undefined && (text !== this.draftOf(roomId) || unsaved)) {
+        this.$set(this.drafts, roomId, text)
+        delete this._unsavedText[roomId]
+        const context = this.leavingContext()
+        this.queueDraftSave(roomId, async (target) => {
+          try {
+            await this.$apollo.mutate({
+              mutation: saveRoomDraft(),
+              variables: { ...target, text },
+              context,
+            })
+          } catch (error) {
+            // Not kept: unless a newer text has been asked for since, this one is saved again.
+            if (this.drafts[roomId] === text && !(roomId in this._unsavedText)) {
+              this._unsavedText[roomId] = text
+            }
+            throw error
+          }
+        })
       }
       if (files !== undefined) this.keepDraftFiles(roomId, files)
+    },
+
+    // The page is left: what is still to be kept goes out with `keepalive`, which lets the
+    // browser finish a request after the page is gone. Not the uploads: keepalive takes no
+    // more than 64 KB.
+    keepDraftsOnLeaving() {
+      this._leaving = true
+      try {
+        this.keepAllDrafts()
+      } finally {
+        this._leaving = false
+      }
+    },
+
+    leavingContext() {
+      return this._leaving ? { fetchOptions: { keepalive: true } } : undefined
     },
 
     // The files of the field against those of the draft: the new ones are uploaded, those
@@ -1510,9 +1576,14 @@ export default {
           known.filter((file) => kept.includes(file.url)),
         )
       }
+      const context = this.leavingContext()
       gone.forEach(({ url }) =>
         this.queueDraftSave(roomId, (target) =>
-          this.$apollo.mutate({ mutation: removeRoomDraftFile(), variables: { ...target, url } }),
+          this.$apollo.mutate({
+            mutation: removeRoomDraftFile(),
+            variables: { ...target, url },
+            context,
+          }),
         ),
       )
       files
@@ -1555,7 +1626,11 @@ export default {
     },
 
     keepAllDrafts() {
-      const roomIds = new Set([...Object.keys(this._typed), ...Object.keys(this._typedFiles)])
+      const roomIds = new Set([
+        ...Object.keys(this._typed),
+        ...Object.keys(this._typedFiles),
+        ...Object.keys(this._unsavedText),
+      ])
       roomIds.forEach((roomId) => this.keepDraft(roomId))
     },
 

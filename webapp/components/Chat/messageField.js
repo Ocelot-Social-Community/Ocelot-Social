@@ -27,7 +27,9 @@ const footerIn = (vnode) => {
 /**
  * The message field of the chat whose host element is given, or null.
  *
- * `roomId` is the room it shows; `files` the files attached, as the library keeps them (`blob`
+ * `roomId` is the room it shows; `message` its text, also as the library itself changes it (a
+ * mention picked from its list is written in without an input event, so without
+ * `typing-message`); `files` the files attached, as the library keeps them (`blob`
  * once loaded, `localUrl` for the preview); `mentioned` the people picked from the list after
  * an "@", whose "@Name" the library turns into a tag when sending. `watch` is Vue 3's `$watch`
  * on the footer.
@@ -41,6 +43,9 @@ export const findMessageField = (host) => {
     },
     get roomId() {
       return footer.props.roomId
+    },
+    get message() {
+      return footer.proxy.message
     },
     get files() {
       return footer.proxy.files

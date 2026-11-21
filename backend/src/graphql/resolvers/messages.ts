@@ -180,7 +180,11 @@ export default {
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, userId, content, files = [], draftFiles = [], endsDraft = true } = params
+      const { roomId, userId, content, files = [] } = params
+      // Explicit nulls taken as left out: no draft files named, and the draft ending, which
+      // only an explicit false keeps from it.
+      const draftFiles: string[] = params.draftFiles ?? []
+      const endsDraft = params.endsDraft !== false
       const {
         user: { id: currentUserId },
       } = context
@@ -203,6 +207,9 @@ export default {
 
       try {
         const created = await session.writeTransaction(async (transaction) => {
+          // Neo4j may run this again after a transient failure: what an attempt rolled back
+          // found is not to be removed from the storage.
+          unsentDraftFiles = []
           // If userId is provided, find-or-create a DM room first
           if (userId) {
             await transaction.run(

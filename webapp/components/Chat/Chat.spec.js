@@ -1446,6 +1446,23 @@ describe('Chat.vue', () => {
       await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'hi', files: [] })
       expect(wrapper.vm.rooms.some((r) => r.id === 'real-1')).toBe(true)
     })
+
+    it('takes a message sent for sent, though fetching the room fails', async () => {
+      wrapper = Wrapper()
+      const virtualRoom = mockRoom({ id: 'temp-u1', roomId: 'temp-u1', _virtualUserId: 'u1' })
+      wrapper.vm.rooms = [virtualRoom]
+      wrapper.vm.selectedRoom = virtualRoom
+      mocks.$apollo.mutate.mockResolvedValue({
+        data: { CreateMessage: { id: 'm1', room: { id: 'real-1' } } },
+      })
+      mocks.$apollo.query.mockRejectedValue(new Error('Offline'))
+
+      await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'hi', files: [] })
+
+      expect(wrapper.vm.messages.filter((m) => m.failure)).toEqual([])
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Offline')
+      expect(mocks.$toast.info).not.toHaveBeenCalled()
+    })
   })
 
   describe('shadow-DOM observers', () => {
@@ -2304,6 +2321,60 @@ describe('Chat.vue', () => {
       window.dispatchEvent(new Event('pagehide'))
 
       expect(draftSaves()).toEqual([{ roomId: 'room-1', text: 'Before reloading' }])
+      // Finished by the browser after the page is gone.
+      expect(mocks.$apollo.mutate.mock.calls[0][0].context).toEqual({
+        fetchOptions: { keepalive: true },
+      })
+    })
+
+    it('goes out as an ordinary request while the page stays', () => {
+      wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Staying' })
+
+      jest.advanceTimersByTime(1000)
+
+      expect(mocks.$apollo.mutate.mock.calls[0][0].context).toBeUndefined()
+    })
+
+    describe('when saving it fails', () => {
+      const flush = async () => {
+        for (let i = 0; i < 10; i++) await Promise.resolve()
+      }
+
+      it('is saved again on leaving, until it is kept', async () => {
+        mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Offline'))
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Not lost' })
+        jest.advanceTimersByTime(1000)
+        await flush()
+
+        wrapper.vm.keepAllDrafts()
+        await flush()
+        wrapper.vm.keepAllDrafts()
+
+        expect(draftSaves()).toEqual([
+          { roomId: 'room-1', text: 'Not lost' },
+          { roomId: 'room-1', text: 'Not lost' },
+        ])
+      })
+
+      it('is not saved again once a newer text was asked for', async () => {
+        let fail
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () => new Promise((resolve, reject) => (fail = () => reject(new Error('Offline')))),
+        )
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Older' })
+        jest.advanceTimersByTime(1000)
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Newer' })
+        jest.advanceTimersByTime(1000)
+        fail()
+        await flush()
+
+        wrapper.vm.keepAllDrafts()
+
+        expect(draftSaves()).toEqual([
+          { roomId: 'room-1', text: 'Older' },
+          { roomId: 'room-1', text: 'Newer' },
+        ])
+      })
     })
 
     describe('on sending', () => {
@@ -2376,6 +2447,26 @@ describe('Chat.vue', () => {
         wrapper.vm.mergeMessages([mockMessage({ id: 'msg-5', indexId: 5 })])
 
         expect(wrapper.vm.messages.map((m) => m.failure || m.id)).toEqual(['msg-5', true])
+      })
+
+      it('is there again in a direct conversation begun here, left and opened again', async () => {
+        const virtualRoom = mockRoom({ id: 'temp-u1', roomId: 'temp-u1', _virtualUserId: 'u1' })
+        wrapper.vm.rooms = [mockRoom(), virtualRoom]
+        wrapper.vm.selectedRoom = virtualRoom
+        await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Hello' })
+        mocks.$apollo.query.mockResolvedValue({ data: { Message: [] } })
+
+        // Sending moved the conversation to the top of the list.
+        const other = wrapper.vm.rooms.find((room) => room.id === 'room-1')
+        await wrapper.vm.fetchMessages({ room: other })
+
+        expect(wrapper.vm.messages).toEqual([])
+
+        await wrapper.vm.fetchMessages({ room: virtualRoom })
+
+        expect(wrapper.vm.messages).toEqual([
+          expect.objectContaining({ content: 'Hello', failure: true }),
+        ])
       })
 
       it('is sent again by a click on its mark, leaving the draft written since', async () => {
@@ -2460,6 +2551,28 @@ describe('Chat.vue', () => {
 
         expect(wrapper.vm.roomMessage).toBe('Hi @Other')
         expect(field.mentioned).toEqual([expect.objectContaining({ _id: 'other-user' })])
+      })
+
+      it('keeps one picked from the list, with nothing typed after it', () => {
+        const field = fakeField('room-1', { mentioned: [other] })
+        field.message = '@Other '
+        wrapper.vm._fieldRoom = 'room-1'
+
+        wrapper.vm.draftTextChanged(field)
+        jest.advanceTimersByTime(1000)
+
+        expect(draftSaves()).toEqual([{ roomId: 'room-1', text: '<usertag>other-user</usertag> ' }])
+      })
+
+      it('take no notice of the field emptied for another room', () => {
+        const field = fakeField('room-1')
+        field.message = ''
+        wrapper.vm._fieldRoom = 'room-2'
+
+        wrapper.vm.draftTextChanged(field)
+        jest.advanceTimersByTime(1000)
+
+        expect(draftSaves()).toEqual([])
       })
 
       it('are not saved again when nothing changed', () => {
@@ -2589,6 +2702,26 @@ describe('Chat.vue', () => {
         jest.advanceTimersByTime(1000)
 
         expect(fileSaves()).toEqual([])
+      })
+
+      it('are put back with those still to be uploaded when the room is opened again', () => {
+        wrapper.vm.rooms = [mockRoom({ draftFiles: [added('old')] })]
+        const uploading = {
+          name: 'new',
+          type: 'text/plain',
+          blob: new Blob(['x']),
+          draftUpload: true,
+        }
+        wrapper.vm._fieldFiles['room-1'] = [
+          { ...added('old'), draftUrl: 'https://s3/old.txt' },
+          uploading,
+        ]
+
+        wrapper.vm.showDraftOf('room-1')
+        jest.advanceTimersByTime(0)
+
+        expect(field.files.map((file) => file.name)).toEqual(['old', 'new'])
+        expect(field.files[1]).toBe(uploading)
       })
 
       it('are put back into the field when the room is opened', () => {

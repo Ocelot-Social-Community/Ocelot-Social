@@ -53,7 +53,18 @@ export const DIRECT_ROOM = 'NOT (room)-[:ROOM_FOR]->()'
 
 // Finds the direct room of the current user and `user`, or opens one: both chat in it. Expects
 // `currentUser` and `user` bound; binds nothing new, and leaves no row when the room was there.
+//
+// Looking for the room and opening one are two steps: two first messages or drafts of the pair
+// at the same moment would both find none and open two. Writing to both users takes their write
+// locks, held until the transaction ends, so the second waits and then finds the first one's
+// room. Always in the order of their ids, so two waiting for each other cannot happen; the
+// property is removed again at once, nothing of it is stored.
 export const OPEN_DIRECT_ROOM = `
+  FOREACH (locked IN CASE WHEN currentUser.id < user.id THEN [currentUser, user] ELSE [user, currentUser] END |
+    SET locked.directRoomLock = true
+    REMOVE locked.directRoomLock
+  )
+  WITH currentUser, user
   OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
   WHERE ${DIRECT_ROOM}
   WITH currentUser, user, collect(room)[0] AS existingRoom
@@ -115,6 +126,9 @@ const draftRoomMatch = (roomId: string | null | undefined) => `
   WHERE ${NOT_A_CLOSED_CALL_ROOM}
 `
 
+// The room stopped taking drafts while a file was uploaded for one (AddRoomDraftFile).
+class DraftRoomClosed extends Error {}
+
 interface DraftRoomVariables {
   currentUserId: string
   roomId: string | null
@@ -147,7 +161,22 @@ const inDraftRoom = async <T>(
       return null
     }
     return await session.writeTransaction(async (transaction) => {
-      if (userId && opensRoom) {
+      // A call's chat: its session is locked first, in a statement of its own, as ending the
+      // call writes it too (callSession.ts). Whichever comes second waits for the other — a
+      // draft then finds the call over, or the end finds the draft and takes it away.
+      if (roomId) {
+        await transaction.run(
+          `
+            MATCH (:Room { id: $roomId })-[:ROOM_FOR]->(call:VideoCallSession)
+            SET call.draftLock = true
+            REMOVE call.draftLock
+          `,
+          { roomId },
+        )
+      }
+      // A direct conversation is opened for a user named alone: with a room named as well, the
+      // draft goes there, and a room opened besides would be left over unused.
+      if (userId && !roomId && opensRoom) {
         await transaction.run(
           `
             MATCH (currentUser:User { id: $currentUserId })
@@ -414,11 +443,10 @@ export default {
       }
     },
     SaveRoomDraft: async (_parent, params, context, _resolveInfo) => {
-      // Kept as typed, blanks included; one of nothing but blanks is none.
-      const text: string | null =
-        typeof params.text === 'string' && params.text.trim()
-          ? params.text.slice(0, DRAFT_MAX_LENGTH)
-          : null
+      // Kept as typed, blanks included, no longer than a message; one of nothing but blanks is
+      // none — asked of what is kept, as cutting it may leave blanks only.
+      const kept = typeof params.text === 'string' ? params.text.slice(0, DRAFT_MAX_LENGTH) : ''
+      const text: string | null = kept.trim() ? kept : null
       // A direct conversation without a message yet has no room: one is opened for a draft,
       // not for taking one away.
       return inDraftRoom(context, params, !!text, async (transaction, matchRoom, variables) => {
@@ -437,30 +465,53 @@ export default {
     // The file goes to the storage at once, as for a message; sending moves it on to the
     // message (CreateMessage, draftFiles) instead of uploading it again.
     AddRoomDraftFile: async (_parent, params, context, _resolveInfo) => {
-      return inDraftRoom(context, params, true, async (transaction, matchRoom, variables) => {
-        const found = await transaction.run(`${matchRoom} RETURN room.id AS id`, variables)
-        if (!found.records.length) {
-          return null
+      let uploaded: string | null = null
+      try {
+        return await inDraftRoom(
+          context,
+          params,
+          true,
+          async (transaction, matchRoom, variables) => {
+            uploaded = null
+            const found = await transaction.run(`${matchRoom} RETURN room.id AS id`, variables)
+            if (!found.records.length) {
+              return null
+            }
+            const file = await attachments(CONFIG).add(
+              { id: variables.currentUserId },
+              'DRAFT_FILE',
+              params.file,
+              {},
+              { transaction },
+            )
+            uploaded = file.url
+            // Asked again: the room may have stopped taking drafts while the file was uploaded,
+            // its call ended. Then nothing of it is kept.
+            const linked = await transaction.run(
+              `
+              ${matchRoom}
+              MATCH (file:File { url: $url })
+              CREATE (file)-[:DRAFT_FILE_IN]->(room)
+              WITH currentUser, chatsIn, room, file
+              ${TOUCH_DRAFT}
+              RETURN file.url AS url
+            `,
+              { ...variables, url: file.url },
+            )
+            if (!linked.records.length) {
+              throw new DraftRoomClosed()
+            }
+            return file
+          },
+        )
+      } catch (error) {
+        if (!(error instanceof DraftRoomClosed)) {
+          throw error
         }
-        const file = await attachments(CONFIG).add(
-          { id: variables.currentUserId },
-          'DRAFT_FILE',
-          params.file,
-          {},
-          { transaction },
-        )
-        await transaction.run(
-          `
-            ${matchRoom}
-            MATCH (file:File { url: $url })
-            CREATE (file)-[:DRAFT_FILE_IN]->(room)
-            WITH currentUser, chatsIn, room
-            ${TOUCH_DRAFT}
-          `,
-          { ...variables, url: file.url },
-        )
-        return file
-      })
+        // Thrown, the transaction rolled the file's node back; the upload is taken back here.
+        await deleteStoredFiles(CONFIG, uploaded ? [uploaded] : [])
+        return null
+      }
     },
     RemoveRoomDraftFile: async (_parent, params, context, _resolveInfo) => {
       const removed = await inDraftRoom(
@@ -571,7 +622,9 @@ export default {
       `,
       draftFiles: `
         OPTIONAL MATCH (this)<-[:DRAFT_FILE_IN]-(file:File)<-[:DRAFT_FILE]-(:User { id: $cypherParams.currentUserId })
-        WITH file ORDER BY file.createdAt
+        // As datetimes: toString(datetime()) gives the fraction of a second no fixed width, so
+        // the strings do not sort by time.
+        WITH file ORDER BY datetime(file.createdAt)
         RETURN collect(file { .* })
       `,
       lastMessage: `

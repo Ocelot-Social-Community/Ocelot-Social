@@ -64,8 +64,33 @@ describe('the message field of vue-advanced-chat', () => {
 
     expect(field).not.toBeNull()
     expect(field.roomId).toBe('room-1')
+    expect(field.message).toBe('')
     expect(field.files).toEqual([])
     expect(field.mentioned).toEqual([])
+  })
+
+  it('tells of a mention picked from its list, written in without typing', async () => {
+    const field = findMessageField(chat)
+    const seen = []
+    field.watch(
+      () => [field.message, field.mentioned.length],
+      () => seen.push([field.message, field.mentioned.map((user) => user._id)]),
+    )
+    const textarea = chat.shadowRoot.querySelector('textarea')
+    textarea.value = '@Ot'
+    textarea.setSelectionRange(3, 3)
+    textarea.dispatchEvent(new Event('input'))
+    // The library opens its list of people once the key is let go, 60ms later.
+    textarea.dispatchEvent(new KeyboardEvent('keyup', { key: 't' }))
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    await settle()
+
+    chat.shadowRoot.querySelector('.vac-tags-box').click()
+    await settle()
+
+    expect(field.message).toBe('@Other ')
+    expect(field.mentioned).toEqual([expect.objectContaining({ _id: 'other-user' })])
+    expect(seen[seen.length - 1]).toEqual(['@Other ', ['other-user']])
   })
 
   it('follows the room opened, emptied for it', async () => {

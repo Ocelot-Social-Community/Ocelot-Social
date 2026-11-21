@@ -87,7 +87,7 @@ const chatDraftsCypher = `
     WHERE group IS NULL AND call IS NULL AND partner.id <> $id
   WITH user, room, chatsIn, call, group, collect(partner)[0] AS partner
   OPTIONAL MATCH (user)-[:DRAFT_FILE]->(file:File)-[:DRAFT_FILE_IN]->(room)
-  WITH room, chatsIn, call, group, partner, file ORDER BY file.createdAt
+  WITH room, chatsIn, call, group, partner, file ORDER BY datetime(file.createdAt)
   WITH room, chatsIn, call, group, partner, collect(file { .* }) AS files
   RETURN {
     roomId: room.id,
