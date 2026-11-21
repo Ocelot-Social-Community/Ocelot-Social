@@ -119,6 +119,20 @@ describe('EmbedComponent.vue', () => {
           wrapper = Wrapper()
         })
 
+        it('only tells its listener, when it has one, that the embed is to be removed', () => {
+          const remove = jest.fn()
+          wrapper = mount(EmbedComponent, {
+            propsData,
+            localVue,
+            mocks,
+            store: new Vuex.Store({ getters }),
+            listeners: { remove },
+          })
+          wrapper.find('.close-button').trigger('click')
+          expect(remove).toHaveBeenCalledTimes(1)
+          expect(wrapper.vm.showLinkOnly).toBe(false)
+        })
+
         it('shows a simple link when a user closes the embed preview', () => {
           wrapper.find('.close-button').trigger('click')
           expect(wrapper.vm.showLinkOnly).toBe(true)

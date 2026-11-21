@@ -880,6 +880,7 @@
         "usedByMe": "Të përdorura nga unë"
       }
     },
+    "invalidLink": "Kjo nuk është lidhje e vlefshme. Shkruaj një adresë uebi, një adresë emaili ose një lidhje tjetër.",
     "legend": {
       "bold": "I trashë",
       "heading3": "Titulli 3",

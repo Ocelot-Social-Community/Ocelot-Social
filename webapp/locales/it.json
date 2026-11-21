@@ -880,6 +880,7 @@
         "usedByMe": "Usati da me"
       }
     },
+    "invalidLink": "Questo non è un link valido. Inserisci un indirizzo web, un indirizzo e-mail o un altro link.",
     "legend": {
       "bold": "Grassetto",
       "heading3": "Titolo 3",
