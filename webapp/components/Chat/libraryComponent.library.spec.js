@@ -25,6 +25,10 @@ window.AudioContext = class {
 HTMLCanvasElement.prototype.getContext = () => null
 window.indexedDB = { open: () => ({}) }
 Element.prototype.scrollTo = () => {}
+window.ResizeObserver = class {
+  observe() {}
+  disconnect() {}
+}
 window.IntersectionObserver = class {
   observe() {}
   unobserve() {}
@@ -91,5 +95,21 @@ describe('the room of vue-advanced-chat', () => {
     const count = chat.shadowRoot.querySelector('.vac-icon-scroll .vac-messages-count')
 
     expect(count.textContent).toBe('4')
+  })
+
+  it('asks for older messages again once its request is marked over', async () => {
+    const room = findLibraryComponent(chat, 'ChatRoom')
+    const asked = []
+    chat.addEventListener('fetch-messages', () => asked.push(true))
+    chat.setAttribute('messages-loaded', 'false')
+    await settle()
+    // A request under way, whose page failed: the messages stay as they are.
+    room.proxy.loadingMoreMessages = true
+
+    room.proxy.loadingMoreMessages = false
+    room.proxy.loadMoreMessages()
+    await new Promise((resolve) => setTimeout(resolve, 600))
+
+    expect(asked).toHaveLength(1)
   })
 })

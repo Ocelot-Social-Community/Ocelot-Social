@@ -688,10 +688,19 @@ describe('Chat.vue', () => {
       await expect(wrapper.vm.fetchMessages({ room })).resolves.toBe(true)
       mocks.$apollo.query.mockRejectedValue(new Error('Offline'))
 
+      const libraryRoom = { loadingMoreMessages: true }
+      wrapper.vm.$el._instance = {
+        subTree: {
+          component: { type: { name: 'ChatRoom' }, isUnmounted: false, proxy: libraryRoom },
+        },
+      }
+
       await expect(wrapper.vm.fetchMessages({ room })).resolves.toBe(false)
 
       expect(wrapper.vm.messages).toHaveLength(20)
       expect(mocks.$toast.error).toHaveBeenCalledWith('Offline')
+      // The library may ask for the older page again.
+      expect(libraryRoom.loadingMoreMessages).toBe(false)
     })
 
     it('shows no messages when the first page fails', async () => {

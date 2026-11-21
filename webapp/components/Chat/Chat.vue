@@ -600,6 +600,14 @@ export default {
       if (count) room.scrollIcon = true
     },
 
+    // The library marks a request for older messages as under way (`loadingMoreMessages`) and
+    // clears the mark only when its messages change. A page that failed changes none, which
+    // left its paging stuck in the room. The mark lives inside the library (libraryComponent.js).
+    releaseLibraryPaging() {
+      const room = findLibraryComponent(this.$el, 'ChatRoom')?.proxy
+      if (room) room.loadingMoreMessages = false
+    },
+
     // Unread messages that came into sight while the room moved on its own, on the way to the
     // oldest unread one, were not read: they are asked about anew where the room stopped.
     reobserveUnseen() {
@@ -1241,8 +1249,10 @@ export default {
       } catch (error) {
         if (this.roomSwitches !== switches) return false
         // An older page that failed leaves the newer ones loaded: emptied, the room would
-        // show a gap once the page came after all.
+        // show a gap once the page came after all. The library, though, waits for new messages
+        // before it asks for older ones again; told the request is over, it asks anew.
         if (variables.beforeIndex === undefined) this.messages = []
+        else this.releaseLibraryPaging()
         this.$toastBackendError(error)
         return false
       }
