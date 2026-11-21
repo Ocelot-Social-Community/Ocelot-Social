@@ -2397,6 +2397,46 @@ describe('Chat.vue', () => {
         expect(draftSaves()).toEqual([{ roomId: 'room-1', text: 'Still there' }])
         expect(wrapper.vm.draftOf('room-1')).toBe('Still there')
       })
+
+      it('does not take the place of what a chat opened anew saved since', async () => {
+        let fail
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () => new Promise((resolve, reject) => (fail = () => reject(new Error('Offline')))),
+        )
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Old' })
+        jest.advanceTimersByTime(1000)
+        wrapper.destroy()
+
+        wrapper = Wrapper()
+        wrapper.vm.rooms = [mockRoom()]
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'New' })
+        jest.advanceTimersByTime(1000)
+        await flush()
+        fail()
+        await flush()
+        mocks.$apollo.mutate.mockClear()
+
+        wrapper.vm.keepAllDrafts()
+
+        expect(draftSaves()).toEqual([])
+        expect(wrapper.vm.draftOf('room-1')).toBe('New')
+      })
+
+      it('is not saved again once the message was sent', async () => {
+        mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Offline'))
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Sent after all' })
+        jest.advanceTimersByTime(1000)
+        await flush()
+        global.URL.createObjectURL = jest.fn(() => 'blob:local')
+        mocks.$apollo.mutate.mockResolvedValue({ data: { CreateMessage: null } })
+        await wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Sent after all' })
+        delete global.URL.createObjectURL
+        mocks.$apollo.mutate.mockClear()
+
+        wrapper.vm.keepAllDrafts()
+
+        expect(draftSaves()).toEqual([])
+      })
     })
 
     describe('when the page is left with a save under way', () => {
@@ -2438,6 +2478,20 @@ describe('Chat.vue', () => {
         window.dispatchEvent(new Event('pagehide'))
 
         expect(keepalives()).toEqual([])
+      })
+
+      it('sends the latest text again, though an earlier save of the same text is through', async () => {
+        mocks.$apollo.mutate.mockImplementationOnce(() => new Promise(() => {}))
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Between' })
+        jest.advanceTimersByTime(1000)
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Under way' })
+        jest.advanceTimersByTime(1000)
+        saved()
+        for (let i = 0; i < 10; i++) await Promise.resolve()
+
+        window.dispatchEvent(new Event('pagehide'))
+
+        expect(keepalives()).toEqual(['Under way'])
       })
     })
 
@@ -2531,6 +2585,31 @@ describe('Chat.vue', () => {
         expect(unsent.roomId).toBe('real-1')
         expect(unsent.details.roomId).toBe('real-1')
         expect(unsent.message.content).toBe('Failed')
+      })
+
+      it('goes to the room a direct conversation got, when it fails only after that', async () => {
+        const virtualRoom = mockRoom({ id: 'temp-u1', roomId: 'temp-u1', _virtualUserId: 'u1' })
+        wrapper.vm.rooms = [mockRoom(), virtualRoom]
+        wrapper.vm.selectedRoom = virtualRoom
+        let fail
+        mocks.$apollo.mutate.mockImplementation(({ variables }) =>
+          variables.content === 'Failed later'
+            ? new Promise((resolve, reject) => (fail = () => reject(new Error('Offline'))))
+            : Promise.resolve({ data: { CreateMessage: { id: 'm1', room: { id: 'real-1' } } } }),
+        )
+        mocks.$apollo.query.mockResolvedValue({
+          data: { Room: [mockRoom({ id: 'real-1', roomId: 'real-1' })], Message: [] },
+        })
+        const failing = wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Failed later' })
+        await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Sent' })
+
+        fail()
+        await failing
+
+        const [unsent] = Object.values(wrapper.vm._unsent)
+        expect(unsent.roomId).toBe('real-1')
+        expect(unsent.details.roomId).toBe('real-1')
+        expect(unsent.message.roomId).toBe('real-1')
       })
 
       it('is there again in a direct conversation begun here, left and opened again', async () => {

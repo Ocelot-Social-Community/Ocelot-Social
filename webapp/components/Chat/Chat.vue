@@ -166,6 +166,8 @@ import chatStyle from '~/constants/chat.js'
 import { findMessageField } from './messageField'
 import {
   clearUnsavedDraft,
+  isLatestDraftRevision,
+  newDraftRevision,
   setUnsavedDraft,
   unsavedDraft,
   unsavedDraftRoomIds,
@@ -298,8 +300,9 @@ export default {
     this._draftSaves = {}
     // The files last seen in the field per room, kept with the draft or not.
     this._fieldFiles = {}
-    // The text of a room's draft whose save is under way, per room id: sent again with
-    // `keepalive` when the page is left meanwhile, as the request under way may be cut off.
+    // The latest save of a room's draft asked for, per room id, as { text }: sent again with
+    // `keepalive` when the page is left while it is under way, as its request may be cut off.
+    // An object of its own per save, so an earlier save of the same text does not take it.
     this._savingText = {}
     // Set while the page is left: saves asked for then go out at once, with `keepalive`.
     this._leaving = false
@@ -310,6 +313,9 @@ export default {
     this._showing = null
     // Messages that could not be sent, by their local id: shown as failed, to be sent again.
     this._unsent = {}
+    // The room a direct conversation begun here got, by the id it was shown with until then:
+    // a message sent there before may fail only after another one opened the room.
+    this._realRoomOf = {}
   },
   watch: {
     draftLabelCss() {
@@ -1238,6 +1244,9 @@ export default {
         // Sending ends the draft, on the server too (CreateMessage). The emptied field reports
         // itself right after; known as empty already, it is not saved again.
         this.forgetTyped(roomId)
+        // Nor may a save of it that failed bring it back.
+        clearUnsavedDraft(this.currentUser.id, roomId)
+        newDraftRevision(this.currentUser.id, roomId)
         this.$set(this.drafts, roomId, '')
         this.$set(this.draftFiles, roomId, [])
       }
@@ -1313,7 +1322,9 @@ export default {
     // the one it was shown in until then. The message is sent by then: should fetching the room
     // fail, that is no failed message — which, sent again, would arrive twice.
     async replaceVirtualRoom(virtualRoomId, realRoomId) {
-      // Messages of the conversation that could not be sent go with it, to be sent again there.
+      // Messages of the conversation that could not be sent go with it, to be sent again there;
+      // so do those that fail later (markUnsent).
+      this._realRoomOf[virtualRoomId] = realRoomId
       Object.values(this._unsent)
         .filter((entry) => entry.roomId === virtualRoomId)
         .forEach((entry) => {
@@ -1341,9 +1352,11 @@ export default {
 
     // A message that could not be sent stays where it was, marked as failed, with all it
     // holds: a click on the mark sends it again (sendAgain).
-    markUnsent(roomId, localMessage, messageDetails) {
-      const message = { ...localMessage, failure: true, isUploading: false }
-      this._unsent[localMessage._id] = { roomId, message, details: messageDetails }
+    markUnsent(sentToRoomId, localMessage, messageDetails) {
+      const roomId = this._realRoomOf[sentToRoomId] || sentToRoomId
+      const message = { ...localMessage, roomId, failure: true, isUploading: false }
+      const details = { ...messageDetails, roomId }
+      this._unsent[localMessage._id] = { roomId, message, details }
       this.messages = this.messages.map((m) => (m._id === localMessage._id ? message : m))
       this.applyAvatarsOnList(this.messages)
     },
@@ -1553,11 +1566,14 @@ export default {
     },
 
     // Saves a room's draft text. Should it fail, the text is saved again later — unless a
-    // newer one has been asked for since — also from a chat opened anew (unsavedDrafts.js).
+    // newer one has been asked for since, by this chat or another — also from a chat opened
+    // anew (unsavedDrafts.js).
     saveDraftText(roomId, text) {
       const userId = this.currentUser.id
       const context = this.leavingContext()
-      this._savingText[roomId] = text
+      const revision = newDraftRevision(userId, roomId)
+      const saving = { text }
+      this._savingText[roomId] = saving
       this.queueDraftSave(roomId, async (target) => {
         try {
           await this.$apollo.mutate({
@@ -1566,12 +1582,15 @@ export default {
             context,
           })
         } catch (error) {
-          if (this.drafts[roomId] === text && unsavedDraft(userId, roomId) === undefined) {
+          if (
+            isLatestDraftRevision(userId, roomId, revision) &&
+            unsavedDraft(userId, roomId) === undefined
+          ) {
             setUnsavedDraft(userId, roomId, text)
           }
           throw error
         } finally {
-          if (this._savingText[roomId] === text) delete this._savingText[roomId]
+          if (this._savingText[roomId] === saving) delete this._savingText[roomId]
         }
       })
     },
@@ -1585,9 +1604,9 @@ export default {
       const saving = { ...this._savingText }
       try {
         this.keepAllDrafts()
-        Object.entries(saving).forEach(([roomId, text]) => {
-          if (this._savingText[roomId] === text && this.drafts[roomId] === text) {
-            this.saveDraftText(roomId, text)
+        Object.entries(saving).forEach(([roomId, save]) => {
+          if (this._savingText[roomId] === save && this.drafts[roomId] === save.text) {
+            this.saveDraftText(roomId, save.text)
           }
         })
       } finally {
