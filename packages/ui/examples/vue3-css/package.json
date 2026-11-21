@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ocelot-social/ui": "file:../..",
-    "vue": "^3.5.27"
+    "vue": "^3.5.45"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.4",
