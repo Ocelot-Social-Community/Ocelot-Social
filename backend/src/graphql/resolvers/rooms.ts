@@ -126,8 +126,13 @@ const draftRoomMatch = (roomId: string | null | undefined) => `
   WHERE ${NOT_A_CLOSED_CALL_ROOM}
 `
 
-// The room stopped taking drafts while a file was uploaded for one (AddRoomDraftFile).
-class DraftRoomClosed extends Error {}
+// The room stopped taking drafts while a file was uploaded for one (AddRoomDraftFile): the
+// upload at `url` is to be taken back.
+class DraftRoomClosed extends Error {
+  constructor(readonly url: string) {
+    super('The room stopped taking drafts')
+  }
+}
 
 interface DraftRoomVariables {
   currentUserId: string
@@ -156,10 +161,9 @@ const inDraftRoom = async <T>(
     throw new AppError(Errors.CHAT_ROOM_PARTNER_IS_SELF)
   }
   const session = context.driver.session()
+  // A group's chat while groups are switched off never gets here: the permissions refuse it
+  // (GROUPS_FEATURE_DISABLED), as they do a message.
   try {
-    if (roomId && groupChatGated(context) && (await roomIsGroupRoom(roomId, session))) {
-      return null
-    }
     return await session.writeTransaction(async (transaction) => {
       // A call's chat: its session is locked first, in a statement of its own, as ending the
       // call writes it too (callSession.ts). Whichever comes second waits for the other — a
@@ -465,14 +469,12 @@ export default {
     // The file goes to the storage at once, as for a message; sending moves it on to the
     // message (CreateMessage, draftFiles) instead of uploading it again.
     AddRoomDraftFile: async (_parent, params, context, _resolveInfo) => {
-      let uploaded: string | null = null
       try {
         return await inDraftRoom(
           context,
           params,
           true,
           async (transaction, matchRoom, variables) => {
-            uploaded = null
             const found = await transaction.run(`${matchRoom} RETURN room.id AS id`, variables)
             if (!found.records.length) {
               return null
@@ -484,7 +486,6 @@ export default {
               {},
               { transaction },
             )
-            uploaded = file.url
             // Asked again: the room may have stopped taking drafts while the file was uploaded,
             // its call ended. Then nothing of it is kept.
             const linked = await transaction.run(
@@ -499,7 +500,7 @@ export default {
               { ...variables, url: file.url },
             )
             if (!linked.records.length) {
-              throw new DraftRoomClosed()
+              throw new DraftRoomClosed(file.url)
             }
             return file
           },
@@ -509,7 +510,7 @@ export default {
           throw error
         }
         // Thrown, the transaction rolled the file's node back; the upload is taken back here.
-        await deleteStoredFiles(CONFIG, uploaded ? [uploaded] : [])
+        await deleteStoredFiles(CONFIG, [error.url])
         return null
       }
     },

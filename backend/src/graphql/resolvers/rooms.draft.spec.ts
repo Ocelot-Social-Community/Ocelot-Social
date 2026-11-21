@@ -7,11 +7,12 @@ import { Readable } from 'node:stream'
 
 import { parse } from 'graphql'
 import { Upload } from 'graphql-upload/public/index.js'
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import CONFIG from '@config/index'
 import Factory, { cleanDatabase } from '@db/factories'
 import AddRoomDraftFile from '@graphql/queries/messaging/AddRoomDraftFile.gql'
+import CreateGroupRoom from '@graphql/queries/messaging/CreateGroupRoom.gql'
 import CreateMessage from '@graphql/queries/messaging/CreateMessage.gql'
 import RemoveRoomDraftFile from '@graphql/queries/messaging/RemoveRoomDraftFile.gql'
 import SaveRoomDraft from '@graphql/queries/messaging/SaveRoomDraft.gql'
@@ -19,8 +20,40 @@ import DeleteUser from '@graphql/queries/users/DeleteUser.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { endCallSession, joinCallSession } from '@src/livekit/callSession'
 
+import type { attachments as Attachments } from '@graphql/resolvers/attachments/attachments'
 import type { ApolloTestSetup } from '@root/test/helpers'
 import type { Context } from '@src/context'
+import type { NetworkPolicy } from '@src/policy'
+import type { Transaction } from 'neo4j-driver'
+
+// What happens while a file is uploaded, within the transaction that stores it, and the address
+// of every file uploaded. `vi.mock` is hoisted above the imports, so its state is too.
+const uploading = vi.hoisted(() => ({
+  meanwhile: null as null | ((transaction: Transaction) => Promise<void>),
+  urls: [] as string[],
+}))
+
+vi.mock('@graphql/resolvers/attachments/attachments', async (importOriginal) => {
+  const actual = await importOriginal<{ attachments: typeof Attachments }>()
+  return {
+    ...actual,
+    attachments: (config: Parameters<typeof actual.attachments>[0]) => {
+      const real = actual.attachments(config)
+      return {
+        ...real,
+        add: async (...args: Parameters<typeof real.add>) => {
+          const file = await real.add(...args)
+          uploading.urls.push(file.url)
+          const transaction = args[4]?.transaction
+          if (uploading.meanwhile && transaction) {
+            await uploading.meanwhile(transaction)
+          }
+          return file
+        },
+      }
+    },
+  }
+})
 
 // What somebody has begun to write in a chat and not sent is kept per person and per chat, on
 // their edge to the room. These hold that it stays theirs alone, that sending ends it, that a
@@ -59,6 +92,7 @@ let anna: Context['user']
 let ben: Context['user']
 let carl: Context['user']
 let directRoomId: string
+let policy: Partial<NetworkPolicy>
 
 const as = (user: Context['user']) => {
   authenticatedUser = user
@@ -129,6 +163,7 @@ beforeAll(async () => {
   setup = await createApolloTestSetup({
     context: () => ({
       authenticatedUser,
+      policy,
       // Draft files go to the storage of CONFIG, as a message's do (messages.ts), while deleting
       // an account goes through the context's: one storage client serves both.
       config: {
@@ -141,6 +176,9 @@ beforeAll(async () => {
 })
 
 beforeEach(async () => {
+  policy = {}
+  uploading.meanwhile = null
+  uploading.urls = []
   await cleanDatabase()
   const [annaUser, benUser, carlUser] = await Promise.all([
     Factory.build('user', { id: 'anna', name: 'Anna' }),
@@ -402,6 +440,30 @@ describe('SaveRoomDraft', () => {
         await expect(fileCount()).resolves.toBe(2)
       })
 
+      it('takes them over in the order named', async () => {
+        as(anna)
+        const first = await attach({ roomId: directRoomId }, 'first.txt')
+        const second = await attach({ roomId: directRoomId }, 'second.txt')
+        const third = await attach({ roomId: directRoomId }, 'third.txt')
+        const urlOf = (result: typeof first) => result.data.AddRoomDraftFile.url
+
+        const sent = await setup.mutate({
+          mutation: CreateMessage,
+          variables: {
+            roomId: directRoomId,
+            content: 'Backwards',
+            draftFiles: [urlOf(third), urlOf(first), urlOf(second)],
+          },
+        })
+
+        expect(sent.errors).toBeUndefined()
+        expect(sent.data.CreateMessage.files.map((file: { name: string }) => file.name)).toEqual([
+          'third.txt',
+          'first.txt',
+          'second.txt',
+        ])
+      })
+
       it('takes a message of draft files only', async () => {
         as(anna)
         const kept = await attach({ roomId: directRoomId }, 'kept.txt')
@@ -573,6 +635,41 @@ describe('SaveRoomDraft', () => {
     })
   })
 
+  describe("in a group's chat while groups are switched off", () => {
+    it('is not kept, and says why', async () => {
+      await Factory.build(
+        'group',
+        { id: 'knit', name: 'Knitting Group', template: 'public', description: DESCRIPTION },
+        { ownerId: 'anna' },
+      )
+      as(anna)
+      const created = await setup.mutate({
+        mutation: CreateGroupRoom,
+        variables: { groupId: 'knit' },
+      })
+
+      expect(created.errors).toBeUndefined()
+
+      const groupRoomId = created.data.CreateGroupRoom.id
+      policy = { groupsEnabled: false }
+
+      const { errors } = await save({ roomId: groupRoomId, text: 'Not now' })
+
+      expect(errors?.[0].extensions?.errorCode).toBe('GROUPS_FEATURE_DISABLED')
+
+      const drafts = await setup.database.driver
+        .session()
+        .run(
+          'MATCH (:User)-[chatsIn:CHATS_IN]->(:Room { id: $id }) RETURN chatsIn.draft AS draft',
+          {
+            id: groupRoomId,
+          },
+        )
+
+      expect(drafts.records.map((record) => record.get('draft'))).toEqual([null])
+    })
+  })
+
   describe('in the conference chat of a video call', () => {
     let callRoomId: string
 
@@ -592,6 +689,35 @@ describe('SaveRoomDraft', () => {
         })
       callRoomId = (await join('anna')) as string
       await join('ben')
+    })
+
+    it('keeps no file whose upload outlasted the call, in the storage neither', async () => {
+      as(anna)
+      // The call ends while the file is being uploaded.
+      uploading.meanwhile = async (transaction) => {
+        await transaction.run(
+          `MATCH (call:VideoCallSession { livekitSid: 'RM_1' }) SET call.endedAt = toString(datetime())`,
+        )
+      }
+
+      const { data, errors } = await attach({ roomId: callRoomId }, 'late.txt')
+
+      expect(errors).toBeUndefined()
+      expect(data.AddRoomDraftFile).toBeNull()
+      expect(uploading.urls).toHaveLength(1)
+      await expect(stored(uploading.urls[0])).resolves.toBe(false)
+      await expect(fileCount()).resolves.toBe(0)
+    })
+
+    it('says so when the upload fails for another reason', async () => {
+      as(anna)
+      uploading.meanwhile = async () => Promise.reject(new Error('Storage unwell'))
+
+      const { data, errors } = await attach({ roomId: callRoomId }, 'unlucky.txt')
+
+      expect(errors?.[0].message).toBe('Storage unwell')
+      expect(data?.AddRoomDraftFile ?? null).toBeNull()
+      await expect(fileCount()).resolves.toBe(0)
     })
 
     it('is kept while the call runs', async () => {
