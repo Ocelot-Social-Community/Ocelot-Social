@@ -1,11 +1,12 @@
 import { Node } from 'tiptap'
 import pasteRule from '../commands/pasteRule'
+import embedToLink from '../commands/embedToLink'
 import { compileToFunctions } from 'vue-template-compiler'
 import Vue from 'vue'
 import EmbedComponent from '~/components/Embed/EmbedComponent'
 
 Vue.component(EmbedComponent)
-const template = `<component :dataEmbedUrl="dataEmbedUrl" :embedData="embedData" :is="componentType" />`
+const template = `<component :dataEmbedUrl="dataEmbedUrl" :embedData="embedData" :is="componentType" @remove="removeEmbed" />`
 
 const compiledTemplate = compileToFunctions(template)
 
@@ -62,7 +63,7 @@ export default class Embed extends Node {
 
   get view() {
     return {
-      props: ['node', 'updateAttrs', 'options'],
+      props: ['node', 'updateAttrs', 'options', 'view', 'getPos'],
       data: () => ({
         embedData: {},
       }),
@@ -70,6 +71,11 @@ export default class Embed extends Node {
         if (this.options) {
           this.embedData = await this.options.onEmbed({ url: this.dataEmbedUrl })
         }
+      },
+      methods: {
+        removeEmbed() {
+          embedToLink({ view: this.view, node: this.node, pos: this.getPos() })
+        },
       },
       computed: {
         componentType() {

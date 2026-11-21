@@ -593,6 +593,7 @@
     "searchBadgeUser": "User",
     "searchPlaceholder": "Search user or group…",
     "typeMessage": "Type message",
+    "unreadAbove": "Unread messages further up: {count}",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chat with “{name}”"
@@ -883,6 +884,7 @@
         "usedByMe": "Used by me"
       }
     },
+    "invalidLink": "This is not a valid link. Enter a web address, an email address or another link.",
     "legend": {
       "bold": "Bold",
       "heading3": "Heading 3",

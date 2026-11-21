@@ -593,6 +593,7 @@
     "searchBadgeUser": "Użytkownik",
     "searchPlaceholder": "Szukaj użytkownika lub grupy…",
     "typeMessage": "Wpisz wiadomość",
+    "unreadAbove": "Nieprzeczytane wiadomości wyżej: {count}",
     "userProfileButton": {
       "label": "Czat",
       "tooltip": "Czat z „{name}”"
@@ -883,6 +884,7 @@
         "usedByMe": "Używane przeze mnie"
       }
     },
+    "invalidLink": "To nie jest prawidłowy link. Wpisz adres internetowy, adres e-mail lub inny link.",
     "legend": {
       "bold": "Pogrubienie",
       "heading3": "Nagłówek 3",
