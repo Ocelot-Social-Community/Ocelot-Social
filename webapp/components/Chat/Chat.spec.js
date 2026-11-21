@@ -679,6 +679,30 @@ describe('Chat.vue', () => {
       expect(calls[1][0].variables.beforeIndex).toBe(0)
     })
 
+    it('keeps what is loaded when an older page fails, and tells', async () => {
+      const room = mockRoom({ id: 'r-older', roomId: 'r-older' })
+      const messages = Array.from({ length: 20 }, (_, i) =>
+        mockMessage({ indexId: i + 20, id: `m${i}`, _id: `m${i}` }),
+      )
+      mocks.$apollo.query.mockResolvedValue({ data: { Message: messages } })
+      await expect(wrapper.vm.fetchMessages({ room })).resolves.toBe(true)
+      mocks.$apollo.query.mockRejectedValue(new Error('Offline'))
+
+      await expect(wrapper.vm.fetchMessages({ room })).resolves.toBe(false)
+
+      expect(wrapper.vm.messages).toHaveLength(20)
+      expect(mocks.$toast.error).toHaveBeenCalledWith('Offline')
+    })
+
+    it('shows no messages when the first page fails', async () => {
+      const room = mockRoom({ id: 'r-first', roomId: 'r-first' })
+      mocks.$apollo.query.mockRejectedValue(new Error('Offline'))
+
+      await expect(wrapper.vm.fetchMessages({ room })).resolves.toBe(false)
+
+      expect(wrapper.vm.messages).toEqual([])
+    })
+
     it('sets messagesLoaded when server returns fewer than pageSize', async () => {
       const room = mockRoom({ id: 'r-loaded', roomId: 'r-loaded' })
       mocks.$apollo.query.mockResolvedValue({
@@ -2383,6 +2407,8 @@ describe('Chat.vue', () => {
             const [page] = pages.splice(0, 1)
             wrapper.vm.messages = [...page, ...wrapper.vm.messages]
             wrapper.vm.unseenMessageIds.add(page[0].id)
+            wrapper.vm.oldestLoadedIndexId = page[0].indexId
+            return true
           })
         container.scrollTop = 1000
         wrapper.vm.unreadAbove = 2
@@ -2453,6 +2479,85 @@ describe('Chat.vue', () => {
         await first
 
         expect(fetchMessages).toHaveBeenCalledTimes(1)
+      })
+
+      it('stops at a page that failed', async () => {
+        const fetchMessages = jest.spyOn(wrapper.vm, 'fetchMessages').mockResolvedValue(false)
+        const scroll = jest.spyOn(wrapper.vm, 'scrollToOldestUnread')
+
+        await wrapper.vm.jumpToOldestUnread()
+
+        expect(fetchMessages).toHaveBeenCalledTimes(1)
+        expect(scroll).toHaveBeenCalled()
+      })
+
+      it('stops at a page that brought nothing older', async () => {
+        const fetchMessages = jest.spyOn(wrapper.vm, 'fetchMessages').mockResolvedValue(true)
+
+        await wrapper.vm.jumpToOldestUnread()
+
+        expect(fetchMessages).toHaveBeenCalledTimes(1)
+      })
+
+      it('loads nothing for unread messages seen just now and not yet reported', async () => {
+        wrapper.vm.messages = [mockMessage({ id: 'msg-2', _id: 'local-2', indexId: 2 })]
+        unread(['msg-2'])
+        wrapper.vm._seenBatch = ['msg-1']
+        const fetchMessages = jest.spyOn(wrapper.vm, 'fetchMessages')
+
+        await wrapper.vm.jumpToOldestUnread()
+
+        expect(fetchMessages).not.toHaveBeenCalled()
+      })
+
+      it('goes no further once the chat is closed', async () => {
+        let done
+        const fetchMessages = jest
+          .spyOn(wrapper.vm, 'fetchMessages')
+          .mockImplementation(() => new Promise((resolve) => (done = resolve)))
+        const reobserve = jest.spyOn(wrapper.vm, 'reobserveUnseen')
+        const scroll = jest.spyOn(wrapper.vm, 'scrollToOldestUnread')
+
+        const jumping = wrapper.vm.jumpToOldestUnread()
+        wrapper.destroy()
+        done(true)
+        await jumping
+
+        expect(fetchMessages).toHaveBeenCalledTimes(1)
+        expect(scroll).not.toHaveBeenCalled()
+        expect(reobserve).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('unread messages come in while the room is open', () => {
+      beforeEach(() => {
+        withMessageColumn()
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 3 })]
+        wrapper.vm.selectedRoom = wrapper.vm.rooms[0]
+        wrapper.vm.messages = []
+      })
+
+      const arrive = (id) =>
+        wrapper.vm.chatMessageAdded({
+          data: {
+            chatMessageAdded: mockMessage({ id, _id: id, room: { id: 'room-1' }, seen: false }),
+          },
+        })
+
+      it('are not counted against the unread count of the room', async () => {
+        await arrive('new-1')
+
+        expect(wrapper.vm.rooms[0].unreadCount).toBe(3)
+        expect(wrapper.vm.unreadNotLoaded(wrapper.vm.rooms[0])).toBe(3)
+      })
+
+      it('are not taken off it once seen', async () => {
+        await arrive('new-1')
+        unread(['msg-1', 'new-1'])
+
+        wrapper.vm.markAsSeen(['msg-1', 'new-1'])
+
+        expect(wrapper.vm.rooms[0].unreadCount).toBe(2)
       })
     })
 

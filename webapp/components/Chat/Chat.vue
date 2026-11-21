@@ -269,6 +269,9 @@ export default {
     this.icons = iconRegistry
     // How often another room has been opened; see fetchMessages.
     this.roomSwitches = 0
+    // Unread messages that came in while their room was open. The room's unread count leaves
+    // them out (chatMessageAdded), so they are neither counted against it nor taken off it.
+    this._arrivedUnseen = new Set()
   },
   watch: {
     groupId(newGroupId) {
@@ -359,6 +362,8 @@ export default {
     this._subscriptions.push(statusSub)
   },
   beforeDestroy() {
+    // A jump to the oldest unread message under way goes no further (jumpToOldestUnread).
+    this._destroyed = true
     if (this._unreadAboveFrame) cancelAnimationFrame(this._unreadAboveFrame)
     this._scrollContainer?.removeEventListener?.('scroll', this.scheduleUnreadAbove)
     this.removeUnreadAbove()
@@ -536,11 +541,7 @@ export default {
     countUnreadAbove() {
       const room = this.rooms.find((r) => r.id === this.selectedRoom?.id)
       if (!room) return 0
-      const unread = typeof room.unreadCount === 'number' ? room.unreadCount : 0
-      // Seen just now, but not yet taken off the room's count: they wait for the batch to be
-      // sent (markAsSeen), and were otherwise taken for unread ones not loaded.
-      const seenPending = this._seenBatch?.length || 0
-      const notLoaded = Math.max(0, unread - this.unseenMessageIds.size - seenPending)
+      const notLoaded = this.unreadNotLoaded(room)
       const shadowRoot = this.$el?.shadowRoot
       const container = shadowRoot?.querySelector?.('.vac-container-scroll')
       if (!(container instanceof Element)) return notLoaded
@@ -551,6 +552,18 @@ export default {
         return !!element && element.getBoundingClientRect().bottom <= top
       }).length
       return notLoaded + scrolledPast
+    },
+
+    // The unread messages of the room not loaded yet: its unread count, less the unread ones
+    // loaded and those seen just now but not yet taken off the count (they wait for the batch
+    // to be sent, markAsSeen). Those come in while the room was open were never in the count.
+    unreadNotLoaded(room) {
+      const unread = typeof room?.unreadCount === 'number' ? room.unreadCount : 0
+      const counted = (ids) => ids.filter((id) => !this._arrivedUnseen.has(id)).length
+      return Math.max(
+        0,
+        unread - counted([...this.unseenMessageIds]) - counted(this._seenBatch || []),
+      )
     },
 
     // Once per frame at most: scrolling reports far more often.
@@ -656,22 +669,26 @@ export default {
       try {
         for (let page = 0; page < UNREAD_JUMP_MAX_PAGES; page++) {
           const roomNow = this.rooms.find((r) => r.id === room.id)
-          const unread = roomNow?.unreadCount || 0
-          if (this.messagesLoaded || unread <= this.unseenMessageIds.size) break
-          const loaded = this.messages.length
-          await this.fetchMessages({ room })
-          if (this.selectedRoom !== room || this.messages.length === loaded) break
+          if (this.messagesLoaded || !this.unreadNotLoaded(roomNow)) break
+          const oldest = this.oldestLoadedIndexId
+          const loaded = await this.fetchMessages({ room })
+          // Stopped by a failed page, another room opened, the chat closed, or a page that
+          // brought nothing older.
+          if (!loaded || this._destroyed || this.selectedRoom !== room) break
+          if (this.oldestLoadedIndexId === oldest) break
         }
-        if (this.selectedRoom !== room) return
+        if (this._destroyed || this.selectedRoom !== room) return
         // The library draws what was loaded with its own Vue, after this one's tick.
         await this.$nextTick()
         await new Promise((resolve) => requestAnimationFrame(resolve))
-        if (this.selectedRoom !== room) return
+        if (this._destroyed || this.selectedRoom !== room) return
         this.scrollToOldestUnread()
       } finally {
         this.jumpingToUnread = false
-        this.reobserveUnseen()
-        this.scheduleUnreadAbove()
+        if (!this._destroyed) {
+          this.reobserveUnseen()
+          this.scheduleUnreadAbove()
+        }
       }
     },
 
@@ -717,7 +734,9 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - messageIds.length)
+        // Those come in while the room was open were never in its count (chatMessageAdded).
+        const counted = messageIds.filter((id) => !this._arrivedUnseen.delete(id)).length
+        changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - counted)
         this.$set(this.rooms, roomIndex, changedRoom)
       }
       // Persist to server
@@ -1151,6 +1170,7 @@ export default {
         this.messages = []
         this.oldestLoadedIndexId = null
         this.unseenMessageIds = new Set()
+        this._arrivedUnseen = new Set()
         this.selectedRoom = room
       }
       const switches = this.roomSwitches
@@ -1194,7 +1214,7 @@ export default {
         // Another room may have been opened while this one was asked for: its messages
         // must not end up there. Counted, not compared by id: after a way there and back the
         // room is the same again, but its messages have been asked for anew.
-        if (this.roomSwitches !== switches) return
+        if (this.roomSwitches !== switches) return false
 
         this.mergeMessages(Message)
 
@@ -1217,10 +1237,14 @@ export default {
           // A room opened may have had its message column drawn anew.
           this.renderHint()
         })
+        return true
       } catch (error) {
-        if (this.roomSwitches !== switches) return
-        this.messages = []
+        if (this.roomSwitches !== switches) return false
+        // An older page that failed leaves the newer ones loaded: emptied, the room would
+        // show a gap once the page came after all.
+        if (variables.beforeIndex === undefined) this.messages = []
         this.$toastBackendError(error)
+        return false
       }
     },
 
@@ -1269,6 +1293,7 @@ export default {
       this.moveRoomToTop(changedRoom, msg.room.id)
       // Only add incoming messages to the chat — own messages are handled via mutation response
       if (isCurrentRoom && !isOwnMessage) {
+        this._arrivedUnseen.add(msg.id)
         this.addSocketMessage(msg)
       }
     },
