@@ -485,11 +485,16 @@ export default {
               (e) => ({ e }),
             )
           const audio = await alone('audio')
-          if (allOvertaken()) return false
+          if (allOvertaken()) {
+            // Not on show, so nothing else would hand the microphone back.
+            if (audio.s) audio.s.getTracks().forEach((t) => t.stop())
+            return false
+          }
           const video = audio.s ? null : await alone('video')
           if (audio.s) failures = { video: err }
           else if (video.s) failures = { audio: audio.e }
-          else failures = { video: err, audio: audio.e }
+          // Each alone says what is wrong with it; the request for both may answer for either.
+          else failures = { video: video.e, audio: audio.e }
           stream = audio.s || video.s || null
         } else {
           failures = { [wantVideo ? 'video' : 'audio']: err }
@@ -514,8 +519,10 @@ export default {
         const complete = shown.length === 0 && !kinds.some(overtaken)
         this.stream = complete ? stream : new MediaStream([...shown, ...fresh])
       }
-      // Only what was asked for here: the other device keeps what it had to say.
+      // Only what was asked for here: the other device keeps what it had to say, and so does
+      // a kind a newer request has taken over.
       for (const kind of kinds) {
+        if (overtaken(kind)) continue
         if (failures[kind]) this.deviceFailed(kind, failures[kind])
         else this.clearFailure(kind)
       }

@@ -682,6 +682,63 @@ describe('PreJoin', () => {
       await expect(first).resolves.toBe(false)
     })
 
+    it('hands back the microphone of a fallback that was overtaken meanwhile', async () => {
+      const both = deferred()
+      const micAlone = deferred()
+      const { wrapper } = mountPending(both, micAlone)
+      const microphone = fakeStream('microphone')
+      const first = wrapper.vm.acquireStream()
+      both.reject(Object.assign(new Error(), { name: 'NotReadableError' }))
+      await flushPromises()
+      wrapper.vm.streamRequests.video++
+      wrapper.vm.streamRequests.audio++
+      micAlone.resolve(microphone)
+      await expect(first).resolves.toBe(false)
+      expect(microphone.track.stop).toHaveBeenCalled()
+    })
+
+    it("leaves a camera's say to the newer request that started it", async () => {
+      const both = deferred()
+      const cameraAlone = deferred()
+      const micAlone = deferred()
+      const { wrapper } = mountPending(both, cameraAlone, micAlone)
+      const first = wrapper.vm.acquireStream()
+      const second = wrapper.vm.acquireStream('video')
+      cameraAlone.resolve(fakeStream('camera'))
+      await expect(second).resolves.toBe(true)
+      both.reject(Object.assign(new Error(), { name: 'NotReadableError' }))
+      await flushPromises()
+      const original = global.MediaStream
+      global.MediaStream = FakeMediaStream
+      try {
+        micAlone.resolve(fakeStream('microphone'))
+        await first
+      } finally {
+        global.MediaStream = original
+      }
+      expect(wrapper.vm.failed.video).toBeNull()
+      expect(wrapper.vm.cameraActive).toBe(true)
+    })
+
+    it('names for each device its own reason when both fail alone too', async () => {
+      const refusal = (name) => Promise.reject(Object.assign(new Error(), { name }))
+      const getUserMedia = jest
+        .fn()
+        .mockImplementationOnce(() => refusal('NotAllowedError'))
+        .mockImplementationOnce(() => refusal('NotAllowedError'))
+        .mockImplementationOnce(() => refusal('NotReadableError'))
+      const { wrapper } = mountWith({
+        getUserMedia,
+        enumerateDevices: jest.fn().mockResolvedValue([]),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      })
+      wrapper.setData({ cameraStatus: 'granted', micStatus: 'granted' })
+      await wrapper.vm.acquireStream()
+      expect(wrapper.vm.failed.audio.reason).toBe('denied')
+      expect(wrapper.vm.failed.video.reason).toBe('busy')
+    })
+
     it('hands back a camera that starts only after the dialog is gone', async () => {
       const slow = deferred()
       const { wrapper } = mountPending(slow)

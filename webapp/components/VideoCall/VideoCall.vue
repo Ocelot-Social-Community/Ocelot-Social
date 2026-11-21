@@ -3814,13 +3814,16 @@ export default {
     // The device settings' retry: what did not start is started again, and says so again
     // should it fail once more. A microphone still switched on was cut off on the way.
     async retryDevices() {
+      // The call asked for: left, and another one joined, while the microphone came back, the
+      // camera of that one is not this retry's to switch on.
+      const room = this.room
       const { camera, mic } = this.deviceIssues
       this.deviceIssues = { camera: null, mic: null }
       if (mic) {
         if (this.micEnabled) await this.restartMic()
         else await this.toggleMic()
       }
-      if (camera && !this.cameraEnabled) await this.toggleCamera()
+      if (camera && !this.cameraEnabled && this.isLive(room)) await this.toggleCamera()
     },
     restartMic() {
       // A click and a device change can ask at the same time; one fresh
@@ -3860,6 +3863,8 @@ export default {
         // The call may have ended (or been retried) while we waited; its
         // outcome must not leak into the next one.
         if (this.room !== room) return
+        // It runs again: whatever it had to say about not starting is over.
+        this.deviceIssues.mic = null
         this.micProblem = this.micEnabled && silent
         // The restart swapped the MediaStreamTrack under the publication.
         this.refreshMicMeter()

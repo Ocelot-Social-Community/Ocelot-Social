@@ -2113,6 +2113,15 @@ describe('VideoCall', () => {
         expect(wrapper.vm.micProblem).toBe(true)
       })
 
+      it('forgets what the microphone had to say about not starting once it runs again', async () => {
+        const { wrapper, room } = await connected()
+        const track = fakeMicTrack()
+        room.localParticipant.getTrackPublication.mockReturnValue({ track })
+        wrapper.setData({ deviceIssues: { camera: 'busy', mic: 'generic' } })
+        await wrapper.vm.restartMic()
+        expect(wrapper.vm.deviceIssues).toEqual({ camera: 'busy', mic: null })
+      })
+
       it('reports no problem when the user muted while the capture restarted', async () => {
         const { wrapper, room } = await connected()
         const track = fakeMicTrack({ checkForSilence: jest.fn().mockResolvedValue(true) })
@@ -2386,6 +2395,21 @@ describe('VideoCall', () => {
         expect(toggleMic).toHaveBeenCalledTimes(1)
         expect(toggleCamera).not.toHaveBeenCalled()
         expect(wrapper.vm.deviceIssues).toEqual({ camera: null, mic: null })
+      })
+
+      it('switches on no camera of a call joined while the microphone came back', async () => {
+        const { wrapper } = await opened()
+        wrapper.setData({
+          micEnabled: true,
+          cameraEnabled: false,
+          deviceIssues: { camera: 'busy', mic: 'generic' },
+        })
+        jest.spyOn(wrapper.vm, 'restartMic').mockImplementation(async () => {
+          wrapper.vm.room = { ...wrapper.vm.room }
+        })
+        const toggleCamera = jest.spyOn(wrapper.vm, 'toggleCamera').mockResolvedValue()
+        await wrapper.vm.retryDevices()
+        expect(toggleCamera).not.toHaveBeenCalled()
       })
 
       it('restarts a microphone that is on but was cut off', async () => {
