@@ -441,6 +441,7 @@
     "CHAT_GROUP_ROOM_NOT_CREATED": "The group chat could not be created.",
     "CHAT_MESSAGE_CONTENT_MISSING": "The message needs a text or a file.",
     "CHAT_ROOM_PARTNER_IS_SELF": "You cannot start a chat with yourself.",
+    "CHAT_ROOM_TARGET_MISSING": "Name either a chat or the person you want to chat with.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "The comment must be at least {min} characters long.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "A user account with this email address already exists.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Please enter a valid email address.",
@@ -565,6 +566,7 @@
     "cancelSelectMessage": "Cancel",
     "closeChat": "Close chat",
     "conversationStarted": "Conversation started on:",
+    "draft": "Draft:",
     "expandChat": "Expand chat",
     "export": {
       "attachment": "Attachment",
@@ -583,6 +585,7 @@
     "messageDeleted": "This message was deleted",
     "messagesEmpty": "No messages",
     "newMessages": "New Messages",
+    "notSent": "The message was not sent. Use the exclamation mark beside it to send it again.",
     "roomEmpty": "No room selected",
     "roomsEmpty": "No rooms",
     "search": "Filter chat rooms",

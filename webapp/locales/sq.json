@@ -441,6 +441,7 @@
     "CHAT_GROUP_ROOM_NOT_CREATED": "Biseda e grupit nuk mund të krijohej.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Mesazhi ka nevojë për një tekst ose një skedar.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Nuk mund të nisësh një bisedë me veten.",
+    "CHAT_ROOM_TARGET_MISSING": "Trego një bisedë ose personin me të cilin do të bisedosh.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Komenti duhet të ketë të paktën {min} karaktere.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Ekziston tashmë një llogari përdoruesi me këtë adresë e-maili.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Fut një adresë e-maili të vlefshme.",
@@ -565,6 +566,7 @@
     "cancelSelectMessage": "Anulo",
     "closeChat": "Mbyll bisedën",
     "conversationStarted": "Biseda filloi më:",
+    "draft": "Draft:",
     "expandChat": "Zgjero bisedën",
     "export": {
       "attachment": "Bashkëngjitje",
@@ -583,6 +585,7 @@
     "messageDeleted": "Ky mesazh u fshi",
     "messagesEmpty": "Nuk ka mesazhe",
     "newMessages": "Mesazhe të reja",
+    "notSent": "Mesazhi nuk u dërgua. Me pikëçuditjen pranë tij mund ta dërgoni përsëri.",
     "roomEmpty": "Asnjë dhomë e zgjedhur",
     "roomsEmpty": "Nuk ka dhoma",
     "search": "Filtro dhomat e bisedës",

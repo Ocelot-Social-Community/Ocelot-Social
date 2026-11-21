@@ -57,6 +57,14 @@ export const roomQuery = () => gql`
       lastMessageAt
       createdAt
       unreadCount
+      draft
+      draftFiles {
+        url
+        name
+        extension
+        type
+        duration
+      }
       group {
         id
         name
@@ -94,6 +102,36 @@ export const roomQuery = () => gql`
         }
       }
     }
+  }
+`
+
+// Keeps what the user has begun to write in a room, or takes it away for an empty text. By
+// userId for a direct conversation that has no room yet: the room is opened for the draft.
+export const saveRoomDraft = () => gql`
+  mutation ($roomId: ID, $userId: ID, $text: String) {
+    SaveRoomDraft(roomId: $roomId, userId: $userId, text: $text) {
+      id
+      draft
+    }
+  }
+`
+
+// Attaches a file to the user's draft in a room, uploaded at once; named as for saveRoomDraft.
+export const addRoomDraftFile = () => gql`
+  mutation ($roomId: ID, $userId: ID, $file: FileInput!) {
+    AddRoomDraftFile(roomId: $roomId, userId: $userId, file: $file) {
+      url
+      name
+      extension
+      type
+      duration
+    }
+  }
+`
+
+export const removeRoomDraftFile = () => gql`
+  mutation ($roomId: ID, $userId: ID, $url: ID!) {
+    RemoveRoomDraftFile(roomId: $roomId, userId: $userId, url: $url)
   }
 `
 

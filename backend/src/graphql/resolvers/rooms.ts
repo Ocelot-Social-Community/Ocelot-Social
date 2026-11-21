@@ -5,13 +5,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-shadow */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { withFilter } from 'graphql-subscriptions'
 
+import CONFIG from '@config/index'
 import { ROOM_UPDATED } from '@constants/subscriptions'
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 import { isActiveMembership } from '@graphql/resolvers/helpers/groupAccessCypher'
 
+import { attachments, deleteStoredFiles } from './attachments/attachments'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import Resolver from './helpers/Resolver'
 
@@ -48,6 +51,44 @@ export const groupChatGated = (context) => context.policy?.getEffective('groupsE
 // conversation do. Asking only "not a group room" would take their conference chat for it.
 export const DIRECT_ROOM = 'NOT (room)-[:ROOM_FOR]->()'
 
+// Finds the direct room of the current user and `user`, or opens one: both chat in it. Expects
+// `currentUser` and `user` bound; binds nothing new, and leaves no row when the room was there.
+export const OPEN_DIRECT_ROOM = `
+  OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
+  WHERE ${DIRECT_ROOM}
+  WITH currentUser, user, collect(room)[0] AS existingRoom
+  WITH currentUser, user, existingRoom
+  WHERE existingRoom IS NULL
+  CREATE (currentUser)-[:CHATS_IN]->(:Room {
+    createdAt: toString(datetime()),
+    id: apoc.create.uuid()
+  })<-[:CHATS_IN]-(user)
+`
+
+// The conference chat of a video call that is over takes no more messages, and so no drafts
+// either. Expects `room` bound.
+export const NOT_A_CLOSED_CALL_ROOM = `NOT EXISTS {
+  MATCH (room)-[:ROOM_FOR]->(call:VideoCallSession)
+  WHERE call.endedAt IS NOT NULL
+}`
+
+// As long as a message is kept, at most: a draft is one unsent.
+export const DRAFT_MAX_LENGTH = 2000
+
+// The files of the current user's draft in `room`, as `file`. Expects both bound.
+export const DRAFT_FILES = '(currentUser)-[:DRAFT_FILE]->(file:File)-[:DRAFT_FILE_IN]->(room)'
+
+// A draft is its text, its files, or both. Its time is that of its last change, and it is
+// gone with the last of either: then the edge's `draftUpdatedAt` is too, which is what tells
+// a room with a draft from one without. Expects `currentUser`, `chatsIn` and `room` bound.
+export const TOUCH_DRAFT = `
+  SET chatsIn.draftUpdatedAt = CASE
+    WHEN chatsIn.draft IS NOT NULL
+      OR size([(currentUser)-[:DRAFT_FILE]->(file:File)-[:DRAFT_FILE_IN]->(room) | file]) > 0
+    THEN toString(datetime())
+  END
+`
+
 // Whether a room is a group room (has a ROOM_FOR edge to a Group). Used to block messaging in
 // a group room while the groups feature is off, without denying DM rooms (shared mutations).
 export const roomIsGroupRoom = async (roomId, session) => {
@@ -58,6 +99,73 @@ export const roomIsGroupRoom = async (roomId, session) => {
     )
     return result.records[0]?.get('isGroup') === true
   })
+}
+
+// The room a draft is kept in, named by roomId, or by userId for a direct conversation: bound as
+// `room`, with `currentUser` and their edge to it as `chatsIn`. A call's chat that is over keeps
+// none.
+const draftRoomMatch = (roomId: string | null | undefined) => `
+  ${
+    roomId
+      ? 'MATCH (currentUser:User { id: $currentUserId })-[chatsIn:CHATS_IN]->(room:Room { id: $roomId })'
+      : `MATCH (currentUser:User { id: $currentUserId })-[chatsIn:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(:User { id: $userId })
+         WHERE ${DIRECT_ROOM}`
+  }
+  WITH currentUser, chatsIn, room
+  WHERE ${NOT_A_CLOSED_CALL_ROOM}
+`
+
+interface DraftRoomVariables {
+  currentUserId: string
+  roomId: string | null
+  userId: string | null
+}
+
+/**
+ * What SaveRoomDraft, AddRoomDraftFile and RemoveRoomDraftFile share: the room named, refused
+ * for oneself and without a name, nothing while a group's chat is gated off (see messages.ts),
+ * and — when `opensRoom` — a direct conversation without a message yet opened for the draft.
+ * `work` runs in the write transaction with the match of draftRoomMatch and its variables.
+ */
+const inDraftRoom = async <T>(
+  context,
+  params: { roomId?: string | null; userId?: string | null },
+  opensRoom: boolean,
+  work: (transaction, matchRoom: string, variables: DraftRoomVariables) => Promise<T>,
+): Promise<T | null> => {
+  const { roomId, userId } = params
+  const currentUserId: string = context.user.id
+  if (!roomId && !userId) {
+    throw new AppError(Errors.CHAT_ROOM_TARGET_MISSING)
+  }
+  if (userId && userId === currentUserId) {
+    throw new AppError(Errors.CHAT_ROOM_PARTNER_IS_SELF)
+  }
+  const session = context.driver.session()
+  try {
+    if (roomId && groupChatGated(context) && (await roomIsGroupRoom(roomId, session))) {
+      return null
+    }
+    return await session.writeTransaction(async (transaction) => {
+      if (userId && opensRoom) {
+        await transaction.run(
+          `
+            MATCH (currentUser:User { id: $currentUserId })
+            MATCH (user:User { id: $userId })
+            ${OPEN_DIRECT_ROOM}
+          `,
+          { currentUserId, userId },
+        )
+      }
+      return work(transaction, draftRoomMatch(roomId), {
+        currentUserId,
+        roomId: roomId ?? null,
+        userId: userId ?? null,
+      })
+    })
+  } finally {
+    await session.close()
+  }
 }
 
 export const getRoomProperties = async (roomId, session) => {
@@ -193,10 +301,18 @@ export default {
           }
           const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''
           const cypher = `
-            MATCH (currentUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room)
+            MATCH (currentUser:User { id: $currentUserId })-[chatsIn:CHATS_IN]->(room:Room)
               // The conference chats of video calls are not conversations of their own: they
               // are reached from the call, not from the chat list.
               WHERE NOT (room)-[:ROOM_FOR]->(:VideoCallSession)
+              // A direct room opened for a draft (SaveRoomDraft, AddRoomDraftFile) has no message yet. It is
+              // listed for whoever keeps a draft in it, not for the other one: nothing was
+              // said to them yet.
+              AND (
+                (room)-[:ROOM_FOR]->()
+                OR (room)<-[:INSIDE]-(:Message)
+                OR chatsIn.draftUpdatedAt IS NOT NULL
+              )
             OPTIONAL MATCH (room)-[:ROOM_FOR]->(g:Group)
             OPTIONAL MATCH (room)<-[:CHATS_IN]-(otherUser:User)
               WHERE g IS NULL AND otherUser.id <> $currentUserId
@@ -297,6 +413,80 @@ export default {
         await session.close()
       }
     },
+    SaveRoomDraft: async (_parent, params, context, _resolveInfo) => {
+      // Kept as typed, blanks included; one of nothing but blanks is none.
+      const text: string | null =
+        typeof params.text === 'string' && params.text.trim()
+          ? params.text.slice(0, DRAFT_MAX_LENGTH)
+          : null
+      // A direct conversation without a message yet has no room: one is opened for a draft,
+      // not for taking one away.
+      return inDraftRoom(context, params, !!text, async (transaction, matchRoom, variables) => {
+        const result = await transaction.run(
+          `
+            ${matchRoom}
+            ${text ? 'SET chatsIn.draft = $text' : 'REMOVE chatsIn.draft'}
+            ${TOUCH_DRAFT}
+            RETURN room { .* } AS room
+          `,
+          { ...variables, text },
+        )
+        return result.records.map((record) => unwrap(record.get('room')))[0] ?? null
+      })
+    },
+    // The file goes to the storage at once, as for a message; sending moves it on to the
+    // message (CreateMessage, draftFiles) instead of uploading it again.
+    AddRoomDraftFile: async (_parent, params, context, _resolveInfo) => {
+      return inDraftRoom(context, params, true, async (transaction, matchRoom, variables) => {
+        const found = await transaction.run(`${matchRoom} RETURN room.id AS id`, variables)
+        if (!found.records.length) {
+          return null
+        }
+        const file = await attachments(CONFIG).add(
+          { id: variables.currentUserId },
+          'DRAFT_FILE',
+          params.file,
+          {},
+          { transaction },
+        )
+        await transaction.run(
+          `
+            ${matchRoom}
+            MATCH (file:File { url: $url })
+            CREATE (file)-[:DRAFT_FILE_IN]->(room)
+            WITH currentUser, chatsIn, room
+            ${TOUCH_DRAFT}
+          `,
+          { ...variables, url: file.url },
+        )
+        return file
+      })
+    },
+    RemoveRoomDraftFile: async (_parent, params, context, _resolveInfo) => {
+      const removed = await inDraftRoom(
+        context,
+        params,
+        false,
+        async (transaction, matchRoom, variables) => {
+          const result = await transaction.run(
+            `
+              ${matchRoom}
+              MATCH ${DRAFT_FILES}
+              WHERE file.url = $url
+              WITH currentUser, chatsIn, room, file, file.url AS url
+              DETACH DELETE file
+              WITH currentUser, chatsIn, room, collect(url) AS urls
+              ${TOUCH_DRAFT}
+              RETURN urls
+            `,
+            { ...variables, url: params.url },
+          )
+          return (result.records[0]?.get('urls') as string[] | undefined) ?? []
+        },
+      )
+      await deleteStoredFiles(CONFIG, removed ?? [])
+      return !!removed?.length
+    },
   },
   Room: {
     ...underscoreIdResolver,
@@ -373,6 +563,16 @@ export default {
         WHERE g IS NULL AND call IS NULL AND NOT user.id = $cypherParams.currentUserId
         OPTIONAL MATCH (user)-[:AVATAR_IMAGE]->(userImg:Image)
         RETURN COALESCE(groupImg.url, userImg.url)
+      `,
+      // The viewer's own draft, from their edge to the room: nobody else's is ever read.
+      draft: `
+        OPTIONAL MATCH (this)<-[chatsIn:CHATS_IN]-(:User { id: $cypherParams.currentUserId })
+        RETURN chatsIn.draft
+      `,
+      draftFiles: `
+        OPTIONAL MATCH (this)<-[:DRAFT_FILE_IN]-(file:File)<-[:DRAFT_FILE]-(:User { id: $cypherParams.currentUserId })
+        WITH file ORDER BY file.createdAt
+        RETURN collect(file { .* })
       `,
       lastMessage: `
         MATCH (this)<-[:INSIDE]-(message:Message)

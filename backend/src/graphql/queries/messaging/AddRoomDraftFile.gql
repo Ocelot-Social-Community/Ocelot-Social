@@ -1,0 +1,7 @@
+mutation AddRoomDraftFile($roomId: ID, $userId: ID, $file: FileInput!) {
+  AddRoomDraftFile(roomId: $roomId, userId: $userId, file: $file) {
+    url
+    name
+    type
+  }
+}

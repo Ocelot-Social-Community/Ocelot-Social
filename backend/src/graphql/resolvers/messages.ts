@@ -16,11 +16,18 @@ import {
 import { Errors } from '@graphql/errorRegistry'
 import { AppError } from '@graphql/errors'
 
-import { attachments } from './attachments/attachments'
+import { attachments, deleteStoredFiles } from './attachments/attachments'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import { pagingClause } from './helpers/paging'
 import Resolver from './helpers/Resolver'
-import { DIRECT_ROOM, getRoomProperties, groupChatGated, roomIsGroupRoom } from './rooms'
+import {
+  DIRECT_ROOM,
+  getRoomProperties,
+  groupChatGated,
+  OPEN_DIRECT_ROOM,
+  roomIsGroupRoom,
+  TOUCH_DRAFT,
+} from './rooms'
 
 import type { File } from './attachments/attachments'
 
@@ -173,7 +180,7 @@ export default {
   },
   Mutation: {
     CreateMessage: async (_parent, params, context, _resolveInfo) => {
-      const { roomId, userId, content, files = [] } = params
+      const { roomId, userId, content, files = [], draftFiles = [], endsDraft = true } = params
       const {
         user: { id: currentUserId },
       } = context
@@ -186,29 +193,23 @@ export default {
         throw new Error('Either roomId or userId must be provided')
       }
 
-      if (!content?.trim() && files.length === 0) {
+      if (!content?.trim() && files.length === 0 && draftFiles.length === 0) {
         throw new AppError(Errors.CHAT_MESSAGE_CONTENT_MISSING)
       }
 
       const session = context.driver.session()
+      // The draft's files not sent along, removed from the storage once the message is in.
+      let unsentDraftFiles: string[] = []
 
       try {
-        return await session.writeTransaction(async (transaction) => {
+        const created = await session.writeTransaction(async (transaction) => {
           // If userId is provided, find-or-create a DM room first
           if (userId) {
             await transaction.run(
               `
               MATCH (currentUser:User { id: $currentUserId })
               MATCH (user:User { id: $userId })
-              OPTIONAL MATCH (currentUser)-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(user)
-              WHERE ${DIRECT_ROOM}
-              WITH currentUser, user, collect(room)[0] AS existingRoom
-              WITH currentUser, user, existingRoom
-              WHERE existingRoom IS NULL
-              CREATE (currentUser)-[:CHATS_IN]->(:Room {
-                createdAt: toString(datetime()),
-                id: apoc.create.uuid()
-              })<-[:CHATS_IN]-(user)
+              ${OPEN_DIRECT_ROOM}
               `,
               { currentUserId, userId },
             )
@@ -239,6 +240,14 @@ export default {
                 END,
                 room.lastMessageAt = toString(datetime())
             WITH room, currentUser, image
+            ${
+              endsDraft
+                ? `// What was sent is no draft any more (SaveRoomDraft).
+                   MATCH (currentUser)-[sentFrom:CHATS_IN]->(room)
+                   REMOVE sentFrom.draft, sentFrom.draftUpdatedAt
+                   WITH room, currentUser, image`
+                : ''
+            }
             CREATE (currentUser)-[:CREATED]->(message:Message {
               createdAt: toString(datetime()),
               id: apoc.create.uuid(),
@@ -306,8 +315,51 @@ export default {
             atns.push(atn)
           }
 
-          return { ...message, files: atns }
+          // The draft's files named are taken over as they are, in the order named.
+          const moved = await transaction.run(
+            `
+              MATCH (message:Message { id: $messageId })-[:INSIDE]->(room:Room)
+              MATCH (:User { id: $currentUserId })-[draftFile:DRAFT_FILE]->(file:File)-[draftFileIn:DRAFT_FILE_IN]->(room)
+              WHERE file.url IN $draftFiles
+              DELETE draftFile, draftFileIn
+              MERGE (message)-[:ATTACHMENT]->(file)
+              RETURN file { .* } AS file
+            `,
+            { messageId: message.id, currentUserId, draftFiles },
+          )
+          // The rest of the draft goes, unless it goes on (endsDraft: false).
+          const left = endsDraft
+            ? await transaction.run(
+                `
+                  MATCH (:Message { id: $messageId })-[:INSIDE]->(room:Room)
+                  MATCH (:User { id: $currentUserId })-[:DRAFT_FILE]->(file:File)-[:DRAFT_FILE_IN]->(room)
+                  WITH file, file.url AS url
+                  DETACH DELETE file
+                  RETURN url
+                `,
+                { messageId: message.id, currentUserId },
+              )
+            : { records: [] }
+          if (!endsDraft && moved.records.length) {
+            // A draft that goes on may have lost its last file to the message.
+            await transaction.run(
+              `
+                MATCH (:Message { id: $messageId })-[:INSIDE]->(room:Room)
+                MATCH (currentUser:User { id: $currentUserId })-[chatsIn:CHATS_IN]->(room)
+                ${TOUCH_DRAFT}
+              `,
+              { messageId: message.id, currentUserId },
+            )
+          }
+          unsentDraftFiles = left.records.map((record) => record.get('url') as string)
+          const takenOver = moved.records
+            .map((record) => record.get('file') as File)
+            .sort((a, b) => draftFiles.indexOf(a.url) - draftFiles.indexOf(b.url))
+
+          return { ...message, files: [...takenOver, ...atns] }
         })
+        await deleteStoredFiles(CONFIG, unsentDraftFiles)
+        return created
       } finally {
         await session.close()
       }

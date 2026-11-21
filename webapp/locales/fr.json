@@ -441,6 +441,7 @@
     "CHAT_GROUP_ROOM_NOT_CREATED": "Le chat de groupe n'a pas pu être créé.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Le message doit contenir un texte ou un fichier.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Tu ne peux pas démarrer un chat avec toi-même.",
+    "CHAT_ROOM_TARGET_MISSING": "Indique soit un chat, soit la personne avec qui tu veux discuter.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Le commentaire doit comporter au moins {min} caractères.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Il existe déjà un compte utilisateur avec cette adresse mail.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Saisis une adresse mail valide.",
@@ -565,6 +566,7 @@
     "cancelSelectMessage": "Annuler",
     "closeChat": "Fermer le chat",
     "conversationStarted": "Conversation commencée le :",
+    "draft": "Brouillon :",
     "expandChat": "Agrandir le chat",
     "export": {
       "attachment": "Pièce jointe",
@@ -583,6 +585,7 @@
     "messageDeleted": "Ce message a été supprimé",
     "messagesEmpty": "Aucun message",
     "newMessages": "Nouveaux messages",
+    "notSent": "Le message n'a pas été envoyé. Le point d'exclamation à côté permet de l'envoyer à nouveau.",
     "roomEmpty": "Aucun salon sélectionné",
     "roomsEmpty": "Aucun salon",
     "search": "Filtrer les salons de chat",

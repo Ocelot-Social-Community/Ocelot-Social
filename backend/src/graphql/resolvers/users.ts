@@ -14,6 +14,7 @@ import { AppError, ForbiddenError, UserInputError } from '@graphql/errors'
 import { branding } from '@src/branding'
 import { publishPrincipalChanged } from '@src/context/principalEpoch'
 
+import { deleteStoredFiles } from './attachments/attachments'
 import { defaultTrophyBadge, defaultVerificationBadge } from './badges'
 import cypherFields, { underscoreIdResolver, unwrap } from './helpers/cypherField'
 import { commentReadableBy, postReadableBy } from './helpers/groupAccessCypher'
@@ -429,6 +430,8 @@ export default {
       const { resource, id: userId } = params
       const allowedLabels = ['Post', 'Comment']
       const session = context.driver.session()
+      // The files of the user's chat drafts, removed from the storage once they are gone.
+      let droppedDraftFiles: string[] = []
       try {
         const deleted = await session.writeTransaction(async (transaction) => {
           if (resource?.length) {
@@ -490,8 +493,28 @@ export default {
           )
           const [user] = deleteUserTransactionResponse.records.map((record) => record.get('user'))
           await images(context.config).deleteImage(user, 'AVATAR_IMAGE', { transaction })
+          // What the user had begun to write in chats and not sent goes with them, files and all.
+          await transaction.run(
+            `
+              MATCH (:User { id: $userId })-[chatsIn:CHATS_IN]->(:Room)
+              WHERE chatsIn.draftUpdatedAt IS NOT NULL
+              REMOVE chatsIn.draft, chatsIn.draftUpdatedAt
+            `,
+            { userId },
+          )
+          const draftFiles = await transaction.run(
+            `
+              MATCH (:User { id: $userId })-[:DRAFT_FILE]->(file:File)
+              WITH file, file.url AS url
+              DETACH DELETE file
+              RETURN url
+            `,
+            { userId },
+          )
+          droppedDraftFiles = draftFiles.records.map((record) => record.get('url') as string)
           return user
         })
+        await deleteStoredFiles(context.config, droppedDraftFiles)
         // After the commit, so the deleted user's open subscriptions read them as gone.
         publishPrincipalChanged(context.pubsub, userId)
         return deleted
