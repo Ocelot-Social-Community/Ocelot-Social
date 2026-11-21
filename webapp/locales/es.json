@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Tu dispositivo está sobrecargado: las cámaras funcionan con menor calidad para que el sonido siga claro.",
     "cpuStrained": "Tu dispositivo no da abasto con los vídeos. Una calidad menor mantiene el sonido claro.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Otra aplicación está usando el dispositivo.",
+        "label": "En uso"
+      },
+      "denied": {
+        "hint": "El navegador bloquea el acceso.",
+        "label": "Bloqueado"
+      },
+      "generic": {
+        "hint": "El dispositivo no se inicia.",
+        "label": "No arranca"
+      },
+      "noDevice": {
+        "hint": "No se encontró ningún dispositivo: conecta uno.",
+        "label": "No se encuentra"
+      }
+    },
     "deviceSettings": {
       "button": "Dispositivos",
       "dtx": "No transmitir las pausas al hablar",

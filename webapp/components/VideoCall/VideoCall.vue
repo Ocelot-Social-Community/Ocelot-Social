@@ -542,12 +542,15 @@
             :meter-stream="micMeterStream"
             :camera-starting="devicesStarting.videoinput > 0"
             :mic-starting="devicesStarting.audioinput > 0"
+            :camera-issue="deviceIssues.camera"
+            :mic-issue="deviceIssues.mic"
             :dtx="dtx"
             :dtx-applying="dtxApplying"
             :send-quality="sendQuality"
             :receive-quality="receiveQuality"
             :camera-renewing="renewingCamera"
             @switch="switchDevice"
+            @retry="retryDevices"
             @dtx-change="setDtx"
             @send-quality-change="setSendQuality"
             @receive-quality-change="setReceiveQuality"
@@ -713,7 +716,7 @@
 </template>
 
 <script>
-import { deviceErrorMessage } from './deviceError'
+import { deviceErrorMessage, deviceErrorReason } from './deviceError'
 import escapeHtml from 'lodash/escape'
 import { mapGetters, mapMutations } from 'vuex'
 import { OsButton, OsCounterIcon, OsIcon } from '@ocelot-social/ui'
@@ -942,6 +945,9 @@ export default {
       // meanwhile. Counted, as the user may pick again before the first
       // switch is through.
       devicesStarting: { videoinput: 0, audioinput: 0, audiooutput: 0 },
+      // Why our camera or microphone did not start (deviceError.js), said in the device
+      // settings until it runs — switched on, or another one picked.
+      deviceIssues: { camera: null, mic: null },
       // What the level meter in the device settings listens to: the very
       // microphone track the others hear.
       micMeterStream: null,
@@ -1510,6 +1516,13 @@ export default {
     },
   },
   watch: {
+    // A device that runs has nothing left to say about not starting.
+    cameraEnabled(on) {
+      if (on) this.deviceIssues.camera = null
+    },
+    micEnabled(on) {
+      if (on) this.deviceIssues.mic = null
+    },
     // The keyboard goes with the question who moderates on, and comes back once it is answered.
     handover(now, before) {
       if (!now === !before) return
@@ -2617,6 +2630,8 @@ export default {
       this.speakerDeviceId = payload.speakerDeviceId
       this.micEnabled = payload.micEnabled
       this.cameraEnabled = payload.cameraEnabled
+      // What did not start in the prejoin, which switched it off for that.
+      this.deviceIssues = { camera: payload.cameraIssue || null, mic: payload.micIssue || null }
       // Close the modal synchronously *before* triggering navigation so the
       // popup actually disappears on the first click. If we let connect() set
       // phase='connecting' instead, the route transition that runs in parallel
@@ -2661,6 +2676,8 @@ export default {
       this.dtxDefault = !!(this.$policy && this.$policy.get('videoCallDtx'))
       this.dtxSwitch = null
       this.resetAudioOnly()
+      // Not deviceIssues: the prejoin has just said what did not start there, and a retry
+      // keeps what the failed attempt found. Leaving the call forgets them (cleanup()).
       // A join begun while this one runs (a second click on retry) takes over, and so does
       // leaving the call (cleanup() counts too). This one then leaves the room it may have
       // joined, or nothing points at it any more and it stays in the call as a second self.
@@ -2914,7 +2931,7 @@ export default {
           } catch (err) {
             if (overtaken() || !this.isLive(room)) break
             this[flag] = false
-            this.showDeviceErrorToast(kind, err)
+            this.deviceFailed(kind, err)
           }
           if (overtaken() || !this.isLive(room)) break
         }
@@ -3098,6 +3115,12 @@ export default {
       if (Object.keys(this.locallyMuted).length) this.applyLocalVolumes()
       this.setParticipantCount(new Set(tiles.map((t) => t.identity)).size)
     },
+    // Our camera or microphone did not start: said at once, and in the device settings until
+    // it runs.
+    deviceFailed(kind, err) {
+      this.deviceIssues[kind] = deviceErrorReason(err)
+      this.showDeviceErrorToast(kind, err)
+    },
     showDeviceErrorToast(kind, err) {
       if (this.$toast && typeof this.$toast.error === 'function') {
         this.$toast.error(deviceErrorMessage(this.$t, kind, err))
@@ -3226,6 +3249,9 @@ export default {
         done()
       }
       switching.settled = deviceId
+      // Another device picked: what the one before had to say is not about it.
+      if (kind === 'videoinput') this.deviceIssues.camera = null
+      if (kind === 'audioinput') this.deviceIssues.mic = null
       saveDevicePreference(kind, { deviceId, label })
       if (kind === 'videoinput') this.refreshTiles()
       if (kind === 'audioinput') {
@@ -3271,6 +3297,7 @@ export default {
       return tile.isLocal && !tile.isScreen
     },
     showSwitchErrorToast(kind, err) {
+      // A device refused on a switch leaves the one before it running, which has no issue.
       if (kind !== 'audiooutput') {
         this.showDeviceErrorToast(kind === 'videoinput' ? 'camera' : 'mic', err)
         return
@@ -3568,7 +3595,7 @@ export default {
           )
         }
       } catch (err) {
-        if (this.isLive(room)) this.showDeviceErrorToast('camera', err)
+        if (this.isLive(room)) this.deviceFailed('camera', err)
       } finally {
         if (restart) this.deviceStarted('videoinput')
         if (this.cameraRenewal === renewal) this.cameraRenewal = null
@@ -3784,6 +3811,17 @@ export default {
       }
       this.audioBlocked = !this.room.canPlaybackAudio
     },
+    // The device settings' retry: what did not start is started again, and says so again
+    // should it fail once more. A microphone still switched on was cut off on the way.
+    async retryDevices() {
+      const { camera, mic } = this.deviceIssues
+      this.deviceIssues = { camera: null, mic: null }
+      if (mic) {
+        if (this.micEnabled) await this.restartMic()
+        else await this.toggleMic()
+      }
+      if (camera && !this.cameraEnabled) await this.toggleCamera()
+    },
     restartMic() {
       // A click and a device change can ask at the same time; one fresh
       // capture is enough, so later callers share the running attempt.
@@ -3826,7 +3864,7 @@ export default {
         // The restart swapped the MediaStreamTrack under the publication.
         this.refreshMicMeter()
       } catch (err) {
-        if (this.room === room) this.showDeviceErrorToast('mic', err)
+        if (this.room === room) this.deviceFailed('mic', err)
       }
     },
     // Called by the device settings' checkbox alone, which is disabled while a switch runs
@@ -3867,7 +3905,7 @@ export default {
           await this.restoreDtx(room, track, publish, before, err)
         }
       } catch (err) {
-        if (this.room === room) this.showDeviceErrorToast('mic', err)
+        if (this.room === room) this.deviceFailed('mic', err)
       } finally {
         if (this.dtxSwitch === dtxSwitch) this.dtxSwitch = null
         settle()
@@ -3896,7 +3934,7 @@ export default {
         }
       } catch {
         track.stop()
-        if (this.room === room) this.showDeviceErrorToast('mic', err)
+        if (this.room === room) this.deviceFailed('mic', err)
       }
     },
     async toggleMic() {
@@ -3938,7 +3976,7 @@ export default {
         // we'd otherwise leave in `this.micEnabled`.
         if (!this.isLive(room)) return
         this.micEnabled = !!room.localParticipant.isMicrophoneEnabled
-        this.showDeviceErrorToast('mic', err)
+        this.deviceFailed('mic', err)
       } finally {
         if (next) this.deviceStarted('audioinput')
       }
@@ -3959,7 +3997,7 @@ export default {
         if (!this.isLive(room)) return
         this.cameraEnabled = !!room.localParticipant.isCameraEnabled
         this.refreshTiles()
-        this.showDeviceErrorToast('camera', err)
+        this.deviceFailed('camera', err)
       } finally {
         if (next) this.deviceStarted('videoinput')
         else this.cameraOffPending = false
@@ -4120,6 +4158,7 @@ export default {
       this.micRestart = null
       this.micSilenceProbe = null
       this.resetAudioOnly()
+      this.deviceIssues = { camera: null, mic: null }
       this.prefetched = null
       // The conference chat belongs to the call just left (see the chatRoomId watcher).
       this.setChatRoomId(null)

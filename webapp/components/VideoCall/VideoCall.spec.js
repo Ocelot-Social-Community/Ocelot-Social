@@ -156,6 +156,8 @@ const stubs = {
       'sendQuality',
       'receiveQuality',
       'cameraRenewing',
+      'cameraIssue',
+      'micIssue',
     ],
   }),
   VideoTile: Stub('VideoTile', {
@@ -1083,6 +1085,30 @@ describe('VideoCall', () => {
       expect(wrapper.vm.phase).toBe('connecting')
       expect(wrapper.vm.connect).toHaveBeenCalled()
       expect(wrapper.vm.$router.push).toHaveBeenCalled()
+    })
+
+    it('keeps what did not start in the prejoin for the device settings, through the join', async () => {
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+      wrapper.setData({ phase: 'prejoin' })
+      wrapper.vm.$apollo = {
+        mutate: jest
+          .fn()
+          .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
+      }
+      wrapper.vm.$router.push = jest.fn().mockResolvedValue()
+      wrapper.vm.$route.name = 'groups-id-slug'
+      await wrapper.vm.onPreJoinReady({
+        cameraDeviceId: 'cam-1',
+        micDeviceId: 'mic-1',
+        speakerDeviceId: null,
+        micEnabled: true,
+        cameraEnabled: false,
+        cameraIssue: 'busy',
+        micIssue: null,
+      })
+      await flushPromises()
+      expect(wrapper.vm.phase).toBe('in-call')
+      expect(wrapper.vm.deviceIssues).toEqual({ camera: 'busy', mic: null })
     })
 
     it('swallows router push errors', async () => {
@@ -2314,6 +2340,77 @@ describe('VideoCall', () => {
 
     beforeEach(() => {
       localStorage.clear()
+    })
+
+    describe('a device that does not start', () => {
+      it('is named in the panel with its reason, until it runs', async () => {
+        const { wrapper, room } = await opened()
+        wrapper.setData({ cameraEnabled: false })
+        room.localParticipant.setCameraEnabled.mockRejectedValueOnce(
+          deviceError('NotReadableError'),
+        )
+        await wrapper.vm.toggleCamera()
+        await wrapper.vm.$nextTick()
+        expect(wrapper.findComponent({ name: 'DeviceSettings' }).props('cameraIssue')).toBe('busy')
+        expect(wrapper.vm.deviceIssues.mic).toBe(null)
+
+        room.localParticipant.setCameraEnabled.mockResolvedValueOnce()
+        await wrapper.vm.toggleCamera()
+        await wrapper.vm.$nextTick()
+        expect(wrapper.findComponent({ name: 'DeviceSettings' }).props('cameraIssue')).toBe(null)
+      })
+
+      it('is named for a microphone missing at the join, which is joined without it', async () => {
+        const { Room } = await import('livekit-client')
+        Room.deviceErrors = { mic: deviceError('NotFoundError') }
+        try {
+          const { wrapper } = await connected({ micEnabled: true })
+          expect(wrapper.vm.phase).toBe('in-call')
+          expect(wrapper.vm.deviceIssues.mic).toBe('noDevice')
+        } finally {
+          Room.deviceErrors = {}
+        }
+      })
+
+      it('is started again by the retry of the panel, the others left as they are', async () => {
+        const { wrapper } = await opened()
+        wrapper.setData({
+          cameraEnabled: false,
+          micEnabled: false,
+          deviceIssues: { camera: null, mic: 'noDevice' },
+        })
+        const toggleMic = jest.spyOn(wrapper.vm, 'toggleMic').mockResolvedValue()
+        const toggleCamera = jest.spyOn(wrapper.vm, 'toggleCamera').mockResolvedValue()
+        wrapper.findComponent({ name: 'DeviceSettings' }).vm.$emit('retry')
+        await flushPromises()
+        expect(toggleMic).toHaveBeenCalledTimes(1)
+        expect(toggleCamera).not.toHaveBeenCalled()
+        expect(wrapper.vm.deviceIssues).toEqual({ camera: null, mic: null })
+      })
+
+      it('restarts a microphone that is on but was cut off', async () => {
+        const { wrapper } = await opened()
+        wrapper.setData({ micEnabled: true, deviceIssues: { camera: null, mic: 'generic' } })
+        const restartMic = jest.spyOn(wrapper.vm, 'restartMic').mockResolvedValue()
+        const toggleMic = jest.spyOn(wrapper.vm, 'toggleMic').mockResolvedValue()
+        await wrapper.vm.retryDevices()
+        expect(restartMic).toHaveBeenCalledTimes(1)
+        expect(toggleMic).not.toHaveBeenCalled()
+      })
+
+      it('is not one when a switch is refused: the device before it runs on', async () => {
+        const { wrapper, room } = await opened()
+        room.switchActiveDevice.mockRejectedValueOnce(deviceError('NotReadableError'))
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2', label: 'Webcam' })
+        expect(wrapper.vm.deviceIssues.camera).toBe(null)
+      })
+
+      it('is forgotten once another device is picked', async () => {
+        const { wrapper } = await opened()
+        wrapper.setData({ deviceIssues: { camera: 'busy', mic: null } })
+        await wrapper.vm.switchDevice({ kind: 'videoinput', deviceId: 'cam-2', label: 'Webcam' })
+        expect(wrapper.vm.deviceIssues.camera).toBe(null)
+      })
     })
 
     describe('the panel', () => {

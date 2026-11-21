@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Je apparaat is overbelast – de camera's draaien op lagere kwaliteit zodat het geluid helder blijft.",
     "cpuStrained": "Je apparaat kan de video's niet bijhouden. Een lagere kwaliteit houdt het geluid helder.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Een andere toepassing gebruikt het apparaat.",
+        "label": "In gebruik"
+      },
+      "denied": {
+        "hint": "De browser blokkeert de toegang.",
+        "label": "Geblokkeerd"
+      },
+      "generic": {
+        "hint": "Het apparaat start niet.",
+        "label": "Start niet"
+      },
+      "noDevice": {
+        "hint": "Geen apparaat gevonden — sluit er een aan.",
+        "label": "Niet gevonden"
+      }
+    },
     "deviceSettings": {
       "button": "Apparaten",
       "dtx": "Spreekpauzes niet verzenden",

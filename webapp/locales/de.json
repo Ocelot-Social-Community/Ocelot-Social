@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Dein Gerät ist ausgelastet – die Kameras laufen in geringerer Qualität, damit der Ton klar bleibt.",
     "cpuStrained": "Dein Gerät kommt mit den Videos nicht hinterher. Eine geringere Qualität hält den Ton klar.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Eine andere Anwendung benutzt das Gerät.",
+        "label": "Belegt"
+      },
+      "denied": {
+        "hint": "Der Browser blockiert den Zugriff.",
+        "label": "Blockiert"
+      },
+      "generic": {
+        "hint": "Das Gerät lässt sich nicht starten.",
+        "label": "Startet nicht"
+      },
+      "noDevice": {
+        "hint": "Kein Gerät gefunden – schließe eins an.",
+        "label": "Nicht gefunden"
+      }
+    },
     "deviceSettings": {
       "button": "Geräte",
       "dtx": "Sprechpausen nicht übertragen",

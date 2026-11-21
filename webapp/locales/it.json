@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Il tuo dispositivo è sovraccarico: le videocamere funzionano a qualità ridotta perché l'audio resti chiaro.",
     "cpuStrained": "Il tuo dispositivo fatica con i video. Una qualità più bassa mantiene l'audio chiaro.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Un'altra applicazione sta usando il dispositivo.",
+        "label": "In uso"
+      },
+      "denied": {
+        "hint": "Il browser blocca l'accesso.",
+        "label": "Bloccato"
+      },
+      "generic": {
+        "hint": "Il dispositivo non si avvia.",
+        "label": "Non si avvia"
+      },
+      "noDevice": {
+        "hint": "Nessun dispositivo trovato: collegane uno.",
+        "label": "Assente"
+      }
+    },
     "deviceSettings": {
       "button": "Dispositivi",
       "dtx": "Non trasmettere le pause nel parlato",

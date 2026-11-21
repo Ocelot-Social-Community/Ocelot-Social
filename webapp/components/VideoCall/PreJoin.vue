@@ -50,6 +50,8 @@
         :selected-speaker="selectedSpeaker"
         :camera-status="cameraStatus"
         :mic-status="micStatus"
+        :camera-issue="failed.video && failed.video.reason"
+        :mic-issue="failed.audio && failed.audio.reason"
         :meter-stream="meterStream"
         @camera-change="onCameraChange"
         @mic-change="onMicChange"
@@ -122,7 +124,7 @@ import { OsButton, OsIcon, OsSpinner } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import DeviceSelectors from './DeviceSelectors.vue'
-import { deviceErrorMessage } from './deviceError'
+import { deviceErrorMessage, deviceErrorReason } from './deviceError'
 import {
   findPreferredDevice,
   loadDevicePreferences,
@@ -395,7 +397,10 @@ export default {
     // Every device that does not start, for whatever reason, goes to off and says why.
     deviceFailed(kind, err) {
       this[kind === 'video' ? 'cameraActive' : 'micActive'] = false
-      this.failed[kind] = deviceErrorMessage(this.$t, kind === 'video' ? 'camera' : 'mic', err)
+      this.failed[kind] = {
+        message: deviceErrorMessage(this.$t, kind === 'video' ? 'camera' : 'mic', err),
+        reason: deviceErrorReason(err),
+      }
       this.showFailures()
     },
     clearFailure(kind) {
@@ -404,7 +409,10 @@ export default {
     },
     showFailures() {
       this.permissionError =
-        [this.failed.video, this.failed.audio].filter(Boolean).join(' ') || null
+        [this.failed.video, this.failed.audio]
+          .filter(Boolean)
+          .map((failure) => failure.message)
+          .join(' ') || null
     },
     async retry() {
       if (this.failed.video) this.cameraActive = true
@@ -606,6 +614,10 @@ export default {
         speakerDeviceId: (this.speakerSupported && this.selectedSpeaker) || null,
         cameraEnabled,
         micEnabled,
+        // A device that did not start here is switched off, so the call will not find out
+        // itself: it is told why, to say so in its device settings.
+        cameraIssue: (this.failed.video && this.failed.video.reason) || null,
+        micIssue: (this.failed.audio && this.failed.audio.reason) || null,
       }
       this.stopStream()
       this.$emit('join', payload)

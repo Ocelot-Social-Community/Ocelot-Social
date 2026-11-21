@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Pajisja juaj është e mbingarkuar — kamerat punojnë me cilësi më të ulët që zëri të mbetet i qartë.",
     "cpuStrained": "Pajisja juaj nuk po i përballon videot. Një cilësi më e ulët e mban zërin të qartë.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Një aplikacion tjetër po e përdor pajisjen.",
+        "label": "Në përdorim"
+      },
+      "denied": {
+        "hint": "Shfletuesi e bllokon aksesin.",
+        "label": "I bllokuar"
+      },
+      "generic": {
+        "hint": "Pajisja nuk niset.",
+        "label": "Nuk niset"
+      },
+      "noDevice": {
+        "hint": "Nuk u gjet asnjë pajisje — lidh një.",
+        "label": "Nuk u gjet"
+      }
+    },
     "deviceSettings": {
       "button": "Pajisjet",
       "dtx": "Mos i transmeto pauzat në të folur",

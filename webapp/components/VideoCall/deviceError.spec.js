@@ -1,4 +1,4 @@
-import { deviceErrorMessage } from './deviceError'
+import { deviceErrorMessage, deviceErrorReason } from './deviceError'
 
 const $t = (k) => k
 
@@ -30,5 +30,21 @@ describe('deviceErrorMessage', () => {
     expect(deviceErrorMessage($t, 'screen', null)).toBe(
       'videoCall.errors.screen.unavailable videoCall.errors.reason.generic',
     )
+  })
+})
+
+describe('deviceErrorReason', () => {
+  it.each([
+    ['NotAllowedError', 'denied'],
+    ['NotFoundError', 'noDevice'],
+    ['NotReadableError', 'busy'],
+    ['AbortError', 'busy'],
+    ['SomethingWeird', 'generic'],
+  ])('names %s as %s', (name, reason) => {
+    expect(deviceErrorReason({ name })).toBe(reason)
+  })
+
+  it('names no error at all as generic', () => {
+    expect(deviceErrorReason(undefined)).toBe('generic')
   })
 })

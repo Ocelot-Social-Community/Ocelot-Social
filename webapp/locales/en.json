@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Your device is struggling — the cameras run at a lower quality so the sound stays clear.",
     "cpuStrained": "Your device is struggling with the videos. A lower quality keeps the sound clear.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Another application is using the device.",
+        "label": "Busy"
+      },
+      "denied": {
+        "hint": "The browser blocks access.",
+        "label": "Blocked"
+      },
+      "generic": {
+        "hint": "The device does not start.",
+        "label": "Won't start"
+      },
+      "noDevice": {
+        "hint": "No device found — connect one.",
+        "label": "Not found"
+      }
+    },
     "deviceSettings": {
       "button": "Devices",
       "dtx": "Don't transmit pauses in speech",

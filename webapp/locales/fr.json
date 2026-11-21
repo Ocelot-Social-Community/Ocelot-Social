@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Votre appareil est surchargé — les caméras passent en qualité réduite pour que le son reste clair.",
     "cpuStrained": "Votre appareil peine à suivre les vidéos. Une qualité réduite garde le son clair.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Une autre application utilise l'appareil.",
+        "label": "En cours d'utilisation"
+      },
+      "denied": {
+        "hint": "Le navigateur bloque l'accès.",
+        "label": "Bloqué"
+      },
+      "generic": {
+        "hint": "L'appareil ne démarre pas.",
+        "label": "Ne démarre pas"
+      },
+      "noDevice": {
+        "hint": "Aucun appareil trouvé — branchez-en un.",
+        "label": "Introuvable"
+      }
+    },
     "deviceSettings": {
       "button": "Appareils",
       "dtx": "Ne pas transmettre les pauses de parole",

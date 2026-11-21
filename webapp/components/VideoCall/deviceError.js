@@ -10,6 +10,9 @@ const REASONS = {
   AbortError: 'busy',
 }
 
+// Why a device did not start, as one of the reasons above; `generic` for anything else.
+export const deviceErrorReason = (err) => REASONS[err && err.name] || 'generic'
+
 export const deviceErrorMessage = ($t, kind, err) => {
   const key = REASONS[err && err.name]
   if (!key && err) {

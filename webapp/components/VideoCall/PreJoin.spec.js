@@ -166,6 +166,25 @@ describe('PreJoin', () => {
       })
     })
 
+    it('tells the call why a device it switched off did not start', async () => {
+      const { wrapper } = mountWith()
+      wrapper.vm.deviceFailed('video', { name: 'NotReadableError' })
+      wrapper.vm.deviceFailed('audio', { name: 'NotFoundError' })
+      wrapper.vm.emitJoin()
+      expect(wrapper.emitted('join')[0][0]).toMatchObject({
+        cameraEnabled: false,
+        micEnabled: false,
+        cameraIssue: 'busy',
+        micIssue: 'noDevice',
+      })
+    })
+
+    it('tells the call of no issue while every device started', () => {
+      const { wrapper } = mountWith()
+      wrapper.vm.emitJoin()
+      expect(wrapper.emitted('join')[0][0]).toMatchObject({ cameraIssue: null, micIssue: null })
+    })
+
     it('treats prompt-status as enabled (Safari fallback)', async () => {
       const { wrapper } = mountWith()
       wrapper.setData({
@@ -1114,6 +1133,9 @@ describe('PreJoin', () => {
         await flushPromises()
         expect(wrapper.vm.permissionError).toBe(
           'videoCall.errors.camera.unavailable videoCall.errors.reason.busy',
+        )
+        expect(wrapper.find('[data-test="device-camera-issue"]').text()).toBe(
+          'videoCall.deviceIssue.busy.hint',
         )
       })
     })

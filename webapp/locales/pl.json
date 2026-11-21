@@ -1993,6 +1993,24 @@
     },
     "cpuRelief": "Twoje urządzenie jest przeciążone – kamery działają w niższej jakości, aby dźwięk pozostał wyraźny.",
     "cpuStrained": "Twoje urządzenie nie nadąża z obrazem. Niższa jakość utrzyma wyraźny dźwięk.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Inna aplikacja używa urządzenia.",
+        "label": "W użyciu"
+      },
+      "denied": {
+        "hint": "Przeglądarka blokuje dostęp.",
+        "label": "Zablokowane"
+      },
+      "generic": {
+        "hint": "Urządzenia nie można uruchomić.",
+        "label": "Nie uruchamia się"
+      },
+      "noDevice": {
+        "hint": "Nie znaleziono urządzenia — podłącz je.",
+        "label": "Nie znaleziono"
+      }
+    },
     "deviceSettings": {
       "button": "Urządzenia",
       "dtx": "Nie przesyłaj przerw w mowie",
