@@ -18,7 +18,7 @@ export const TEST_CONFIG = {
   DEBUG: undefined,
   TEST: true,
   PRODUCTION: false,
-  PRODUCTION_DB_CLEAN_ALLOW: false,
+  DB_WIPE_ALLOWED: false,
   DISABLED_MIDDLEWARES: [],
   SEND_MAIL: false,
   PROXY_S3: 'http://localhost:9000',
@@ -29,6 +29,10 @@ export const TEST_CONFIG = {
 
   MAPBOX_TOKEN:
     'pk.eyJ1IjoiYnVzZmFrdG9yIiwiYSI6ImNraDNiM3JxcDBhaWQydG1uczhpZWtpOW4ifQ.7TNRTO-o9aK1Y6MyW_Nd4g',
+  // The Mapbox stub where one runs: the suite's own (test/mapboxStubSetup.ts), or the compose
+  // test stack's for `db:seed`, which goes through this config too. Mapbox itself otherwise.
+  // eslint-disable-next-line n/no-process-env -- set by the global setup, not a CONFIG value
+  MAPBOX_API_URL: process.env.MAPBOX_API_URL ?? 'https://api.mapbox.com',
   JWT_SECRET: 'JWT_SECRET',
 
   NEO4J_URI: 'bolt://localhost:7687',
@@ -45,6 +49,7 @@ export const TEST_CONFIG = {
   LIVEKIT_URL: undefined,
   LIVEKIT_API_KEY: undefined,
   LIVEKIT_API_SECRET: undefined,
+  LIVEKIT_ROOM_PREFIX: '',
   LIVEKIT_ENABLED: false,
 
   AWS_ACCESS_KEY_ID: 'minio',

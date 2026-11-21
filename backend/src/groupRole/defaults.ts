@@ -54,6 +54,9 @@ const ADMIN_EXTRAS: GroupPermissionKey[] = [
   // Inviting someone who is not on the network yet is the stronger of the two invite
   // rights (it can lead to a registration), so it stays with admins in every visibility.
   'group.invite.external',
+  // Stepping into the moderation of a call somebody else started. Starting a call makes one
+  // its moderator without any right; this is what lets an admin take over or hand it back.
+  'group.videoCall.moderate',
 ]
 
 // An applicant sees that the group exists and can withdraw. Nothing else: `pending` is

@@ -135,6 +135,8 @@ export default [
             // the dock registry (components/Dock/modules.js) names each module's flag label
             '/^dock\\.[^.]+\\.flag$/',
             // enums: one key per value
+            // the fixed network roles (utils/networkRoles.js), looked up by role name
+            '/^networkRoles\\.(owner|user)$/',
             '/^notifications\\.reason\\./',
             '/^report\\.reason\\.category\\.options\\./',
             '/^settings\\.notifications\\./',
@@ -146,7 +148,7 @@ export default [
             '/^permissions\\.sections\\./',
             '/^profile\\.(groups|network)\\./',
             '/^map\\.legend\\.(event|group|theUser|user)$/',
-            '/^videoCall\\.(errors|prejoin\\.permission)\\./',
+            '/^videoCall\\.(errors|prejoin\\.permission|deviceSettings\\.quality)\\./',
             // one key per resource type (ContentMenu, ReportModal, ReportList)
             '/^(report|disable|release)\\.[^.]+\\.(title|message)$/',
             '/^(disable|release)\\.(submit|success|cancel)$/',
@@ -158,6 +160,7 @@ export default [
             '/^(admin|settings)\\.api-keys\\.revoke/',
             '/^admin\\.groupRoles\\.saved$/',
             '/^admin\\.roles\\.selfLockout\\./',
+            '/^admin\\.roles\\.grantRoleManage\\./',
             '/^admin\\.users\\.delete\\.(message|submit)$/',
             '/^components\\.registration\\.[^.]+\\.(title|buttonTitle)/',
             '/^delete\\.((comment|contribution)\\.(title|message)|cancel|submit)$/',
@@ -165,6 +168,7 @@ export default [
             '/^group\\.(invite-links|members)$/',
             '/^group\\.leaveModal\\./',
             '/^group\\.rights\\.(confirmApplyTemplate|confirmApplyTemplateDiscards|mootJoin|mootLeave)$/',
+            '/^group\\.rights\\.roleManageWarning\\./',
             '/^invite-codes\\.delete-modal\\./',
             '/^moderation\\.reports\\.decideModal\\.(cancel|submit)$/',
             '/^report\\.reason\\.category\\.invalid$/',

@@ -51,6 +51,31 @@ describe('AvatarMenu.vue', () => {
       expect(wrapper.find('.avatar-image').exists()).toBe(true)
     })
 
+    // The owner reads translated, like a group's owner; any other role keeps its title-cased name.
+    describe('the role under the name', () => {
+      const roleLine = (roleName) => {
+        getters['auth/user'] = () => ({ id: 'u343', name: 'Matt', roleName })
+        const menu = Wrapper()
+        menu.find('.avatar-menu-trigger').trigger('click')
+        return menu.find('.avatar-menu-popover p')
+      }
+
+      it('names the owner translated', async () => {
+        const line = roleLine('owner')
+        await line.vm?.$nextTick?.()
+
+        expect(line.text()).toBe('networkRoles.owner')
+      })
+
+      it('names another role by its title-cased name', () => {
+        expect(roleLine('moderator').text()).toBe('Moderator')
+      })
+
+      it('names nothing for the baseline user', () => {
+        expect(roleLine('user').exists()).toBe(false)
+      })
+    })
+
     describe('given a userName', () => {
       it('displays the userName', () => {
         expect(wrapper.find('b').text()).toEqual('Matt')

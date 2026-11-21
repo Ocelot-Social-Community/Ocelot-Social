@@ -144,9 +144,11 @@
                   :data-test="`user-role-select-${user.id}`"
                   @change="setRole(user, $event)"
                 >
-                  <option v-for="rn in roleOptionsFor(user)" :key="rn" :value="rn">{{ rn }}</option>
+                  <option v-for="rn in roleOptionsFor(user)" :key="rn" :value="rn">
+                    {{ networkRoleLabel(rn) }}
+                  </option>
                 </select>
-                <span v-else class="ds-text">{{ user.roleName }}</span>
+                <span v-else class="ds-text">{{ networkRoleLabel(user.roleName) }}</span>
               </td>
               <td
                 v-if="$policy.get('badgesEnabled') && canManageBadges"
@@ -225,6 +227,7 @@ import PaginationButtons from '~/components/_new/generic/PaginationButtons/Pagin
 import { adminUserQuery, deleteUserMutation, disableUserMutation } from '~/graphql/User'
 import { rolesQuery, setUserRoleMutation } from '~/graphql/admin/Roles'
 import formValidation from '~/mixins/formValidation'
+import networkRoleLabel from '~/mixins/networkRoleLabel'
 import OcelotInput from '~/components/OcelotInput/OcelotInput.vue'
 
 // Shared user-administration list, used by both the admin area (/admin/users) and the
@@ -249,7 +252,7 @@ const SEARCH_PERMISSIONS = ['role.manage', 'badge.manage', 'user.delete.any', 'u
 const COMMENTS_COUNT_PERMISSIONS = ['user.delete.any', 'user.disable', 'badge.manage']
 
 export default {
-  mixins: [formValidation],
+  mixins: [formValidation, networkRoleLabel],
   components: {
     ConfirmModal,
     OsButton,

@@ -332,3 +332,31 @@ describe('buildEmailBrandingCss', () => {
     }
   })
 })
+
+test('resolveTokens drops a token whose light-dark() cannot be read, instead of storing a half-rewritten value', () => {
+  const resolved = resolveTokens({
+    ok: 'light-dark(red, blue)',
+    broken: 'light-dark(red, blue) light-dark(#fff)',
+  })
+  assert.equal(resolved.ok, 'red')
+  assert.equal(Object.hasOwn(resolved, 'broken'), false)
+})
+
+test('resolveTokens drops a token whose light-dark() is not two non-empty arguments', () => {
+  assert.equal(
+    Object.hasOwn(resolveTokens({ 'text-color-base': 'light-dark(, blue)' }), 'text-color-base'),
+    false,
+  )
+})
+
+test('resolveTokens leaves light-dark( inside a quoted string alone', () => {
+  assert.equal(
+    resolveTokens({ 'font-family-text': `'light-dark(', sans-serif` })['font-family-text'],
+    `'light-dark(', sans-serif`,
+  )
+})
+
+test('resolveTokens flattens a light-dark() token to its light value, references inside it too', () => {
+  const out = resolveTokens({ a: 'rgb(1, 2, 3)', b: 'light-dark(var(--a), rgb(9, 9, 9))' })
+  assert.equal(out.b, 'rgb(1, 2, 3)')
+})

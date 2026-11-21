@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Shfaq filtrin e përmbajtjes në rrjetën masonry (lajme).",
         "showGroupButtonInHeader": "Shfaq butonin e grupeve në krye.",
         "socialMediaEnabled": "Aktivizon funksionin e lidhjeve të mediave sociale: lidhjet shfaqen në profile dhe menaxhohen te cilësimet e përdoruesit.",
+        "videoCallDtx": "Parazgjedhja për telefonatat me video: për sa kohë dikush hesht, mikrofoni i tij nuk dërgon pothuajse asnjë të dhënë. Kursen gjerësinë e brezit, por mund t’i bëjë pjesëmarrës të veçantë të padëgjueshëm për dëgjues të veçantë. Çdo përdorues mund ta ndryshojë për mikrofonin e vet te cilësimet e pajisjeve të një telefonate.",
         "videoConference": "Aktivizon videokonferencën (LiveKit). Çelësi në kohën e ekzekutimit për lejet e telefonatave me video. Kërkon variablat e mjedisit të LiveKit; pa to mbetet i fikur dhe i zbehur."
       },
       "envLink": "Shiko mjedisin",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Filtri i përmbajtjes në rrjetë",
         "showGroupButtonInHeader": "Butoni i grupeve në krye",
         "socialMediaEnabled": "Media sociale",
+        "videoCallDtx": "Shtypja e heshtjes në telefonata",
         "videoConference": "Videokonferencë"
       },
       "lastUpdated": "Ndryshuar së fundi: {timestamp} nga {actor}",
@@ -327,10 +329,15 @@
       "deleteError": "Roli nuk u fshi dot: {message}",
       "deleteSuccess": "Roli u fshi.",
       "description": "Kush mund të bëjë çfarë në të gjithë rrjetin. Krijo role dhe cakto të drejta — ndryshimet veprojnë menjëherë.",
+      "discard": "Hidhi",
+      "grantRoleManage": {
+        "confirm": "Jepe gjithsesi",
+        "message": "<strong>{role}</strong> merr „menaxho rolet“: kush e ka rolin mund të formësojë lirisht çdo rol përveç owner, t’u heqë të drejta edhe roleve më të larta, dhe pastaj t’u ndryshojë rolin, t’i bllokojë ose t’i fshijë mbajtësit e tyre. Llogaritë dhe përmbajtjet e fshira nuk i rikthen dot as një owner. Jepjani rolin vetëm personave të cilëve do t’u besonit kompetenca administratori.",
+        "title": "Të jepet „menaxho rolet“?"
+      },
       "members": "{count} anëtarë",
       "name": "Rolet dhe të drejtat",
       "nameLabel": "Emri",
-      "notEditableHint": "Mund të ndryshosh vetëm rolin tënd dhe rolet me më pak autoritet se yti.",
       "perm": {
         "apiKey_administer": "Administro çelësat API të përdoruesve të tjerë.",
         "apiKey_create": "Krijo çelësa API personalë.",
@@ -364,7 +371,6 @@
         "videoCall_create_open": "Nis një thirrje video në një grup ku kushdo mund të hyjë — që gjendet lehtë dhe pranon anëtarë pa miratim.",
         "videoCall_create_restricted": "Nis një thirrje video në një grup ku nuk hyn kushdo: bashkimi kërkon miratim ose ftesë, ose grupi është i fshehur."
       },
-      "permNotHeld": "Nuk e ke vetë këtë të drejtë, ndaj nuk mund ta japësh.",
       "permUnavailable": "Funksioni nuk është konfiguruar — dhënia e kësaj të drejte nuk ka efekt.",
       "permUnavailableLink": "Shiko konfigurimin",
       "protected": "i mbrojtur",
@@ -468,6 +474,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "Përshkrimi duhet të ketë të paktën {min} karaktere.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "Një grup që të jashtmit nuk mund ta gjejnë, nuk mund t'u tregojë as anëtarët e tij.",
+    "GROUP_SAVE_NAME_TOO_LONG": "Emri i grupit duhet të ketë jo më shumë se {max} karaktere.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "Emri i grupit duhet të ketë të paktën {min} karaktere.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "Ky emër unik i grupit është i zënë tashmë.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Janë zgjedhur shumë pak tema (të paktën {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Janë zgjedhur shumë tema (më së shumti {max}).",
@@ -510,6 +518,7 @@
     "POST_PIN_LIMIT_REACHED": "Është arritur numri maksimal i postimeve të ngulura. Hiq fillimisht një postim tjetër të ngulur.",
     "POST_SAVE_CATEGORY_UNKNOWN": "Të paktën një nga temat nuk ekziston.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "Ekziston tashmë një postim me këtë slug.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "Titulli i postimit duhet të ketë midis {min} dhe {max} karaktere.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Janë zgjedhur shumë pak tema (të paktën {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Janë zgjedhur shumë tema (më së shumti {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "Kodi i konfirmimit është i pavlefshëm.",
@@ -522,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "Nuk mund të japësh një rol me të drejta që nuk i ke vetë.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Vetëm një pronar mund ta japë ose ta ndryshojë rolin e pronarit.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "Mund të ndryshosh rolin vetëm të përdoruesve, roli i të cilëve ka më pak autoritet se yti.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "Mund të ndryshosh vetëm rolin tënd ose role me më pak autoritet se yti.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "Roli „{name}“ është ende i caktuar për {count} përdorues dhe nuk mund të fshihet.",
     "ROLE_DELETE_SYSTEM_ROLE": "Roli „{name}“ është rol sistemi dhe nuk mund të fshihet.",
     "ROLE_DOES_NOT_EXIST": "Roli „{name}“ nuk ekziston.",
@@ -530,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "Roli „{name}“ është rol sistemi dhe nuk mund të riemërtohet.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "Roli „{name}“ ekziston tashmë.",
     "ROLE_SAVE_NAME_INVALID": "Emri i rolit duhet të ketë 2 deri në 50 karaktere dhe mund të përmbajë vetëm shkronja, shifra, „_“ dhe „-“; karakteri i parë duhet të jetë shkronjë ose shifër.",
-    "ROLE_SAVE_NOT_COVERED": "Një rol mund të përmbajë vetëm të drejta që i ke vetë.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "Një rol nuk mund të krijohet ose të shënohet si i mbrojtur.",
-    "ROLE_SAVE_WOULD_OUTRANK": "Roli yt nuk mund të ngrihet mbi një rol që sot nuk e tejkalon.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "Këtë mund ta bësh vetëm me përdorues, roli i të cilëve jep më pak autoritet se yti.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "Nuk mund të kërkosh në administrimin e përdoruesve.",
     "USER_DOES_NOT_EXIST": "Përdoruesi nuk u gjet.",
@@ -544,6 +550,12 @@
     "USER_UNBLOCK_USER_NOT_BLOCKED": "Ky përdorues nuk është i bllokuar.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "Biseda e një telefonate me video është e hapur vetëm për pjesëmarrësit e saj. Bashkohu fillimisht në telefonatë.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "Për telefonatën me video nuk u gjet asnjë anëtarësim aktiv në këtë grup.",
+    "VIDEO_CALL_MODERATION_NOT_IN_CALL": "Vetëm pjesëmarrësit e video-thirrjes mund ta moderojnë.",
+    "VIDEO_CALL_MODERATION_NOT_MODERATOR": "Këtë mund ta bëjë vetëm moderimi i video-thirrjes.",
+    "VIDEO_CALL_MODERATION_OUTRANKED": "Roli yt në grup nuk është mjaft i lartë për këtë.",
+    "VIDEO_CALL_MODERATION_OWNER": "Pronari i grupit nuk mund të hiqet nga video-thirrja e tij.",
+    "VIDEO_CALL_MODERATION_PARTICIPANT_NOT_IN_CALL": "Ky person nuk është në video-thirrje.",
+    "VIDEO_CALL_REMOVED_FROM_CALL": "U hoqe nga kjo video-thirrje. Në tjetrën mund të marrësh pjesë.",
     "VIDEO_CALL_START_NOT_PERMITTED": "Nuk mund të nisësh një telefonatë me video në këtë grup."
   },
   "chat": {
@@ -892,7 +904,11 @@
         "participant": "Të përfshirë në postim"
       }
     },
-    "placeholder": "Lër mendimet tuaja frymëzuese …"
+    "placeholder": "Lër mendimet tuaja frymëzuese …",
+    "unfinished": {
+      "hashtag": "Nuk është zgjedhur asnjë hashtag: kështu hashtagu nuk lidhet. Zgjidhe nga lista.",
+      "mention": "Nuk është zgjedhur asnjë përdorues: kështu askush nuk njoftohet. Zgjidh emrin nga lista."
+    }
   },
   "error-pages": {
     "403-default": "Nuk je i autorizuar për këtë faqe!",
@@ -969,7 +985,7 @@
     },
     "actionRadius": "Rrezja e veprimit të grupit",
     "addMember": "Shto anëtar",
-    "addMemberToGroupSuccess": "„{name}“ u shtua në grup me rolin „{role}“!",
+    "addMemberToGroupSuccess": "„<b>{name}</b>“ (<b>@{slug}</b>) u shtua në grup me rolin „<b>{role}</b>“!",
     "addUser": "Shto përdorues",
     "addUserNoOptions": "Nuk u gjetën përdorues!",
     "addUserPlaceholder": "Emri i përdoruesit",
@@ -1052,7 +1068,7 @@
       "title": "A dëshiron vërtet të largohesh nga grupi?"
     },
     "memberOutranked": "Nuk mund ta ndryshosh rolin e kësaj personi — ka të paktën aq sa ti.",
-    "memberRemoved": "Përdoruesi „{name}“ u hoq nga grupi!",
+    "memberRemoved": "Përdoruesi „<b>{name}</b>“ (<b>@{slug}</b>) u hoq nga grupi!",
     "members": "Anëtarët",
     "membersAdministrationList": {
       "avatar": "Avatari",
@@ -1120,9 +1136,17 @@
         "group_role_manage": "Redakto rolet e grupit dhe të drejtat e tyre.",
         "group_settings_manage": "Ndrysho cilësimet e grupit: emrin, përshkrimin, imazhin, vendndodhjen dhe kategoritë.",
         "group_videoCall_create": "Nis një thirrje video në grup.",
-        "group_videoCall_join": "Merr pjesë në një thirrje video që po zhvillohet në grup."
+        "group_videoCall_join": "Merr pjesë në një thirrje video që po zhvillohet në grup.",
+        "group_videoCall_moderate": "Të marrë moderimin e një video-thirrjeje të grupit."
       },
       "resultingType": "Me këto leje grupi është:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> do të mund t’i redaktojë rolet e grupit: kush e ka këtë rol mund të formësojë çdo rol përveç atij të pronarit, t’u heqë të drejta roleve të tjera dhe të ndryshojë atë që shohin jo-anëtarët. Jepjani rolin vetëm anëtarëve të cilëve do t’u besonit menaxhimin e grupit. <strong>{own}</strong>, roli juaj, nuk do të mund t’i redaktojë më rolet e grupit. Këtë mund ta zhbëjë vetëm një pronar.",
+        "confirm": "Ruaje gjithsesi",
+        "grant": "<strong>{roles}</strong> do të mund t’i redaktojë rolet e grupit: kush e ka këtë rol mund të formësojë çdo rol përveç atij të pronarit, t’u heqë të drejta roleve të tjera dhe të ndryshojë atë që shohin jo-anëtarët. Jepjani rolin vetëm anëtarëve të cilëve do t’u besonit menaxhimin e grupit.",
+        "lockout": "<strong>{own}</strong>, roli juaj, nuk do të mund t’i redaktojë më rolet e grupit. Këtë mund ta zhbëjë vetëm një pronar.",
+        "title": "Të ndryshohet kush i menaxhon rolet?"
+      },
       "saved": "Lejet u ruajtën",
       "saveFirst": "Fillimisht ruaj ose hidh poshtë — ka ndryshime të paruajtura.",
       "simple": {
@@ -1312,6 +1336,7 @@
     "pageTitle": "Harta",
     "styles": {
       "dark": "E errët",
+      "navigation-night": "Natë",
       "outdoors": "Jashtë",
       "satellite": "Satelit",
       "streets": "Rrugë",
@@ -1391,6 +1416,10 @@
     "users": {
       "name": "Përdoruesit"
     }
+  },
+  "networkRoles": {
+    "owner": "Pronar",
+    "user": "Përdorues"
   },
   "notifications": {
     "comment": "Koment",
@@ -1915,6 +1944,11 @@
     "termsAndConditionsNewConfirm": "Kam lexuar dhe pranoj kushtet dhe rregullat e reja.",
     "termsAndConditionsNewConfirmText": "Ju lutem lexoni tani kushtet e reja të përdorimit!"
   },
+  "themeSwitch": {
+    "dark": "Tema: e errët",
+    "light": "Tema: e çelët",
+    "system": "Tema: si sistemi"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Hap profilin",
@@ -1928,9 +1962,13 @@
     "chatTabs": {
       "call": "Telefonata",
       "callHint": "E dukshme vetëm për pjesëmarrësit e kësaj telefonate me video (pa njoftime)",
+      "callTitle": "Biseda e thirrjes",
       "group": "Grupi",
       "groupHint": "E dukshme për të gjithë anëtarët e grupit (me njoftime)",
-      "label": "Zgjidh bisedën"
+      "groupTitle": "Biseda e grupit",
+      "label": "Zgjidh bisedën",
+      "participants": "Pjesëmarrësit",
+      "participantsHint": "Kush është në thirrje dhe çfarë mund të bëhet"
     },
     "closeChat": "Mbylle bisedën",
     "connecting": "Po lidhet…",
@@ -1941,6 +1979,7 @@
       "chat": "Bisedë",
       "leave": "Largohu",
       "microphone": "Mikrofoni",
+      "participants": "Pjesëmarrësit",
       "screen": "Ekrani",
       "startSharing": "Ndaj ekranin, një dritare ose një skedë",
       "stopSharing": "{surface}: ndalo ndarjen",
@@ -1952,12 +1991,27 @@
       "turnOff": "{device}: fik",
       "turnOn": "{device}: ndiz"
     },
+    "cpuRelief": "Pajisja juaj është e mbingarkuar — kamerat punojnë me cilësi më të ulët që zëri të mbetet i qartë.",
+    "cpuStrained": "Pajisja juaj nuk po i përballon videot. Një cilësi më e ulët e mban zërin të qartë.",
     "deviceSettings": {
       "button": "Pajisjet",
+      "dtx": "Mos i transmeto pauzat në të folur",
+      "dtxFailed": "Cilësimi i pauzave në të folur nuk mund të ndryshohej – mikrofoni yt vazhdon si më parë.",
+      "dtxHint": "Kursen të dhëna për sa kohë hesht. Nëse të tjerët ndonjëherë nuk të dëgjojnë, fike.",
+      "quality": {
+        "audio": "Pa kamera (ndarjet e ekranit mbeten)",
+        "auto": "Automatike",
+        "high": "E lartë",
+        "low": "E ulët",
+        "medium": "Mesatare"
+      },
+      "receiveQuality": "Cilësia e videove që marr",
+      "sendQuality": "Cilësia e videos sime",
       "speakerError": "Altoparlanti nuk mund të ndërrohej.",
       "title": "Cilësimet e pajisjeve"
     },
     "dialogLabel": "Telefonatë me video në grup",
+    "dismissNotice": "Fshih",
     "enableAudio": "Aktivizo zërin",
     "enterFullscreen": "Ekran i plotë",
     "errorBackToPrejoin": "Ndrysho cilësimet",
@@ -1983,16 +2037,102 @@
     "gotoGroup": "Shko te grupi „{name}“",
     "groupVideoCallButton": {
       "label": "Video grupi",
+      "removed": "U hoqe nga kjo thirrje",
       "tooltip": "Telefonatë me video në grupin „{name}“"
     },
+    "handover": {
+      "confirm": "Kaloje dhe largohu",
+      "skip": "Largohu pa zgjedhur",
+      "suggestedName": "{name} (propozim)",
+      "text": "Je i fundit që moderon këtë thirrje. Kaloje moderimin para se të largohesh.",
+      "title": "Kush moderon tani e tutje?"
+    },
     "hideBars": "Fshih shiritat",
+    "hideNotices": "Fshih njoftimet",
     "leave": "Largohu nga telefonata",
+    "lowerQuality": "Ul cilësinë",
     "maximize": "Maksimizo",
     "micMuted": "Mikrofoni fikur",
     "micNoSignal": "Mikrofoni juaj nuk po jep zë — të tjerët nuk ju dëgjojnë.",
     "micUnmuted": "Mikrofoni ndezur",
     "minimize": "Minimizo",
+    "moderation": {
+      "cameraOff": "{name} të fiku kamerën.",
+      "everyone": "{name} i lejon tani të gjithë ta moderojnë thirrjen.",
+      "everyoneOff": "{name} e përfundoi moderimin nga të gjithë.",
+      "floor": "{name} të dha fjalën.",
+      "floorMicOff": "{name} të dha fjalën. Ndize mikrofonin që të dëgjohesh.",
+      "microphoneMuted": "{name} të heshti mikrofonin.",
+      "moderatorAppointed": "{name} të bëri moderator të kësaj thirrjeje.",
+      "moderatorAutomatic": "Tani e moderon ti këtë thirrje.",
+      "moderatorHandedOver": "{name} të kaloi moderimin e kësaj thirrjeje.",
+      "removed": "{name} të hoqi nga thirrja.",
+      "removedPlain": "U hoqe nga thirrja.",
+      "revoked": "{name} të hoqi moderimin.",
+      "screenShareStopped": "{name} të përfundoi ndarjen e ekranit.",
+      "switchMicOn": "Ndiz mikrofonin",
+      "takenOver": "{name} mori moderimin."
+    },
     "openChat": "Hap bisedën",
+    "participants": {
+      "actionsFor": "Veprime për {name}",
+      "cameraOff": "kamera fikur",
+      "cameraOffAction": "Fik kamerën",
+      "cameraOn": "kamera ndezur",
+      "cameraOnAction": "Ndiz kamerën",
+      "close": "Fshih pjesëmarrësit",
+      "countWithDevices": "Pjesëmarrësit: {people} · Pajisjet: {devices}",
+      "devices": "{count} pajisje",
+      "everyoneModerates": "Të gjithë moderojnë",
+      "filter": "Filtro pjesëmarrësit",
+      "filterBy": "Filtro sipas",
+      "filterChip": {
+        "cameraOn": "Kamera ndezur",
+        "floor": "Ka fjalën",
+        "micOn": "Mikrofoni ndezur",
+        "moderator": "Moderimi",
+        "mutedForMe": "I heshtur për mua",
+        "sharing": "Ndan ekranin",
+        "speaking": "Po flet tani"
+      },
+      "filterChipRemove": "Hiq „{name}“",
+      "filterCount": "{shown} nga {total}",
+      "filterName": "Filtro sipas emrit",
+      "filterNameClear": "Pastro emrin",
+      "filterNamePlaceholder": "Filtro emrat",
+      "filterNone": "Askush nuk përputhet me filtrin.",
+      "filterReset": "Rivendos filtrin",
+      "giveFloor": "Jepi fjalën",
+      "hasFloor": "Ka fjalën",
+      "label": "Pjesëmarrësit e thirrjes",
+      "leadModerator": "Moderimi kryesor",
+      "makeModerator": "Bëje moderator",
+      "micOff": "mikrofoni fikur",
+      "micOn": "mikrofoni ndezur",
+      "micOnAction": "Ndiz mikrofonin",
+      "moderator": "Moderimi",
+      "muteAll": "Hesht të gjithë",
+      "muteCount": "Hesht {count}",
+      "muteForMe": "Hesht për mua",
+      "muteMicrophone": "Hesht mikrofonin",
+      "muteName": "Hesht {name}",
+      "muteWhom": "Kë të heshtësh?",
+      "open": "Shfaq pjesëmarrësit",
+      "openProfile": "Hap profilin",
+      "remove": "Hiq",
+      "removeEllipsis": "Hiq nga thirrja …",
+      "removeExplanation": "Nuk mund të rikthehet sa të zgjasë kjo thirrje. Në tjetrën po.",
+      "removeQuestion": "Ta heqësh {name} nga thirrja?",
+      "resign": "Hiq dorë nga moderimi",
+      "revokeModerator": "Hiqi moderimin",
+      "sharing": "ndan ekranin",
+      "showLarge": "Shfaq të madh",
+      "speaking": "po flet",
+      "stopSharing": "Përfundo ndarjen e ekranit",
+      "takeFloor": "Hiqja fjalën",
+      "takeOver": "Merr moderimin",
+      "unmuteForMe": "Dëgjo sërish"
+    },
     "prejoin": {
       "camera": "Kamera",
       "cameraDisabled": "Kamera është e fikur.",
@@ -2030,12 +2170,25 @@
       "unnamedSpeaker": "Altoparlanti",
       "unsupportedBrowser": "Shfletuesi yt nuk mbështet audio/video."
     },
+    "qualityLimit": {
+      "cameraHidden": "Kamera e fshehur",
+      "ownBandwidth": "Videoja jote dërgohet me cilësi më të ulët: lidhja jote nuk lejon më shumë.",
+      "ownChoice": "Videoja jote dërgohet me cilësi më të ulët, siç zgjodhe te cilësimet e pajisjeve.",
+      "ownCpu": "Videoja jote dërgohet me cilësi më të ulët: pajisja jote është e mbingarkuar.",
+      "remoteChoice": "Videoja e {name} vjen me cilësi më të ulët, siç zgjodhe te cilësimet e pajisjeve.",
+      "remoteCpu": "Videoja e {name} vjen me cilësi më të ulët: pajisja jote është e mbingarkuar.",
+      "remoteHiddenBandwidth": "Kamera e {name} është e fshehur: lidhja jote është shumë e dobët.",
+      "remoteHiddenChoice": "Kamera e {name} është e fshehur, siç e zgjodhe te cilësimet e pajisjeve."
+    },
     "reconnecting": "Lidhja u humb — po rilidhet…",
     "reloadPending": "Platforma ka një dizajn të ri. Do të zbatohet sapo të largoheni nga thirrja.",
+    "resizeSidebar": "Ndrysho madhësinë e shiritit anësor",
     "restartMic": "Rinis mikrofonin",
+    "restoreQuality": "Rikthe cilësinë",
     "screenShare": "Ekrani",
     "screenShareEnded": "Ndarja e ekranit përfundoi",
     "showBars": "Shfaq shiritat",
+    "showNotices": "Shfaq njoftimet",
     "showVideos": "Shfaq videot",
     "spotlightExit": "Dil nga spotlight",
     "title": "Telefonatë me video në grup",

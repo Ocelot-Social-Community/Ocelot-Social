@@ -58,6 +58,6 @@ export default {
 
 .logo-svg {
   height: auto;
-  fill: #000000;
+  fill: var(--color-logo);
 }
 </style>

@@ -1,4 +1,4 @@
-import { dominatesInNetwork } from '@src/role'
+import { effectiveRoleName, outranksInNetwork } from '@src/role'
 
 import type { Context } from '@src/context'
 
@@ -21,8 +21,15 @@ export const roleNameOfUser = async (context: Context, userId: string): Promise<
   return result.records[0].get('roleName') as string
 }
 
-export const viewerOutranksUser = async (context: Context, userId: string): Promise<boolean> =>
-  dominatesInNetwork(
-    context.effectivePermissions,
-    context.role.permissionsForRole(await roleNameOfUser(context, userId)),
+/** Whether the viewer outranks a holder of this role (outranksInNetwork). */
+export const viewerOutranksRole = (context: Context, roleName: string): boolean =>
+  outranksInNetwork(
+    {
+      permissions: context.effectivePermissions,
+      roleName: effectiveRoleName(context.user ?? {}),
+    },
+    { permissions: context.role.permissionsForRole(roleName), roleName },
   )
+
+export const viewerOutranksUser = async (context: Context, userId: string): Promise<boolean> =>
+  viewerOutranksRole(context, await roleNameOfUser(context, userId))

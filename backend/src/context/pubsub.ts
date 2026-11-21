@@ -17,7 +17,7 @@ let instance: PubSub | RedisPubSub | undefined
 
 // Far above what a publish takes, even from a pod under CPU pressure: running into it loses a live
 // event, while it only ever costs time when Redis is gone anyway.
-const PUBLISH_TIMEOUT_MS = 2_000
+export const PUBLISH_TIMEOUT_MS = 2_000
 
 // An event crosses Redis as JSON, while the in-process PubSub hands on the object itself. A Neo4j
 // integer does not survive that: it arrives as `{ low, high }`, which no Int field can serialize.

@@ -10,9 +10,9 @@
 //   • Peers (equal sets) — neither dominates → blocked. A holder of a right can
 //     never use it on another holder of the same authority.
 //   • Higher target (holds something the actor lacks) → blocked.
-//   • `owner` resolves to the full catalog, so owner ⊋ every non-owner (owner can
-//     act on anyone) and owner ⊀ owner (two owners can't act on each other — remove
-//     an owner via demote-first, the owner-only setUserRole path).
+//   • The network's `owner` is not ranked here but by name (role/authority.ts
+//     outranksInNetwork): above every non-owner, a peer of other owners. Its full
+//     catalog does not decide that — a custom role can hold the full catalog too.
 //   • Incomparable custom roles (disjoint extras) → neither dominates → blocked.
 //     For delete/disable, erring safe beats deciding by raw permission count.
 //

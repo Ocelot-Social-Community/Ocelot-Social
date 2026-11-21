@@ -51,6 +51,18 @@ describe('osRibbon', () => {
       expect(wrapper.classes()).toContain('os-ribbon--pinned')
     })
 
+    it('keeps the class names of the webapp Ribbon it replaced, for brand stylesheets', () => {
+      const plain = mount(OsRibbon, { props: { text: 'Article' } })
+      const event = mount(OsRibbon, { props: { text: 'Event', type: 'Event' } })
+      const pinned = mount(OsRibbon, { props: { text: 'Article', pinned: true } })
+
+      expect(plain.classes()).toContain('ribbon')
+      expect(plain.classes()).not.toContain('eventBg')
+      expect(plain.classes()).not.toContain('--pinned')
+      expect(event.classes()).toContain('eventBg')
+      expect(pinned.classes()).toContain('--pinned')
+    })
+
     it('applies both modifier classes when an event is pinned', () => {
       const wrapper = mount(OsRibbon, { props: { text: 'Event', type: 'Event', pinned: true } })
 

@@ -7,7 +7,7 @@ import { beforeAll, afterAll, beforeEach, afterEach, describe, it, expect } from
 import Factory, { cleanDatabase } from '@db/factories'
 import queryLocations from '@graphql/queries/queryLocations.gql'
 import UpdateUser from '@graphql/queries/users/UpdateUser.gql'
-import { createApolloTestSetup } from '@root/test/helpers'
+import { createApolloTestSetup, TEST_CONFIG } from '@root/test/helpers'
 
 import {
   attachLocationFeature,
@@ -174,8 +174,8 @@ beforeEach(() => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     const path = decodeURIComponent(url)
 
-    // Mapbox requests
-    if (path.includes('api.mapbox.com')) {
+    // Mapbox requests, wherever MAPBOX_API_URL points
+    if (path.includes('/geocoding/v5/mapbox.places/')) {
       if (path.includes('Berlin')) {
         if (path.includes('language=de')) {
           return Promise.resolve(mockJsonResponse(berlinMapboxDe))
@@ -215,6 +215,8 @@ describe('Location Service', () => {
     const calledUrl = fetchSpy.mock.calls[0][0] as string
 
     expect(calledUrl).toContain(`proximity=${encodeURIComponent(variables.proximity as string)}`)
+    // Where the search goes is MAPBOX_API_URL's, as for the lookups further down.
+    expect(new URL(calledUrl).origin).toBe(new URL(TEST_CONFIG.MAPBOX_API_URL).origin)
   })
 
   it('encodes place names with umlauts exactly once in the Mapbox URL', async () => {
@@ -501,7 +503,10 @@ describe('Location Service', () => {
 // arrive at the same four lines. The coordinate variant has no GraphQL entry point of its own at
 // all: it is reached only from the event-location branch of CreatePost/UpdatePost.
 describe(createOrUpdateLocations, () => {
-  const locationContext = () => ({ config: { MAPBOX_TOKEN: 'test-token' } }) as unknown as Context
+  const locationContext = () =>
+    ({
+      config: { MAPBOX_TOKEN: 'test-token', MAPBOX_API_URL: 'https://geocoder.example' },
+    }) as unknown as Context
 
   const withSession = async (work: (session: Session) => Promise<unknown>): Promise<void> => {
     const session = database.driver.session()
@@ -573,6 +578,28 @@ describe(createOrUpdateLocations, () => {
     )
 
     expect(requestedTypes).toEqual(['address', 'poi', 'place'])
+  })
+
+  // Tests point MAPBOX_API_URL at a stand-in so that they bill no Mapbox account; a lookup that
+  // still named Mapbox's host itself would quietly go back to doing so.
+  it('sends every lookup to MAPBOX_API_URL', async () => {
+    respondWith({ features: [] })
+
+    // Both refuse the empty answer — what matters here is only where they asked.
+    await withSession(async (session) => {
+      await expect(
+        createOrUpdateLocations('Post', 'event-post', 'somewhere', session, locationContext(), {
+          lat: 0,
+          lng: 0,
+        }),
+      ).rejects.toThrow()
+      await expect(attachByName(session, 'User', 'located-user', 'Absurdistan')).rejects.toThrow()
+    })
+
+    const origins = fetchSpy.mock.calls.map(([input]) => new URL(input as string).origin)
+
+    expect(origins).toHaveLength(4)
+    expect(new Set(origins)).toEqual(new Set(['https://geocoder.example']))
   })
 
   // The forward-geocoding counterpart: free text Mapbox knows nothing about. Accepting it would
@@ -681,7 +708,10 @@ describe(createOrUpdateLocations, () => {
 })
 
 describe('a location picked by its Mapbox id', () => {
-  const locationContext = () => ({ config: { MAPBOX_TOKEN: 'test-token' } }) as unknown as Context
+  const locationContext = () =>
+    ({
+      config: { MAPBOX_TOKEN: 'test-token', MAPBOX_API_URL: 'https://geocoder.example' },
+    }) as unknown as Context
   const groupTypes = ['neighborhood', 'locality', 'place', 'region', 'country']
   const friesackCentre = { lat: 52.742332, lng: 12.579309 }
 
@@ -1002,7 +1032,10 @@ describe('userMiddleware', () => {
 // The one path for every location a user picked (profile, group, registration): resolved before
 // anything is written, attached after.
 describe(resolveLocationInput, () => {
-  const locationContext = () => ({ config: { MAPBOX_TOKEN: 'test-token' } }) as unknown as Context
+  const locationContext = () =>
+    ({
+      config: { MAPBOX_TOKEN: 'test-token', MAPBOX_API_URL: 'https://geocoder.example' },
+    }) as unknown as Context
   const TYPES = ['place', 'region', 'country']
 
   const withSession = async (work: (session: Session) => Promise<unknown>): Promise<void> => {

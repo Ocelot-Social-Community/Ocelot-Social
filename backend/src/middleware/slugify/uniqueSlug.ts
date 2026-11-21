@@ -6,7 +6,6 @@ import slugify from 'slugify'
 // CJS module by static analysis. It cannot see `extend`, so `import { extend }` type-checks and
 // then throws at load: "does not provide an export named 'extend'". The default import is the
 // whole module.exports and always has it.
-// eslint-disable-next-line import-x/no-named-as-default-member -- see above: no named export exists at runtime
 slugify.extend({ Ä: 'AE', ä: 'ae', Ö: 'OE', ö: 'oe', Ü: 'UE', ü: 'ue', ß: 'ss' })
 
 // The single slug builder: the User/Group/Post models validate slugs against

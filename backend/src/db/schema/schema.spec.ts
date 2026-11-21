@@ -1,4 +1,8 @@
-import { USER_NAME_LENGTH_FLOOR } from '@ocelot-social/branding'
+import {
+  GROUP_NAME_LENGTH_FLOOR,
+  POST_TITLE_LENGTH_FLOOR,
+  USER_NAME_LENGTH_FLOOR,
+} from '@ocelot-social/branding'
 import { Ajv } from 'ajv'
 import { describe, expect, it } from 'vitest'
 
@@ -6,9 +10,18 @@ import { sourcesOf, targetsOf } from './derive/rules'
 import { jsonSchemaFor, relationshipJsonSchemaFor } from './types'
 import { validateProperty } from './validate'
 
-import { entities, labels, PasswordReset, relationships, relationshipTypes, User } from './index'
+import {
+  entities,
+  Group,
+  labels,
+  PasswordReset,
+  Post,
+  relationships,
+  relationshipTypes,
+  User,
+} from './index'
 
-import type { Post, Role } from './index'
+import type { Role } from './index'
 import type { EntityProperties, RelationshipDefinition } from './types'
 
 const ajv = new Ajv({ allErrors: true })
@@ -41,6 +54,17 @@ describe('the declaration', () => {
   // lowest minimum a brand may configure, the audit would report names that brand allowed.
   it('holds User.name to no more than the shortest name a brand may allow', () => {
     expect(User.properties.name.minLength).toBeLessThanOrEqual(USER_NAME_LENGTH_FLOOR)
+  })
+
+  // Same for group names, whose bounds a brand sets just like those of user names.
+  it('holds Group.name to no more than the shortest name a brand may allow', () => {
+    expect(Group.properties.name.minLength).toBeLessThanOrEqual(GROUP_NAME_LENGTH_FLOOR)
+  })
+
+  // Same for titles: every stored title satisfies the schema, whichever brand's limits it was saved
+  // under.
+  it('holds Post.title to no more than the shortest title a brand may allow', () => {
+    expect(Post.properties.title.minLength).toBeLessThanOrEqual(POST_TITLE_LENGTH_FLOOR)
   })
 
   it('connects only declared entities', () => {

@@ -1,0 +1,18 @@
+{{- /*
+An eviction (node drain, k3s upgrade, kured reboot) deletes the pod BEFORE its replacement exists —
+maxSurge only applies to rollouts. With the budget the drain evicts one replica at a time and waits
+until the replacement is Ready. Rendered only for more than one replica: with a single one the
+budget could never be satisfied and would block every drain until its timeout. Switched off with
+webapp.podDisruptionBudget on a cluster without a second node (see values.yaml).
+*/ -}}
+{{- if and .Values.webapp.podDisruptionBudget (gt (int .Values.webapp.replicas) 1) }}
+kind: PodDisruptionBudget
+apiVersion: policy/v1
+metadata:
+  name: {{ .Release.Name }}-webapp
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-webapp
+{{- end }}

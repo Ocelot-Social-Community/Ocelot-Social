@@ -1,8 +1,10 @@
 import { defineStep } from '@badeball/cypress-cucumber-preprocessor'
 
 defineStep('I choose {string} as the name', name => {
-  const lastGroup = {}
-  lastGroup.name = name.replace('\n', ' ')
+  const typed = name.replace('\n', ' ')
+  // The backend stores a group name without its surrounding spaces, so that is what the saved
+  // group shows.
+  const lastGroup = { name: typed.trim() }
   cy.task('pushValue', { name: 'lastGroup', value: lastGroup })
-  cy.get('input[name="name"]').type(lastGroup.name)
+  cy.get('input[name="name"]').type(typed)
 })

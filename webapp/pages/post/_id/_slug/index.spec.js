@@ -99,7 +99,7 @@ describe('PostSlug', () => {
         'client-only': true,
         'nuxt-link': true,
         'router-link': true,
-        HcEditor: { render: () => {}, methods: { insertReply: jest.fn(() => null) } },
+        Editor: { render: () => {}, methods: { insertReply: jest.fn(() => null) } },
         ContentViewer: true,
         ...opts.stubs,
       }
@@ -180,7 +180,7 @@ describe('PostSlug', () => {
           id: 'commentAuthorId',
           slug: 'ogerly',
         })
-        expect(stubs.HcEditor.methods.insertReply).toHaveBeenCalledWith({
+        expect(stubs.Editor.methods.insertReply).toHaveBeenCalledWith({
           id: 'commentAuthorId',
           slug: 'ogerly',
         })

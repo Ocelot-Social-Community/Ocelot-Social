@@ -30,6 +30,9 @@ defineStep('a video call is running in group {string} with {string}', (groupId, 
             avatar: null,
           },
           participantCount: 1,
+          // Every field the query asks for: Apollo drops an answer that lacks one, and the dock
+          // stays empty.
+          removed: false,
           participants: [
             {
               __typename: 'User',

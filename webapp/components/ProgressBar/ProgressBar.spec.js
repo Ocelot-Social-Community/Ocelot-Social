@@ -22,6 +22,11 @@ describe('ProgessBar.vue', () => {
       expect(wrapper.vm.progressBarWidth).toBe('width: 20%;')
     })
 
+    it('puts the fill inside the goal, which clips it to the bar', () => {
+      wrapper = Wrapper()
+      expect(wrapper.find('.progress-bar__goal .progress-bar__progress').exists()).toBe(true)
+    })
+
     it('renders no label', () => {
       wrapper = Wrapper()
       expect(wrapper.find('.progress-bar__label').exists()).toBe(false)

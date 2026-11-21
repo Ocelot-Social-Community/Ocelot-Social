@@ -134,16 +134,16 @@ export default {
 .invitation {
   display: flex;
   padding: calc(var(--space-base) / 2);
-  border-bottom: 1px dotted var(--color-neutral-80);
+  border-bottom: 1px dotted var(--border-color-softer);
   align-items: center;
 }
 
 .invitation:nth-child(odd) {
-  background-color: var(--color-neutral-90);
+  background-color: var(--background-color-softer);
 }
 
 .invitation:nth-child(even) {
-  background-color: var(--color-neutral-100);
+  background-color: var(--background-color-base);
 }
 
 .column1 {

@@ -57,11 +57,21 @@ export default {
   },
   computed: {
     legendItems() {
+      // The same pattern ProseMirror's keymap uses to decide what `Mod` is (prosemirror-keymap), so
+      // the legend says what the editor really answers to, on an iPhone or an iPad as well.
+      const modifier =
+        typeof navigator !== 'undefined' && /Mac|iP(hone|[oa]d)/.test(navigator.platform)
+          ? 'cmd'
+          : 'ctrl'
       return [
-        { iconName: this.icons.bold, name: `editor.legend.bold`, shortcut: 'ctrl + b' },
-        { iconName: this.icons.italic, name: `editor.legend.italic`, shortcut: 'ctrl + i' },
-        { iconName: this.icons.underline, name: `editor.legend.underline`, shortcut: 'ctrl + u' },
-        { iconName: this.icons.link, name: `editor.legend.link`, shortcut: '' },
+        { iconName: this.icons.bold, name: `editor.legend.bold`, shortcut: `${modifier} + b` },
+        { iconName: this.icons.italic, name: `editor.legend.italic`, shortcut: `${modifier} + i` },
+        {
+          iconName: this.icons.underline,
+          name: `editor.legend.underline`,
+          shortcut: `${modifier} + u`,
+        },
+        { iconName: this.icons.link, name: `editor.legend.link`, shortcut: `${modifier} + k` },
         { iconName: this.icons.paragraph, name: `editor.legend.paragraph`, shortcut: '' },
         { label: 'H3', name: `editor.legend.heading3`, shortcut: '### + space' },
         { label: 'H4', name: `editor.legend.heading4`, shortcut: '#### + space' },
@@ -80,19 +90,19 @@ export default {
 
 <style scoped>
 .legend-question-button {
-  color: var(--color-neutral-40) !important;
+  color: var(--text-color-soft) !important;
   font-size: 1.2rem !important;
 }
 .legend-question-button:hover {
   background: none !important;
-  color: var(--color-neutral-40) !important;
+  color: var(--text-color-soft) !important;
 }
 .legend-question-button:focus {
   outline: none !important;
 }
 .legend {
   padding: 0rem;
-  border: 1px solid var(--color-neutral-80);
+  border: 1px solid var(--border-color-softer);
 }
 .legend-container {
   display: flex;

@@ -6,8 +6,13 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 
+import { createHash } from 'node:crypto'
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+
 import { faker } from '@faker-js/faker'
 import sample from 'lodash/sample.js'
+import sharp from 'sharp'
 
 import CONFIG from '@config/index'
 import { categories } from '@constants/categories'
@@ -21,10 +26,13 @@ import CreatePost from '@graphql/queries/posts/CreatePost.gql'
 import { createApolloTestSetup } from '@root/test/helpers'
 import { NONE_ROLE, seedGroupRoleTemplates, writeGroupRole } from '@src/groupRole'
 import { ensureUserRoleEdges, seedDefaultRoleNodes } from '@src/role'
+import { s3Service } from '@src/uploads/s3Service'
 
-import Factory from './factories'
+import { assertWipeAllowed } from './assertWipeAllowed'
+import Factory, { setImageUrlSource } from './factories'
 import { nudgeCacheResync } from './resync-caches'
 import { trophies, verification } from './seed/badges'
+import { SEED_GROUP_AVATARS_DIRECTORY, resolveSeedImages, seedImageUploader } from './seed/images'
 
 import type { TestNode } from './testing/node'
 
@@ -38,8 +46,8 @@ const requireNode = (node: TestNode | null, what: string): TestNode => {
   return node
 }
 
-// The media type of an external image, by its extension: the seeded group avatars are JPEG,
-// PNG and WebP.
+// The media type of an image, by the extension of its file name or URL: the seeded group avatars
+// are JPEG, PNG and WebP.
 const imageTypeOf = (url: string): string => {
   if (url.endsWith('.png')) {
     return 'image/png'
@@ -50,13 +58,21 @@ const imageTypeOf = (url: string): string => {
   return 'image/jpeg'
 }
 
-if (CONFIG.PRODUCTION && !CONFIG.PRODUCTION_DB_CLEAN_ALLOW) {
-  throw new Error(`You cannot seed the database in a non-staging and real production environment!`)
-}
+assertWipeAllowed(CONFIG, 'db:seed')
 
-CONFIG.SEND_MAIL = true
+// The seed sends no mail. Its users mostly carry made-up addresses on real domains
+// (`faker.internet.email`: gmail.com, yahoo.com, …) with every notification switched on, so a seed
+// run against a staging network with real SMTP would mail its posts and comments to whoever owns
+// those addresses — and it needed a reachable mail server just to finish, as a notification mail
+// that cannot be delivered rejects outside of any request and ends the process.
+CONFIG.SEND_MAIL = false
 
 const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
+
+// Resolved before anything is written, so a wrong SEED_IMAGES fails an empty database, not a
+// half-seeded one. See seed/images.ts for the sources.
+// eslint-disable-next-line n/no-process-env
+const seedImages = resolveSeedImages(process.env.SEED_IMAGES)
 
 ;(async function () {
   /* eslint-disable-next-line no-console */
@@ -84,6 +100,12 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
     // Same reasoning for the group role templates: this CLI never runs the boot path, and the
     // groups created below copy their roles from the template for their type.
     await seedGroupRoleTemplates(database)
+
+    // eslint-disable-next-line no-console
+    console.log('seed', `post images from ${seedImages}`)
+    if (seedImages === 'local') {
+      setImageUrlSource(await seedImageUploader(CONFIG))
+    }
 
     // eslint-disable-next-line no-console
     console.log('seed', 'locations')
@@ -1402,29 +1424,57 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       variables: { groupId: 'g33', userId: 'u6', roleInGroup: 'usual' },
     })
 
+    await mutate({
+      mutation: CreateGroup,
+      variables: {
+        id: 'g34',
+        name: 'busFaktor() e.V.',
+        about:
+          'Wir pflegen FOSSware: ein Netzwerk für Menschen, die freie und Open-Source-Software nutzen und pflegen.',
+        description: `<h3>Worum geht es?</h3><p>Weil eine freie Gesellschaft freie und offene Software braucht: Der busFaktor() e.V. verbreitet Wissen und verteilt Aufgaben auf mehr Schultern, damit Projekte widerstandsfähig und langfristig tragfähig werden.</p><h3>Aktivitäten</h3><p>Ein Netzwerk für Menschen, die freie und Open-Source-Software (FOSSware) nutzen und pflegen – offene Veranstaltungen, gemeinnützige Bildungsangebote und Software-Projekte. Willkommen sind auch Betreiber, Server-Administratoren, Designer und Anwender.</p><h3>Projekte</h3><p>Tech-Day (aufgezeichnete Online-Vortragsreihe), Ocelot.Social und Utopia Map. Unterstützen kannst du den Verein mit einer Spende oder einer Fördermitgliedschaft. Mehr unter <a href="https://busfaktor.org/de" target="_blank">busfaktor.org/de</a>.</p>`,
+        template: 'public',
+        actionRadius: 'global',
+        categoryIds: ['cat15', 'cat0'],
+        locationName: 'Germany',
+      },
+    })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g34', userId: 'u1' } })
+    await mutate({ mutation: JoinGroup, variables: { groupId: 'g34', userId: 'u4' } })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g34', userId: 'u1', roleInGroup: 'admin' },
+    })
+    await mutate({
+      mutation: ChangeGroupMemberRole,
+      variables: { groupId: 'g34', userId: 'u4', roleInGroup: 'usual' },
+    })
+
     // eslint-disable-next-line no-console
     console.log('seed', 'group avatars')
-    // External images, so their ratio and type are written down rather than measured on upload.
-    // The ratios are measured off the images (#9288); a guessed one makes every consumer that
-    // sizes a group avatar by it reserve the wrong space.
-    for (const { groupId, url, alt, aspectRatio } of [
+    // Pictures the project has the right to use are files in seed/group-avatars/ (see its README),
+    // uploaded like any upload and served from the bucket; their ratio is measured off the file. The
+    // others are still linked from the site they belong to, with their ratio and type written down
+    // since there is nothing to measure. The ratios are measured off the images (#9288): a guessed
+    // one makes every consumer that sizes a group avatar by it reserve the wrong space.
+    const { uploadFile } = s3Service(CONFIG, 'seed')
+    const groupAvatars: (
+      | { groupId: string; alt: string; file: string }
+      | { groupId: string; alt: string; url: string; aspectRatio: number }
+    )[] = [
       {
         groupId: 'g3',
-        url: 'https://nsosp.org/share/images/FrQFT/FrQFT_header_v01_3.jpg',
+        file: 'g3-FrQFT_header_v01_3.jpg',
         alt: 'Quantum Flow Theory',
-        aspectRatio: 5.25,
       },
       {
         groupId: 'g4',
-        url: 'https://nsosp.org/share/images/NSOSP/NSOSP_header_v01_9.jpg',
+        file: 'g4-NSOSP_header_v01_9.jpg',
         alt: 'New Soul Of Science Project',
-        aspectRatio: 5.25,
       },
       {
         groupId: 'g5',
-        url: 'https://nsosp.org/share/images/SN/SN_header_v04-01.jpg',
+        file: 'g5-SN_header_v04-01.jpg',
         alt: 'Superial Numbers',
-        aspectRatio: 5.25,
       },
       {
         groupId: 'g6',
@@ -1446,9 +1496,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
       {
         groupId: 'g9',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/IT4C-Website-Bild-ohne-Text.webp',
+        file: 'g9-IT4C-Website-Bild-ohne-Text.webp',
         alt: 'IT4C Team',
-        aspectRatio: 1.99,
       },
       {
         groupId: 'g10',
@@ -1494,9 +1543,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
       {
         groupId: 'g17',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/ocelot.social-Logo-Text-normal-v02-945x630-2.webp',
+        file: 'g17-ocelot-social-logo-squared.png',
         alt: 'Ocelot.Social Logo',
-        aspectRatio: 1.5,
       },
       {
         groupId: 'g18',
@@ -1536,15 +1584,13 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
       {
         groupId: 'g24',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Hermesstab-schwarzweisseFluegel-v01-clip-3-2.jpg',
+        file: 'g24-Hermesstab-schwarzweisseFluegel-v01-clip-3-2.jpg',
         alt: 'Konstitutionstherapie Hermesstab',
-        aspectRatio: 1.5,
       },
       {
         groupId: 'g27',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Natur-und-Imkerhof-Zingst.jpg',
+        file: 'g27-Natur-und-Imkerhof-Zingst.jpg',
         alt: 'Naturerlebnis Zingst Imkerhof',
-        aspectRatio: 0.56,
       },
       {
         groupId: 'g28',
@@ -1554,9 +1600,8 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
       },
       {
         groupId: 'g29',
-        url: 'https://menschlichwirtschaften.de/wp-content/uploads/Landladen-Rullstorf.jpg',
+        file: 'g29-Landladen-Rullstorf.jpg',
         alt: 'Landladen Rullstorf',
-        aspectRatio: 0.75,
       },
       {
         groupId: 'g30',
@@ -1582,7 +1627,33 @@ const languages = ['de', 'en', 'es', 'fr', 'it', 'pt', 'pl']
         alt: 'Unterstützung von Hebammen',
         aspectRatio: 1.5,
       },
-    ]) {
+      {
+        groupId: 'g34',
+        file: 'g34-busfaktor-logo-de.png',
+        alt: 'busFaktor() Logo – Wir pflegen FOSSware',
+      },
+    ]
+    for (const entry of groupAvatars) {
+      const { groupId, alt } = entry
+      let url: string
+      let aspectRatio: number
+      if ('file' in entry) {
+        const filePath = path.join(SEED_GROUP_AVATARS_DIRECTORY, entry.file)
+        const { width, height } = await sharp(filePath).metadata()
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const body = await readFile(filePath)
+        // The hash is part of the name: the bucket serves with a week of Cache-Control and imagor
+        // caches by path, so a changed picture must not keep the name of the old one.
+        const hash = createHash('sha1').update(body).digest('hex').slice(0, 8)
+        url = await uploadFile({
+          createReadStream: () => body,
+          uniqueFilename: `${hash}-${entry.file}`,
+          mimetype: imageTypeOf(entry.file),
+        })
+        aspectRatio = width / height
+      } else {
+        ;({ url, aspectRatio } = entry)
+      }
       await database.write({
         query: `
           MATCH (group:Group {id: $groupId})

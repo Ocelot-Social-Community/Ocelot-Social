@@ -278,6 +278,7 @@
         "showContentFilterMasonryGrid": "Show the content filter in the masonry grid (newsfeed).",
         "showGroupButtonInHeader": "Show the groups button in the header.",
         "socialMediaEnabled": "Enable the social-media links feature: links are shown on profiles and managed in user settings.",
+        "videoCallDtx": "Default for video calls: while someone is silent, their microphone sends hardly any data. Saves bandwidth, but can make single participants inaudible to single listeners. Every user can change it for their own microphone in the device settings of a call.",
         "videoConference": "Enable video conferencing (LiveKit). The runtime switch for the video-call permissions. Requires the LiveKit environment variables; without them it stays off and greyed out."
       },
       "envLink": "View environment",
@@ -301,6 +302,7 @@
         "showContentFilterMasonryGrid": "Content filter in grid",
         "showGroupButtonInHeader": "Groups button in header",
         "socialMediaEnabled": "Social media",
+        "videoCallDtx": "Silence suppression in calls",
         "videoConference": "Video conferencing"
       },
       "lastUpdated": "Last changed: {timestamp} by {actor}",
@@ -327,10 +329,15 @@
       "deleteError": "Could not delete role: {message}",
       "deleteSuccess": "Role deleted.",
       "description": "Who may do what across the network. Create roles and assign permissions — changes apply immediately.",
+      "discard": "Discard",
+      "grantRoleManage": {
+        "confirm": "Grant anyway",
+        "message": "<strong>{role}</strong> gets “manage roles”: its holders can shape every role but owner freely, strip rights from higher roles too, and then re-role, disable or delete their holders. Deleted accounts and content cannot be restored, not even by an owner. Assign the role only to people you would trust with admin powers.",
+        "title": "Grant “manage roles”?"
+      },
       "members": "{count} members",
       "name": "Roles & permissions",
       "nameLabel": "Name",
-      "notEditableHint": "You can only change your own role and roles that grant less authority than yours.",
       "perm": {
         "apiKey_administer": "Administer other users’ API keys.",
         "apiKey_create": "Create personal API keys.",
@@ -364,7 +371,6 @@
         "videoCall_create_open": "Start a video call in a group a stranger can walk into — one anybody may find and join without approval.",
         "videoCall_create_restricted": "Start a video call in a group one cannot simply walk into: joining needs approval, an invite, or the group is unlisted."
       },
-      "permNotHeld": "You do not hold this right yourself, so you cannot hand it out.",
       "permUnavailable": "Feature not configured — granting this has no effect.",
       "permUnavailableLink": "View configuration",
       "protected": "protected",
@@ -468,6 +474,8 @@
     "GROUP_SAVE_CATEGORY_UNKNOWN": "At least one of the categories does not exist.",
     "GROUP_SAVE_DESCRIPTION_TOO_SHORT": "The description must be at least {min} characters long.",
     "GROUP_SAVE_MEMBER_LIST_UNAVAILABLE": "A group that outsiders cannot find cannot show them its members either.",
+    "GROUP_SAVE_NAME_TOO_LONG": "The group name must be at most {max} characters long.",
+    "GROUP_SAVE_NAME_TOO_SHORT": "The group name must be at least {min} characters long.",
     "GROUP_SAVE_SLUG_ALREADY_TAKEN": "This unique group name is already taken.",
     "GROUP_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
     "GROUP_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",
@@ -510,6 +518,7 @@
     "POST_PIN_LIMIT_REACHED": "The maximum number of pinned posts has been reached. Unpin another post first.",
     "POST_SAVE_CATEGORY_UNKNOWN": "At least one of the categories does not exist.",
     "POST_SAVE_SLUG_ALREADY_TAKEN": "A post with this slug already exists.",
+    "POST_SAVE_TITLE_LENGTH_INVALID": "The post title must be between {min} and {max} characters long.",
     "POST_SAVE_TOO_FEW_CATEGORIES": "Too few topics selected (at least {min}).",
     "POST_SAVE_TOO_MANY_CATEGORIES": "Too many topics selected (at most {max}).",
     "REGISTRATION_CONFIRMATION_CODE_INVALID": "The confirmation code is invalid.",
@@ -522,7 +531,6 @@
     "ROLE_ASSIGNMENT_NOT_COVERED": "You cannot hand out a role with rights you do not hold yourself.",
     "ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER": "Only an owner may assign or change the owner role.",
     "ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED": "You can only change the role of users whose role grants less authority than yours.",
-    "ROLE_CHANGE_NOT_OUTRANKED": "You can only change your own role or roles that grant less authority than yours.",
     "ROLE_DELETE_ROLE_HAS_MEMBERS": "The role “{name}” is still assigned to {count} users and cannot be deleted.",
     "ROLE_DELETE_SYSTEM_ROLE": "The role “{name}” is a system role and cannot be deleted.",
     "ROLE_DOES_NOT_EXIST": "The role “{name}” does not exist.",
@@ -530,9 +538,7 @@
     "ROLE_RENAME_SYSTEM_ROLE": "The role “{name}” is a system role and cannot be renamed.",
     "ROLE_SAVE_NAME_ALREADY_TAKEN": "The role “{name}” already exists.",
     "ROLE_SAVE_NAME_INVALID": "The role name must be 2 to 50 characters long and may only contain letters, digits, “_” and “-”; the first character must be a letter or a digit.",
-    "ROLE_SAVE_NOT_COVERED": "A role can only contain rights you hold yourself.",
     "ROLE_SAVE_PROTECTED_FLAG_NOT_ALLOWED": "A role cannot be created or marked as protected.",
-    "ROLE_SAVE_WOULD_OUTRANK": "Your own role cannot be raised above a role that yours does not outrank today.",
     "USER_ACTION_TARGET_NOT_OUTRANKED": "You can only do this to users whose role grants less authority than yours.",
     "USER_ADMIN_SEARCH_NOT_PERMITTED": "You are not allowed to search the user administration.",
     "USER_DOES_NOT_EXIST": "The user could not be found.",
@@ -544,6 +550,12 @@
     "USER_UNBLOCK_USER_NOT_BLOCKED": "This user is not blocked.",
     "VIDEO_CALL_CHAT_NOT_IN_CALL": "The chat of a video call is open to those taking part in it. Join the call first.",
     "VIDEO_CALL_GROUP_MEMBERSHIP_NOT_FOUND": "No active membership in this group was found for the video call.",
+    "VIDEO_CALL_MODERATION_NOT_IN_CALL": "Only those taking part in the video call can moderate it.",
+    "VIDEO_CALL_MODERATION_NOT_MODERATOR": "Only a moderator of the video call can do this.",
+    "VIDEO_CALL_MODERATION_OUTRANKED": "You do not rank high enough in the group to do this to them.",
+    "VIDEO_CALL_MODERATION_OWNER": "The owner of the group cannot be removed from its video call.",
+    "VIDEO_CALL_MODERATION_PARTICIPANT_NOT_IN_CALL": "They are not in the video call.",
+    "VIDEO_CALL_REMOVED_FROM_CALL": "You were removed from this video call. You can join the next one.",
     "VIDEO_CALL_START_NOT_PERMITTED": "You may not start a video call in this group."
   },
   "chat": {
@@ -892,7 +904,11 @@
         "participant": "Involved in this post"
       }
     },
-    "placeholder": "Leave your inspirational thoughts …"
+    "placeholder": "Leave your inspirational thoughts …",
+    "unfinished": {
+      "hashtag": "No hashtag is chosen: the hashtag is not linked this way. Choose it from the list.",
+      "mention": "No user is chosen: nobody is notified this way. Choose the name from the list."
+    }
   },
   "error-pages": {
     "403-default": "Not authorized to this page!",
@@ -969,7 +985,7 @@
     },
     "actionRadius": "Action radius of the group",
     "addMember": "Add Member",
-    "addMemberToGroupSuccess": "“{name}” was added to the group with the role “{role}”!",
+    "addMemberToGroupSuccess": "“<b>{name}</b>” (<b>@{slug}</b>) was added to the group with the role “<b>{role}</b>”!",
     "addUser": "Add User",
     "addUserNoOptions": "No users found!",
     "addUserPlaceholder": "User name",
@@ -1052,7 +1068,7 @@
       "title": "Do you really want to leave the group?"
     },
     "memberOutranked": "You cannot change this person’s role — they hold at least as much as you do.",
-    "memberRemoved": "User “{name}” was removed from group!",
+    "memberRemoved": "User “<b>{name}</b>” (<b>@{slug}</b>) was removed from group!",
     "members": "Members",
     "membersAdministrationList": {
       "avatar": "Avatar",
@@ -1120,9 +1136,17 @@
         "group_role_manage": "Edit the group's roles and their rights.",
         "group_settings_manage": "Change the group's settings: name, description, avatar, location and categories.",
         "group_videoCall_create": "Start a video call in the group.",
-        "group_videoCall_join": "Join a video call running in the group."
+        "group_videoCall_join": "Join a video call running in the group.",
+        "group_videoCall_moderate": "Take over the moderation of a video call in the group."
       },
       "resultingType": "With these rights the group is:",
+      "roleManageWarning": {
+        "both": "<strong>{roles}</strong> may then edit the group's roles: its holders can shape every role but the owner's, take rights away from other roles and change what non-members see. Give the role only to members you would trust with running the group. <strong>{own}</strong>, your own role, may then no longer edit the group's roles. Only an owner can undo that.",
+        "confirm": "Save anyway",
+        "grant": "<strong>{roles}</strong> may then edit the group's roles: its holders can shape every role but the owner's, take rights away from other roles and change what non-members see. Give the role only to members you would trust with running the group.",
+        "lockout": "<strong>{own}</strong>, your own role, may then no longer edit the group's roles. Only an owner can undo that.",
+        "title": "Change who manages roles?"
+      },
       "saved": "Rights saved",
       "saveFirst": "Save or discard first — there are unsaved changes.",
       "simple": {
@@ -1312,6 +1336,7 @@
     "pageTitle": "Map",
     "styles": {
       "dark": "Dark",
+      "navigation-night": "Night",
       "outdoors": "Outdoors",
       "satellite": "Satellite",
       "streets": "Streets",
@@ -1391,6 +1416,10 @@
     "users": {
       "name": "Users"
     }
+  },
+  "networkRoles": {
+    "owner": "Owner",
+    "user": "User"
   },
   "notifications": {
     "comment": "Comment",
@@ -1915,6 +1944,11 @@
     "termsAndConditionsNewConfirm": "I have read and agree to the new terms of conditions.",
     "termsAndConditionsNewConfirmText": "Please read the new terms of use now!"
   },
+  "themeSwitch": {
+    "dark": "Theme: dark",
+    "light": "Theme: light",
+    "system": "Theme: follow system"
+  },
   "user-avatar": {
     "popover": {
       "open-profile": "Open profile",
@@ -1928,9 +1962,13 @@
     "chatTabs": {
       "call": "Call",
       "callHint": "Visible only to the participants of this video call (without notifications)",
+      "callTitle": "Call chat",
       "group": "Group",
       "groupHint": "Visible to all members of the group (with notifications)",
-      "label": "Choose chat"
+      "groupTitle": "Group chat",
+      "label": "Choose chat",
+      "participants": "People",
+      "participantsHint": "Who is in the call, and what can be done about them"
     },
     "closeChat": "Close chat",
     "connecting": "Connecting…",
@@ -1941,6 +1979,7 @@
       "chat": "Chat",
       "leave": "Leave",
       "microphone": "Microphone",
+      "participants": "People",
       "screen": "Screen",
       "startSharing": "Share your screen, a window or a tab",
       "stopSharing": "{surface}: stop sharing",
@@ -1952,12 +1991,27 @@
       "turnOff": "{device}: turn off",
       "turnOn": "{device}: turn on"
     },
+    "cpuRelief": "Your device is struggling — the cameras run at a lower quality so the sound stays clear.",
+    "cpuStrained": "Your device is struggling with the videos. A lower quality keeps the sound clear.",
     "deviceSettings": {
       "button": "Devices",
+      "dtx": "Don't transmit pauses in speech",
+      "dtxFailed": "The speech pauses setting could not be changed – your microphone carries on as before.",
+      "dtxHint": "Saves data while you are silent. If others sometimes cannot hear you, switch it off.",
+      "quality": {
+        "audio": "No cameras (screen shares stay)",
+        "auto": "Automatic",
+        "high": "High",
+        "low": "Low",
+        "medium": "Medium"
+      },
+      "receiveQuality": "Quality of the videos I receive",
+      "sendQuality": "Quality of my video",
       "speakerError": "Could not switch the speaker.",
       "title": "Device settings"
     },
     "dialogLabel": "Group video call",
+    "dismissNotice": "Dismiss",
     "enableAudio": "Enable sound",
     "enterFullscreen": "Fullscreen",
     "errorBackToPrejoin": "Change settings",
@@ -1983,16 +2037,102 @@
     "gotoGroup": "Go to group “{name}”",
     "groupVideoCallButton": {
       "label": "Group Video",
+      "removed": "Removed from this call",
       "tooltip": "Video call in group “{name}”"
     },
+    "handover": {
+      "confirm": "Hand on and leave",
+      "skip": "Leave without choosing",
+      "suggestedName": "{name} (suggested)",
+      "text": "You are the last moderator of this call. Hand the moderation on before you leave.",
+      "title": "Who moderates from now on?"
+    },
     "hideBars": "Hide the bars",
+    "hideNotices": "Hide notices",
     "leave": "Leave call",
+    "lowerQuality": "Lower quality",
     "maximize": "Maximize",
     "micMuted": "Microphone off",
     "micNoSignal": "Your microphone isn't delivering any sound — others can't hear you.",
     "micUnmuted": "Microphone on",
     "minimize": "Minimize",
+    "moderation": {
+      "cameraOff": "{name} has switched your camera off.",
+      "everyone": "{name} lets everybody moderate the call.",
+      "everyoneOff": "{name} has ended that everybody moderates the call.",
+      "floor": "{name} has given you the floor.",
+      "floorMicOff": "{name} has given you the floor. Switch your microphone on so that you can be heard.",
+      "microphoneMuted": "{name} has muted your microphone.",
+      "moderatorAppointed": "{name} has made you a moderator of this call.",
+      "moderatorAutomatic": "You moderate this call now.",
+      "moderatorHandedOver": "{name} has handed the moderation of this call on to you.",
+      "removed": "{name} has removed you from the call.",
+      "removedPlain": "You were removed from the call.",
+      "revoked": "{name} has taken your moderation away.",
+      "screenShareStopped": "{name} has ended your screen share.",
+      "switchMicOn": "Switch microphone on",
+      "takenOver": "{name} has taken over the moderation."
+    },
     "openChat": "Open chat",
+    "participants": {
+      "actionsFor": "What can be done about {name}",
+      "cameraOff": "camera off",
+      "cameraOffAction": "Switch camera off",
+      "cameraOn": "camera on",
+      "cameraOnAction": "Switch camera on",
+      "close": "Hide the people in the call",
+      "countWithDevices": "People: {people} · Devices: {devices}",
+      "devices": "{count} devices",
+      "everyoneModerates": "Everybody moderates",
+      "filter": "Filter participants",
+      "filterBy": "Filter by",
+      "filterChip": {
+        "cameraOn": "Camera on",
+        "floor": "Has the floor",
+        "micOn": "Microphone on",
+        "moderator": "Moderation",
+        "mutedForMe": "Muted for me",
+        "sharing": "Sharing screen",
+        "speaking": "Speaking"
+      },
+      "filterChipRemove": "Deselect “{name}”",
+      "filterCount": "{shown} of {total}",
+      "filterName": "Filter by name",
+      "filterNameClear": "Clear name",
+      "filterNamePlaceholder": "Filter names",
+      "filterNone": "Nobody matches the filter.",
+      "filterReset": "Reset filter",
+      "giveFloor": "Give the floor",
+      "hasFloor": "Has the floor",
+      "label": "People in the call",
+      "leadModerator": "Lead moderator",
+      "makeModerator": "Make moderator",
+      "micOff": "microphone off",
+      "micOn": "microphone on",
+      "micOnAction": "Switch microphone on",
+      "moderator": "Moderator",
+      "muteAll": "Mute everybody",
+      "muteCount": "Mute {count}",
+      "muteForMe": "Mute for me",
+      "muteMicrophone": "Mute microphone",
+      "muteName": "Mute {name}",
+      "muteWhom": "Whom to mute?",
+      "open": "Show the people in the call",
+      "openProfile": "Open profile",
+      "remove": "Remove",
+      "removeEllipsis": "Remove from the call …",
+      "removeExplanation": "They cannot join this call again while it lasts. The next call is open to them.",
+      "removeQuestion": "Remove {name} from the call?",
+      "resign": "Give up the moderation",
+      "revokeModerator": "Take the moderation away",
+      "sharing": "sharing the screen",
+      "showLarge": "Show large",
+      "speaking": "speaking",
+      "stopSharing": "End screen share",
+      "takeFloor": "Take the floor back",
+      "takeOver": "Take over the moderation",
+      "unmuteForMe": "Hear again"
+    },
     "prejoin": {
       "camera": "Camera",
       "cameraDisabled": "Camera is disabled.",
@@ -2030,12 +2170,25 @@
       "unnamedSpeaker": "Speaker",
       "unsupportedBrowser": "Your browser does not support audio/video."
     },
+    "qualityLimit": {
+      "cameraHidden": "Camera hidden",
+      "ownBandwidth": "Your video goes out in lower quality: your connection is limited.",
+      "ownChoice": "Your video goes out in lower quality, as you chose in the device settings.",
+      "ownCpu": "Your video goes out in lower quality: your device is busy.",
+      "remoteChoice": "{name}'s video arrives in lower quality, as you chose in the device settings.",
+      "remoteCpu": "{name}'s video arrives in lower quality: your device is busy.",
+      "remoteHiddenBandwidth": "{name}'s camera is hidden: your connection is too weak.",
+      "remoteHiddenChoice": "{name}'s camera is hidden, as you chose in the device settings."
+    },
     "reconnecting": "Connection lost — reconnecting…",
     "reloadPending": "The platform has a new design. It will be applied once you leave the call.",
+    "resizeSidebar": "Resize the sidebar",
     "restartMic": "Restart microphone",
+    "restoreQuality": "Restore quality",
     "screenShare": "Screen",
     "screenShareEnded": "Screen sharing ended",
     "showBars": "Show the bars",
+    "showNotices": "Show notices",
     "showVideos": "Show videos",
     "spotlightExit": "Exit spotlight",
     "title": "Group video call",

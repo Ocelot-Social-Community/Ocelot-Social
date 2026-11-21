@@ -179,7 +179,7 @@ const exposedToSpecs = {
   NODE_ENV: parsed.NODE_ENV,
   CLIENT_URI: parsed.CLIENT_URI,
   GRAPHQL_URI: parsed.GRAPHQL_URI,
-  PRODUCTION_DB_CLEAN_ALLOW: parsed.PRODUCTION_DB_CLEAN_ALLOW,
+  DB_WIPE_ALLOWED: parsed.DB_WIPE_ALLOWED,
   // The fixtures talk to neo4j straight from the browser, so these cannot be withheld without
   // moving fixture setup into a Node task.
   NEO4J_URI: parsed.NEO4J_URI,

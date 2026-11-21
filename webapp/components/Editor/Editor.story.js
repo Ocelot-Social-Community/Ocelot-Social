@@ -1,5 +1,5 @@
 import { storiesOf } from '@storybook/vue'
-import HcEditor from '~/components/Editor/Editor.vue'
+import Editor from '~/components/Editor/Editor.vue'
 import { OsCard } from '@ocelot-social/ui'
 import helpers from '~/storybook/helpers'
 
@@ -27,15 +27,15 @@ storiesOf('Editor', module)
   })
   .addDecorator(helpers.layout)
   .add('Empty', () => ({
-    components: { HcEditor },
+    components: { Editor },
     store: helpers.store,
     data: () => ({
       users,
     }),
-    template: `<hc-editor :mention-suggestions="() => users" />`,
+    template: `<editor :mention-suggestions="() => users" />`,
   }))
   .add('Basic formatting', () => ({
-    components: { HcEditor },
+    components: { Editor },
     store: helpers.store,
     data: () => ({
       users,
@@ -90,10 +90,10 @@ storiesOf('Editor', module)
         </ol>
       `,
     }),
-    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
+    template: `<editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('@Mentions', () => ({
-    components: { HcEditor },
+    components: { Editor },
     store: helpers.store,
     data: () => ({
       users,
@@ -105,10 +105,10 @@ storiesOf('Editor', module)
         </p>
       `,
     }),
-    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
+    template: `<editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('#Hashtags', () => ({
-    components: { HcEditor },
+    components: { Editor },
     store: helpers.store,
     data: () => ({
       users,
@@ -119,10 +119,10 @@ storiesOf('Editor', module)
         </p>
       `,
     }),
-    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
+    template: `<editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('Embeds with iframe', () => ({
-    components: { HcEditor },
+    components: { Editor },
     store: helpers.store,
     data: () => ({
       users,
@@ -132,10 +132,10 @@ storiesOf('Editor', module)
         </a>
       `,
     }),
-    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
+    template: `<editor :mention-suggestions="() => users" :value="content" />`,
   }))
   .add('Embeds with plain link', () => ({
-    components: { HcEditor },
+    components: { Editor },
     store: helpers.store,
     data: () => ({
       users,
@@ -145,5 +145,5 @@ storiesOf('Editor', module)
        </a>
       `,
     }),
-    template: `<hc-editor :mention-suggestions="() => users" :value="content" />`,
+    template: `<editor :mention-suggestions="() => users" :value="content" />`,
   }))

@@ -18,7 +18,12 @@ import { validateEventParams } from './helpers/events'
 import { filterForMutedUsers } from './helpers/filterForMutedUsers'
 import { filterInvisiblePosts } from './helpers/filterInvisiblePosts'
 import { filterPostsOfMyGroups } from './helpers/filterPostsOfMyGroups'
-import { nonMemberReadsContent } from './helpers/groupAccessCypher'
+import {
+  nonMemberReadsContent,
+  optionalWithholdingGroupMatch,
+  postReadableBy,
+  readsWithholdingGroupContent,
+} from './helpers/groupAccessCypher'
 import { orderClause } from './helpers/ordering'
 import { pagingClause } from './helpers/paging'
 import { postFilterToCypher, postOrderClause } from './helpers/postFilter'
@@ -62,13 +67,6 @@ const NOTIFIED_FOR_RESOURCE_CYPHER = `
   MATCH (resource)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
   WHERE resource.id IN $resourceIds
     AND NOT coalesce(resource.deleted, false)
-    AND NOT coalesce(resource.disabled, false)
-  ${NOTIFICATION_PROJECTION_SUFFIX}
-`
-
-const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
-  MATCH (:Post {id: $postId})<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
-  WHERE NOT coalesce(resource.deleted, false)
     AND NOT coalesce(resource.disabled, false)
   ${NOTIFICATION_PROJECTION_SUFFIX}
 `
@@ -161,6 +159,54 @@ const filterEventDates = (params) => {
   }
   return params
 }
+
+/**
+ * The groups whose comments the viewer reads, for `optionalWithholdingGroupMatch`.
+ *
+ * A post can be visible while what was written under it is not: its author keeps the post after
+ * leaving the group, but the members' comments stay the group's (#10629). Every elevation counts
+ * here: the post was already let through by the visibility rule, which decides what a request
+ * may name.
+ */
+const commentScope = async (
+  context: Context,
+): Promise<{ contentGroupIds: string[]; elevatedGroupIds: string[] }> => {
+  const { contentGroupIds, elevatedGroupIds } = await viewerScope(context)
+  return { contentGroupIds, elevatedGroupIds }
+}
+
+/**
+ * Binds `readsGroup` once per post: whether the viewer reads the group the post sits in (or the
+ * post sits in none). The comments below it are then filtered on that value, not on a group
+ * lookup of their own — which named only the post, and ran once per comment of every post in a
+ * feed.
+ */
+const bindReadsGroup = (post: string, ...carried: string[]): string => `
+  ${optionalWithholdingGroupMatch(post, 'contentGroupIds', 'elevatedGroupIds')}
+  WITH ${[...carried, post].join(', ')}, ${readsWithholdingGroupContent} AS readsGroup`
+
+/**
+ * A comment under a visible post that the viewer may read: they read the group — the case of
+ * nearly every post anyone sees, which leaves the author lookup unasked — or they wrote it: what
+ * one writes stays one's own, as the post does.
+ */
+const commentReadable = (comment: string): string => `(
+  readsGroup
+  OR EXISTS { MATCH (${comment})<-[:WROTE]-(:User { id: $cypherParams.currentUserId }) }
+)`
+
+// Only for comments the reader may read (commentReadable, above). A notification carries its
+// comment, so one written while the reader was in the group must not outlive their access to it:
+// a post stays visible to its author after they leave, its members' comments do not.
+const NOTIFIED_COMMENTS_FOR_POST_CYPHER = `
+  MATCH (post:Post {id: $postId})
+  ${bindReadsGroup('post')}
+  MATCH (post)<-[:COMMENTS]-(resource:Comment)-[notification:NOTIFIED {read: FALSE}]->(user:User {id: $userId})
+  WHERE NOT coalesce(resource.deleted, false)
+    AND NOT coalesce(resource.disabled, false)
+    AND ${commentReadable('resource')}
+  ${NOTIFICATION_PROJECTION_SUFFIX}
+`
 
 // ORDER BY from `_CommentOrdering`. Oldest first by default — how a thread reads, and what
 // the webapp asks for.
@@ -870,8 +916,6 @@ export default {
         eventLocation: '-[:IS_IN]->(related:Location)',
       },
       count: {
-        commentsCount:
-          '<-[:COMMENTS]-(related:Comment) WHERE NOT related.deleted = true AND NOT related.disabled = true',
         shoutedCount:
           '<-[:SHOUTED]-(related:User) WHERE NOT related.deleted = true AND NOT related.disabled = true',
         emotionsCount: '<-[related:EMOTED]-(:User)',
@@ -925,15 +969,46 @@ export default {
               cypher: `
                 UNWIND $ids AS __id
                 MATCH (post:Post { id: __id })
+                ${bindReadsGroup('post', '__id')}
                 OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
+                  WHERE ${commentReadable('comment')}
                 WITH __id, comment ORDER BY ${order}
                 RETURN __id AS __id, collect(comment { .* }) AS __value
               `,
+              params: await commentScope(context),
             })
             return ids.map((id) => unwrap(byId.get(id) ?? []))
           })
           .load(parent.id as string)
       )
+    },
+    // Counted like the list above: in a group the viewer does not read, nothing.
+    commentsCount: async (parent, _params, context: Context) => {
+      if (typeof parent?.commentsCount !== 'undefined') {
+        return parent.commentsCount
+      }
+      if (!parent?.id) {
+        return 0
+      }
+      return context.loaders
+        .forField('Post.commentsCount', async (ids) => {
+          const { byId } = await runBatch({
+            context,
+            ids,
+            cypher: `
+              UNWIND $ids AS __id
+              MATCH (post:Post { id: __id })
+              ${bindReadsGroup('post', '__id')}
+              OPTIONAL MATCH (post)<-[:COMMENTS]-(comment:Comment)
+                WHERE NOT coalesce(comment.deleted, false) AND NOT coalesce(comment.disabled, false)
+                AND ${commentReadable('comment')}
+              RETURN __id AS __id, count(comment) AS __value
+            `,
+            params: await commentScope(context),
+          })
+          return ids.map((id) => unwrap(byId.get(id) ?? 0))
+        })
+        .load(parent.id as string)
     },
     ...cypherFields('Post', {
       postType: {
@@ -982,12 +1057,15 @@ export default {
       if (!currentUserId || !parent?.id) {
         return []
       }
+      const scope = await commentScope(context)
       const session = context.driver.session()
       try {
         const result = await session.readTransaction((transaction) =>
           transaction.run(NOTIFIED_COMMENTS_FOR_POST_CYPHER, {
             userId: currentUserId,
             postId: parent.id,
+            cypherParams: { currentUserId },
+            ...scope,
           }),
         )
         return result.records.map((record) => record.get('notification'))
@@ -1003,14 +1081,17 @@ export default {
       const session = context.driver.session()
 
       const writeTxResultPromise = session.writeTransaction(async (transaction) => {
+        // Only what the viewer reads: a tag or a category is shared across groups, so a public
+        // post would otherwise recommend the posts of a closed or hidden group to anyone.
         const relatedContributionsTransactionResponse = await transaction.run(
           `
             MATCH (p:Post {id: $id})-[:TAGGED|CATEGORIZED]->(categoryOrTag)<-[:TAGGED|CATEGORIZED]-(post:Post)
             WHERE NOT post.deleted AND NOT post.disabled
+              AND ${postReadableBy('post', '$currentUserId')}
             RETURN DISTINCT post
             LIMIT 10
           `,
-          { id },
+          { id, currentUserId: context.user?.id ?? null },
         )
         return relatedContributionsTransactionResponse.records.map(
           (record) => record.get('post').properties,

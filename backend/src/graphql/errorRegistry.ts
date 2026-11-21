@@ -100,6 +100,14 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'Description too short (at least {min} characters).',
   },
+  GROUP_SAVE_NAME_TOO_SHORT: {
+    type: 'BAD_USER_INPUT',
+    text: 'The group name must be at least {min} characters long.',
+  },
+  GROUP_SAVE_NAME_TOO_LONG: {
+    type: 'BAD_USER_INPUT',
+    text: 'The group name must be at most {max} characters long.',
+  },
   // A query selected a computed Group field (myRole, postsCount, …) without the group's id.
   GROUP_FIELD_GROUP_ID_MISSING: {
     type: 'BAD_USER_INPUT',
@@ -270,6 +278,11 @@ const definitions = {
     type: 'BAD_USER_INPUT',
     text: 'At least one of the categories does not exist.',
   },
+  // Limits from branding.post (titleLengthMin/titleLengthMax), counted on the trimmed title.
+  POST_SAVE_TITLE_LENGTH_INVALID: {
+    type: 'BAD_USER_INPUT',
+    text: 'The post title must be between {min} and {max} characters long.',
+  },
   // locations
   // A query selected Location.distanceToMe without the location's id.
   LOCATION_FIELD_LOCATION_ID_MISSING: {
@@ -345,18 +358,6 @@ const definitions = {
   ROLE_ASSIGNMENT_NOT_COVERED: {
     type: 'FORBIDDEN',
     text: 'You cannot hand out a role with rights you do not hold yourself.',
-  },
-  ROLE_CHANGE_NOT_OUTRANKED: {
-    type: 'FORBIDDEN',
-    text: 'You can only change your own role or roles that grant less authority than yours.',
-  },
-  ROLE_SAVE_WOULD_OUTRANK: {
-    type: 'FORBIDDEN',
-    text: 'Your own role cannot be raised above a role that yours does not outrank today.',
-  },
-  ROLE_SAVE_NOT_COVERED: {
-    type: 'FORBIDDEN',
-    text: 'A role can only contain rights you hold yourself.',
   },
   ROLE_SAVE_NAME_ALREADY_TAKEN: { type: 'BAD_USER_INPUT', text: "Role '{name}' already exists." },
   ROLE_SAVE_NAME_INVALID: {
@@ -436,6 +437,31 @@ const definitions = {
   VIDEO_CALL_START_NOT_PERMITTED: {
     type: 'FORBIDDEN',
     text: 'You may not start a video call in this group.',
+  },
+  // moderating a video call (livekit/moderation.ts)
+  VIDEO_CALL_REMOVED_FROM_CALL: {
+    type: 'FORBIDDEN',
+    text: 'You were removed from this video call. You can join the next one.',
+  },
+  VIDEO_CALL_MODERATION_NOT_IN_CALL: {
+    type: 'FORBIDDEN',
+    text: 'Only those taking part in the video call can moderate it.',
+  },
+  VIDEO_CALL_MODERATION_NOT_MODERATOR: {
+    type: 'FORBIDDEN',
+    text: 'Only a moderator of the video call can do this.',
+  },
+  VIDEO_CALL_MODERATION_OUTRANKED: {
+    type: 'FORBIDDEN',
+    text: 'You do not rank high enough in the group to do this to them.',
+  },
+  VIDEO_CALL_MODERATION_OWNER: {
+    type: 'FORBIDDEN',
+    text: 'The owner of the group cannot be removed from its video call.',
+  },
+  VIDEO_CALL_MODERATION_PARTICIPANT_NOT_IN_CALL: {
+    type: 'BAD_USER_INPUT',
+    text: 'They are not in the video call.',
   },
 } as const satisfies Record<string, ErrorDefinition>
 

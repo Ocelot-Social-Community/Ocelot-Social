@@ -35,6 +35,7 @@ export interface NetworkPolicy {
   showGroupButtonInHeader: boolean
   apiKeysEnabled: boolean
   videoConference: boolean
+  videoCallDtx: boolean
   apiKeysMaxPerUser: number
   maxPinnedPosts: number
   maxGroupPinnedPosts: number

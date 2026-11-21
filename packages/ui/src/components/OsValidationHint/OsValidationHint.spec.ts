@@ -153,7 +153,7 @@ describe('osValidationHint', () => {
       const badge = wrapper.find('.os-badge')
 
       expect(badge.exists()).toBe(true)
-      expect(badge.classes()).toContain('bg-[var(--color-danger)]')
+      expect(badge.classes()).toContain('bg-[var(--color-danger-fill,var(--color-danger))]')
     })
 
     it('renders badge with default variant (warning override via style) for warning', () => {

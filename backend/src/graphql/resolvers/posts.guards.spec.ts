@@ -112,6 +112,28 @@ describe('Post.comments', () => {
   })
 })
 
+describe('Post.commentsCount', () => {
+  it('returns a count the parent query already projected instead of querying again', async () => {
+    // The search projects its own count onto each post; asking again would cost a query per
+    // hit and could disagree with the number the search ranked by.
+    await expect(
+      postsResolvers.Post.commentsCount({ id: 'p1', commentsCount: 7 }, {}, fieldContext()),
+    ).resolves.toBe(7)
+  })
+
+  it('counts nothing for a parent that carries no id', async () => {
+    // Keyed on the parent id, as `comments` above: without one, every such parent would share
+    // the answer of the key `undefined`.
+    await expect(postsResolvers.Post.commentsCount({}, {}, fieldContext())).resolves.toBe(0)
+  })
+
+  it('counts nothing for a post the batch query found no row for', async () => {
+    await expect(
+      postsResolvers.Post.commentsCount({ id: 'never-existed' }, {}, fieldContext()),
+    ).resolves.toBe(0)
+  })
+})
+
 describe('Post.relatedContributions', () => {
   beforeAll(async () => {
     // Two visible posts and one deleted one, all sharing a single category.

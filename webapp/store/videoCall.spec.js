@@ -22,6 +22,8 @@ describe('videoCall store', () => {
         conferenceUnread: 0,
         groupChatUnread: 0,
         lastChatTab: 'call',
+        participantsOpen: false,
+        participantsView: null,
         phase: 'idle',
         pageBars: 'normal',
         reloadPending: false,
@@ -252,6 +254,52 @@ describe('videoCall store', () => {
         state.groupChatUnread = 4
         mutations.CLOSE(state)
         expect(state.groupChatUnread).toBe(0)
+      })
+    })
+
+    describe('SET_PARTICIPANTS_VIEW', () => {
+      it('keeps what the participant list shows, for the window beside the parked call', () => {
+        const view = { people: [], moderation: {}, mayTakeOver: false, locallyMuted: {} }
+        mutations.SET_PARTICIPANTS_VIEW(state, view)
+        expect(getters.participantsView(state)).toBe(view)
+        mutations.SET_PARTICIPANTS_VIEW(state, undefined)
+        expect(getters.participantsView(state)).toBeNull()
+      })
+    })
+
+    describe('SET_PARTICIPANTS_OPEN', () => {
+      it('opens and closes the participants in the sidebar', () => {
+        mutations.SET_PARTICIPANTS_OPEN(state, 1)
+        expect(getters.participantsOpen(state)).toBe(true)
+        mutations.SET_PARTICIPANTS_OPEN(state, undefined)
+        expect(getters.participantsOpen(state)).toBe(false)
+      })
+    })
+
+    describe('the participant list', () => {
+      const view = { people: [], moderation: {}, mayTakeOver: false, locallyMuted: {} }
+      const shown = () => {
+        mutations.SET_PARTICIPANTS_OPEN(state, true)
+        mutations.SET_PARTICIPANTS_VIEW(state, view)
+      }
+
+      beforeEach(() => {
+        mutations.OPEN(state, { groupId: 'g1' })
+        shown()
+      })
+
+      it('is kept when the running call is brought up again', () => {
+        mutations.OPEN(state, { groupId: 'g1' })
+        expect(state).toMatchObject({ participantsOpen: true, participantsView: view })
+      })
+
+      it("is forgotten for another group's call, and when the call is closed", () => {
+        mutations.OPEN(state, { groupId: 'g2' })
+        expect(state).toMatchObject({ participantsOpen: false, participantsView: null })
+
+        shown()
+        mutations.CLOSE(state)
+        expect(state).toMatchObject({ participantsOpen: false, participantsView: null })
       })
     })
 

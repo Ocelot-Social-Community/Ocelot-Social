@@ -19,6 +19,8 @@ export const brandingDefaults: BrandingConfig = {
     // Vanilla declares its palette in the webapp's own stylesheets; a brand that overrides nothing
     // adds nothing here (consumers fall back to FRAMEWORK_TOKENS).
     tokens: {},
+    // A brand has the one look it always had; vanilla offers both (index.ts → vanilla).
+    colorScheme: 'light',
   },
   group: {
     nameLengthMin: 3,
@@ -32,6 +34,10 @@ export const brandingDefaults: BrandingConfig = {
     nameLengthMax: 50,
     slugLengthMin: 3,
     slugLengthMax: 50,
+  },
+  post: {
+    titleLengthMin: 3,
+    titleLengthMax: 100,
   },
   registration: {
     nonceLength: 5,
@@ -85,6 +91,11 @@ export const brandingDefaults: BrandingConfig = {
   },
   donation: {
     progressBarColorType: 'gradient',
+  },
+  map: {
+    // "outdoors" in both themes: it draws the most detail (the night styles are quiet, in the dark theme
+    // the details of a zoomed-in map were hard to see).
+    defaultStyle: { light: 'outdoors', dark: 'outdoors' },
   },
   badges: {
     trophyBadgesSelectedMax: 9,

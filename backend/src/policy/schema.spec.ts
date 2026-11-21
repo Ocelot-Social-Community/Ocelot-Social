@@ -202,6 +202,7 @@ describe('policy visibility', () => {
         'showContentFilterMasonryGrid',
         'showGroupButtonInHeader',
         'socialMediaEnabled',
+        'videoCallDtx',
       ])
     })
   })
@@ -214,6 +215,7 @@ describe(categoryFor, () => {
     expect(categoryFor('apiKeysEnabled')).toBe('features')
     expect(categoryFor('maxGroupPinnedPosts')).toBe('features')
     expect(categoryFor('videoConference')).toBe('video')
+    expect(categoryFor('videoCallDtx')).toBe('video')
   })
 
   it('has a category for every policy key (schema is the single source, no silent gaps)', () => {

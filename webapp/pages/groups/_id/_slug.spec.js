@@ -1346,6 +1346,47 @@ describe('GroupProfileSlug', () => {
       expect(button.classes()).not.toContain('permission-denied')
     })
 
+    it('says on the button that the viewer was removed from the call running now', async () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      wrapper.setData({ videoCallParticipantCount: 2, videoCallRemoved: true })
+      await wrapper.vm.$nextTick()
+      const button = wrapper.find('[data-test="video-call-btn"]')
+      expect(button.text()).toContain('videoCall.groupVideoCallButton.removed')
+      expect(button.classes()).toContain('permission-denied')
+      expect(button.attributes('aria-disabled')).toBe('true')
+    })
+
+    it('does not open a call the viewer was removed from, and says why', async () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      wrapper.setData({ videoCallParticipantCount: 2, videoCallRemoved: true })
+      const refetch = jest.fn().mockResolvedValue()
+      wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      // Asked again first: the call may be over by now.
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(openVideoCallMock).not.toHaveBeenCalled()
+      expect(mocks.$toast.error).toHaveBeenCalledWith('backendErrors.VIDEO_CALL_REMOVED_FROM_CALL')
+    })
+
+    it('opens the call on the same click when asking again shows the viewer is free again', async () => {
+      const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights('usual') })
+      wrapper.setData({ videoCallParticipantCount: 2, videoCallRemoved: true })
+      // A refetch answers through the query's result, as vue-apollo does.
+      const refetch = jest.fn(async () => {
+        wrapper.vm.$options.apollo.videoCallParticipantCount.result.call(wrapper.vm, {
+          data: { videoCallParticipantCount: 2, videoCallRemoved: false },
+        })
+      })
+      wrapper.vm.$apollo.queries.videoCallParticipantCount = { refetch }
+      await wrapper.find('[data-test="video-call-btn"]').trigger('click')
+      await wrapper.vm.$nextTick()
+      expect(refetch).toHaveBeenCalledTimes(1)
+      expect(wrapper.vm.videoCallRemoved).toBe(false)
+      expect(openVideoCallMock).toHaveBeenCalled()
+      expect(mocks.$toast.error).not.toHaveBeenCalled()
+    })
+
     it('hides the video-call button for non-members', () => {
       const wrapper = mountWithGroup({ ...yogaPractice, ...groupRights(null) })
       expect(wrapper.find('[data-test="video-call-btn"]').exists()).toBe(false)

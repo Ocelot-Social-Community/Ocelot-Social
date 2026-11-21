@@ -70,6 +70,7 @@
             </client-only>
             <!-- locale switch -->
             <locale-switch class="topbar-locale-switch" placement="top" offset="8" />
+            <theme-switch v-if="hasThemeChoice" class="topbar-theme-switch" />
             <template v-if="isLoggedIn">
               <!-- chat menu -->
               <client-only>
@@ -258,7 +259,7 @@
               <div class="mobile-user-details">
                 <b>{{ userName }}</b>
                 <span v-if="user.roleName && user.roleName !== 'user'" class="mobile-user-role">
-                  {{ user.roleName | camelCase }}
+                  {{ networkRoleTitle(user.roleName) }}
                 </span>
               </div>
               <os-button
@@ -411,6 +412,10 @@
                 <filter-menu-component />
               </client-only>
             </div>
+          </div>
+
+          <div v-if="hasThemeChoice" class="mobile-theme-section">
+            <theme-switch row class="mobile-theme-switch" />
           </div>
 
           <!-- Locale switch collapsible (only when open) -->
@@ -576,8 +581,9 @@ import isEmpty from 'lodash/isEmpty'
 import orderBy from 'lodash/orderBy'
 import throttle from 'lodash/throttle'
 import locales from '~/locales'
-import { branding } from '@ocelot-social/branding'
+import { branding, colorSchemeOf, getBranding } from '@ocelot-social/branding'
 import AvatarMenu from '~/components/AvatarMenu/AvatarMenu'
+import networkRoleLabel from '~/mixins/networkRoleLabel'
 import ChatNotificationMenu from '~/components/ChatNotificationMenu/ChatNotificationMenu'
 import CustomButton from '~/components/CustomButton/CustomButton'
 import FilterMenu from '~/components/FilterMenu/FilterMenu.vue'
@@ -585,6 +591,7 @@ import FilterMenuComponent from '~/components/FilterMenu/FilterMenuComponent'
 import Dropdown from '~/components/Dropdown'
 import InviteCodeList from '~/components/_new/features/Invitations/InviteCodeList.vue'
 import LocaleSwitch from '~/components/LocaleSwitch/LocaleSwitch'
+import ThemeSwitch from '~/components/ThemeSwitch/ThemeSwitch'
 import Logo from '~/components/Logo/Logo'
 import SearchField from '~/components/features/SearchField/SearchField.vue'
 import NotificationMenu from '~/components/NotificationMenu/NotificationMenu'
@@ -596,7 +603,7 @@ import GetCategories from '~/mixins/getCategoriesMixin.js'
 import localeUpdate from '~/mixins/localeUpdate.js'
 
 export default {
-  mixins: [GetCategories, localeUpdate],
+  mixins: [GetCategories, localeUpdate, networkRoleLabel],
   components: {
     OsButton,
     OsIcon,
@@ -608,6 +615,7 @@ export default {
     Dropdown,
     InviteCodeList,
     LocaleSwitch,
+    ThemeSwitch,
     Logo,
     NotificationMenu,
     PageParamsLink,
@@ -637,6 +645,10 @@ export default {
     }
   },
   computed: {
+    // The switch only where the brand has both colour schemes (branding theme.colorScheme).
+    hasThemeChoice() {
+      return colorSchemeOf(getBranding()) === 'light dark'
+    },
     ...mapGetters({
       isLoggedIn: 'auth/isLoggedIn',
       user: 'auth/user',
@@ -760,11 +772,15 @@ export default {
       if (this.hideNavbar && event.clientY < 50) {
         this.hideNavbar = false
         this.navbarRevealedByHover = true
+        // Whatever sticks below the header (the editor's toolbar, say) moves down with it, as it
+        // does when the header comes back by scrolling; else the header lies over it.
+        this.$nextTick(() => this.updateHeaderOffset())
       } else if (this.navbarRevealedByHover && !this.hideNavbar) {
         const rect = this.$el.getBoundingClientRect()
         if (event.clientY > rect.bottom + 50) {
           this.hideNavbar = true
           this.navbarRevealedByHover = false
+          this.$nextTick(() => this.updateHeaderOffset())
         }
       }
     },
@@ -911,7 +927,7 @@ export default {
     flex-direction: column;
     height: calc(100dvh - 20px);
     margin: 0 -10px; /*  extend to screen edge */
-    background-color: var(--color-neutral-100);
+    background-color: var(--background-color-base);
 
     > .mobile-header-row {
       flex: 0 0 auto;
@@ -1012,7 +1028,7 @@ export default {
 
     &.mobile-logout-item {
       color: var(--text-color-danger);
-      border-top: 1px solid var(--color-neutral-90);
+      border-top: 1px solid var(--border-color-softest);
       padding-top: 4px;
       margin-top: 2px;
 
@@ -1073,7 +1089,7 @@ export default {
 
   .mobile-user-info {
     padding: 6px 0;
-    border-bottom: 1px solid var(--color-neutral-90);
+    border-bottom: 1px solid var(--border-color-softest);
   }
 
   .mobile-avatar.avatar-image {
@@ -1116,8 +1132,8 @@ export default {
     padding: 4px 0 0 0;
 
     hr {
-      color: var(--color-neutral-90);
-      background-color: var(--color-neutral-90);
+      color: var(--border-color-softest);
+      background-color: var(--border-color-softest);
       margin: 2px 0;
     }
   }
@@ -1157,7 +1173,7 @@ export default {
 
   .mobile-more-section {
     padding: 2px 0;
-    border-top: 1px solid var(--color-neutral-90);
+    border-top: 1px solid var(--border-color-softest);
   }
 
   .mobile-more-header {
@@ -1178,8 +1194,8 @@ export default {
     padding: 0;
 
     hr {
-      color: var(--color-neutral-90);
-      background-color: var(--color-neutral-90);
+      color: var(--border-color-softest);
+      background-color: var(--border-color-softest);
       margin: 2px 0;
     }
   }
@@ -1202,6 +1218,14 @@ export default {
       color: var(--text-color-link);
       background-color: var(--background-color-soft);
       box-shadow: inset 3px 0 0 var(--color-primary);
+    }
+  }
+
+  .mobile-theme-section {
+    padding: 2px 0;
+
+    > .mobile-nav-item {
+      cursor: pointer;
     }
   }
 

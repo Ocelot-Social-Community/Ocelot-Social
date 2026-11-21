@@ -6,8 +6,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
-/* eslint-disable import-x/no-named-as-default */
-
 import debug from 'debug'
 import isArray from 'lodash/isArray.js'
 import mergeWith from 'lodash/mergeWith.js'

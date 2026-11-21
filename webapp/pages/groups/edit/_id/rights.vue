@@ -123,7 +123,7 @@
 
     <!-- One draft, so one Save: under whatever is unfolded, after everything it writes. -->
     <div class="actions">
-      <os-button :disabled="!dirty || !canEdit" data-test="save" @click="save">
+      <os-button :disabled="!dirty || !canEdit" data-test="save" @click="requestSave">
         {{ $t('actions.save') }}
       </os-button>
       <os-button :disabled="!dirty || saving" data-test="revert" @click="resetDraft">
@@ -142,6 +142,12 @@
       v-if="templateToApply"
       :modalData="applyTemplateModalData"
       @close="templateToApply = null"
+    />
+    <!-- A save that changes who may edit this group's roles: said before it is written. -->
+    <confirm-modal
+      v-if="showRoleManageWarning"
+      :modalData="roleManageWarningModalData"
+      @close="showRoleManageWarning = false"
     />
     <confirm-modal
       v-if="showLeaveConfirmModal"
@@ -172,6 +178,9 @@ import confirmLeaveIfUnsavedChanges from '~/mixins/confirmLeaveIfUnsavedChanges'
 import warnBeforeUnload from '~/mixins/warnBeforeUnload'
 import { iconRegistry } from '~/utils/iconRegistry'
 
+// The right to edit this group's roles — whom it goes to, and whom it leaves, is asked about.
+const ROLE_MANAGE = 'group.role.manage'
+
 export default {
   mixins: [groupRightsEditor, confirmLeaveIfUnsavedChanges, warnBeforeUnload],
   components: {
@@ -198,6 +207,7 @@ export default {
       // group is too much for a browser confirm box — the same modal that asks about leaving
       // an editor asks about this.
       templateToApply: null,
+      showRoleManageWarning: false,
       roles: [],
       myGroupPermissions: [],
       /** The network right each capped group right needs in THIS group, by group right. */
@@ -226,6 +236,54 @@ export default {
         disabled: !this.canEdit,
         attrs: { 'data-test': `template-${template.name}` },
       }))
+    },
+    /**
+     * The roles this save gives `group.role.manage`. Their holders shape every role but the
+     * owner's — take rights from the others, change what non-members see — so the save asks first.
+     */
+    roleManageGrants() {
+      return this.changes.filter(
+        (change) =>
+          !change.protected &&
+          change.permissions.includes(ROLE_MANAGE) &&
+          !this.storedPermissions(change.name).includes(ROLE_MANAGE),
+      )
+    },
+    /**
+     * The viewer's own role, when this save takes `group.role.manage` from it: afterwards they
+     * cannot edit the roles any more, and only an owner gives it back. The owner role cannot lose
+     * it (it holds the catalog), and a network admin acting here holds it from outside the group.
+     */
+    roleManageLockout() {
+      const own = this.group.myGroupRole?.name
+      const change = this.changes.find((candidate) => candidate.name === own)
+      if (!change || change.protected) return null
+      const loses =
+        this.storedPermissions(own).includes(ROLE_MANAGE) &&
+        !change.permissions.includes(ROLE_MANAGE)
+      return loses ? change : null
+    },
+    roleManageWarningModalData() {
+      const grants = this.roleManageGrants
+      const lockout = this.roleManageLockout
+      const message = grants.length && lockout ? 'both' : grants.length ? 'grant' : 'lockout'
+      return {
+        titleIdent: 'group.rights.roleManageWarning.title',
+        messageIdent: `group.rights.roleManageWarning.${message}`,
+        messageParams: {
+          roles: grants.map((role) => this.roleLabel(role)).join(', '),
+          own: lockout ? this.roleLabel(lockout) : '',
+        },
+        buttons: {
+          confirm: {
+            danger: true,
+            icon: this.icons.save,
+            textIdent: 'group.rights.roleManageWarning.confirm',
+            callback: () => this.save(),
+          },
+          cancel: { icon: this.icons.close, textIdent: 'actions.cancel', callback: () => {} },
+        },
+      }
     },
     applyTemplateModalData() {
       const template = this.$t(`group.types.${this.templateToApply}`)
@@ -259,6 +317,18 @@ export default {
     // edit one) holds a change nobody saved.
     hasUnsavedChanges() {
       return this.dirty
+    },
+    /** The rights a role holds as stored, before this draft. */
+    storedPermissions(name) {
+      return this.editedRoles.find((role) => role.name === name)?.permissions ?? []
+    },
+    // Save, unless the save changes who may edit the roles: then ask first (roleManageWarning).
+    requestSave() {
+      if (this.roleManageGrants.length || this.roleManageLockout) {
+        this.showRoleManageWarning = true
+        return undefined
+      }
+      return this.save()
     },
     /**
      * A right can only be handed out by somebody who holds it — the same coverage rule the

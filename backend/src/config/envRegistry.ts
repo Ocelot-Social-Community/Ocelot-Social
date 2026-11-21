@@ -171,11 +171,19 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
 
   // --- Maps ---------------------------------------------------------------
   { name: 'MAPBOX_TOKEN', secret: true, category: 'maps', softwareDefault: null },
+  {
+    name: 'MAPBOX_API_URL',
+    secret: false,
+    category: 'maps',
+    softwareDefault: SOFTWARE_DEFAULTS.MAPBOX_API_URL,
+  },
 
   // --- Video (LiveKit) — hard-required by the videoConference policy -------
   { name: 'LIVEKIT_URL', secret: false, category: 'video', softwareDefault: null },
   { name: 'LIVEKIT_API_KEY', secret: true, category: 'video', softwareDefault: null },
   { name: 'LIVEKIT_API_SECRET', secret: true, category: 'video', softwareDefault: null },
+  // Set it where several instances share one LiveKit server; see config/index.ts.
+  { name: 'LIVEKIT_ROOM_PREFIX', secret: false, category: 'video', softwareDefault: null },
 
   // --- Redis --------------------------------------------------------------
   { name: 'REDIS_DOMAIN', secret: false, category: 'redis', softwareDefault: null },
@@ -197,10 +205,10 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
     softwareDefault: String(SOFTWARE_DEFAULTS.DEBUG),
   },
   {
-    name: 'PRODUCTION_DB_CLEAN_ALLOW',
+    name: 'DB_WIPE_ALLOWED',
     secret: false,
     category: 'general',
-    softwareDefault: String(SOFTWARE_DEFAULTS.PRODUCTION_DB_CLEAN_ALLOW),
+    softwareDefault: String(SOFTWARE_DEFAULTS.DB_WIPE_ALLOWED),
   },
   // A comma-separated list; shown as a JSON array so the empty default reads as [] and a set
   // value as ["m_a","m_b"] rather than a bare/blank string.

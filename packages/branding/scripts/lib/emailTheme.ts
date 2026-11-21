@@ -16,6 +16,8 @@
 // clothes of a branding fix. A declaration is therefore emitted only where the brand's resolved value
 // DIFFERS from the framework's, so a brand that overrides nothing gets no stylesheet at all and its
 // mails render exactly as before.
+import { lightOf, lightDarkAt } from '../../dist/lightDark.js'
+
 /** One e-mail rule fed by one theme token. */
 interface Mapping {
   /** The selector as it appears in webflow.css — this stylesheet is loaded after it and overrides. */
@@ -277,6 +279,15 @@ export function resolveTokens(raw: Record<string, string>): Record<string, strin
     // the dependency graph.
     if (out !== null && referencesIn(out).length > 0) {
       out = null
+    }
+    if (out !== null) {
+      out = lightOf(out)
+      // A light-dark() that lightOf could not read (one argument, never closed) stays in the value:
+      // as stored it is a declaration a mail client discards, so the token is unresolvable and the
+      // consumer falls back to its default.
+      if (lightDarkAt(out) !== -1) {
+        out = null
+      }
     }
     if (out !== null) {
       resolved[name] = out.trim().replace(/\s+/g, ' ')

@@ -6,9 +6,13 @@ const localVue = global.localVue
 
 describe('CallChatTabs', () => {
   let openChat
+  let setParticipantsOpen
 
   const Wrapper = (state = {}, propsData = {}) => {
     openChat = jest.fn()
+    setParticipantsOpen = jest.fn((_state, open) => {
+      state.participantsOpen = open
+    })
     const store = new Vuex.Store({
       getters: {
         'videoCall/groupId': () => 'g1',
@@ -17,8 +21,12 @@ describe('CallChatTabs', () => {
         'videoCall/groupChatUnread': () => state.groupUnread ?? 0,
         'chat/showChat': () =>
           state.chat ?? { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
+        'videoCall/participantsOpen': () => state.participantsOpen ?? false,
       },
-      mutations: { 'chat/SET_OPEN_CHAT': openChat },
+      mutations: {
+        'chat/SET_OPEN_CHAT': openChat,
+        'videoCall/SET_PARTICIPANTS_OPEN': setParticipantsOpen,
+      },
     })
     return mount(CallChatTabs, {
       localVue,
@@ -191,5 +199,60 @@ describe('CallChatTabs', () => {
     expect(opened()).toEqual([
       { showChat: true, chatUserId: null, groupId: null, roomId: 'room-1' },
     ])
+  })
+
+  describe('the participants beside the chats', () => {
+    it('are the first tab in the call, with how many are in it', () => {
+      wrapper = Wrapper({}, { withParticipants: true, participantCount: 4 })
+      expect(wrapper.vm.tabs.map(({ value }) => value)).toEqual(['participants', 'call', 'group'])
+      expect(tab(wrapper, 'participants').exists()).toBe(true)
+      expect(wrapper.find('[data-test="call-chat-tab-count-participants"]').exists()).toBe(true)
+    })
+
+    it('are no tab beside the parked call', () => {
+      wrapper = Wrapper()
+      expect(tab(wrapper, 'participants').exists()).toBe(false)
+    })
+
+    it('open on their tab, and give way to a chat chosen after them', async () => {
+      const state = {}
+      wrapper = Wrapper(state, { withParticipants: true })
+      await tab(wrapper, 'participants').trigger('click')
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), true)
+      expect(openChat).not.toHaveBeenCalled()
+      await tab(wrapper, 'group').trigger('click')
+      expect(setParticipantsOpen).toHaveBeenLastCalledWith(expect.anything(), false)
+      expect(opened()).toEqual([{ showChat: true, chatUserId: null, groupId: 'g1' }])
+    })
+
+    it('are the active tab while open', () => {
+      wrapper = Wrapper({ participantsOpen: true }, { withParticipants: true })
+      expect(tab(wrapper, 'participants').attributes('aria-selected')).toBe('true')
+    })
+
+    it('say their full name first in the tooltip, and to a screen reader', () => {
+      wrapper = Wrapper({}, { withParticipants: true })
+      expect(wrapper.vm.tabs.map(({ title, tooltip }) => [title, tooltip])).toEqual([
+        [
+          'videoCall.chatTabs.participants',
+          'videoCall.chatTabs.participants – videoCall.chatTabs.participantsHint',
+        ],
+        [
+          'videoCall.chatTabs.callTitle',
+          'videoCall.chatTabs.callTitle – videoCall.chatTabs.callHint',
+        ],
+        [
+          'videoCall.chatTabs.groupTitle',
+          'videoCall.chatTabs.groupTitle – videoCall.chatTabs.groupHint',
+        ],
+      ])
+      expect(tab(wrapper, 'group').attributes('aria-label')).toBe('videoCall.chatTabs.groupTitle')
+    })
+
+    it('hold the conference chat back until the server has confirmed it', () => {
+      wrapper = Wrapper({ chatRoomId: null }, { withParticipants: true })
+      expect(tab(wrapper, 'call').exists()).toBe(false)
+      expect(tab(wrapper, 'group').exists()).toBe(true)
+    })
   })
 })

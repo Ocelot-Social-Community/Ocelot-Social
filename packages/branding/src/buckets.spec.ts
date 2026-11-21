@@ -77,6 +77,7 @@ test('grenzfall mappings: split domains land in the right bucket', () => {
   assert.equal(bucketOfPath('registration.layout'), 'theme')
   assert.equal(bucketOfPath('registration.nonceLength'), 'behavior')
   assert.equal(bucketOfPath('donation'), 'theme')
+  assert.equal(bucketOfPath('map'), 'theme')
   assert.equal(bucketOfPath('about'), 'identity')
 })
 

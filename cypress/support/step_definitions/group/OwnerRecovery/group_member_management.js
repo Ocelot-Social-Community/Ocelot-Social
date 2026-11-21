@@ -51,7 +51,7 @@ defineStep('the member {string} has the group role {string}', (userId, roleName)
 
 defineStep('I remove the member {string} from the group', (userId) => {
   memberRow(userId).find('[data-test="group-member-remove"]').click()
-  cy.get('[data-testid="os-modal-confirm"]').click()
+  cy.get('[data-testid="os-confirm-dialog-confirm"]').click()
 })
 
 defineStep('the member {string} is no longer listed', (userId) => {

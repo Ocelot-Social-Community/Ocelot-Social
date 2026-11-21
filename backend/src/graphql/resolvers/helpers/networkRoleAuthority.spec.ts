@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { Errors } from '@graphql/errorRegistry'
 import { createInMemoryRoleService } from '@src/role'
 
-import { assignmentError, changeError, roleOfferRefusal } from './networkRoleAuthority'
+import { assignmentError, roleOfferRefusal } from './networkRoleAuthority'
 
 import type { Context } from '@src/context'
 import type { NetworkRoleRefusal } from '@src/role'
@@ -40,21 +40,7 @@ describe('the errors the shield answers with', () => {
     ['notOutranked', Errors.ROLE_ASSIGNMENT_TARGET_NOT_OUTRANKED.code],
     ['notCovered', Errors.ROLE_ASSIGNMENT_NOT_COVERED.code],
     ['ownerOnly', Errors.ROLE_ASSIGNMENT_OWNER_ROLE_REQUIRES_OWNER.code],
-    // Raising a role above others is a role change; should an assignment ever report it, it is
-    // still a matter of rights the actor does not hold.
-    ['wouldOutrank', Errors.ROLE_ASSIGNMENT_NOT_COVERED.code],
   ])('names an assignment refused as %s', (refusal, code) => {
     expect(codeOf(assignmentError(refusal))).toBe(code)
-  })
-
-  it.each<[NetworkRoleRefusal, string]>([
-    ['notOutranked', Errors.ROLE_CHANGE_NOT_OUTRANKED.code],
-    ['notCovered', Errors.ROLE_SAVE_NOT_COVERED.code],
-    ['wouldOutrank', Errors.ROLE_SAVE_WOULD_OUTRANK.code],
-    // The owner rule belongs to assignments; a role change it would refuse is one of a role
-    // above the actor.
-    ['ownerOnly', Errors.ROLE_CHANGE_NOT_OUTRANKED.code],
-  ])('names a role change refused as %s', (refusal, code) => {
-    expect(codeOf(changeError(refusal))).toBe(code)
   })
 })

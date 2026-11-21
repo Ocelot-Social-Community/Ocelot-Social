@@ -12,7 +12,7 @@
 
 .tooltip {
   --arrow-size: 5px;
-  --arrow-color: var(--background-color-inverse-soft);
+  --arrow-color: var(--tooltip-background);
 
   display: block !important;
   z-index: calc(var(--z-index-modal) - 2);
@@ -24,8 +24,8 @@
 }
 
 .tooltip .tooltip-inner {
-  background: var(--background-color-inverse-soft);
-  color: var(--text-color-inverse);
+  background: var(--tooltip-background);
+  color: var(--tooltip-color);
   border-radius: var(--border-radius-base);
   padding: var(--space-x-small) var(--space-small);
   box-shadow: var(--box-shadow-large);

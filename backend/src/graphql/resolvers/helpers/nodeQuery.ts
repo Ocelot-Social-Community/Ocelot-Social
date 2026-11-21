@@ -54,6 +54,12 @@ interface NodeQueryConfig {
   defaultOrder: { field: string; direction: 'ASC' | 'DESC' }
   /** Sortable fields that are NOT stored properties, mapped to their expression. */
   computedOrder?: Record<string, string>
+  /**
+   * Which nodes the viewer may read, as a condition on the node bound as `alias` for the viewer
+   * whose id is `viewerIdExpression` (null for a visitor). Applied to every request, whatever
+   * else it asks; a label without it is public as a whole.
+   */
+  readableBy?: (alias: string, viewerIdExpression: string) => string
 }
 
 /**
@@ -152,6 +158,13 @@ export const nodeQuery =
       )
       conditions.push(condition)
       Object.assign(queryParams, handlerParams)
+    }
+
+    if (config.readableBy) {
+      // Not a request argument: equality fields and filters name their parameters after
+      // themselves or `filter_*`, so `viewerId` cannot be supplied or overwritten from outside.
+      conditions.push(config.readableBy(alias, '$viewerId'))
+      queryParams.viewerId = context.user?.id ?? null
     }
 
     const order = orderClause(params.orderBy, {

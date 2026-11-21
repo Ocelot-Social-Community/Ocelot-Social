@@ -6,6 +6,13 @@
   }
 }
 
+/* iziToast brings its own font ('Lato', Tahoma, Arial: a font of the visitor's machine, which each
+   browser fills in, and bolds, its own way). A toast is set in the app's font, like the rest. */
+.iziToast,
+.iziToast-rtl {
+  font-family: var(--font-family-text) !important;
+}
+
 .iziToast .iziToast-message {
   font-weight: 400 !important;
 }
