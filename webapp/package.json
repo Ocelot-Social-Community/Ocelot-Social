@@ -88,7 +88,7 @@
     "@csstools/postcss-global-data": "^4.0.0",
     "@eslint/js": "^10.0.1",
     "@faker-js/faker": "10.6.0",
-    "@playwright/test": "~1.61.1",
+    "@playwright/test": "~1.65.1",
     "@storybook/addon-a11y": "7.6.24",
     "@storybook/addon-actions": "7.6.24",
     "@storybook/vue": "7.6.24",
