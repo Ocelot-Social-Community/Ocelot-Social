@@ -590,6 +590,7 @@
     "searchBadgeUser": "Utente",
     "searchPlaceholder": "Cerca utente o gruppo…",
     "typeMessage": "Scrivi un messaggio",
+    "unreadAbove": "Messaggi non letti più in alto: {count}",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chatta con «{name}»"
@@ -880,6 +881,7 @@
         "usedByMe": "Usati da me"
       }
     },
+    "invalidLink": "Questo non è un link valido. Inserisci un indirizzo web, un indirizzo e-mail o un altro link.",
     "legend": {
       "bold": "Grassetto",
       "heading3": "Titolo 3",

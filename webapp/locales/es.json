@@ -590,6 +590,7 @@
     "searchBadgeUser": "Usuario",
     "searchPlaceholder": "Buscar usuario o grupo…",
     "typeMessage": "Escribe un mensaje",
+    "unreadAbove": "Mensajes no leídos más arriba: {count}",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chatear con «{name}»"
@@ -880,6 +881,7 @@
         "usedByMe": "Usados por mí"
       }
     },
+    "invalidLink": "Esto no es un enlace válido. Introduce una dirección web, una dirección de correo electrónico u otro enlace.",
     "legend": {
       "bold": "Negrita",
       "heading3": "Título 3",

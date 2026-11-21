@@ -590,6 +590,7 @@
     "searchBadgeUser": "Utilisateur",
     "searchPlaceholder": "Chercher un utilisateur ou un groupe…",
     "typeMessage": "Écris un message",
+    "unreadAbove": "Messages non lus plus haut : {count}",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chatter avec « {name} »"
@@ -880,6 +881,7 @@
         "usedByMe": "Utilisés par moi"
       }
     },
+    "invalidLink": "Ce n’est pas un lien valide. Saisissez une adresse web, une adresse e-mail ou un autre lien.",
     "legend": {
       "bold": "Gras",
       "heading3": "Titre 3",
