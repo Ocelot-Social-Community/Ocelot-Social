@@ -164,6 +164,12 @@ import {
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
 import { findMessageField } from './messageField'
+import {
+  clearUnsavedDraft,
+  setUnsavedDraft,
+  unsavedDraft,
+  unsavedDraftRoomIds,
+} from './unsavedDrafts'
 import { mapGetters, mapMutations } from 'vuex'
 
 const EMPTY_ACTIONS = JSON.stringify([])
@@ -292,10 +298,10 @@ export default {
     this._draftSaves = {}
     // The files last seen in the field per room, kept with the draft or not.
     this._fieldFiles = {}
-    // Texts kept as a room's draft whose save failed, per room id: saved again with the next
-    // change, on leaving the room, closing the chat or leaving the page.
-    this._unsavedText = {}
-    // Set while the page is left: saves asked for then go out with `keepalive`.
+    // The text of a room's draft whose save is under way, per room id: sent again with
+    // `keepalive` when the page is left meanwhile, as the request under way may be cut off.
+    this._savingText = {}
+    // Set while the page is left: saves asked for then go out at once, with `keepalive`.
     this._leaving = false
     // The message field's inside (messageField.js), and the room whose draft it has been given:
     // until then, its changes are the library's own, emptying it for another room.
@@ -387,6 +393,8 @@ export default {
 
     // Leaving the page keeps what was typed, as far as the browser still lets the request go.
     window.addEventListener('pagehide', this.keepDraftsOnLeaving)
+    // Drafts whose save failed, maybe after a chat closed before: saved again now.
+    unsavedDraftRoomIds(this.currentUser.id).forEach((roomId) => this.keepDraft(roomId))
   },
   beforeDestroy() {
     // The chat is taken down — closed, or swapped for the participant list of a call: what
@@ -1305,6 +1313,14 @@ export default {
     // the one it was shown in until then. The message is sent by then: should fetching the room
     // fail, that is no failed message — which, sent again, would arrive twice.
     async replaceVirtualRoom(virtualRoomId, realRoomId) {
+      // Messages of the conversation that could not be sent go with it, to be sent again there.
+      Object.values(this._unsent)
+        .filter((entry) => entry.roomId === virtualRoomId)
+        .forEach((entry) => {
+          entry.roomId = realRoomId
+          entry.details = { ...entry.details, roomId: realRoomId }
+          entry.message = { ...entry.message, roomId: realRoomId }
+        })
       this.rooms = this.rooms.filter((r) => r.id !== virtualRoomId)
       try {
         const {
@@ -1396,6 +1412,8 @@ export default {
     // with.
     draftOf(roomId) {
       if (roomId in this.drafts) return this.drafts[roomId]
+      const unsaved = unsavedDraft(this.currentUser.id, roomId)
+      if (unsaved !== undefined) return unsaved
       return this.rooms.find((r) => r.id === roomId)?.draft || ''
     },
 
@@ -1520,40 +1538,58 @@ export default {
       const typed = this._typed[roomId]
       const files = this._typedFiles[roomId]
       const mentioned = this._typedMentions[roomId]
-      const unsaved = roomId in this._unsavedText
+      const userId = this.currentUser.id
+      const unsavedText = unsavedDraft(userId, roomId)
+      const unsaved = unsavedText !== undefined
       if (typed === undefined && files === undefined && !unsaved) return
       this.forgetTyped(roomId)
-      const text = typed !== undefined ? this.tagged(typed, mentioned) : this._unsavedText[roomId]
+      const text = typed !== undefined ? this.tagged(typed, mentioned) : unsavedText
       if (text !== undefined && (text !== this.draftOf(roomId) || unsaved)) {
         this.$set(this.drafts, roomId, text)
-        delete this._unsavedText[roomId]
-        const context = this.leavingContext()
-        this.queueDraftSave(roomId, async (target) => {
-          try {
-            await this.$apollo.mutate({
-              mutation: saveRoomDraft(),
-              variables: { ...target, text },
-              context,
-            })
-          } catch (error) {
-            // Not kept: unless a newer text has been asked for since, this one is saved again.
-            if (this.drafts[roomId] === text && !(roomId in this._unsavedText)) {
-              this._unsavedText[roomId] = text
-            }
-            throw error
-          }
-        })
+        clearUnsavedDraft(userId, roomId)
+        this.saveDraftText(roomId, text)
       }
       if (files !== undefined) this.keepDraftFiles(roomId, files)
     },
 
-    // The page is left: what is still to be kept goes out with `keepalive`, which lets the
-    // browser finish a request after the page is gone. Not the uploads: keepalive takes no
-    // more than 64 KB.
+    // Saves a room's draft text. Should it fail, the text is saved again later — unless a
+    // newer one has been asked for since — also from a chat opened anew (unsavedDrafts.js).
+    saveDraftText(roomId, text) {
+      const userId = this.currentUser.id
+      const context = this.leavingContext()
+      this._savingText[roomId] = text
+      this.queueDraftSave(roomId, async (target) => {
+        try {
+          await this.$apollo.mutate({
+            mutation: saveRoomDraft(),
+            variables: { ...target, text },
+            context,
+          })
+        } catch (error) {
+          if (this.drafts[roomId] === text && unsavedDraft(userId, roomId) === undefined) {
+            setUnsavedDraft(userId, roomId, text)
+          }
+          throw error
+        } finally {
+          if (this._savingText[roomId] === text) delete this._savingText[roomId]
+        }
+      })
+    },
+
+    // The page is left: what is still to be kept goes out at once, without waiting for a save
+    // under way, and with `keepalive`, which lets the browser finish a request after the page
+    // is gone. A text whose save is under way goes out again that way, as the request may be
+    // cut off. Not the uploads: keepalive takes no more than 64 KB.
     keepDraftsOnLeaving() {
       this._leaving = true
+      const saving = { ...this._savingText }
       try {
         this.keepAllDrafts()
+        Object.entries(saving).forEach(([roomId, text]) => {
+          if (this._savingText[roomId] === text && this.drafts[roomId] === text) {
+            this.saveDraftText(roomId, text)
+          }
+        })
       } finally {
         this._leaving = false
       }
@@ -1603,6 +1639,14 @@ export default {
               // Taken out of the field again while it was uploaded: it goes again too.
               const inField = this._fieldFiles[roomId]
               if (inField && !inField.includes(file)) this.keepDraftFiles(roomId, inField)
+            } catch (error) {
+              // Not uploaded: the files of the field count as changed again, so the next change,
+              // leaving the room, closing the chat or leaving the page tries again — with the
+              // field as it is then, without what was taken out meanwhile.
+              if (!(roomId in this._typedFiles)) {
+                this._typedFiles[roomId] = this._fieldFiles[roomId] || [file]
+              }
+              throw error
             } finally {
               file.draftUpload = false
             }
@@ -1615,7 +1659,8 @@ export default {
     // one fails: the draft is still in the field, and its next change tries again.
     queueDraftSave(roomId, save) {
       const target = this.draftTarget(roomId)
-      const previous = this._draftSaves[roomId]
+      // Leaving the page, nothing waits: a save behind another may never start.
+      const previous = this._leaving ? null : this._draftSaves[roomId]
       const next = previous ? previous.then(() => save(target)) : Promise.resolve(save(target))
       const chained = next
         .catch(() => {})
@@ -1629,7 +1674,7 @@ export default {
       const roomIds = new Set([
         ...Object.keys(this._typed),
         ...Object.keys(this._typedFiles),
-        ...Object.keys(this._unsavedText),
+        ...unsavedDraftRoomIds(this.currentUser.id),
       ])
       roomIds.forEach((roomId) => this.keepDraft(roomId))
     },

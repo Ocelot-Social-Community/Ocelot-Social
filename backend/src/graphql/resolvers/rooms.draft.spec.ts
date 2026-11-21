@@ -489,15 +489,26 @@ describe('SaveRoomDraft', () => {
     it('opens one room for the pair, however many drafts come at once', async () => {
       as(anna)
 
-      await Promise.all([
+      const saves = await Promise.all([
         save({ userId: 'carl', text: 'One' }),
         save({ userId: 'carl', text: 'Two' }),
         save({ userId: 'carl', text: 'Three' }),
       ])
 
-      const found = await setup.query({ query: roomWithUser, variables: { userId: 'carl' } })
+      saves.forEach(({ errors, data }) => {
+        expect(errors).toBeUndefined()
+        expect(data.SaveRoomDraft).not.toBeNull()
+      })
+      // Counted in the database: asked for by user, a room is found once even if there are two.
+      const rooms = await setup.database.driver.session().run(
+        `
+          MATCH (:User { id: 'anna' })-[:CHATS_IN]->(room:Room)<-[:CHATS_IN]-(:User { id: 'carl' })
+          WHERE NOT (room)-[:ROOM_FOR]->()
+          RETURN count(room) AS count
+        `,
+      )
 
-      expect(found.data.Room).toHaveLength(1)
+      expect(rooms.records[0].get('count').toNumber()).toBe(1)
     })
 
     it('opens the room for the draft, listed for the one writing only', async () => {

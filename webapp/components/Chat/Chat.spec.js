@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import Vuex from 'vuex'
 import Chat from './Chat.vue'
+import { forgetUnsavedDrafts } from './unsavedDrafts'
 
 const localVue = global.localVue
 
@@ -70,6 +71,8 @@ describe('Chat.vue', () => {
 
   beforeEach(() => {
     subscriptionHandlers = {}
+    // Drafts whose save failed outlive a chat; none is to reach into the next test.
+    forgetUnsavedDrafts()
 
     mocks = {
       $t: jest.fn((key) => key),
@@ -2375,6 +2378,67 @@ describe('Chat.vue', () => {
           { roomId: 'room-1', text: 'Newer' },
         ])
       })
+
+      it('outlives the chat closed meanwhile, shown and saved again when it opens anew', async () => {
+        let fail
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () => new Promise((resolve, reject) => (fail = () => reject(new Error('Offline')))),
+        )
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Still there' })
+        jest.advanceTimersByTime(1000)
+        wrapper.destroy()
+        fail()
+        await flush()
+        mocks.$apollo.mutate.mockClear()
+
+        wrapper = Wrapper()
+        wrapper.vm.rooms = [mockRoom()]
+
+        expect(draftSaves()).toEqual([{ roomId: 'room-1', text: 'Still there' }])
+        expect(wrapper.vm.draftOf('room-1')).toBe('Still there')
+      })
+    })
+
+    describe('when the page is left with a save under way', () => {
+      let saved
+
+      beforeEach(() => {
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () => new Promise((resolve) => (saved = () => resolve({ data: {} }))),
+        )
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Under way' })
+        jest.advanceTimersByTime(1000)
+      })
+
+      const keepalives = () =>
+        mocks.$apollo.mutate.mock.calls
+          .filter(([options]) => options.context?.fetchOptions?.keepalive)
+          .map(([options]) => options.variables.text)
+
+      it('sends a newer text at once, not behind it', () => {
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Newer' })
+
+        window.dispatchEvent(new Event('pagehide'))
+
+        expect(keepalives()).toEqual(['Newer'])
+        saved()
+      })
+
+      it('sends the text under way again, as its request may be cut off', () => {
+        window.dispatchEvent(new Event('pagehide'))
+
+        expect(keepalives()).toEqual(['Under way'])
+        saved()
+      })
+
+      it('sends nothing again once that save is through', async () => {
+        saved()
+        for (let i = 0; i < 10; i++) await Promise.resolve()
+
+        window.dispatchEvent(new Event('pagehide'))
+
+        expect(keepalives()).toEqual([])
+      })
     })
 
     describe('on sending', () => {
@@ -2447,6 +2511,26 @@ describe('Chat.vue', () => {
         wrapper.vm.mergeMessages([mockMessage({ id: 'msg-5', indexId: 5 })])
 
         expect(wrapper.vm.messages.map((m) => m.failure || m.id)).toEqual(['msg-5', true])
+      })
+
+      it('goes with a direct conversation begun here to the room it gets', async () => {
+        const virtualRoom = mockRoom({ id: 'temp-u1', roomId: 'temp-u1', _virtualUserId: 'u1' })
+        wrapper.vm.rooms = [mockRoom(), virtualRoom]
+        wrapper.vm.selectedRoom = virtualRoom
+        await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Failed' })
+        mocks.$apollo.mutate.mockResolvedValue({
+          data: { CreateMessage: { id: 'm1', room: { id: 'real-1' } } },
+        })
+        mocks.$apollo.query.mockResolvedValue({
+          data: { Room: [mockRoom({ id: 'real-1', roomId: 'real-1' })], Message: [] },
+        })
+
+        await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Sent' })
+
+        const [unsent] = Object.values(wrapper.vm._unsent)
+        expect(unsent.roomId).toBe('real-1')
+        expect(unsent.details.roomId).toBe('real-1')
+        expect(unsent.message.content).toBe('Failed')
       })
 
       it('is there again in a direct conversation begun here, left and opened again', async () => {
@@ -2692,6 +2776,33 @@ describe('Chat.vue', () => {
 
         expect(fileSaves()).toHaveLength(2)
         expect(file.draftUrl).toBe('https://s3/notes.txt')
+      })
+
+      it('tries an upload that failed again when the chat closes, without another change', async () => {
+        mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Offline'))
+        const file = { name: 'notes', type: 'text/plain', blob: new Blob(['x']) }
+        wrapper.vm.draftFilesChanged(field, [file])
+        jest.advanceTimersByTime(1000)
+        await settle()
+
+        wrapper.destroy()
+        await settle()
+
+        expect(fileSaves()).toHaveLength(2)
+      })
+
+      it('does not try again a file taken out of the field meanwhile', async () => {
+        mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Offline'))
+        const file = { name: 'notes', type: 'text/plain', blob: new Blob(['x']) }
+        wrapper.vm.draftFilesChanged(field, [file])
+        jest.advanceTimersByTime(1000)
+        await settle()
+        wrapper.vm.draftFilesChanged(field, [])
+
+        wrapper.destroy()
+        await settle()
+
+        expect(fileSaves()).toHaveLength(1)
       })
 
       it('takes no notice of the field emptied for another room', () => {
