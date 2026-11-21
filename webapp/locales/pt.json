@@ -590,6 +590,7 @@
     "searchBadgeUser": "Usuário",
     "searchPlaceholder": "Buscar usuário ou grupo…",
     "typeMessage": "Escreva uma mensagem",
+    "unreadAbove": "Mensagens não lidas mais acima: {count}",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Conversar com “{name}”"

@@ -590,6 +590,7 @@
     "searchBadgeUser": "Gebruiker",
     "searchPlaceholder": "Gebruiker of groep zoeken…",
     "typeMessage": "Typ een bericht",
+    "unreadAbove": "Ongelezen berichten verder omhoog: {count}",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chat met “{name}”"

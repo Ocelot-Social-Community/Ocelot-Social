@@ -590,6 +590,7 @@
     "searchBadgeUser": "Nutzer",
     "searchPlaceholder": "Nutzer oder Gruppe suchen…",
     "typeMessage": "Nachricht schreiben",
+    "unreadAbove": "Ungelesene Nachrichten weiter oben: {count}",
     "userProfileButton": {
       "label": "Chat",
       "tooltip": "Chatte mit „{name}“"

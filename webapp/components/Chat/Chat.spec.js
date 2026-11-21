@@ -2,10 +2,16 @@ import { mount } from '@vue/test-utils'
 import flushPromises from 'flush-promises'
 import Vuex from 'vuex'
 import Chat from './Chat.vue'
+import { createTooltip, destroyTooltip } from 'v-tooltip'
 
 const localVue = global.localVue
 
 // Stub the web component to avoid shadow DOM issues in tests
+jest.mock('v-tooltip', () => {
+  const actual = jest.requireActual('v-tooltip')
+  return { ...actual, createTooltip: jest.fn(), destroyTooltip: jest.fn() }
+})
+
 const stubs = {
   'vue-advanced-chat': {
     template:
@@ -2161,6 +2167,424 @@ describe('Chat.vue', () => {
         expect(mocks.$toast.error).toHaveBeenCalled()
         expect(wrapper.vm.exporting).toBe(false)
       })
+    })
+  })
+
+  describe('button to the unread messages above', () => {
+    let shadow, column, container
+
+    // A real shadow root with the library's message column and its scrolling part, the top of
+    // which is at 100px; each message drawn there ends where `bottoms` says.
+    const withMessageColumn = (propsData, bottoms = {}) => {
+      wrapper = Wrapper(propsData)
+      shadow = wrapper.vm.$el.attachShadow({ mode: 'open' })
+      column = document.createElement('div')
+      column.className = 'vac-col-messages'
+      container = document.createElement('div')
+      container.className = 'vac-container-scroll'
+      container.getBoundingClientRect = () => ({ top: 100, bottom: 500 })
+      Object.entries(bottoms).forEach(([id, bottom]) => {
+        const element = document.createElement('div')
+        element.id = id
+        element.getBoundingClientRect = () => ({ top: bottom - 50, bottom })
+        container.appendChild(element)
+      })
+      column.appendChild(container)
+      shadow.appendChild(column)
+    }
+    const unread = (ids) => {
+      wrapper.vm.unseenMessageIds = new Set(ids)
+    }
+    const button = () => column.querySelector('[data-test="chat-unread-above"]')
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
+
+    beforeEach(() => {
+      createTooltip.mockClear()
+      destroyTooltip.mockClear()
+      // As v-tooltip does: the element carries its tooltip.
+      createTooltip.mockImplementation((element) => {
+        element._tooltip = {}
+      })
+      mocks.$t.mockImplementation((key, params) =>
+        params ? `${key} ${JSON.stringify(params)}` : key,
+      )
+    })
+
+    describe('counts', () => {
+      it('the unread messages not loaded yet, and those loaded and scrolled past', () => {
+        withMessageColumn({}, { 'local-1': 90, 'local-2': 150 })
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 5 })]
+        wrapper.vm.selectedRoom = wrapper.vm.rooms[0]
+        wrapper.vm.messages = [
+          mockMessage({ id: 'msg-1', _id: 'local-1', indexId: 1 }),
+          mockMessage({ id: 'msg-2', _id: 'local-2', indexId: 2 }),
+        ]
+        unread(['msg-1', 'msg-2'])
+
+        // 3 not loaded, msg-1 above the top, msg-2 in sight.
+        expect(wrapper.vm.countUnreadAbove()).toBe(4)
+      })
+
+      it('not those seen just now, before the count of the room is told', () => {
+        withMessageColumn()
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 3 })]
+        wrapper.vm.selectedRoom = wrapper.vm.rooms[0]
+        wrapper.vm._seenBatch = ['msg-1']
+
+        expect(wrapper.vm.countUnreadAbove()).toBe(2)
+      })
+
+      it('none without a room open', () => {
+        withMessageColumn()
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 5 })]
+        wrapper.vm.selectedRoom = null
+
+        expect(wrapper.vm.countUnreadAbove()).toBe(0)
+      })
+
+      it('those not loaded alone without the library drawn yet', () => {
+        wrapper = Wrapper()
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 2 })]
+        wrapper.vm.selectedRoom = wrapper.vm.rooms[0]
+
+        expect(wrapper.vm.countUnreadAbove()).toBe(2)
+      })
+
+      it('anew once per frame, as messages come and go', async () => {
+        withMessageColumn()
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 3 })]
+        wrapper.vm.selectedRoom = wrapper.vm.rooms[0]
+        await frame()
+
+        expect(wrapper.vm.unreadAbove).toBe(3)
+
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 0 })]
+        wrapper.vm.selectedRoom = wrapper.vm.rooms[0]
+        await frame()
+
+        expect(wrapper.vm.unreadAbove).toBe(0)
+      })
+    })
+
+    describe('is shown', () => {
+      it('with its count, a label and a tooltip, at the top of the column', () => {
+        withMessageColumn()
+        wrapper.vm.unreadAbove = 3
+
+        wrapper.vm.renderUnreadAbove()
+
+        expect(button().querySelector('.vac-messages-count').textContent).toBe('3')
+        expect(button().classList.contains('vac-icon-scroll')).toBe(true)
+        expect(button().getAttribute('aria-label')).toBe('chat.unreadAbove {"count":3}')
+        expect(button().style.top).toBe('68px')
+        expect(createTooltip).toHaveBeenCalledWith(button(), {
+          content: 'chat.unreadAbove {"count":3}',
+          placement: 'left',
+        })
+      })
+
+      it('above 99 as 99+', () => {
+        withMessageColumn()
+        wrapper.vm.unreadAbove = 120
+
+        wrapper.vm.renderUnreadAbove()
+
+        expect(button().querySelector('.vac-messages-count').textContent).toBe('99+')
+      })
+
+      it('once, its count and tooltip kept up to date', () => {
+        withMessageColumn()
+        wrapper.vm.unreadAbove = 3
+        wrapper.vm.renderUnreadAbove()
+        wrapper.vm.renderUnreadAbove()
+
+        expect(createTooltip).toHaveBeenCalledTimes(1)
+
+        wrapper.vm.unreadAbove = 2
+        wrapper.vm.renderUnreadAbove()
+
+        expect(column.querySelectorAll('[data-test="chat-unread-above"]')).toHaveLength(1)
+        expect(button().querySelector('.vac-messages-count').textContent).toBe('2')
+        expect(destroyTooltip).toHaveBeenCalledTimes(1)
+        expect(createTooltip).toHaveBeenCalledTimes(2)
+      })
+
+      it('below the hint, where there is one', () => {
+        withMessageColumn({ hint: 'Visible only to the participants', hintKey: 'call' })
+        wrapper.vm.renderHint()
+        const bubble = column.querySelector('.chat-hint')
+        Object.defineProperty(bubble, 'offsetTop', { value: 68 })
+        Object.defineProperty(bubble, 'offsetHeight', { value: 40 })
+        wrapper.vm.unreadAbove = 1
+
+        wrapper.vm.renderUnreadAbove()
+
+        expect(button().style.top).toBe('116px')
+      })
+
+      it('at the very top when the host brings its own header', () => {
+        withMessageColumn({ hideHeader: true })
+        wrapper.vm.unreadAbove = 1
+
+        wrapper.vm.renderUnreadAbove()
+
+        expect(button().style.top).toBe('8px')
+      })
+
+      it('not without unread messages above, and gone with the last of them', () => {
+        withMessageColumn()
+        wrapper.vm.renderUnreadAbove()
+
+        expect(button()).toBeNull()
+
+        wrapper.vm.unreadAbove = 1
+        wrapper.vm.renderUnreadAbove()
+        wrapper.vm.unreadAbove = 0
+        wrapper.vm.renderUnreadAbove()
+
+        expect(button()).toBeNull()
+        expect(destroyTooltip).toHaveBeenCalledTimes(1)
+      })
+
+      it('not before the library has drawn its column', () => {
+        wrapper = Wrapper()
+        wrapper.vm.unreadAbove = 1
+
+        expect(() => wrapper.vm.renderUnreadAbove()).not.toThrow()
+      })
+
+      it('gone with the chat', () => {
+        withMessageColumn()
+        wrapper.vm.unreadAbove = 1
+        wrapper.vm.renderUnreadAbove()
+
+        wrapper.destroy()
+
+        expect(column.querySelector('[data-test="chat-unread-above"]')).toBeNull()
+      })
+    })
+
+    describe('a click', () => {
+      beforeEach(() => {
+        withMessageColumn({}, { 'local-1': -400, 'local-2': -200 })
+        wrapper.vm.rooms = [mockRoom({ unreadCount: 2 })]
+        wrapper.vm.selectedRoom = wrapper.vm.rooms[0]
+        wrapper.vm.messagesLoaded = false
+      })
+
+      it('loads older messages until the oldest unread one is, and scrolls it to the top', async () => {
+        const pages = [
+          [mockMessage({ id: 'msg-2', _id: 'local-2', indexId: 2 })],
+          [mockMessage({ id: 'msg-1', _id: 'local-1', indexId: 1 })],
+        ]
+        const fetchMessages = jest
+          .spyOn(wrapper.vm, 'fetchMessages')
+          .mockImplementation(async () => {
+            const [page] = pages.splice(0, 1)
+            wrapper.vm.messages = [...page, ...wrapper.vm.messages]
+            wrapper.vm.unseenMessageIds.add(page[0].id)
+          })
+        container.scrollTop = 1000
+        wrapper.vm.unreadAbove = 2
+        wrapper.vm.renderUnreadAbove()
+
+        button().click()
+        expect(wrapper.vm.jumpingToUnread).toBe(true)
+        expect(button().getAttribute('aria-busy')).toBe('true')
+        await flushPromises()
+        await frame()
+        await flushPromises()
+
+        expect(fetchMessages).toHaveBeenCalledTimes(2)
+        // msg-1 ends at -400, 50 high: its top at -450, 550 above the column's top, less the margin.
+        expect(container.scrollTop).toBe(1000 - 550 - 48)
+        expect(wrapper.vm.jumpingToUnread).toBe(false)
+      })
+
+      it('loads nothing when the oldest unread message is loaded already', async () => {
+        wrapper.vm.messages = [
+          mockMessage({ id: 'msg-1', _id: 'local-1', indexId: 1 }),
+          mockMessage({ id: 'msg-2', _id: 'local-2', indexId: 2 }),
+        ]
+        unread(['msg-1', 'msg-2'])
+        const fetchMessages = jest.spyOn(wrapper.vm, 'fetchMessages')
+        container.scrollTop = 1000
+
+        await wrapper.vm.jumpToOldestUnread()
+
+        expect(fetchMessages).not.toHaveBeenCalled()
+        expect(container.scrollTop).toBe(1000 - 550 - 48)
+      })
+
+      it('stops at the beginning of the room, or once nothing more comes', async () => {
+        const fetchMessages = jest.spyOn(wrapper.vm, 'fetchMessages').mockResolvedValue()
+
+        await wrapper.vm.jumpToOldestUnread()
+
+        expect(fetchMessages).toHaveBeenCalledTimes(1)
+
+        fetchMessages.mockClear()
+        wrapper.vm.messagesLoaded = true
+        await wrapper.vm.jumpToOldestUnread()
+
+        expect(fetchMessages).not.toHaveBeenCalled()
+      })
+
+      it('scrolls nowhere once another room is opened meanwhile', async () => {
+        jest.spyOn(wrapper.vm, 'fetchMessages').mockImplementation(async () => {
+          wrapper.vm.selectedRoom = mockRoom({ id: 'room-2' })
+        })
+        const scroll = jest.spyOn(wrapper.vm, 'scrollToOldestUnread')
+
+        await wrapper.vm.jumpToOldestUnread()
+
+        expect(scroll).not.toHaveBeenCalled()
+      })
+
+      it('is taken once while on its way', async () => {
+        let done
+        const fetchMessages = jest
+          .spyOn(wrapper.vm, 'fetchMessages')
+          .mockImplementation(() => new Promise((resolve) => (done = resolve)))
+
+        const first = wrapper.vm.jumpToOldestUnread()
+        await wrapper.vm.jumpToOldestUnread()
+        done()
+        await first
+
+        expect(fetchMessages).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('below', () => {
+      // The library's room, whose button to the newest message shows `scrollMessagesCount`.
+      const withLibraryRoom = () => {
+        const proxy = { scrollMessagesCount: 0, scrollIcon: false }
+        wrapper.vm.$el._instance = {
+          subTree: { component: { type: { name: 'ChatRoom' }, isUnmounted: false, proxy } },
+        }
+        return proxy
+      }
+
+      it('counts the unread messages loaded below what is shown', () => {
+        withMessageColumn({}, { 'local-1': 300, 'local-2': 600, 'local-3': 700 })
+        wrapper.vm.messages = [
+          mockMessage({ id: 'msg-1', _id: 'local-1', indexId: 1 }),
+          mockMessage({ id: 'msg-2', _id: 'local-2', indexId: 2 }),
+          mockMessage({ id: 'msg-3', _id: 'local-3', indexId: 3 }),
+        ]
+        unread(['msg-1', 'msg-2'])
+
+        // msg-1 in sight, msg-2 below (its top at 550), msg-3 below but read.
+        expect(wrapper.vm.countUnreadBelow()).toBe(1)
+      })
+
+      it('counts none before the library has drawn its column', () => {
+        wrapper = Wrapper()
+
+        expect(wrapper.vm.countUnreadBelow()).toBe(0)
+      })
+
+      it("shows them on the library's button to the newest message", () => {
+        withMessageColumn()
+        const room = withLibraryRoom()
+
+        wrapper.vm.showUnreadBelow(4)
+
+        expect(room).toEqual({ scrollMessagesCount: 4, scrollIcon: true })
+
+        wrapper.vm.showUnreadBelow(0)
+
+        expect(room).toEqual({ scrollMessagesCount: 0, scrollIcon: true })
+      })
+
+      it('shows nothing without the library room', () => {
+        withMessageColumn()
+
+        expect(() => wrapper.vm.showUnreadBelow(4)).not.toThrow()
+      })
+
+      it('are counted with those above, once per frame', async () => {
+        withMessageColumn()
+        const room = withLibraryRoom()
+        jest.spyOn(wrapper.vm, 'countUnreadBelow').mockReturnValue(2)
+
+        wrapper.vm.scheduleUnreadAbove()
+        await frame()
+
+        expect(room.scrollMessagesCount).toBe(2)
+      })
+    })
+
+    describe('on the way to the oldest unread message', () => {
+      let observed, callback
+
+      beforeEach(() => {
+        withMessageColumn()
+        observed = []
+        global.IntersectionObserver = jest.fn((handler) => {
+          callback = handler
+          return {
+            observe: jest.fn((element) => observed.push(['observe', element.id])),
+            unobserve: jest.fn((element) => observed.push(['unobserve', element.id])),
+            disconnect: jest.fn(),
+          }
+        })
+        global.MutationObserver = jest.fn(() => ({ observe: jest.fn(), disconnect: jest.fn() }))
+        wrapper.vm.setupMessageVisibilityTracking()
+        unread(['msg-1'])
+      })
+
+      it('reads nothing that comes into sight', () => {
+        wrapper.vm.jumpingToUnread = true
+        const element = document.createElement('div')
+        element.dataset.unseenId = 'msg-1'
+
+        callback([{ isIntersecting: true, target: element }])
+
+        expect(wrapper.vm.unseenMessageIds.has('msg-1')).toBe(true)
+      })
+
+      it('asks about the unread ones anew where it stopped', () => {
+        const element = document.createElement('div')
+        element.id = 'local-1'
+        element.dataset.unseenId = 'msg-1'
+        container.appendChild(element)
+
+        wrapper.vm.reobserveUnseen()
+
+        expect(observed).toEqual([
+          ['unobserve', 'local-1'],
+          ['observe', 'local-1'],
+        ])
+      })
+
+      it('asks nothing before the messages are watched', () => {
+        wrapper.vm._intersectionObserver = null
+
+        expect(() => wrapper.vm.reobserveUnseen()).not.toThrow()
+      })
+    })
+
+    it('counts anew on scrolling the messages', async () => {
+      withMessageColumn()
+      global.IntersectionObserver = jest.fn(() => ({ observe: jest.fn(), disconnect: jest.fn() }))
+      global.MutationObserver = jest.fn(() => ({ observe: jest.fn(), disconnect: jest.fn() }))
+      wrapper.vm.setupMessageVisibilityTracking()
+      const count = jest.spyOn(wrapper.vm, 'countUnreadAbove').mockReturnValue(7)
+
+      container.dispatchEvent(new Event('scroll'))
+      await frame()
+
+      expect(count).toHaveBeenCalled()
+      expect(wrapper.vm.unreadAbove).toBe(7)
+
+      wrapper.destroy()
+      count.mockClear()
+      container.dispatchEvent(new Event('scroll'))
+      await frame()
+
+      expect(count).not.toHaveBeenCalled()
     })
   })
 })
