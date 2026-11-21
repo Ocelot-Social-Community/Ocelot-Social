@@ -30,14 +30,14 @@
     "@nuxt/eslint": "^1.17.0",
     "@nuxt/test-utils": "^4.4.0",
     "@tailwindcss/vite": "^4.3.5",
-    "@vitest/coverage-v8": "^4.1.2",
+    "@vitest/coverage-v8": "^5.1.1",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^10.8.1",
     "eslint-config-it4c": "^0.14.1",
     "happy-dom": "^21.0.4",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.2",
+    "vitest": "^5.1.1",
     "vue-tsc": "^3.2.6"
   }
 }
