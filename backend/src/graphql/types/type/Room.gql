@@ -37,11 +37,23 @@ type Room {
 
   "Count unread messages, excluding those from blocked/muted senders."
   unreadCount: Int
+
+  "What the current user has begun to write in this room but not sent yet, or null. Only ever the viewer's own; nobody else learns of it."
+  draft: String
+
+  "The files attached to the current user's draft in this room, oldest first. Only ever the viewer's own."
+  draftFiles: [File]
 }
 
 type Mutation {
   "Create (or fetch) the chat room for a group. Requires authentication."
   CreateGroupRoom(groupId: ID!): Room
+  "Keep what the current user has begun to write in a room but not sent yet; an empty text removes it. Named by roomId, or by userId for a direct conversation without a message yet: that one is opened for the draft. Sending a message in the room removes the draft. Requires authentication."
+  SaveRoomDraft(roomId: ID, userId: ID, text: String): Room
+  "Attach a file to the current user's draft in a room, named as for SaveRoomDraft; a direct conversation without a message yet is opened for it. Stored at once; sending the message takes it over (CreateMessage, draftFiles). Requires authentication."
+  AddRoomDraftFile(roomId: ID, userId: ID, file: FileInput!): File
+  "Remove a file from the current user's draft in a room, by its URL, and from the storage. True when there was one. Requires authentication."
+  RemoveRoomDraftFile(roomId: ID, userId: ID, url: ID!): Boolean
 }
 
 type Query {

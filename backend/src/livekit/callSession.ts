@@ -23,7 +23,43 @@
 // (poller), and — the one that cannot be missed — when the group's next call begins and finds
 // an earlier session still marked as running.
 
-import type { Driver } from 'neo4j-driver'
+import CONFIG from '@config/index'
+import { deleteStoredFiles } from '@graphql/resolvers/attachments/attachments'
+
+import type { Driver, Transaction } from 'neo4j-driver'
+
+/**
+ * A call that is over takes no more messages in its chat (Room.isWritable), so what its
+ * participants had begun to write there and not sent (SaveRoomDraft, AddRoomDraftFile) goes
+ * with it. For the sessions `where` picks out of those ended, `session` being the one looked at.
+ * Answers the URLs of the draft files deleted, for deleteStoredFiles once the transaction is
+ * through.
+ */
+const dropDraftsOfEndedSessions = async (
+  transaction: Transaction,
+  where: string,
+  params: Record<string, unknown>,
+): Promise<string[]> => {
+  await transaction.run(
+    `
+      MATCH (:User)-[chatsIn:CHATS_IN]->(:Room)-[:ROOM_FOR]->(session:VideoCallSession)
+      WHERE ${where} AND session.endedAt IS NOT NULL AND chatsIn.draftUpdatedAt IS NOT NULL
+      REMOVE chatsIn.draft, chatsIn.draftUpdatedAt
+    `,
+    params,
+  )
+  const files = await transaction.run(
+    `
+      MATCH (file:File)-[:DRAFT_FILE_IN]->(:Room)-[:ROOM_FOR]->(session:VideoCallSession)
+      WHERE ${where} AND session.endedAt IS NOT NULL
+      WITH file, file.url AS url
+      DETACH DELETE file
+      RETURN url
+    `,
+    params,
+  )
+  return files.records.map((record) => record.get('url') as string)
+}
 
 interface JoinCallSessionInput {
   groupId: string
@@ -61,8 +97,11 @@ export const joinCallSession = async (
   { groupId, userId, livekitRoom, livekitSid, presentUserIds, currentSid }: JoinCallSessionInput,
 ): Promise<string | null> => {
   const session = driver.session()
+  // The draft files of the sessions ended (dropDraftsOfEndedSessions).
+  let droppedFiles: string[] = []
   try {
-    return await session.writeTransaction(async (transaction) => {
+    const roomId = await session.writeTransaction(async (transaction) => {
+      droppedFiles = []
       // The lock makes "is there a session to carry on, else open one" a single step. Two
       // participants asking at the same moment would otherwise both find none and both create
       // one. Writing to the group takes its write lock, which is held until the transaction
@@ -133,6 +172,9 @@ export const joinCallSession = async (
           `,
           { ids: over },
         )
+        droppedFiles = await dropDraftsOfEndedSessions(transaction, 'session.id IN $ids', {
+          ids: over,
+        })
       }
       if (!sessionId) {
         // Whoever opens the session started the call, and moderates it (see moderation.ts).
@@ -177,6 +219,8 @@ export const joinCallSession = async (
       // The lock above has found the user, and a session always has its room.
       return joined.records[0].get('roomId') as string
     })
+    await deleteStoredFiles(CONFIG, droppedFiles)
+    return roomId
   } finally {
     await session.close()
   }
@@ -188,17 +232,25 @@ export const joinCallSession = async (
  */
 export const endCallSession = async (driver: Driver, livekitSid: string): Promise<void> => {
   const session = driver.session()
+  // The draft files of the sessions ended (dropDraftsOfEndedSessions).
+  let droppedFiles: string[] = []
   try {
-    await session.writeTransaction(async (transaction) =>
-      transaction.run(
+    await session.writeTransaction(async (transaction) => {
+      await transaction.run(
         `
           MATCH (session:VideoCallSession { livekitSid: $livekitSid })
           WHERE session.endedAt IS NULL
           SET session.endedAt = toString(datetime())
         `,
         { livekitSid },
-      ),
-    )
+      )
+      droppedFiles = await dropDraftsOfEndedSessions(
+        transaction,
+        'session.livekitSid = $livekitSid',
+        { livekitSid },
+      )
+    })
+    await deleteStoredFiles(CONFIG, droppedFiles)
   } finally {
     await session.close()
   }
@@ -223,9 +275,11 @@ export const endCallSessionsOfMissingRoom = async (
   livekitRoom: string,
 ): Promise<boolean> => {
   const session = driver.session()
+  // The draft files of the sessions ended (dropDraftsOfEndedSessions).
+  let droppedFiles: string[] = []
   try {
-    const result = await session.writeTransaction(async (transaction) =>
-      transaction.run(
+    const result = await session.writeTransaction(async (transaction) => {
+      const ended = await transaction.run(
         `
           OPTIONAL MATCH (session:VideoCallSession { livekitRoom: $livekitRoom })
             WHERE session.endedAt IS NULL
@@ -240,8 +294,15 @@ export const endCallSessionsOfMissingRoom = async (
           RETURN count(CASE WHEN session IS NOT NULL AND NOT due THEN 1 END) = 0 AS settled
         `,
         { livekitRoom, graceSeconds: MISSING_ROOM_GRACE_SECONDS },
-      ),
-    )
+      )
+      droppedFiles = await dropDraftsOfEndedSessions(
+        transaction,
+        'session.livekitRoom = $livekitRoom',
+        { livekitRoom },
+      )
+      return ended
+    })
+    await deleteStoredFiles(CONFIG, droppedFiles)
     return result.records[0].get('settled') === true
   } finally {
     await session.close()

@@ -59,6 +59,7 @@ export const FRAMEWORK_TOKENS: Record<string, string> = {
   'chat-code-color': 'light-dark(#e01e5a, rgb(240, 110, 150))',
   'chat-confirm-color': '#1ba65b',
   'chat-deleted-background': 'light-dark(var(--color-neutral-80), var(--color-neutral-12))',
+  'chat-draft-label-color': 'var(--color-danger)',
   'chat-hint-background': 'var(--tooltip-background)',
   'chat-hint-close-hover-background': 'rgba(255, 255, 255, 0.15)',
   'chat-hint-color': 'var(--tooltip-color)',

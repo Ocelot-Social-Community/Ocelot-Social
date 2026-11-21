@@ -441,6 +441,7 @@
     "CHAT_GROUP_ROOM_NOT_CREATED": "Nie udało się utworzyć czatu grupowego.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Wiadomość musi zawierać tekst lub plik.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Nie możesz rozpocząć czatu z samym/samą sobą.",
+    "CHAT_ROOM_TARGET_MISSING": "Podaj czat albo osobę, z którą chcesz czatować.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Komentarz musi mieć co najmniej {min} znaków.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Konto z tym adresem e-mail już istnieje.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Podaj prawidłowy adres e-mail.",
@@ -565,6 +566,7 @@
     "cancelSelectMessage": "Anuluj",
     "closeChat": "Zamknij czat",
     "conversationStarted": "Rozmowa rozpoczęta:",
+    "draft": "Szkic:",
     "expandChat": "Rozwiń czat",
     "export": {
       "attachment": "Załącznik",
@@ -583,6 +585,7 @@
     "messageDeleted": "Ta wiadomość została usunięta",
     "messagesEmpty": "Brak wiadomości",
     "newMessages": "Nowe wiadomości",
+    "notSent": "Wiadomość nie została wysłana. Wykrzyknik obok niej pozwala wysłać ją ponownie.",
     "roomEmpty": "Nie wybrano pokoju",
     "roomsEmpty": "Brak pokojów",
     "search": "Filtruj pokoje czatu",

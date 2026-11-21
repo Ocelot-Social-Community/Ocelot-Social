@@ -1,5 +1,6 @@
 import { Group } from '@db/schema/entities/Group'
 import { Message } from '@db/schema/entities/Message'
+import { ISO_DATE_TIME } from '@db/schema/entities/patterns'
 import { Room } from '@db/schema/entities/Room'
 import { SocialMedia } from '@db/schema/entities/SocialMedia'
 import { User } from '@db/schema/entities/User'
@@ -18,11 +19,17 @@ export const chat: readonly RelationshipDefinition[] = [
     to: [Message, Group],
     cardinality: 'many',
   }),
+  // What the user has begun to write in the room and not sent yet (SaveRoomDraft), with its
+  // attached files hanging off DRAFT_FILE / DRAFT_FILE_IN (media.ts).
   defineRelationship({
     type: 'CHATS_IN',
     from: User,
     to: Room,
     cardinality: 'many',
+    properties: {
+      draft: { type: 'string' },
+      draftUpdatedAt: { type: 'string', pattern: ISO_DATE_TIME },
+    },
   }),
   defineRelationship({
     type: 'INSIDE',

@@ -63,6 +63,10 @@ export default {
         const userData = result.records[0].get('result')
         userData.posts.sort(byCreationDate)
         userData.posts.forEach((post) => post.comments.sort(byCreationDate))
+        userData.chatDrafts = await session.readTransaction(async (transaction) => {
+          const drafts = await transaction.run(chatDraftsCypher, { id })
+          return drafts.records.map((record) => record.get('draft'))
+        })
         return userData
       } finally {
         await session.close()
@@ -70,6 +74,31 @@ export default {
     },
   },
 }
+
+// The user's unsent drafts (SaveRoomDraft, AddRoomDraftFile), each named after its chat as the
+// chat list names it: the group, the group a call takes place in, or the other participant of a
+// direct conversation.
+const chatDraftsCypher = `
+  MATCH (user:User { id: $id })-[chatsIn:CHATS_IN]->(room:Room)
+  WHERE chatsIn.draftUpdatedAt IS NOT NULL
+  OPTIONAL MATCH (room)-[:ROOM_FOR]->(call:VideoCallSession)
+  OPTIONAL MATCH (room)-[:ROOM_FOR|CALL_IN*1..2]->(group:Group)
+  OPTIONAL MATCH (room)<-[:CHATS_IN]-(partner:User)
+    WHERE group IS NULL AND call IS NULL AND partner.id <> $id
+  WITH user, room, chatsIn, call, group, collect(partner)[0] AS partner
+  OPTIONAL MATCH (user)-[:DRAFT_FILE]->(file:File)-[:DRAFT_FILE_IN]->(room)
+  WITH room, chatsIn, call, group, partner, file ORDER BY datetime(file.createdAt)
+  WITH room, chatsIn, call, group, partner, collect(file { .* }) AS files
+  RETURN {
+    roomId: room.id,
+    roomName: COALESCE(group.name, partner.name),
+    isCallRoom: call IS NOT NULL,
+    text: chatsIn.draft,
+    files: files,
+    updatedAt: chatsIn.draftUpdatedAt
+  } AS draft
+  ORDER BY datetime(chatsIn.draftUpdatedAt)
+`
 
 export const byCreationDate = (a, b) => {
   if (a.createdAt < b.createdAt) {

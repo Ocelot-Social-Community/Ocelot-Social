@@ -2,6 +2,21 @@
 type UserData {
   user: User!
   posts: [Post]
+  "What the user has begun to write in chats and not sent yet, oldest first."
+  chatDrafts: [ChatDraft]
+}
+
+"A message begun in a chat and not sent yet, as kept for the one writing it."
+type ChatDraft {
+  roomId: ID!
+  "The chat's name: the group's, or the other participant's for a direct conversation."
+  roomName: String
+  "True for the conference chat of a video call that is still running."
+  isCallRoom: Boolean!
+  "Null for a draft of files only."
+  text: String
+  files: [File]
+  updatedAt: String
 }
 
 type Query {

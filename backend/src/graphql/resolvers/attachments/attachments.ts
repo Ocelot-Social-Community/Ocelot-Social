@@ -17,6 +17,9 @@ export type FileDeleteCallback = (url: string) => Promise<void>
 export type FileUploadCallback = (
   upload: Pick<FileUpload, 'createReadStream' | 'mimetype'> & { uniqueFilename: string },
 ) => Promise<string>
+// A message's files, or those of a draft not sent yet (resource: its writer).
+export type AttachmentRelationship = 'ATTACHMENT' | 'DRAFT_FILE'
+
 export interface DeleteAttachmentsOpts {
   transaction?: Transaction
 }
@@ -44,13 +47,13 @@ export interface File {
 export interface Attachments {
   del: (
     resource: { id: string },
-    relationshipType: 'ATTACHMENT',
+    relationshipType: AttachmentRelationship,
     opts?: DeleteAttachmentsOpts,
   ) => Promise<File>
 
   add: (
     resource: { id: string },
-    relationshipType: 'ATTACHMENT',
+    relationshipType: AttachmentRelationship,
     file: FileInput,
     fileAttributes?: object,
     opts?: AddAttachmentOpts,
@@ -59,7 +62,7 @@ export interface Attachments {
 
 const wrapTransactionDeleteAttachment = async (
   wrappedCallback: Attachments['del'],
-  args: [resource: { id: string }, relationshipType: 'ATTACHMENT'],
+  args: [resource: { id: string }, relationshipType: AttachmentRelationship],
   opts: DeleteAttachmentsOpts,
 ): ReturnType<Attachments['del']> => {
   const session = getDriver().session()
@@ -77,7 +80,7 @@ const wrapTransactionMergeAttachment = async (
   wrappedCallback: Attachments['add'],
   args: [
     resource: { id: string },
-    relationshipType: 'ATTACHMENT',
+    relationshipType: AttachmentRelationship,
     file: FileInput,
     fileAttributes?: object,
   ],
@@ -185,4 +188,18 @@ export const attachments = (config: S3Config) => {
     add,
   } satisfies Attachments
   return attachments
+}
+
+/**
+ * Removes files from the storage whose nodes are gone already, once the transaction that
+ * deleted them is through: deleted earlier, a rolled-back transaction would leave nodes
+ * pointing at nothing. A file that cannot be removed is left behind rather than failing what
+ * has been done.
+ */
+export const deleteStoredFiles = async (config: S3Config, urls: string[]): Promise<void> => {
+  if (!urls.length) {
+    return
+  }
+  const s3 = s3Service(config, 'attachments')
+  await Promise.allSettled(urls.map(async (url) => s3.deleteFile(url)))
 }

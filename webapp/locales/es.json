@@ -441,6 +441,7 @@
     "CHAT_GROUP_ROOM_NOT_CREATED": "No se ha podido crear el chat del grupo.",
     "CHAT_MESSAGE_CONTENT_MISSING": "El mensaje necesita un texto o un archivo.",
     "CHAT_ROOM_PARTNER_IS_SELF": "No puedes iniciar un chat contigo mismo.",
+    "CHAT_ROOM_TARGET_MISSING": "Indica un chat o la persona con la que quieres chatear.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "El comentario debe tener al menos {min} caracteres.",
     "EMAIL_CHANGE_ADDRESS_ALREADY_IN_USE": "Ya hay una cuenta de usuario con esta dirección de correo electrónico.",
     "EMAIL_CHANGE_ADDRESS_INVALID": "Por favor, introduce una dirección de correo electrónico válida.",
@@ -565,6 +566,7 @@
     "cancelSelectMessage": "Cancelar",
     "closeChat": "Cerrar chat",
     "conversationStarted": "Conversación iniciada el:",
+    "draft": "Borrador:",
     "expandChat": "Expandir chat",
     "export": {
       "attachment": "Adjunto",
@@ -583,6 +585,7 @@
     "messageDeleted": "Este mensaje fue eliminado",
     "messagesEmpty": "No hay mensajes",
     "newMessages": "Nuevos mensajes",
+    "notSent": "El mensaje no se ha enviado. Con el signo de exclamación junto a él puedes enviarlo de nuevo.",
     "roomEmpty": "No hay sala seleccionada",
     "roomsEmpty": "No hay salas",
     "search": "Filtrar salas de chat",

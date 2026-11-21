@@ -426,6 +426,10 @@ const definitions = {
     type: 'FORBIDDEN',
     text: 'This video call is over. Its chat can still be read, but no longer written to.',
   },
+  CHAT_ROOM_TARGET_MISSING: {
+    type: 'BAD_USER_INPUT',
+    text: 'Name either a chat or the user to chat with.',
+  },
   CHAT_ROOM_PARTNER_IS_SELF: {
     type: 'BAD_USER_INPUT',
     text: 'You cannot create a chat with yourself.',
