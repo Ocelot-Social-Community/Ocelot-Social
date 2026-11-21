@@ -123,6 +123,9 @@
       />
     </div>
 
+    <!-- The room list's field filters the rooms by name: the filter's icon, not a search. -->
+    <os-icon slot="search-icon" :icon="icons.filter" class="chat-rooms-filter-icon" />
+
     <template v-for="msg in messages">
       <avatar-image
         v-if="msg.avatar"
@@ -152,6 +155,8 @@ import {
   markMessagesAsSeen,
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
+import { createTooltip, destroyTooltip } from 'v-tooltip'
+import { findLibraryComponent } from './libraryComponent'
 import { mapGetters, mapMutations } from 'vuex'
 
 const EMPTY_ACTIONS = JSON.stringify([])
@@ -161,6 +166,13 @@ const INFO_ICON_PATH =
   'M16 3c7.168 0 13 5.832 13 13s-5.832 13-13 13-13-5.832-13-13 5.832-13 13-13zM16 5c-6.087 0-11 4.913-11 11s4.913 11 11 11 11-4.913 11-11-4.913-11-11-11zM15 10h2v2h-2v-2zM15 14h2v8h-2v-8z'
 const CLOSE_ICON_PATH =
   'M7.219 5.781l8.781 8.781 8.781-8.781 1.438 1.438-8.781 8.781 8.781 8.781-1.438 1.438-8.781-8.781-8.781 8.781-1.438-1.438 8.781-8.781-8.781-8.781z'
+// The library's arrow down on its button to the newest message, turned up: the button to the
+// oldest unread message above mirrors it (renderUnreadAbove).
+const ARROW_UP_ICON_PATH = 'M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z'
+// Room left above the oldest unread message once it is jumped to: what was said before it.
+const UNREAD_JUMP_MARGIN = 48
+// The most pages of older messages loaded to reach it, as a stop for a count that is off.
+const UNREAD_JUMP_MAX_PAGES = 50
 const ROOM_PAGE_SIZE = 10
 const MESSAGE_PAGE_SIZE = 20
 const EXPORT_PAGE_SIZE = 100
@@ -245,6 +257,10 @@ export default {
       oldestLoadedIndexId: null,
       messages: [],
       unseenMessageIds: new Set(),
+      // Unread messages above the part of the room shown (countUnreadAbove), and whether the
+      // button to them is on its way there.
+      unreadAbove: 0,
+      jumpingToUnread: false,
       pendingStatusUpdates: {},
       exporting: false,
     }
@@ -253,6 +269,9 @@ export default {
     this.icons = iconRegistry
     // How often another room has been opened; see fetchMessages.
     this.roomSwitches = 0
+    // Unread messages that came in while their room was open. The room's unread count leaves
+    // them out (chatMessageAdded), so they are neither counted against it nor taken off it.
+    this._arrivedUnseen = new Set()
   },
   watch: {
     groupId(newGroupId) {
@@ -280,6 +299,17 @@ export default {
     },
     hint() {
       this.renderHint()
+    },
+    // What the button to the unread messages above counts changes with the messages, the
+    // room's unread count, and the room open.
+    messages() {
+      this.scheduleUnreadAbove()
+    },
+    rooms() {
+      this.scheduleUnreadAbove()
+    },
+    selectedRoom() {
+      this.scheduleUnreadAbove()
     },
     // The host can start or stop bringing its own header while this chat stays the same —
     // beside a video call, once the call's conference chat is confirmed. The styles that
@@ -332,6 +362,11 @@ export default {
     this._subscriptions.push(statusSub)
   },
   beforeDestroy() {
+    // A jump to the oldest unread message under way goes no further (jumpToOldestUnread).
+    this._destroyed = true
+    if (this._unreadAboveFrame) cancelAnimationFrame(this._unreadAboveFrame)
+    this._scrollContainer?.removeEventListener?.('scroll', this.scheduleUnreadAbove)
+    this.removeUnreadAbove()
     this._subscriptions?.forEach((s) => s.unsubscribe())
     if (this._intersectionObserver) this._intersectionObserver.disconnect()
     if (this._roomLoaderObserver) this._roomLoaderObserver.disconnect()
@@ -497,6 +532,187 @@ export default {
       close.setAttribute('aria-label', this.$t('actions.close'))
       close.addEventListener('click', () => this.dismissHint(this.hintKey || this.hint))
       column.appendChild(bubble)
+      // The button to the unread messages above goes below the hint.
+      this.renderUnreadAbove()
+    },
+
+    // The unread messages above the part of the room shown: those loaded and scrolled past,
+    // and those not loaded yet — the room's unread count beyond the unread ones loaded.
+    countUnreadAbove() {
+      const room = this.rooms.find((r) => r.id === this.selectedRoom?.id)
+      if (!room) return 0
+      const notLoaded = this.unreadNotLoaded(room)
+      const shadowRoot = this.$el?.shadowRoot
+      const container = shadowRoot?.querySelector?.('.vac-container-scroll')
+      if (!(container instanceof Element)) return notLoaded
+      const top = container.getBoundingClientRect().top
+      const scrolledPast = this.messages.filter((m) => {
+        if (!this.unseenMessageIds.has(m.id)) return false
+        const element = shadowRoot.querySelector(`[id="${m._id}"]`)
+        return !!element && element.getBoundingClientRect().bottom <= top
+      }).length
+      return notLoaded + scrolledPast
+    },
+
+    // The unread messages of the room not loaded yet: its unread count, less the unread ones
+    // loaded and those seen just now but not yet taken off the count (they wait for the batch
+    // to be sent, markAsSeen). Those come in while the room was open were never in the count.
+    unreadNotLoaded(room) {
+      const unread = typeof room?.unreadCount === 'number' ? room.unreadCount : 0
+      const counted = (ids) => ids.filter((id) => !this._arrivedUnseen.has(id)).length
+      return Math.max(
+        0,
+        unread - counted([...this.unseenMessageIds]) - counted(this._seenBatch || []),
+      )
+    },
+
+    // Once per frame at most: scrolling reports far more often.
+    scheduleUnreadAbove() {
+      if (this._unreadAboveFrame) return
+      this._unreadAboveFrame = requestAnimationFrame(() => {
+        this._unreadAboveFrame = null
+        this.unreadAbove = this.countUnreadAbove()
+        this.renderUnreadAbove()
+        this.showUnreadBelow(this.countUnreadBelow())
+      })
+    },
+
+    // The unread messages loaded below the part of the room shown.
+    countUnreadBelow() {
+      const shadowRoot = this.$el?.shadowRoot
+      const container = shadowRoot?.querySelector?.('.vac-container-scroll')
+      if (!(container instanceof Element)) return 0
+      const bottom = container.getBoundingClientRect().bottom
+      return this.messages.filter((m) => {
+        if (!this.unseenMessageIds.has(m.id)) return false
+        const element = shadowRoot.querySelector(`[id="${m._id}"]`)
+        return !!element && element.getBoundingClientRect().top >= bottom
+      }).length
+    },
+
+    // The library's button to the newest message counts the messages come in while scrolled up;
+    // it is given the unread ones below instead, which holds those and the ones jumped over
+    // (jumpToOldestUnread). Its count lives inside the library (libraryComponent.js).
+    showUnreadBelow(count) {
+      const room = findLibraryComponent(this.$el, 'ChatRoom')?.proxy
+      if (!room || room.scrollMessagesCount === count) return
+      room.scrollMessagesCount = count
+      if (count) room.scrollIcon = true
+    },
+
+    // The library marks a request for older messages as under way (`loadingMoreMessages`) and
+    // clears the mark only when its messages change. A page that failed changes none, which
+    // left its paging stuck in the room. The mark lives inside the library (libraryComponent.js).
+    releaseLibraryPaging() {
+      const room = findLibraryComponent(this.$el, 'ChatRoom')?.proxy
+      if (room) room.loadingMoreMessages = false
+    },
+
+    // Unread messages that came into sight while the room moved on its own, on the way to the
+    // oldest unread one, were not read: they are asked about anew where the room stopped.
+    reobserveUnseen() {
+      const observer = this._intersectionObserver
+      const shadowRoot = this.$el?.shadowRoot
+      if (!observer || !shadowRoot) return
+      shadowRoot.querySelectorAll('[data-unseen-id]').forEach((element) => {
+        observer.unobserve(element)
+        observer.observe(element)
+      })
+    },
+
+    // The button to the oldest unread message above, the counterpart of the library's button
+    // to the newest one below: its look and its counter's colours, those of unread messages,
+    // at the top. Written into the library's markup like the hint, where no component of the
+    // app can be put.
+    renderUnreadAbove() {
+      const shadowRoot = this.$el?.shadowRoot
+      const column = shadowRoot?.querySelector?.('.vac-col-messages')
+      let button = shadowRoot?.querySelector?.('.chat-unread-above')
+      if (!(button instanceof Element)) button = null
+      if (!this.unreadAbove || !(column instanceof Element)) {
+        this.removeUnreadAbove()
+        return
+      }
+      if (!button || button.parentNode !== column) {
+        this.removeUnreadAbove()
+        button = document.createElement('button')
+        button.type = 'button'
+        button.className = 'vac-icon-scroll chat-unread-above'
+        button.dataset.test = 'chat-unread-above'
+        button.innerHTML = `<div class="vac-badge-counter vac-messages-count"></div><svg viewBox="0 0 24 24" width="25" height="25" aria-hidden="true" focusable="false"><path d="${ARROW_UP_ICON_PATH}"/></svg>`
+        button.addEventListener('click', () => this.jumpToOldestUnread())
+        column.appendChild(button)
+      }
+      // Below the hint where there is one, else below the room's header.
+      const hint = column.querySelector('.chat-hint')
+      button.style.top = hint
+        ? `${hint.offsetTop + hint.offsetHeight + 8}px`
+        : `${this.hideHeader ? 8 : 68}px`
+      button.querySelector('.vac-messages-count').textContent =
+        this.unreadAbove > 99 ? '99+' : String(this.unreadAbove)
+      button.classList.toggle('chat-unread-above--busy', this.jumpingToUnread)
+      button.setAttribute('aria-busy', String(this.jumpingToUnread))
+      const label = this.$t('chat.unreadAbove', { count: this.unreadAbove })
+      if (button.getAttribute('aria-label') !== label) {
+        button.setAttribute('aria-label', label)
+        if (button._tooltip) destroyTooltip(button)
+        createTooltip(button, { content: label, placement: 'left' })
+      }
+    },
+
+    removeUnreadAbove() {
+      const button = this.$el?.shadowRoot?.querySelector?.('.chat-unread-above')
+      if (!(button instanceof Element)) return
+      if (button._tooltip) destroyTooltip(button)
+      button.remove()
+    },
+
+    // To the oldest unread message: the older pages are loaded until it is, then it is
+    // scrolled to the top of the room, with what was said before it above.
+    async jumpToOldestUnread() {
+      if (this.jumpingToUnread || !this.selectedRoom) return
+      const room = this.selectedRoom
+      this.jumpingToUnread = true
+      this.renderUnreadAbove()
+      try {
+        for (let page = 0; page < UNREAD_JUMP_MAX_PAGES; page++) {
+          const roomNow = this.rooms.find((r) => r.id === room.id)
+          if (this.messagesLoaded || !this.unreadNotLoaded(roomNow)) break
+          const oldest = this.oldestLoadedIndexId
+          const loaded = await this.fetchMessages({ room })
+          // Stopped by a failed page, another room opened, the chat closed, or a page that
+          // brought nothing older.
+          if (!loaded || this._destroyed || this.selectedRoom !== room) break
+          if (this.oldestLoadedIndexId === oldest) break
+        }
+        if (this._destroyed || this.selectedRoom !== room) return
+        // The library draws what was loaded with its own Vue, after this one's tick.
+        await this.$nextTick()
+        await new Promise((resolve) => requestAnimationFrame(resolve))
+        if (this._destroyed || this.selectedRoom !== room) return
+        this.scrollToOldestUnread()
+      } finally {
+        this.jumpingToUnread = false
+        if (!this._destroyed) {
+          this.reobserveUnseen()
+          this.scheduleUnreadAbove()
+        }
+      }
+    },
+
+    scrollToOldestUnread() {
+      const shadowRoot = this.$el?.shadowRoot
+      const container = shadowRoot?.querySelector?.('.vac-container-scroll')
+      const oldest = this.messages
+        .filter((m) => this.unseenMessageIds.has(m.id))
+        .reduce((min, m) => (!min || m.indexId < min.indexId ? m : min), null)
+      if (!oldest || !(container instanceof Element)) return
+      const element = shadowRoot.querySelector(`[id="${oldest._id}"]`)
+      if (!element) return
+      container.scrollTop +=
+        element.getBoundingClientRect().top -
+        container.getBoundingClientRect().top -
+        UNREAD_JUMP_MARGIN
     },
 
     buildLastMessage(msg) {
@@ -526,7 +742,9 @@ export default {
       const roomIndex = this.rooms.findIndex((r) => r.id === room.id)
       if (roomIndex !== -1) {
         const changedRoom = { ...this.rooms[roomIndex] }
-        changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - messageIds.length)
+        // Those come in while the room was open were never in its count (chatMessageAdded).
+        const counted = messageIds.filter((id) => !this._arrivedUnseen.delete(id)).length
+        changedRoom.unreadCount = Math.max(0, changedRoom.unreadCount - counted)
         this.$set(this.rooms, roomIndex, changedRoom)
       }
       // Persist to server
@@ -569,7 +787,21 @@ export default {
            overlays line up when stacked. The wrapper's 16px horizontal padding
            already matches the video header's $space-small (16px). */
         .vac-room-header { height: 60px !important; }
+        /* The messages begin where the header ends: the library keeps 65px free above them
+           (50px on a narrow screen), which left a strip between the two. */
+        .vac-col-messages .vac-container-scroll { margin-top: 60px; }
         .vac-room-header .vac-avatar-profile--header { margin-right: 8px; }
+        /* A scrollbar that floats over the messages (macOS): room for it, as the avatar of
+           one's own messages reaches the right edge of the list; and above them, as the
+           avatars (AvatarImage, positioned, its content transformed) were drawn over it. Its
+           own stacking context puts the list's scrollbar above all that is in it. Both classes
+           for the padding: the library's own (padding: 0 5px 5px) comes later in the shadow root.
+           Thin, as Safari's is wider than the padding; still floating, unlike a scrollbar styled
+           through ::-webkit-scrollbar, which takes a track of its own there. */
+        .vac-container-scroll { isolation: isolate; scrollbar-width: thin; }
+        .vac-container-scroll .vac-messages-container { padding-right: 12px; }
+        /* The room list's scrollbar like the messages': thin, and above the avatars in it. */
+        .vac-rooms-container .vac-room-list { isolation: isolate; scrollbar-width: thin; }
         ${
           // A chat on its own — the floating window, the call's sidebar — has little height,
           // and the library puts 10px above and below the input (7px on a narrow screen).
@@ -628,6 +860,15 @@ export default {
         }
         .chat-hint__close:hover { background: var(--chat-hint-close-hover-background); }
         .chat-hint__close:focus-visible { outline: 2px solid var(--chat-hint-color); }
+        /* The button to the unread messages above (renderUnreadAbove): the library's button to
+           the newest message, at the top, with its counter below the arrow. Both classes: the
+           library's own rules for .vac-icon-scroll (bottom: 70px) come later in the shadow root
+           and would otherwise pin the button to the bottom as well, stretching it. */
+        .vac-icon-scroll.chat-unread-above { top: 68px; bottom: auto; height: auto; border: 0; font: inherit; }
+        .vac-icon-scroll.chat-unread-above svg { fill: var(--chat-icon-color-dropdown-scroll); }
+        .vac-icon-scroll.chat-unread-above .vac-messages-count { top: auto; bottom: -8px; }
+        .vac-icon-scroll.chat-unread-above:focus-visible { outline: 2px solid var(--chat-icon-color-dropdown-scroll); outline-offset: 2px; }
+        .vac-icon-scroll.chat-unread-above--busy { cursor: progress; opacity: 0.6; }
         ${
           this.singleRoom
             ? `
@@ -647,6 +888,10 @@ export default {
       if (!shadowRoot || this._mutationObserver) return
       const scrollContainer = shadowRoot.querySelector('.vac-container-scroll')
       if (!scrollContainer) return
+      // Scrolling up past unread messages counts them for the button to them, down again
+      // counts them off.
+      this._scrollContainer = scrollContainer
+      scrollContainer.addEventListener?.('scroll', this.scheduleUnreadAbove, { passive: true })
 
       this._seenBatch = []
       this._seenFlushTimer = null
@@ -654,6 +899,8 @@ export default {
       // IntersectionObserver: detects when unseen messages become visible
       this._intersectionObserver = new IntersectionObserver(
         (entries) => {
+          // On the way to the oldest unread message, nothing passed is read (reobserveUnseen).
+          if (this.jumpingToUnread) return
           for (const entry of entries) {
             if (entry.isIntersecting) {
               const msgId = entry.target.dataset.unseenId
@@ -931,6 +1178,7 @@ export default {
         this.messages = []
         this.oldestLoadedIndexId = null
         this.unseenMessageIds = new Set()
+        this._arrivedUnseen = new Set()
         this.selectedRoom = room
       }
       const switches = this.roomSwitches
@@ -974,7 +1222,7 @@ export default {
         // Another room may have been opened while this one was asked for: its messages
         // must not end up there. Counted, not compared by id: after a way there and back the
         // room is the same again, but its messages have been asked for anew.
-        if (this.roomSwitches !== switches) return
+        if (this.roomSwitches !== switches) return false
 
         this.mergeMessages(Message)
 
@@ -997,10 +1245,16 @@ export default {
           // A room opened may have had its message column drawn anew.
           this.renderHint()
         })
+        return true
       } catch (error) {
-        if (this.roomSwitches !== switches) return
-        this.messages = []
+        if (this.roomSwitches !== switches) return false
+        // An older page that failed leaves the newer ones loaded: emptied, the room would
+        // show a gap once the page came after all. The library, though, waits for new messages
+        // before it asks for older ones again; told the request is over, it asks anew.
+        if (variables.beforeIndex === undefined) this.messages = []
+        else this.releaseLibraryPaging()
         this.$toastBackendError(error)
+        return false
       }
     },
 
@@ -1049,6 +1303,7 @@ export default {
       this.moveRoomToTop(changedRoom, msg.room.id)
       // Only add incoming messages to the chat — own messages are handled via mutation response
       if (isCurrentRoom && !isOwnMessage) {
+        this._arrivedUnseen.add(msg.id)
         this.addSocketMessage(msg)
       }
     },
@@ -1554,6 +1809,12 @@ export default {
 .room-name-with-icon {
   color: var(--chat-room-color-username);
   font-weight: 500;
+}
+
+.chat-rooms-filter-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--chat-icon-color-search, var(--chat-text-muted));
 }
 
 .vac-message-avatar {

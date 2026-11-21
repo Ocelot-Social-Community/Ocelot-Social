@@ -590,6 +590,7 @@
     "searchBadgeUser": "Користувач",
     "searchPlaceholder": "Шукати користувача або групу…",
     "typeMessage": "Написати повідомлення",
+    "unreadAbove": "Непрочитані повідомлення вище: {count}",
     "userProfileButton": {
       "label": "Чат",
       "tooltip": "Чат з «{name}»"

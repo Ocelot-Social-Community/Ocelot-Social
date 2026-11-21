@@ -590,6 +590,7 @@
     "searchBadgeUser": "Përdorues",
     "searchPlaceholder": "Kërko përdorues ose grup…",
     "typeMessage": "Shkruaj mesazh",
+    "unreadAbove": "Mesazhe të palexuara më lart: {count}",
     "userProfileButton": {
       "label": "Biseda",
       "tooltip": "Bisedo me „{name}“"

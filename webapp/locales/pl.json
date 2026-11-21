@@ -590,6 +590,7 @@
     "searchBadgeUser": "Użytkownik",
     "searchPlaceholder": "Szukaj użytkownika lub grupy…",
     "typeMessage": "Wpisz wiadomość",
+    "unreadAbove": "Nieprzeczytane wiadomości wyżej: {count}",
     "userProfileButton": {
       "label": "Czat",
       "tooltip": "Czat z „{name}”"

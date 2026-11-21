@@ -590,6 +590,7 @@
     "searchBadgeUser": "Пользователь",
     "searchPlaceholder": "Искать пользователя или группу…",
     "typeMessage": "Напиши сообщение",
+    "unreadAbove": "Непрочитанные сообщения выше: {count}",
     "userProfileButton": {
       "label": "Чат",
       "tooltip": "Написать «{name}»"
