@@ -4323,6 +4323,9 @@ export default {
   overflow: hidden;
   /*  The resizer is placed on its edge. */
   position: relative;
+  /*  What the chat layers inside (its hint above the messages: z-index 20) stays inside: */
+  /*  the device settings panel, which reaches over the sidebar, lies above all of it. */
+  isolation: isolate;
 }
 
 /*  A pulled width is the user's: only the half of the body caps it (clampSidebarSize). */
