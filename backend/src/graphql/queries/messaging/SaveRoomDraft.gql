@@ -1,0 +1,7 @@
+mutation SaveRoomDraft($roomId: ID, $userId: ID, $text: String) {
+  SaveRoomDraft(roomId: $roomId, userId: $userId, text: $text) {
+    id
+    roomId
+    draft
+  }
+}

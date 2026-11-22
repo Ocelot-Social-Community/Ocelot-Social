@@ -126,6 +126,26 @@ type Category {
   updatedAt: String
 }
 
+"""
+A message begun in a chat and not sent yet, as kept for the one writing it.
+"""
+type ChatDraft {
+  files: [File]
+
+  """True for the conference chat of a video call that is still running."""
+  isCallRoom: Boolean!
+  roomId: ID!
+
+  """
+  The chat's name: the group's, or the other participant's for a direct conversation.
+  """
+  roomName: String
+
+  """Null for a draft of files only."""
+  text: String
+  updatedAt: String
+}
+
 """Real-time delivery/seen-status update for messages in a room."""
 type ChatMessageStatusPayload {
   messageIds: [String!]!
@@ -951,6 +971,11 @@ type Mutation {
   AddPostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
 
   """
+  Attach a file to the current user's draft in a room, named as for SaveRoomDraft; a direct conversation without a message yet is opened for it. Stored at once; sending the message takes it over (CreateMessage, draftFiles). Requires authentication.
+  """
+  AddRoomDraftFile(file: FileInput!, roomId: ID, userId: ID): File
+
+  """
   Change a member's role in a group. Deprecated: it takes the GroupMemberRole enum, so it cannot assign a role the group defined itself — use setGroupMemberRole. Needs group.member.role.assign, subject to the same dominance and coverage rules.
   """
   ChangeGroupMemberRole(groupId: ID!, roleInGroup: GroupMemberRole!, userId: ID!): GroupMember @deprecated(reason: "Group roles are group-defined; use setGroupMemberRole instead.")
@@ -999,9 +1024,9 @@ type Mutation {
   CreateGroupRoom(groupId: ID!): Room
 
   """
-  Send a message to a room (by `roomId`) or to a user (by `userId`, opening a direct room). Requires authentication.
+  Send a message to a room (by `roomId`) or to a user (by `userId`, opening a direct room). `draftFiles` names files of the sender's draft in the room by URL (AddRoomDraftFile): they are attached without another upload, and the rest of the draft is removed — unless `endsDraft` is false, as for a message sent again after failing, written before the draft there now. Requires authentication.
   """
-  CreateMessage(content: String, files: [FileInput], roomId: ID, userId: ID): Message
+  CreateMessage(content: String, draftFiles: [ID], endsDraft: Boolean = true, files: [FileInput], roomId: ID, userId: ID): Message
 
   """
   Create a post. Requires authentication and the `post.create` permission; posting into a group additionally requires membership of that group.
@@ -1062,9 +1087,19 @@ type Mutation {
   RemovePostEmotions(data: _EMOTEDInput!, to: _PostInput!): EMOTED
 
   """
+  Remove a file from the current user's draft in a room, by its URL, and from the storage. True when there was one. Requires authentication.
+  """
+  RemoveRoomDraftFile(roomId: ID, url: ID!, userId: ID): Boolean
+
+  """
   Remove a user from a group. Restricted to those allowed to manage the group's members.
   """
   RemoveUserFromGroup(groupId: ID!, userId: ID!): GroupMember
+
+  """
+  Keep what the current user has begun to write in a room but not sent yet; an empty text removes it. Named by roomId, or by userId for a direct conversation without a message yet: that one is opened for the draft. Sending a message in the room removes the draft. Requires authentication.
+  """
+  SaveRoomDraft(roomId: ID, text: String, userId: ID): Room
 
   """
   Begin registration for an email address, sending a verification nonce. Allowed when public or invite registration is enabled (or by an admin with `role.manage`); an inviteCode is required for invite-only registration.
@@ -2359,6 +2394,16 @@ type Room {
   createdAt: String
 
   """
+  What the current user has begun to write in this room but not sent yet, or null. Only ever the viewer's own; nobody else learns of it.
+  """
+  draft: String
+
+  """
+  The files attached to the current user's draft in this room, oldest first. Only ever the viewer's own.
+  """
+  draftFiles: [File]
+
+  """
   The group this room belongs to — for the conference chat of a video call, the group the call takes place in — or null for a direct room.
   """
   group: Group
@@ -2733,6 +2778,10 @@ type User {
 A bundle of a user together with their posts, used for GDPR-style data export/inspection.
 """
 type UserData {
+  """
+  What the user has begun to write in chats and not sent yet, oldest first.
+  """
+  chatDrafts: [ChatDraft]
   posts: [Post]
   user: User!
 }

@@ -1053,6 +1053,19 @@ export default shield(
         hasGroupPermission('group.videoCall.join'),
         hasGroupPermission('group.videoCall.moderate'),
       ),
+      // As for a message: whoever may write in the room may keep a draft there.
+      SaveRoomDraft: and(
+        isAuthenticated,
+        hasGroupPermission('group.chat.participate', byRoom('roomId')),
+      ),
+      AddRoomDraftFile: and(
+        isAuthenticated,
+        hasGroupPermission('group.chat.participate', byRoom('roomId')),
+      ),
+      RemoveRoomDraftFile: and(
+        isAuthenticated,
+        hasGroupPermission('group.chat.participate', byRoom('roomId')),
+      ),
       MarkMessagesAsSeen: and(
         isAuthenticated,
         hasGroupPermission('group.chat.participate', byRoom('roomId')),

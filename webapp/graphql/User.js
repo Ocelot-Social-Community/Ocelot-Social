@@ -554,6 +554,19 @@ export const userDataQuery = (i18n) => {
             ...comment
           }
         }
+        chatDrafts {
+          roomId
+          roomName
+          isCallRoom
+          text
+          files {
+            url
+            name
+            extension
+            type
+          }
+          updatedAt
+        }
       }
     }
   `

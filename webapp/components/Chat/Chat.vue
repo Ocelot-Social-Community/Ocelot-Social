@@ -24,7 +24,10 @@
     show-reaction-emojis="false"
     custom-search-room-enabled="true"
     textarea-auto-focus="false"
+    :room-message="roomMessage"
     @send-message="sendMessage($event.detail[0])"
+    @typing-message="draftTyped($event.detail[0])"
+    @open-failed-message="sendAgain($event.detail[0])"
     @fetch-messages="fetchMessages($event.detail[0])"
     @fetch-more-rooms="fetchMoreRooms"
     @search-room="searchRooms($event.detail[0])"
@@ -146,7 +149,15 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import AvatarImage from '~/components/_new/generic/AvatarImage/AvatarImage'
 import RoomTitleLink from '~/components/_new/generic/RoomTitleLink/RoomTitleLink'
 import locales from '~/locales/index.js'
-import { roomQuery, createGroupRoom, unreadRoomsQuery, userProfileQuery } from '~/graphql/Rooms'
+import {
+  roomQuery,
+  createGroupRoom,
+  saveRoomDraft,
+  addRoomDraftFile,
+  removeRoomDraftFile,
+  unreadRoomsQuery,
+  userProfileQuery,
+} from '~/graphql/Rooms'
 import {
   messageQuery,
   createMessageMutation,
@@ -155,6 +166,20 @@ import {
   markMessagesAsSeen,
 } from '~/graphql/Messages'
 import chatStyle from '~/constants/chat.js'
+import { findMessageField } from './messageField'
+import {
+  clearUnsavedDraft,
+  isLatestDraftRevision,
+  newDraftRevision,
+  queueDraftWork,
+  setUnsavedDraft,
+  unsavedDraft,
+  unsavedDraftRoomIds,
+  goneDraftFiles,
+  setGoneDraftFiles,
+  markDraftFileRemoved,
+  isDraftFileRemoved,
+} from './unsavedDrafts'
 import { createTooltip, destroyTooltip } from 'v-tooltip'
 import { findLibraryComponent } from './libraryComponent'
 import { mapGetters, mapMutations } from 'vuex'
@@ -181,6 +206,15 @@ const EXPORT_URL_RELEASE_MS = 1000
 // What belongs to the message above it in an exported chat is set in by this much: the
 // further lines of a message written over several, and its attachments.
 const EXPORT_INDENT = '    '
+// How long typing has to rest before what was typed is kept as the room's draft. Leaving the
+// room, closing the chat and leaving the page keep it at once.
+const DRAFT_SAVE_DELAY_MS = 1000
+// As much of a draft as the room list shows, like the last message there.
+const DRAFT_PREVIEW_LENGTH = 30
+// How often, and how far apart, a room's draft looks for the message field showing that room
+// before it gives up putting back its files and mentions (see whenFieldShows).
+const FIELD_TRIES = 20
+const FIELD_RETRY_MS = 50
 
 export default {
   name: 'Chat',
@@ -263,17 +297,55 @@ export default {
       jumpingToUnread: false,
       pendingStatusUpdates: {},
       exporting: false,
+      // The drafts known per room id, as last kept — they override the `draft` a room came
+      // with. What is being typed right now is not in here (see draftTyped).
+      drafts: {},
+      // The files of the drafts, per room id, as known on the server — they override the
+      // `draftFiles` a room came with.
+      draftFiles: {},
+      // The text the message field is to show for the room opened (vue-advanced-chat's
+      // `room-message`): its draft. Set when another room is opened, never while typing.
+      roomMessage: null,
     }
   },
   created() {
     this.icons = iconRegistry
     // How often another room has been opened; see fetchMessages.
     this.roomSwitches = 0
+    // Typed, and not kept yet, per room id — the text, the people picked to mention in it, the
+    // files attached; and its timer. The saves go one after the other (queueDraftSave).
+    this._typed = {}
+    this._typedMentions = {}
+    this._typedFiles = {}
+    this._draftTimers = {}
+    // The addresses of draft files whose removal is under way (removeDraftFiles).
+    this._removing = new Set()
+    // The files last seen in the field per room, kept with the draft or not.
+    this._fieldFiles = {}
+    // The latest save of a room's draft asked for, per room id, as { text }: sent again with
+    // `keepalive` when the page is left while it is under way, as its request may be cut off.
+    // An object of its own per save, so an earlier save of the same text does not take it.
+    this._savingText = {}
+    // Set while the page is left: saves asked for then go out at once, with `keepalive`.
+    this._leaving = false
+    // The message field's inside (messageField.js), and the room whose draft it has been given:
+    // until then, its changes are the library's own, emptying it for another room.
+    this._field = null
+    this._fieldRoom = null
+    this._showing = null
+    // Messages that could not be sent, by their local id: shown as failed, to be sent again.
+    this._unsent = {}
+    // The room a direct conversation begun here got, by the id it was shown with until then:
+    // a message sent there before may fail only after another one opened the room.
+    this._realRoomOf = {}
     // Unread messages that came in while their room was open. The room's unread count leaves
     // them out (chatMessageAdded), so they are neither counted against it nor taken off it.
     this._arrivedUnseen = new Set()
   },
   watch: {
+    draftLabelCss() {
+      this.renderDraftLabels()
+    },
     groupId(newGroupId) {
       if (this.singleRoom && newGroupId) {
         this.newGroupRoom(newGroupId)
@@ -360,8 +432,17 @@ export default {
       next: this.handleMessageStatusUpdated,
     })
     this._subscriptions.push(statusSub)
+
+    // Leaving the page keeps what was typed, as far as the browser still lets the request go.
+    window.addEventListener('pagehide', this.keepDraftsOnLeaving)
+    // Drafts whose save failed, maybe after a chat closed before: saved again now.
+    unsavedDraftRoomIds(this.currentUser.id).forEach((roomId) => this.keepDraft(roomId))
   },
   beforeDestroy() {
+    // The chat is taken down — closed, or swapped for the participant list of a call: what
+    // was typed is kept, to be there again when the room is opened anew.
+    window.removeEventListener('pagehide', this.keepDraftsOnLeaving)
+    this.keepAllDrafts()
     // A jump to the oldest unread message under way goes no further (jumpToOldestUnread).
     this._destroyed = true
     if (this._unreadAboveFrame) cancelAnimationFrame(this._unreadAboveFrame)
@@ -426,9 +507,43 @@ export default {
     },
     displayedRooms() {
       // Cap unreadCount at "99+" for display; internal state stays numeric for arithmetic
-      return this.rooms.map((r) =>
-        typeof r.unreadCount === 'number' && r.unreadCount > 99 ? { ...r, unreadCount: '99+' } : r,
-      )
+      return this.rooms.map((r) => {
+        const room =
+          typeof r.unreadCount === 'number' && r.unreadCount > 99 ? { ...r, unreadCount: '99+' } : r
+        // A room left with a draft says so in place of its last message, as messengers do:
+        // its text, or the names of its files. Not the room open: its draft is in the field.
+        if (r.id === this.selectedRoom?.id) return room
+        const draft = this.untagged(r.id, this.draftOf(r.id)).text.trim()
+        const files = this.draftFilesOf(r.id)
+        if (!draft && !files.length) return room
+        const text = draft || files.map((file) => this.fileNameOf(file)).join(', ')
+        return {
+          ...room,
+          // Marked "Draft:" before the text, in a colour of its own (draftLabelCss).
+          _hasDraft: true,
+          lastMessage: {
+            ...room.lastMessage,
+            content: text.substring(0, DRAFT_PREVIEW_LENGTH),
+            // Nobody's message: no sender's name before it, no ticks after it.
+            senderId: null,
+            username: null,
+            files: [],
+            deleted: false,
+          },
+        }
+      })
+    },
+    // The room list draws the last message as plain text, out of reach of the app's components:
+    // "Draft:" goes before it through the stylesheet, by the room's id the list gives its entry.
+    draftLabelCss() {
+      const label = JSON.stringify(this.$t('chat.draft'))
+      return this.displayedRooms
+        .filter((room) => room._hasDraft)
+        .map(
+          (room) =>
+            `.vac-room-item[id=${JSON.stringify(String(room.roomId))}] .vac-text-last::before { content: ${label}; color: var(--chat-draft-label-color); margin-right: 0.25em; flex-shrink: 0; }`,
+        )
+        .join('\n')
     },
     selectedRoomProfile() {
       if (!this.selectedRoom) return null
@@ -881,6 +996,19 @@ export default {
       shadowRoot.appendChild(style)
       this._shadowStyle = style
       this._shadowStylesInjected = true
+      this.renderDraftLabels()
+    },
+
+    // Writes the "Draft:" marks of the room list (draftLabelCss) into a stylesheet of their own
+    // in the library's shadow root.
+    renderDraftLabels() {
+      const shadowRoot = this.$el?.shadowRoot
+      if (!shadowRoot || typeof shadowRoot.appendChild !== 'function') return
+      if (!this._draftLabelStyle) {
+        this._draftLabelStyle = document.createElement('style')
+        shadowRoot.appendChild(this._draftLabelStyle)
+      }
+      this._draftLabelStyle.textContent = this.draftLabelCss
     },
     setupMessageVisibilityTracking() {
       this.injectShadowStyles()
@@ -956,7 +1084,11 @@ export default {
         const prepared = m._rawDate ? m : this.prepareMessage(m)
         msgs[prepared.indexId] = prepared
       })
-      const filtered = msgs.filter(Boolean)
+      // Those that could not be sent have no place in the room's order: they stay last.
+      const unsent = Object.values(this._unsent)
+        .filter((entry) => entry.roomId === this.selectedRoom?.id)
+        .map((entry) => entry.message)
+      const filtered = [...msgs.filter(Boolean), ...unsent]
       this.applyAvatarsOnList(filtered)
       this.messages = filtered
     },
@@ -1096,9 +1228,18 @@ export default {
           this.rooms = Room.map((r) => this.fixRoomObject(r))
         } else {
           const existingIds = new Set(this.rooms.map((r) => r.id))
-          const newRooms = Room.filter((r) => !existingIds.has(r.id)).map((r) =>
-            this.fixRoomObject(r),
-          )
+          // A direct conversation begun here has no room until its first message — unless a
+          // draft opened one meanwhile. That one is shown already, as the room begun here.
+          const begunWith = new Set(this.rooms.map((r) => r._virtualUserId).filter(Boolean))
+          const newRooms = Room.filter(
+            (r) =>
+              !existingIds.has(r.id) &&
+              !(
+                !r.isGroupRoom &&
+                !r.group &&
+                r.users?.some((u) => u.id !== this.currentUser.id && begunWith.has(u.id))
+              ),
+          ).map((r) => this.fixRoomObject(r))
           this.rooms = [...this.rooms, ...newRooms]
         }
 
@@ -1174,6 +1315,9 @@ export default {
         }
       }
       if (this.selectedRoom?.id !== room.id) {
+        // What was typed in the room left is kept, and the room opened shows its own draft.
+        if (this.selectedRoom) this.keepDraft(this.selectedRoom.id)
+        this.showDraftOf(room.id)
         this.roomSwitches++
         this.messages = []
         this.oldestLoadedIndexId = null
@@ -1194,8 +1338,9 @@ export default {
           this.$el?.shadowRoot?.querySelector('textarea#roomTextarea')?.focus()
         })
       }
-      // Virtual rooms have no messages on the server yet
+      // Virtual rooms have no messages on the server yet; only those that could not be sent.
       if (!room.id || room.id.startsWith('temp-')) {
+        this.mergeMessages([])
         // Toggle messagesLoaded to ensure vue-advanced-chat's watcher fires
         this.messagesLoaded = false
         this.$nextTick(() => {
@@ -1350,25 +1495,26 @@ export default {
       }
     },
 
-    async sendMessage(messageDetails) {
+    // Sends what the field handed over. Sent again after failing (`again`), it leaves the
+    // draft as it is: that is what was written since.
+    async sendMessage(messageDetails, { again = false } = {}) {
       const { roomId, content, files } = messageDetails
       const isVirtualRoom = roomId.startsWith('temp-')
-
-      const hasFiles = files && files.length > 0
-
-      const filesToUpload = hasFiles
-        ? files.map((file) => ({
-            upload: new File(
-              [file.blob],
-              file.extension ? `${file.name}.${file.extension}` : file.name,
-              { type: file.type },
-            ),
-            name: file.name,
-            extension: file.extension || undefined,
-            type: file.type,
-            ...(file.duration != null && { duration: file.duration }),
-          }))
-        : null
+      if (!again) {
+        // Sending ends the draft, on the server too (CreateMessage). The emptied field reports
+        // itself right after; known as empty already, it is not saved again.
+        this.forgetTyped(roomId)
+        // Nor may a save of it that failed bring it back.
+        clearUnsavedDraft(this.currentUser.id, roomId)
+        newDraftRevision(this.currentUser.id, roomId)
+        this.$set(this.drafts, roomId, '')
+        this.$set(this.draftFiles, roomId, [])
+        // Its files are the message's now, one still uploaded for the draft too: the field
+        // emptied after sending does not take them out of the draft (keepDraftFiles).
+        files?.forEach((file) => {
+          file.takenOver = true
+        })
+      }
 
       // Immediately add new message
       const localMessage = {
@@ -1382,9 +1528,9 @@ export default {
           this.initialsAvatarUrl(this.currentUser.name),
         senderId: this.currentUser.id,
         files:
-          messageDetails.files?.map((file) => ({
+          files?.map((file) => ({
             ...file,
-            url: URL.createObjectURL(new Blob([file.blob], { type: file.type })),
+            url: file.draftUrl || URL.createObjectURL(new Blob([file.blob], { type: file.type })),
           })) ?? [],
         isUploading: true,
       }
@@ -1403,23 +1549,29 @@ export default {
       }
 
       try {
-        // Build mutation variables — userId for virtual rooms, roomId for existing
-        const mutationVariables = { content }
-        if (isVirtualRoom) {
-          const virtualRoom = this.rooms.find((r) => r.id === roomId)
-          mutationVariables.userId = virtualRoom?._virtualUserId || roomId.replace('temp-', '')
-        } else {
-          mutationVariables.roomId = roomId
-        }
-        if (filesToUpload && filesToUpload.length > 0) {
-          mutationVariables.files = filesToUpload
-        }
+        // In line with the draft's saves: those asked for before go first — the draft must not
+        // outlive what was sent, and a file being uploaded for it is taken over, not uploaded a
+        // second time — and those asked for while it is sent wait for it, as ending the draft
+        // would take them away.
+        const createdMessage = await this.queueDraftSave(roomId, async (target) => {
+          if (!again) this.$set(this.draftFiles, roomId, [])
 
-        const { data } = await this.$apollo.mutate({
-          mutation: createMessageMutation(),
-          variables: mutationVariables,
+          // userId for virtual rooms, roomId for existing
+          const mutationVariables = { ...target, content }
+          const fresh = (files || []).filter((file) => !file.draftUrl)
+          const fromDraft = (files || []).filter((file) => file.draftUrl)
+          if (fresh.length) mutationVariables.files = fresh.map((file) => this.fileInputOf(file))
+          if (fromDraft.length) {
+            mutationVariables.draftFiles = fromDraft.map((file) => file.draftUrl)
+          }
+          if (again) mutationVariables.endsDraft = false
+
+          const { data } = await this.$apollo.mutate({
+            mutation: createMessageMutation(),
+            variables: mutationVariables,
+          })
+          return data.CreateMessage
         })
-        const createdMessage = data.CreateMessage
 
         if (createdMessage) {
           // Replace local message with server response
@@ -1427,31 +1579,429 @@ export default {
         }
 
         if (isVirtualRoom && createdMessage?.room?.id) {
-          // Replace virtual room with real room by fetching the specific room
-          const realRoomId = createdMessage.room.id
-          this.rooms = this.rooms.filter((r) => r.id !== roomId)
-          const {
-            data: { Room },
-          } = await this.$apollo.query({
-            query: roomQuery(),
-            variables: { id: realRoomId },
-            fetchPolicy: 'no-cache',
-          })
-          if (Room?.length) {
-            const realRoom = this.fixRoomObject(Room[0])
-            this.bringRoomToTopAndSelect(realRoom)
-          }
+          await this.replaceVirtualRoom(roomId, createdMessage.room.id)
         }
       } catch (error) {
-        // Remove the optimistic local message so it doesn't linger as a ghost
-        this.messages = this.messages.filter((m) => m._id !== localMessage._id)
-        this.applyAvatarsOnList(this.messages)
+        this.markUnsent(roomId, localMessage, messageDetails)
+        this.$toastBackendError(error)
+        this.$toast.info(this.$t('chat.notSent'))
+      }
+    },
+
+    // The room a direct conversation begun here got with its first message takes the place of
+    // the one it was shown in until then. The message is sent by then: should fetching the room
+    // fail, that is no failed message — which, sent again, would arrive twice.
+    async replaceVirtualRoom(virtualRoomId, realRoomId) {
+      // Messages of the conversation that could not be sent go with it, to be sent again there;
+      // so do those that fail later (markUnsent).
+      this._realRoomOf[virtualRoomId] = realRoomId
+      Object.values(this._unsent)
+        .filter((entry) => entry.roomId === virtualRoomId)
+        .forEach((entry) => {
+          entry.roomId = realRoomId
+          entry.details = { ...entry.details, roomId: realRoomId }
+          entry.message = { ...entry.message, roomId: realRoomId }
+        })
+      this.rooms = this.rooms.filter((r) => r.id !== virtualRoomId)
+      try {
+        const {
+          data: { Room },
+        } = await this.$apollo.query({
+          query: roomQuery(),
+          variables: { id: realRoomId },
+          fetchPolicy: 'no-cache',
+        })
+        if (Room?.length) {
+          const realRoom = this.fixRoomObject(Room[0])
+          this.bringRoomToTopAndSelect(realRoom)
+        }
+      } catch (error) {
         this.$toastBackendError(error)
       }
     },
 
+    // A message that could not be sent stays where it was, marked as failed, with all it
+    // holds: a click on the mark sends it again (sendAgain).
+    markUnsent(sentToRoomId, localMessage, messageDetails) {
+      const roomId = this._realRoomOf[sentToRoomId] || sentToRoomId
+      const message = { ...localMessage, roomId, failure: true, isUploading: false }
+      const details = { ...messageDetails, roomId }
+      this._unsent[localMessage._id] = { roomId, message, details }
+      this.messages = this.messages.map((m) => (m._id === localMessage._id ? message : m))
+      this.applyAvatarsOnList(this.messages)
+    },
+
+    sendAgain({ message } = {}) {
+      const unsent = this._unsent[message?._id]
+      if (!unsent) return
+      delete this._unsent[message._id]
+      this.messages = this.messages.filter((m) => m._id !== message._id)
+      this.sendMessage(unsent.details, { again: true })
+    },
+
+    // A file of the field as an upload: one of the message, or one of the draft.
+    fileInputOf(file) {
+      return {
+        upload: new File([file.blob], this.fileNameOf(file), { type: file.type }),
+        name: file.name,
+        extension: file.extension || undefined,
+        type: file.type,
+        ...(file.duration != null && { duration: file.duration }),
+      }
+    },
+
+    fileNameOf(file) {
+      return file.extension ? `${file.name}.${file.extension}` : file.name
+    },
+
+    // A room's draft is saved by its id; a direct conversation that has no room yet by its
+    // user, for whom the server opens the room.
+    draftTarget(roomId) {
+      if (!roomId.startsWith('temp-')) return { roomId }
+      const room = this.rooms.find((r) => r.id === roomId)
+      return { userId: room?._virtualUserId || roomId.replace('temp-', '') }
+    },
+
+    // A text as the library sends it: of each person picked to mention, the first "@Name" not
+    // taken yet becomes a tag of their id.
+    tagged(text, mentioned) {
+      return (mentioned || []).reduce(
+        (result, user) => result.replace(`@${user.username}`, `<usertag>${user._id}</usertag>`),
+        text,
+      )
+    },
+
+    // A tagged text as the field shows it, "@Name", and the people it mentions, one for each
+    // tag as the library keeps them. `names` stands in for whoever is no longer in the room.
+    untagged(roomId, text, names = {}) {
+      const users = this.rooms.find((r) => r.id === roomId)?.users || []
+      const mentioned = []
+      const plain = (text || '').replace(/<usertag>(.*?)<\/usertag>/g, (tag, id) => {
+        const user = users.find((u) => u._id === id)
+        if (user) {
+          mentioned.push(user)
+          return `@${user.username}`
+        }
+        return names[id] ? `@${names[id]}` : tag
+      })
+      return { text: plain, mentioned }
+    },
+
     toggleUserSearch() {
       this.$emit('toggle-user-search')
+    },
+
+    // The room's draft as known here, its mentions as tags: kept just now, or the one it came
+    // with.
+    draftOf(roomId) {
+      if (roomId in this.drafts) return this.drafts[roomId]
+      const unsaved = unsavedDraft(this.currentUser.id, roomId)
+      if (unsaved !== undefined) return unsaved
+      return this.rooms.find((r) => r.id === roomId)?.draft || ''
+    },
+
+    // Without those removed, or still to be (unsavedDrafts.js).
+    draftFilesOf(roomId) {
+      const files =
+        roomId in this.draftFiles
+          ? this.draftFiles[roomId]
+          : this.rooms.find((r) => r.id === roomId)?.draftFiles || []
+      const gone = goneDraftFiles(this.currentUser.id, roomId)
+      return files.filter((file) => !gone.includes(file.url) && !isDraftFileRemoved(file.url))
+    },
+
+    // The message field's inside, found anew once the library has drawn another one, and
+    // watched for the files attached to it, which the library tells of in no event.
+    messageField() {
+      if (this._field && !this._field.isUnmounted) return this._field
+      const field = findMessageField(this.$el)
+      this._field = field
+      field?.watch('files', (files) => this.draftFilesChanged(field, files), { deep: true })
+      // The text too, with the people picked to mention: a mention picked from the library's
+      // list is written into the field without `typing-message`.
+      field?.watch(
+        () => [field.message, field.mentioned.length],
+        () => this.draftTextChanged(field),
+      )
+      return field
+    },
+
+    // Puts the room's draft into the message field: the text through `room-message`, through
+    // null first, as the field takes it only when it changes and two rooms may hold the same;
+    // the people it mentions and its files on the field itself, once it shows the room. Then
+    // `room-message` is null again: the library puts it into the field of every room opened
+    // later, and would report it as typed there.
+    showDraftOf(roomId) {
+      this._fieldRoom = null
+      this.roomMessage = null
+      const { text, mentioned } = this.untagged(roomId, this.draftOf(roomId))
+      const files = this.draftFilesOf(roomId)
+      // Files attached when the room was left and not uploaded yet: they go back as they are,
+      // to be the draft's once uploaded — left out, the field would seem to have lost them.
+      const pending = (this._fieldFiles[roomId] || []).filter((file) => !file.draftUrl)
+      this.$nextTick(() => {
+        this.roomMessage = text || null
+      })
+      this.whenFieldShows(roomId, (field) => {
+        this.roomMessage = null
+        field.mentioned = mentioned
+        field.files = [
+          ...files.map((file) => ({
+            name: file.name,
+            extension: file.extension,
+            type: file.type,
+            ...(file.duration != null && { duration: file.duration }),
+            localUrl: file.url,
+            draftUrl: file.url,
+          })),
+          ...pending,
+        ]
+      })
+    },
+
+    // The library empties its field for the room opened, once that has reached it: only after
+    // that can the draft go in. Given up on after a while, or for another room opened since.
+    whenFieldShows(roomId, apply) {
+      const showing = {}
+      this._showing = showing
+      const attempt = (left) => {
+        if (this._showing !== showing) return
+        const field = this.messageField()
+        if (field?.roomId === roomId) {
+          apply(field)
+          this._fieldRoom = roomId
+        } else if (left > 0) {
+          setTimeout(() => attempt(left - 1), FIELD_RETRY_MS)
+        } else {
+          // No field to be found: the draft keeps its text alone.
+          this._fieldRoom = roomId
+        }
+      }
+      setTimeout(() => attempt(FIELD_TRIES))
+    },
+
+    // vue-advanced-chat reports the message field on every change, null once it was emptied
+    // by sending or by Escape. Kept once typing rests, with the people picked to mention.
+    draftTyped(event) {
+      const roomId = event?.roomId
+      if (!roomId || !this.selectedRoomWritable) return
+      this._typed[roomId] = event.message || ''
+      const field = this.messageField()
+      if (field?.roomId === roomId) this._typedMentions[roomId] = [...field.mentioned]
+      this.keepSoon(roomId)
+    },
+
+    // Files attached to the field or taken out of it are kept with the draft as typing is.
+    // Not while the library empties the field for another room: that is no change of the draft.
+    // The text of the field and the people picked to mention in it, as the field holds them;
+    // kept as typing is. Not while the library empties the field for another room.
+    draftTextChanged(field) {
+      const roomId = field.roomId
+      if (!roomId || roomId !== this._fieldRoom || !this.selectedRoomWritable) return
+      this._typed[roomId] = field.message || ''
+      this._typedMentions[roomId] = [...field.mentioned]
+      this.keepSoon(roomId)
+    },
+
+    draftFilesChanged(field, files) {
+      const roomId = field.roomId
+      if (!roomId || roomId !== this._fieldRoom || !this.selectedRoomWritable) return
+      this._typedFiles[roomId] = [...files]
+      this._fieldFiles[roomId] = this._typedFiles[roomId]
+      this.keepSoon(roomId)
+    },
+
+    keepSoon(roomId) {
+      clearTimeout(this._draftTimers[roomId])
+      this._draftTimers[roomId] = setTimeout(() => this.keepDraft(roomId), DRAFT_SAVE_DELAY_MS)
+    },
+
+    forgetTyped(roomId) {
+      clearTimeout(this._draftTimers[roomId])
+      delete this._draftTimers[roomId]
+      delete this._typed[roomId]
+      delete this._typedMentions[roomId]
+      delete this._typedFiles[roomId]
+    },
+
+    // Saves what changed in the room's field, as far as it differs from the draft known.
+    keepDraft(roomId) {
+      const typed = this._typed[roomId]
+      const files = this._typedFiles[roomId]
+      const mentioned = this._typedMentions[roomId]
+      const userId = this.currentUser.id
+      const unsavedText = unsavedDraft(userId, roomId)
+      const unsaved = unsavedText !== undefined
+      const gone = goneDraftFiles(userId, roomId)
+      if (typed === undefined && files === undefined && !unsaved && !gone.length) return
+      this.forgetTyped(roomId)
+      const text = typed !== undefined ? this.tagged(typed, mentioned) : unsavedText
+      if (text !== undefined && (text !== this.draftOf(roomId) || unsaved)) {
+        this.$set(this.drafts, roomId, text)
+        clearUnsavedDraft(userId, roomId)
+        this.saveDraftText(roomId, text)
+      }
+      if (files !== undefined) this.keepDraftFiles(roomId, files)
+      else if (gone.length) this.removeDraftFiles(roomId, gone)
+    },
+
+    // Saves a room's draft text. Should it fail, the text is saved again later — unless a
+    // newer one has been asked for since, by this chat or another — also from a chat opened
+    // anew (unsavedDrafts.js).
+    saveDraftText(roomId, text) {
+      const userId = this.currentUser.id
+      const context = this.leavingContext()
+      const revision = newDraftRevision(userId, roomId)
+      const saving = { text }
+      this._savingText[roomId] = saving
+      this.queueDraftSave(roomId, async (target) => {
+        try {
+          await this.$apollo.mutate({
+            mutation: saveRoomDraft(),
+            variables: { ...target, text },
+            context,
+          })
+        } catch (error) {
+          if (
+            isLatestDraftRevision(userId, roomId, revision) &&
+            unsavedDraft(userId, roomId) === undefined
+          ) {
+            setUnsavedDraft(userId, roomId, text)
+          }
+          throw error
+        } finally {
+          if (this._savingText[roomId] === saving) delete this._savingText[roomId]
+        }
+      })
+    },
+
+    // The page is left: what is still to be kept goes out at once, without waiting for a save
+    // under way, and with `keepalive`, which lets the browser finish a request after the page
+    // is gone. A text whose save is under way goes out again that way, as the request may be
+    // cut off. Not the uploads: keepalive takes no more than 64 KB.
+    keepDraftsOnLeaving() {
+      this._leaving = true
+      const saving = { ...this._savingText }
+      try {
+        this.keepAllDrafts()
+        Object.entries(saving).forEach(([roomId, save]) => {
+          if (this._savingText[roomId] === save && this.drafts[roomId] === save.text) {
+            this.saveDraftText(roomId, save.text)
+          }
+        })
+      } finally {
+        this._leaving = false
+      }
+    },
+
+    leavingContext() {
+      return this._leaving ? { fetchOptions: { keepalive: true } } : undefined
+    },
+
+    // The files of the field against those of the draft: the new ones are uploaded, those
+    // taken out removed. A file is the draft's once it knows its address there (`draftUrl`).
+    keepDraftFiles(roomId, files) {
+      const kept = files.map((file) => file.draftUrl).filter(Boolean)
+      const known = this.draftFilesOf(roomId)
+      const gone = known.filter((file) => !kept.includes(file.url))
+      if (gone.length) {
+        this.$set(
+          this.draftFiles,
+          roomId,
+          known.filter((file) => kept.includes(file.url)),
+        )
+      }
+      // Those whose removal failed go again.
+      const goneBefore = goneDraftFiles(this.currentUser.id, roomId)
+      this.removeDraftFiles(roomId, [...gone.map(({ url }) => url), ...goneBefore])
+      files
+        .filter((file) => !file.draftUrl && !file.draftUpload && file.blob && !file.loading)
+        .forEach((file) => {
+          file.draftUpload = true
+          this.queueDraftSave(roomId, async (target) => {
+            try {
+              const { data } = await this.$apollo.mutate({
+                mutation: addRoomDraftFile(),
+                variables: { ...target, file: this.fileInputOf(file) },
+              })
+              const added = data?.AddRoomDraftFile
+              if (!added) return
+              file.draftUrl = added.url
+              this.$set(this.draftFiles, roomId, [...this.draftFilesOf(roomId), added])
+              // Taken out of the field again while it was uploaded: it goes again too. Not when
+              // it was sent meanwhile: the field emptied by sending did not take it out.
+              const inField = this._fieldFiles[roomId]
+              if (inField && !inField.includes(file) && !file.takenOver) {
+                this.keepDraftFiles(roomId, inField)
+              }
+            } catch (error) {
+              // Not uploaded: the files of the field count as changed again, so the next change,
+              // leaving the room, closing the chat or leaving the page tries again — with the
+              // field as it is then, without what was taken out meanwhile.
+              if (!(roomId in this._typedFiles) && !file.takenOver) {
+                this._typedFiles[roomId] = this._fieldFiles[roomId] || [file]
+              }
+              throw error
+            } finally {
+              file.draftUpload = false
+            }
+          })
+        })
+    },
+
+    // Removes files from the draft. They count as gone until the server says so: not shown,
+    // even by a chat opened anew (unsavedDrafts.js). A removal that fails is asked for again with
+    // the next change of the draft, leaving the room, closing the chat, a chat opened anew or
+    // leaving the page — else the file would be back. One under way is not asked for again,
+    // unless the page is left, which may cut its request off.
+    removeDraftFiles(roomId, urls) {
+      const userId = this.currentUser.id
+      const gone = goneDraftFiles(userId, roomId)
+      setGoneDraftFiles(userId, roomId, [...gone, ...urls.filter((url) => !gone.includes(url))])
+      const context = this.leavingContext()
+      urls
+        .filter((url) => this._leaving || !this._removing.has(url))
+        .forEach((url) => {
+          this._removing.add(url)
+          this.queueDraftSave(roomId, async (target) => {
+            try {
+              await this.$apollo.mutate({
+                mutation: removeRoomDraftFile(),
+                variables: { ...target, url },
+                context,
+              })
+              markDraftFileRemoved(url)
+              setGoneDraftFiles(
+                userId,
+                roomId,
+                goneDraftFiles(userId, roomId).filter((goneUrl) => goneUrl !== url),
+              )
+            } finally {
+              this._removing.delete(url)
+            }
+          })
+        })
+    },
+
+    // The saves of a room's draft go one after the other, those of other chats too
+    // (unsavedDrafts.js): a direct conversation's room is opened by the first, and a message
+    // goes in line with them (sendMessage). Not told when a save fails: the draft is still in
+    // the field, and its next change tries again. Gives the save's promise.
+    queueDraftSave(roomId, save) {
+      const target = this.draftTarget(roomId)
+      // Leaving the page, nothing waits: a save behind another may never start.
+      return queueDraftWork(this.currentUser.id, roomId, () => save(target), {
+        waits: !this._leaving,
+      })
+    },
+
+    keepAllDrafts() {
+      const roomIds = new Set([
+        ...Object.keys(this._typed),
+        ...Object.keys(this._typedFiles),
+        ...unsavedDraftRoomIds(this.currentUser.id),
+      ])
+      roomIds.forEach((roomId) => this.keepDraft(roomId))
     },
 
     fixRoomObject(room) {
@@ -1688,11 +2238,18 @@ export default {
       lines.push(this.$t('chat.export.savedAt', { date: new Date().toLocaleString(locale) }), '')
       // Said in so many words, so the file is understood on its own.
       if (messages.length === 0) lines.push(this.$t('chat.messagesEmpty'))
+      // A mention is written as the chat shows it, "@Name", also of somebody no longer in
+      // the room as long as they wrote in it.
+      const names = Object.fromEntries(
+        messages.map((message) => [message.senderId, message.username]),
+      )
       for (const message of messages) {
         const sentAt = new Date(message.date).toLocaleString(locale)
         // A line break inside a message stays one, but what follows it is indented:
         // at the start of a line it would read as a message of its own, without sender.
-        const content = (message.content || '').trim().replace(/\r?\n/g, `\n${EXPORT_INDENT}`)
+        const content = this.untagged(room.id, message.content, names)
+          .text.trim()
+          .replace(/\r?\n/g, `\n${EXPORT_INDENT}`)
         lines.push(`[${sentAt}] ${message.username}:${content ? ` ${content}` : ''}`)
         for (const file of message.files || []) {
           const name = file.extension ? `${file.name}.${file.extension}` : file.name

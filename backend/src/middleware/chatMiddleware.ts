@@ -59,6 +59,7 @@ export default {
   },
   Mutation: {
     CreateGroupRoom: roomProperties,
+    SaveRoomDraft: roomProperties,
     CreateMessage: messageProperties,
   },
   Subscription: {

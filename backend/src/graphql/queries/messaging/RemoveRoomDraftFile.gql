@@ -1,0 +1,3 @@
+mutation RemoveRoomDraftFile($roomId: ID, $userId: ID, $url: ID!) {
+  RemoveRoomDraftFile(roomId: $roomId, userId: $userId, url: $url)
+}
