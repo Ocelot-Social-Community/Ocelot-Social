@@ -175,6 +175,10 @@ import {
   setUnsavedDraft,
   unsavedDraft,
   unsavedDraftRoomIds,
+  goneDraftFiles,
+  setGoneDraftFiles,
+  markDraftFileRemoved,
+  isDraftFileRemoved,
 } from './unsavedDrafts'
 import { createTooltip, destroyTooltip } from 'v-tooltip'
 import { findLibraryComponent } from './libraryComponent'
@@ -314,9 +318,8 @@ export default {
     this._typedMentions = {}
     this._typedFiles = {}
     this._draftTimers = {}
-    // The addresses of the draft's files taken out whose removal failed, per room id: no longer
-    // shown, removed again with the next change of the draft (removeDraftFiles).
-    this._goneFiles = {}
+    // The addresses of draft files whose removal is under way (removeDraftFiles).
+    this._removing = new Set()
     // The files last seen in the field per room, kept with the draft or not.
     this._fieldFiles = {}
     // The latest save of a room's draft asked for, per room id, as { text }: sent again with
@@ -1697,9 +1700,14 @@ export default {
       return this.rooms.find((r) => r.id === roomId)?.draft || ''
     },
 
+    // Without those removed, or still to be (unsavedDrafts.js).
     draftFilesOf(roomId) {
-      if (roomId in this.draftFiles) return this.draftFiles[roomId]
-      return this.rooms.find((r) => r.id === roomId)?.draftFiles || []
+      const files =
+        roomId in this.draftFiles
+          ? this.draftFiles[roomId]
+          : this.rooms.find((r) => r.id === roomId)?.draftFiles || []
+      const gone = goneDraftFiles(this.currentUser.id, roomId)
+      return files.filter((file) => !gone.includes(file.url) && !isDraftFileRemoved(file.url))
     },
 
     // The message field's inside, found anew once the library has drawn another one, and
@@ -1821,8 +1829,8 @@ export default {
       const userId = this.currentUser.id
       const unsavedText = unsavedDraft(userId, roomId)
       const unsaved = unsavedText !== undefined
-      const gone = this._goneFiles[roomId]
-      if (typed === undefined && files === undefined && !unsaved && !gone) return
+      const gone = goneDraftFiles(userId, roomId)
+      if (typed === undefined && files === undefined && !unsaved && !gone.length) return
       this.forgetTyped(roomId)
       const text = typed !== undefined ? this.tagged(typed, mentioned) : unsavedText
       if (text !== undefined && (text !== this.draftOf(roomId) || unsaved)) {
@@ -1831,7 +1839,7 @@ export default {
         this.saveDraftText(roomId, text)
       }
       if (files !== undefined) this.keepDraftFiles(roomId, files)
-      else if (gone) this.removeDraftFiles(roomId, gone)
+      else if (gone.length) this.removeDraftFiles(roomId, gone)
     },
 
     // Saves a room's draft text. Should it fail, the text is saved again later — unless a
@@ -1901,7 +1909,7 @@ export default {
         )
       }
       // Those whose removal failed go again.
-      const goneBefore = this._goneFiles[roomId] || []
+      const goneBefore = goneDraftFiles(this.currentUser.id, roomId)
       this.removeDraftFiles(roomId, [...gone.map(({ url }) => url), ...goneBefore])
       files
         .filter((file) => !file.draftUrl && !file.draftUpload && file.blob && !file.loading)
@@ -1938,27 +1946,38 @@ export default {
         })
     },
 
-    // Removes files from the draft, which are no longer shown. A removal that fails is asked
-    // for again with the next change of the draft, leaving the room, closing the chat or
-    // leaving the page — else the file would be back once the chat is opened anew.
+    // Removes files from the draft. They count as gone until the server says so: not shown,
+    // even by a chat opened anew (unsavedDrafts.js). A removal that fails is asked for again with
+    // the next change of the draft, leaving the room, closing the chat, a chat opened anew or
+    // leaving the page — else the file would be back. One under way is not asked for again,
+    // unless the page is left, which may cut its request off.
     removeDraftFiles(roomId, urls) {
-      delete this._goneFiles[roomId]
+      const userId = this.currentUser.id
+      const gone = goneDraftFiles(userId, roomId)
+      setGoneDraftFiles(userId, roomId, [...gone, ...urls.filter((url) => !gone.includes(url))])
       const context = this.leavingContext()
-      urls.forEach((url) =>
-        this.queueDraftSave(roomId, async (target) => {
-          try {
-            await this.$apollo.mutate({
-              mutation: removeRoomDraftFile(),
-              variables: { ...target, url },
-              context,
-            })
-          } catch (error) {
-            const gone = this._goneFiles[roomId] || []
-            if (!gone.includes(url)) this._goneFiles[roomId] = [...gone, url]
-            throw error
-          }
-        }),
-      )
+      urls
+        .filter((url) => this._leaving || !this._removing.has(url))
+        .forEach((url) => {
+          this._removing.add(url)
+          this.queueDraftSave(roomId, async (target) => {
+            try {
+              await this.$apollo.mutate({
+                mutation: removeRoomDraftFile(),
+                variables: { ...target, url },
+                context,
+              })
+              markDraftFileRemoved(url)
+              setGoneDraftFiles(
+                userId,
+                roomId,
+                goneDraftFiles(userId, roomId).filter((goneUrl) => goneUrl !== url),
+              )
+            } finally {
+              this._removing.delete(url)
+            }
+          })
+        })
     },
 
     // The saves of a room's draft go one after the other, those of other chats too
@@ -1977,7 +1996,6 @@ export default {
       const roomIds = new Set([
         ...Object.keys(this._typed),
         ...Object.keys(this._typedFiles),
-        ...Object.keys(this._goneFiles),
         ...unsavedDraftRoomIds(this.currentUser.id),
       ])
       roomIds.forEach((roomId) => this.keepDraft(roomId))

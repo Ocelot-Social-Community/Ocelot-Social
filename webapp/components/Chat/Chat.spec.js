@@ -2958,6 +2958,50 @@ describe('Chat.vue', () => {
         ])
       })
 
+      it('removes a file again whose removal failed after the chat closed, in a chat opened anew', async () => {
+        wrapper.vm.rooms = [mockRoom({ draftFiles: [added('old')] })]
+        let fail
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () => new Promise((resolve, reject) => (fail = () => reject(new Error('Offline')))),
+        )
+        wrapper.vm.draftFilesChanged(field, [])
+        jest.advanceTimersByTime(1000)
+        wrapper.destroy()
+        fail()
+        await settle()
+        mocks.$apollo.mutate.mockClear()
+
+        wrapper = Wrapper()
+        wrapper.vm.rooms = [mockRoom({ draftFiles: [added('old')] })]
+        await settle()
+
+        expect(fileSaves()).toEqual([{ roomId: 'room-1', url: 'https://s3/old.txt' }])
+        expect(wrapper.vm.draftFilesOf('room-1')).toEqual([])
+      })
+
+      it('does not show a file whose removal is under way, nor ask for it twice', async () => {
+        wrapper.vm.rooms = [mockRoom({ draftFiles: [added('old'), added('kept')] })]
+        let removed
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () => new Promise((resolve) => (removed = () => resolve({ data: {} }))),
+        )
+        wrapper.vm.draftFilesChanged(field, [{ ...added('kept'), draftUrl: 'https://s3/kept.txt' }])
+        jest.advanceTimersByTime(1000)
+        delete wrapper.vm.draftFiles['room-1']
+        wrapper.vm.keepAllDrafts()
+
+        expect(wrapper.vm.draftFilesOf('room-1')).toEqual([added('kept')])
+        expect(fileSaves()).toHaveLength(1)
+
+        removed()
+        await settle()
+
+        wrapper.vm.keepAllDrafts()
+        await settle()
+
+        expect(fileSaves()).toHaveLength(1)
+      })
+
       it('removes a file again whose removal failed with the next change of the field', async () => {
         wrapper.vm.rooms = [mockRoom({ draftFiles: [added('old')] })]
         mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Offline'))
