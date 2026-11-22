@@ -1011,6 +1011,151 @@ describe('Chat.vue', () => {
     })
   })
 
+  describe('an answer for an opening replaced meanwhile', () => {
+    // A server answer held back until the test lets it through.
+    const held = () => {
+      let resolve
+      const promise = new Promise((r) => {
+        resolve = r
+      })
+      return { promise, resolve }
+    }
+    const roomAnswer = (room) => ({ data: { Room: room ? [room] : [] } })
+    const groupRoom = (id, groupId) =>
+      mockRoom({
+        id,
+        roomId: id,
+        isGroupRoom: true,
+        group: { id: groupId, name: groupId, slug: groupId },
+        groupProfile: { id: groupId },
+        users: [{ id: 'current-user', name: 'Me' }],
+      })
+    const directRoom = (id, userId) =>
+      mockRoom({
+        id,
+        roomId: id,
+        users: [
+          { id: 'current-user', name: 'Me' },
+          { id: userId, name: userId },
+        ],
+      })
+
+    it('selects nothing for a roomId replaced meanwhile', async () => {
+      const first = held()
+      mocks.$apollo.query
+        .mockReturnValueOnce(first.promise)
+        .mockResolvedValueOnce(roomAnswer(mockRoom({ id: 'room-b', roomId: 'room-b' })))
+      wrapper = Wrapper({ singleRoom: true, roomId: 'room-a' })
+      await wrapper.setProps({ roomId: 'room-b' })
+      await flushPromises()
+      first.resolve(roomAnswer(mockRoom({ id: 'room-a', roomId: 'room-a' })))
+      await flushPromises()
+      expect(wrapper.vm.activeRoomId).toBe('room-b')
+      expect(wrapper.vm.rooms.map((r) => r.id)).toEqual(['room-b'])
+    })
+
+    it('selects nothing for a groupId replaced meanwhile', async () => {
+      const first = held()
+      mocks.$apollo.query
+        .mockReturnValueOnce(first.promise)
+        .mockResolvedValueOnce(roomAnswer(groupRoom('gr-b', 'g-b')))
+      wrapper = Wrapper({ singleRoom: true, groupId: 'g-a' })
+      await wrapper.setProps({ groupId: 'g-b' })
+      await flushPromises()
+      first.resolve(roomAnswer(groupRoom('gr-a', 'g-a')))
+      await flushPromises()
+      expect(wrapper.vm.activeRoomId).toBe('gr-b')
+      expect(wrapper.vm.rooms.map((r) => r.id)).toEqual(['gr-b'])
+    })
+
+    it('creates no group room for a groupId replaced meanwhile', async () => {
+      const first = held()
+      mocks.$apollo.query
+        .mockReturnValueOnce(first.promise)
+        .mockResolvedValueOnce(roomAnswer(groupRoom('gr-b', 'g-b')))
+      wrapper = Wrapper({ singleRoom: true, groupId: 'g-a' })
+      await wrapper.setProps({ groupId: 'g-b' })
+      await flushPromises()
+      first.resolve(roomAnswer(null))
+      await flushPromises()
+      expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
+      expect(wrapper.vm.activeRoomId).toBe('gr-b')
+    })
+
+    it('selects nothing for a userId replaced meanwhile, not even a room of its own', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      mocks.$apollo.query.mockClear()
+      wrapper.vm.rooms = []
+      const first = held()
+      mocks.$apollo.query
+        .mockReturnValueOnce(first.promise)
+        .mockResolvedValueOnce(roomAnswer(directRoom('dm-b', 'u-b')))
+      const opening = wrapper.vm.newRoom({ id: 'u-a', name: 'A' })
+      await wrapper.vm.newRoom({ id: 'u-b', name: 'B' })
+      first.resolve(roomAnswer(null))
+      await opening
+      await flushPromises()
+      expect(wrapper.vm.activeRoomId).toBe('dm-b')
+      expect(wrapper.vm.rooms.map((r) => r.id)).toEqual(['dm-b'])
+    })
+
+    it('selects nothing for a userId whose profile came in after it was replaced', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      mocks.$apollo.query.mockClear()
+      wrapper.vm.rooms = [directRoom('dm-a', 'u-a')]
+      const profile = held()
+      mocks.$apollo.query
+        .mockReturnValueOnce(profile.promise)
+        .mockResolvedValueOnce(roomAnswer(directRoom('dm-b', 'u-b')))
+      const opening = wrapper.vm.newRoom('u-a')
+      await wrapper.vm.newRoom({ id: 'u-b', name: 'B' })
+      profile.resolve({ data: { User: [{ id: 'u-a', name: 'A', slug: 'a' }] } })
+      await opening
+      await flushPromises()
+      expect(wrapper.vm.activeRoomId).toBe('dm-b')
+    })
+
+    it('selects not the group room created for a groupId replaced meanwhile', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      mocks.$apollo.query.mockClear()
+      wrapper.vm.rooms = [groupRoom('gr-b', 'g-b')]
+      const created = held()
+      mocks.$apollo.query.mockResolvedValueOnce(roomAnswer(null))
+      mocks.$apollo.mutate.mockReturnValueOnce(created.promise)
+      const opening = wrapper.vm.newGroupRoom('g-a')
+      await flushPromises()
+      expect(mocks.$apollo.mutate).toHaveBeenCalled()
+      await wrapper.vm.newGroupRoom('g-b')
+      created.resolve({ data: { CreateGroupRoom: groupRoom('gr-a', 'g-a') } })
+      await opening
+      await flushPromises()
+      expect(wrapper.vm.activeRoomId).toBe('gr-b')
+      expect(wrapper.vm.rooms.map((r) => r.id)).toEqual(['gr-b'])
+    })
+
+    it('says nothing of a failed creation for a groupId replaced meanwhile', async () => {
+      wrapper = Wrapper()
+      await flushPromises()
+      mocks.$apollo.query.mockClear()
+      wrapper.vm.rooms = [groupRoom('gr-b', 'g-b')]
+      const created = held()
+      mocks.$apollo.query.mockResolvedValueOnce(roomAnswer(null))
+      mocks.$apollo.mutate.mockReturnValueOnce(
+        created.promise.then(() => Promise.reject(new Error('Create failed'))),
+      )
+      const opening = wrapper.vm.newGroupRoom('g-a')
+      await flushPromises()
+      await wrapper.vm.newGroupRoom('g-b')
+      created.resolve()
+      await opening
+      await flushPromises()
+      expect(mocks.$toast.error).not.toHaveBeenCalled()
+    })
+  })
+
   describe('singleRoom mode', () => {
     it('mounts with groupId and calls newGroupRoom', () => {
       mocks.$apollo.query.mockResolvedValue({ data: { Room: [] } })
@@ -1053,7 +1198,12 @@ describe('Chat.vue', () => {
       })
       wrapper = Wrapper({ singleRoom: true, groupId: 'g1' })
       await wrapper.setProps({ groupId: 'g2' })
-      expect(mocks.$apollo.mutate).toHaveBeenCalled()
+      await flushPromises()
+      // Created for g2 only: g1's answer comes in after g2 has replaced it.
+      expect(mocks.$apollo.mutate).toHaveBeenCalledTimes(1)
+      expect(mocks.$apollo.mutate).toHaveBeenCalledWith(
+        expect.objectContaining({ variables: { groupId: 'g2' } }),
+      )
     })
 
     it('calls newRoom when userId changes in singleRoom mode', async () => {

@@ -343,6 +343,9 @@ export default {
     // Unread messages that came in while their room was open. The room's unread count leaves
     // them out (chatMessageAdded), so they are neither counted against it nor taken off it.
     this._arrivedUnseen = new Set()
+    // Counts the openings of one room (newRoom, newGroupRoom, openRoom): an answer for an
+    // opening that a later one has replaced selects nothing (beginOpening).
+    this._openingGeneration = 0
   },
   watch: {
     draftLabelCss() {
@@ -2073,13 +2076,26 @@ export default {
       })
     },
 
+    // Begins opening one room. The one opened before may still be waiting for the server; its
+    // answer, coming in later, must not select its room over this one.
+    beginOpening() {
+      this._openingGeneration += 1
+      return this._openingGeneration
+    },
+
+    isCurrentOpening(opening) {
+      return opening === this._openingGeneration
+    },
+
     findLocalRoom(predicate) {
       const room = this.rooms.find(predicate)
       if (room) this.bringRoomToTopAndSelect(room)
       return room
     },
 
-    async fetchServerRoom(variables) {
+    // The room asked for, selected; null when there is none, or another room is being opened
+    // by now (`opening`, see beginOpening).
+    async fetchServerRoom(variables, opening) {
       try {
         const {
           data: { Room },
@@ -2088,6 +2104,7 @@ export default {
           variables,
           fetchPolicy: 'no-cache',
         })
+        if (!this.isCurrentOpening(opening)) return null
         if (Room?.length) {
           const room = this.fixRoomObject(Room[0])
           this.bringRoomToTopAndSelect(room)
@@ -2100,6 +2117,7 @@ export default {
     },
 
     async newRoom(userOrId) {
+      const opening = this.beginOpening()
       const userId = typeof userOrId === 'string' ? userOrId : userOrId.id
       let userName = typeof userOrId === 'string' ? null : userOrId.name
       let userSlug = typeof userOrId === 'string' ? null : userOrId.slug
@@ -2126,8 +2144,10 @@ export default {
         if (!userName) userName = userId
       }
 
+      if (!this.isCurrentOpening(opening)) return
       if (this.findLocalRoom((r) => !r.isGroupRoom && r.users.some((u) => u.id === userId))) return
-      if (await this.fetchServerRoom({ userId })) return
+      if (await this.fetchServerRoom({ userId }, opening)) return
+      if (!this.isCurrentOpening(opening)) return
 
       // Create a virtual room (no backend call — room is created on first message)
       const currentUserProfile = {
@@ -2181,12 +2201,14 @@ export default {
     },
 
     async newGroupRoom(groupId) {
+      const opening = this.beginOpening()
       // Not a call's conference chat: it carries the group too, but is not the group's chat.
       if (
         this.findLocalRoom((r) => r.isGroupRoom && !r.isCallRoom && r.groupProfile?.id === groupId)
       )
         return
-      if (await this.fetchServerRoom({ groupId })) return
+      if (await this.fetchServerRoom({ groupId }, opening)) return
+      if (!this.isCurrentOpening(opening)) return
 
       try {
         const {
@@ -2195,16 +2217,21 @@ export default {
           mutation: createGroupRoom(),
           variables: { groupId },
         })
+        // Created all the same; it is there when this group's chat is opened again.
+        if (!this.isCurrentOpening(opening)) return
         const room = this.fixRoomObject(CreateGroupRoom)
         this.bringRoomToTopAndSelect(room)
       } catch (error) {
-        this.$toastBackendError(error)
+        if (this.isCurrentOpening(opening)) this.$toastBackendError(error)
       }
     },
 
     async openRoom(roomId) {
+      const opening = this.beginOpening()
       if (this.findLocalRoom((r) => r.id === roomId)) return
-      const room = await this.fetchServerRoom({ id: roomId })
+      const room = await this.fetchServerRoom({ id: roomId }, opening)
+      // The opening that replaced this one says when the rooms are loaded.
+      if (!this.isCurrentOpening(opening)) return null
       this.loadingRooms = false
       return room
     },
