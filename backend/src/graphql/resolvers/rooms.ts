@@ -157,7 +157,8 @@ const inDraftRoom = async <T>(
   if (!roomId && !userId) {
     throw new AppError(Errors.CHAT_ROOM_TARGET_MISSING)
   }
-  if (userId && userId === currentUserId) {
+  // Oneself as the user to chat with; with a room named, the room counts, as below.
+  if (userId && !roomId && userId === currentUserId) {
     throw new AppError(Errors.CHAT_ROOM_PARTNER_IS_SELF)
   }
   const session = context.driver.session()
@@ -449,7 +450,9 @@ export default {
     SaveRoomDraft: async (_parent, params, context, _resolveInfo) => {
       // Kept as typed, blanks included, no longer than a message; one of nothing but blanks is
       // none — asked of what is kept, as cutting it may leave blanks only.
-      const kept = typeof params.text === 'string' ? params.text.slice(0, DRAFT_MAX_LENGTH) : ''
+      const cut = typeof params.text === 'string' ? params.text.slice(0, DRAFT_MAX_LENGTH) : ''
+      // Not through a character of two halves, like an emoji: the half left would be broken.
+      const kept = /[\uD800-\uDBFF]$/.test(cut) ? cut.slice(0, -1) : cut
       const text: string | null = kept.trim() ? kept : null
       // A direct conversation without a message yet has no room: one is opened for a draft,
       // not for taking one away.

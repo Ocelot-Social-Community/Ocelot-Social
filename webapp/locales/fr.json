@@ -440,6 +440,7 @@
     "CHAT_CALL_ROOM_CLOSED": "Cet appel vidéo est terminé. Son chat peut encore être lu, mais plus aucun message ne peut y être écrit.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Le chat de groupe n'a pas pu être créé.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Le message doit contenir un texte ou un fichier.",
+    "CHAT_MESSAGE_DRAFT_FILE_NOT_FOUND": "Un fichier du brouillon qui devait être envoyé n’existe plus. Merci de le joindre à nouveau.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Tu ne peux pas démarrer un chat avec toi-même.",
     "CHAT_ROOM_TARGET_MISSING": "Indique soit un chat, soit la personne avec qui tu veux discuter.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Le commentaire doit comporter au moins {min} caractères.",

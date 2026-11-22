@@ -257,6 +257,14 @@ describe('SaveRoomDraft', () => {
     await expect(draftIn(directRoomId)).resolves.toBe('x'.repeat(2000))
   })
 
+  it('cuts it through no character of two halves, like an emoji', async () => {
+    as(anna)
+
+    await save({ roomId: directRoomId, text: `${'x'.repeat(1999)}😀` })
+
+    await expect(draftIn(directRoomId)).resolves.toBe('x'.repeat(1999))
+  })
+
   it('keeps none of blanks only once cut to the length of a message', async () => {
     as(anna)
     await save({ roomId: directRoomId, text: 'Something' })
@@ -306,6 +314,16 @@ describe('SaveRoomDraft', () => {
     const { errors } = await save({ text: 'To whom?' })
 
     expect(errors?.[0].message).toBe('Name either a chat or the user to chat with.')
+  })
+
+  it('keeps it in the room named, oneself named as the user besides', async () => {
+    as(anna)
+
+    const { data, errors } = await save({ roomId: directRoomId, userId: 'anna', text: 'For Ben' })
+
+    expect(errors).toBeUndefined()
+    expect(data.SaveRoomDraft.id).toBe(directRoomId)
+    await expect(draftIn(directRoomId)).resolves.toBe('For Ben')
   })
 
   it('opens no direct conversation with oneself', async () => {
@@ -538,11 +556,40 @@ describe('SaveRoomDraft', () => {
           },
         })
 
-        expect(sent.data.CreateMessage.files).toEqual([])
+        expect(sent.errors?.[0].message).toBe(
+          'A file of the draft to be sent along is no longer there. Attach it again.',
+        )
 
         as(ben)
 
         await expect(draftFilesIn(directRoomId)).resolves.toEqual(['bens.txt'])
+      })
+
+      it('sends none without a file named that is gone meanwhile, nor uploads one', async () => {
+        as(anna)
+        const earlier = await attach({ roomId: directRoomId }, 'earlier.txt')
+        // Another message sent since ended the draft, its file too.
+        await send({ roomId: directRoomId, content: 'Sent in between' })
+        const filesBefore = await fileCount()
+        uploading.urls = []
+
+        const sent = await setup.mutate({
+          mutation: CreateMessage,
+          variables: {
+            roomId: directRoomId,
+            content: 'Sent again',
+            files: [aFile('fresh.txt')],
+            draftFiles: [earlier.data.AddRoomDraftFile.url],
+            endsDraft: false,
+          },
+        })
+
+        expect(sent.errors?.[0].message).toBe(
+          'A file of the draft to be sent along is no longer there. Attach it again.',
+        )
+        expect(sent.data?.CreateMessage ?? null).toBeNull()
+        await expect(fileCount()).resolves.toBe(filesBefore)
+        expect(uploading.urls).toEqual([])
       })
     })
   })

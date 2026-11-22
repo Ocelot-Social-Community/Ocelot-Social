@@ -440,6 +440,7 @@
     "CHAT_CALL_ROOM_CLOSED": "Kjo telefonatë me video ka përfunduar. Biseda e saj mund të lexohet ende, por nuk mund të shkruhet më në të.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Biseda e grupit nuk mund të krijohej.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Mesazhi ka nevojë për një tekst ose një skedar.",
+    "CHAT_MESSAGE_DRAFT_FILE_NOT_FOUND": "Një skedar i draftit që duhej dërguar nuk ekziston më. Ju lutemi bashkëngjiteni përsëri.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Nuk mund të nisësh një bisedë me veten.",
     "CHAT_ROOM_TARGET_MISSING": "Trego një bisedë ose personin me të cilin do të bisedosh.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "Komenti duhet të ketë të paktën {min} karaktere.",

@@ -307,6 +307,25 @@ export default {
             return null
           }
 
+          // The draft's files named are taken over as they are, in the order named — before
+          // anything is uploaded, which would be left over in the storage should one be missing.
+          const moved = await transaction.run(
+            `
+              MATCH (message:Message { id: $messageId })-[:INSIDE]->(room:Room)
+              MATCH (:User { id: $currentUserId })-[draftFile:DRAFT_FILE]->(file:File)-[draftFileIn:DRAFT_FILE_IN]->(room)
+              WHERE file.url IN $draftFiles
+              DELETE draftFile, draftFileIn
+              MERGE (message)-[:ATTACHMENT]->(file)
+              RETURN file { .* } AS file
+            `,
+            { messageId: message.id, currentUserId, draftFiles },
+          )
+          // One of them no longer there — taken away by another message sent since, say — fails
+          // the message, rather than letting it arrive without it.
+          if (moved.records.length < new Set(draftFiles).size) {
+            throw new AppError(Errors.CHAT_MESSAGE_DRAFT_FILE_NOT_FOUND)
+          }
+
           const atns: File[] = []
 
           for await (const file of files) {
@@ -322,18 +341,6 @@ export default {
             atns.push(atn)
           }
 
-          // The draft's files named are taken over as they are, in the order named.
-          const moved = await transaction.run(
-            `
-              MATCH (message:Message { id: $messageId })-[:INSIDE]->(room:Room)
-              MATCH (:User { id: $currentUserId })-[draftFile:DRAFT_FILE]->(file:File)-[draftFileIn:DRAFT_FILE_IN]->(room)
-              WHERE file.url IN $draftFiles
-              DELETE draftFile, draftFileIn
-              MERGE (message)-[:ATTACHMENT]->(file)
-              RETURN file { .* } AS file
-            `,
-            { messageId: message.id, currentUserId, draftFiles },
-          )
           // The rest of the draft goes, unless it goes on (endsDraft: false).
           const left = endsDraft
             ? await transaction.run(

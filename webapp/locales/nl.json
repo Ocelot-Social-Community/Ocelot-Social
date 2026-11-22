@@ -440,6 +440,7 @@
     "CHAT_CALL_ROOM_CLOSED": "Dit videogesprek is afgelopen. De chat kan nog worden gelezen, maar er kan niet meer in worden geschreven.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "De groepschat kon niet worden aangemaakt.",
     "CHAT_MESSAGE_CONTENT_MISSING": "Het bericht heeft een tekst of een bestand nodig.",
+    "CHAT_MESSAGE_DRAFT_FILE_NOT_FOUND": "Een bestand van het concept dat mee verzonden zou worden, is er niet meer. Voeg het opnieuw toe.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Je kunt geen chat met jezelf starten.",
     "CHAT_ROOM_TARGET_MISSING": "Geef een chat op of de persoon met wie je wilt chatten.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "De reactie moet minimaal {min} tekens lang zijn.",

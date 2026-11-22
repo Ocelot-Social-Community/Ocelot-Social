@@ -426,6 +426,10 @@ const definitions = {
     type: 'FORBIDDEN',
     text: 'This video call is over. Its chat can still be read, but no longer written to.',
   },
+  CHAT_MESSAGE_DRAFT_FILE_NOT_FOUND: {
+    type: 'BAD_USER_INPUT',
+    text: 'A file of the draft to be sent along is no longer there. Attach it again.',
+  },
   CHAT_ROOM_TARGET_MISSING: {
     type: 'BAD_USER_INPUT',
     text: 'Name either a chat or the user to chat with.',

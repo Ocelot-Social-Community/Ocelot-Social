@@ -440,6 +440,7 @@
     "CHAT_CALL_ROOM_CLOSED": "This video call is over. Its chat can still be read, but no longer written to.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "The group chat could not be created.",
     "CHAT_MESSAGE_CONTENT_MISSING": "The message needs a text or a file.",
+    "CHAT_MESSAGE_DRAFT_FILE_NOT_FOUND": "A file of the draft to be sent along is no longer there. Please attach it again.",
     "CHAT_ROOM_PARTNER_IS_SELF": "You cannot start a chat with yourself.",
     "CHAT_ROOM_TARGET_MISSING": "Name either a chat or the person you want to chat with.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "The comment must be at least {min} characters long.",

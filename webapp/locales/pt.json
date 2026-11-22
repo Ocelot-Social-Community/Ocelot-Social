@@ -440,6 +440,7 @@
     "CHAT_CALL_ROOM_CLOSED": "Esta videochamada terminou. O chat ainda pode ser lido, mas não é mais possível escrever nele.",
     "CHAT_GROUP_ROOM_NOT_CREATED": "Não foi possível criar o chat do grupo.",
     "CHAT_MESSAGE_CONTENT_MISSING": "A mensagem precisa de um texto ou de um arquivo.",
+    "CHAT_MESSAGE_DRAFT_FILE_NOT_FOUND": "Um arquivo do rascunho que deveria ser enviado não existe mais. Anexe-o novamente, por favor.",
     "CHAT_ROOM_PARTNER_IS_SELF": "Você não pode iniciar um chat consigo mesmo.",
     "CHAT_ROOM_TARGET_MISSING": "Indique um chat ou a pessoa com quem você quer conversar.",
     "COMMENT_SAVE_CONTENT_TOO_SHORT": "O comentário deve ter pelo menos {min} caracteres.",
