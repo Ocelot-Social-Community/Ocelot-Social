@@ -568,6 +568,8 @@ export default {
     },
     async onCameraChange(deviceId) {
       this.selectedCamera = deviceId
+      // Switched off for failing, not by the user: another one picked is tried.
+      if (this.failed.video && this.usable(this.cameraStatus)) this.cameraActive = true
       const shown = await this.acquireStream('video')
       // Not one that was overtaken by a later choice, nor one that left the
       // preview without a picture.
@@ -577,6 +579,7 @@ export default {
     },
     async onMicChange(deviceId) {
       this.selectedMic = deviceId
+      if (this.failed.audio && this.usable(this.micStatus)) this.micActive = true
       if ((await this.acquireStream('audio')) && !this.failed.audio) {
         this.rememberDevice('audioinput', this.mics, deviceId)
       }
@@ -599,6 +602,10 @@ export default {
       if (next) await this.refreshPermissionStatus()
       if (this.cameraStatus === 'denied') this.cameraActive = false
     },
+    // Not refused by the browser for good: 'denied' and 'unsupported' leave nothing to try.
+    usable(status) {
+      return status !== 'denied' && status !== 'unsupported'
+    },
     onSpeakerChange(deviceId) {
       this.selectedSpeaker = deviceId
       this.rememberDevice('audiooutput', this.speakers, deviceId)
@@ -608,16 +615,13 @@ export default {
       // even when getUserMedia already worked for the preview. Treat anything
       // that isn't a hard 'denied'/'unsupported' as usable — matches the
       // disabled state of the toggle buttons.
-      const micEnabled =
-        this.micActive && this.micStatus !== 'denied' && this.micStatus !== 'unsupported'
-      const cameraEnabled =
-        this.cameraActive && this.cameraStatus !== 'denied' && this.cameraStatus !== 'unsupported'
+      const micEnabled = this.micActive && this.usable(this.micStatus)
+      const cameraEnabled = this.cameraActive && this.usable(this.cameraStatus)
       // A device that is merely switched off for now still goes along: it is
       // the one to start once the user turns it on during the call.
-      const usable = (status) => status !== 'denied' && status !== 'unsupported'
       const payload = {
-        cameraDeviceId: (usable(this.cameraStatus) && this.selectedCamera) || null,
-        micDeviceId: (usable(this.micStatus) && this.selectedMic) || null,
+        cameraDeviceId: (this.usable(this.cameraStatus) && this.selectedCamera) || null,
+        micDeviceId: (this.usable(this.micStatus) && this.selectedMic) || null,
         speakerDeviceId: (this.speakerSupported && this.selectedSpeaker) || null,
         cameraEnabled,
         micEnabled,

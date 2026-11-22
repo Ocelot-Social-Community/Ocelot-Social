@@ -751,6 +751,59 @@ describe('PreJoin', () => {
     })
   })
 
+  describe('another device picked after one failed', () => {
+    const picture = {
+      getTracks: () => [{ kind: 'video', stop: jest.fn() }],
+      getAudioTracks: () => [],
+      getVideoTracks: () => [{}],
+    }
+    const sound = {
+      getTracks: () => [{ kind: 'audio', stop: jest.fn() }],
+      getAudioTracks: () => [{}],
+      getVideoTracks: () => [],
+    }
+    const mountStarting = (stream) => {
+      const built = mountWith({
+        getUserMedia: jest.fn().mockResolvedValue(stream),
+        enumerateDevices: jest.fn().mockResolvedValue([]),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      })
+      built.wrapper.setData({ cameraStatus: 'granted', micStatus: 'granted' })
+      return built
+    }
+
+    it('tries the camera picked, which starts', async () => {
+      const { wrapper, mediaDevices } = mountStarting(picture)
+      wrapper.vm.deviceFailed('video', { name: 'NotReadableError' })
+      await wrapper.vm.onCameraChange('cam-2')
+      expect(mediaDevices.getUserMedia).toHaveBeenCalledWith(
+        expect.objectContaining({ video: expect.anything() }),
+      )
+      expect(wrapper.vm.cameraActive).toBe(true)
+      expect(wrapper.vm.failed.video).toBeNull()
+    })
+
+    it('tries the microphone picked, which starts', async () => {
+      const { wrapper, mediaDevices } = mountStarting(sound)
+      wrapper.vm.deviceFailed('audio', { name: 'NotFoundError' })
+      await wrapper.vm.onMicChange('mic-2')
+      expect(mediaDevices.getUserMedia).toHaveBeenCalledWith(
+        expect.objectContaining({ audio: expect.anything() }),
+      )
+      expect(wrapper.vm.micActive).toBe(true)
+      expect(wrapper.vm.failed.audio).toBeNull()
+    })
+
+    it('leaves a camera off that the user switched off', async () => {
+      const { wrapper, mediaDevices } = mountStarting(picture)
+      wrapper.setData({ cameraActive: false })
+      await wrapper.vm.onCameraChange('cam-2')
+      expect(mediaDevices.getUserMedia).not.toHaveBeenCalled()
+      expect(wrapper.vm.cameraActive).toBe(false)
+    })
+  })
+
   describe('a chosen camera that fails while the microphone works', () => {
     const audioStream = {
       getTracks: () => [],
