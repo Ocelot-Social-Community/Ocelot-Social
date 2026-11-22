@@ -2338,6 +2338,21 @@ describe('Chat.vue', () => {
         expect(wrapper.vm.roomMessage).toBe('Newer')
       })
 
+      it("does not hand the room's draft on to the rooms opened later", async () => {
+        wrapper.vm._field = fakeField('room-2')
+        await wrapper.vm.fetchMessages({ room: wrapper.vm.rooms[1] })
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.vm.roomMessage).toBe('Kept before')
+
+        // Once the field shows the room, it holds the draft: the library would put a
+        // `room-message` left over into the field of the next room, and report it typed there.
+        jest.advanceTimersByTime(0)
+
+        expect(wrapper.vm._fieldRoom).toBe('room-2')
+        expect(wrapper.vm.roomMessage).toBeNull()
+      })
+
       it('empties the message field for a room without a draft', async () => {
         wrapper.vm.selectedRoom = wrapper.vm.rooms[1]
         wrapper.vm.roomMessage = 'Kept before'
@@ -2818,9 +2833,11 @@ describe('Chat.vue', () => {
 
         wrapper.vm.showDraftOf('room-1')
         await wrapper.vm.$nextTick()
-        jest.advanceTimersByTime(0)
 
         expect(wrapper.vm.roomMessage).toBe('Hi @Other')
+
+        jest.advanceTimersByTime(0)
+
         expect(field.mentioned).toEqual([expect.objectContaining({ _id: 'other-user' })])
       })
 

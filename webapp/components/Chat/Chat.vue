@@ -1728,7 +1728,9 @@ export default {
 
     // Puts the room's draft into the message field: the text through `room-message`, through
     // null first, as the field takes it only when it changes and two rooms may hold the same;
-    // the people it mentions and its files on the field itself, once it shows the room.
+    // the people it mentions and its files on the field itself, once it shows the room. Then
+    // `room-message` is null again: the library puts it into the field of every room opened
+    // later, and would report it as typed there.
     showDraftOf(roomId) {
       this._fieldRoom = null
       this.roomMessage = null
@@ -1741,6 +1743,7 @@ export default {
         this.roomMessage = text || null
       })
       this.whenFieldShows(roomId, (field) => {
+        this.roomMessage = null
         field.mentioned = mentioned
         field.files = [
           ...files.map((file) => ({
