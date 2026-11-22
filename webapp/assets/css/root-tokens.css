@@ -481,6 +481,9 @@
   --chat-hint-icon-color: var(--tooltip-color);
   --chat-hint-shadow: var(--box-shadow-large);
   --chat-hint-close-hover-background: rgba(255, 255, 255, 0.15);
+  /* "Draft:" before the text of a draft in the room list (Chat.vue draftLabelCss), as messengers
+     mark it: in the colour of what still waits for something. */
+  --chat-draft-label-color: var(--color-danger);
   /* The bars of the chat and of the call — their headers, the call's control bar, the chat's footer. One
      step off the content in the light theme; in the dark one the page's own bars are that same step, so
      these take the content's ground instead and stand off the page's. */

@@ -41,8 +41,8 @@ type Message {
 }
 
 type Mutation {
-  "Send a message to a room (by `roomId`) or to a user (by `userId`, opening a direct room). Requires authentication."
-  CreateMessage(roomId: ID, userId: ID, content: String, files: [FileInput]): Message
+  "Send a message to a room (by `roomId`) or to a user (by `userId`, opening a direct room). `draftFiles` names files of the sender's draft in the room by URL (AddRoomDraftFile): they are attached without another upload, and the rest of the draft is removed — unless `endsDraft` is false, as for a message sent again after failing, written before the draft there now. Requires authentication."
+  CreateMessage(roomId: ID, userId: ID, content: String, files: [FileInput], draftFiles: [ID], endsDraft: Boolean = true): Message
 
   "Mark the given messages as seen by the current user. Requires authentication."
   MarkMessagesAsSeen(messageIds: [String!]): Boolean
