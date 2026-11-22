@@ -151,7 +151,7 @@ const inDraftRoom = async <T>(
   params: { roomId?: string | null; userId?: string | null },
   opensRoom: boolean,
   work: (transaction, matchRoom: string, variables: DraftRoomVariables) => Promise<T>,
-): Promise<T | null> => {
+): Promise<T> => {
   const { roomId, userId } = params
   const currentUserId: string = context.user.id
   if (!roomId && !userId) {
@@ -536,8 +536,8 @@ export default {
           return (result.records[0]?.get('urls') as string[] | undefined) ?? []
         },
       )
-      await deleteStoredFiles(CONFIG, removed ?? [])
-      return !!removed?.length
+      await deleteStoredFiles(CONFIG, removed)
+      return removed.length > 0
     },
   },
   Room: {
