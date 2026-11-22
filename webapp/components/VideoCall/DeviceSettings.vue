@@ -38,8 +38,22 @@
       :mic-starting="micStarting"
       @camera-change="emitSwitch('videoinput', cameras, $event)"
       @mic-change="emitSwitch('audioinput', mics, $event)"
+      :camera-issue="cameraIssue"
+      :mic-issue="micIssue"
       @speaker-change="emitSwitch('audiooutput', speakers, $event)"
     />
+    <os-button
+      v-if="cameraIssue || micIssue"
+      class="device-settings__retry"
+      data-test="video-call-device-retry"
+      appearance="outline"
+      variant="danger"
+      size="sm"
+      @click="$emit('retry')"
+    >
+      <template #icon><os-icon :icon="icons.refresh" /></template>
+      {{ $t('videoCall.prejoin.retry') }}
+    </os-button>
     <div class="device-settings__row">
       <label class="device-settings__label" for="video-call-send-quality">
         {{ $t('videoCall.deviceSettings.sendQuality') }}
@@ -126,6 +140,15 @@ export default {
     micStarting: {
       type: Boolean,
       default: false,
+    },
+    // Why our camera or microphone did not start (deviceError.js), until it does.
+    cameraIssue: {
+      type: String,
+      default: null,
+    },
+    micIssue: {
+      type: String,
+      default: null,
     },
     // Whether our microphone leaves out pauses in speech (Opus DTX).
     dtx: {
@@ -234,6 +257,14 @@ export default {
   /*  The panel takes the focus when it opens so Escape and Tab start from it; */
   /*  a focus ring around the whole panel would only be noise. */
   outline: none;
+}
+
+.device-settings__retry {
+  /*  OsButton's root carries no data-v attribute of this component, so scoped rules */
+  /*  only reach it with !important. */
+  align-self: flex-start !important;
+  /*  The panel is a column of fixed height that scrolls: without this it squeezes the button. */
+  flex-shrink: 0 !important;
 }
 
 .device-settings__header {

@@ -1999,6 +1999,24 @@
     },
     "cpuRelief": "Seu dispositivo está sobrecarregado — as câmeras funcionam com qualidade reduzida para o som continuar claro.",
     "cpuStrained": "Seu dispositivo não está dando conta dos vídeos. Uma qualidade mais baixa mantém o som claro.",
+    "deviceIssue": {
+      "busy": {
+        "hint": "Outro aplicativo está usando o dispositivo.",
+        "label": "Em uso"
+      },
+      "denied": {
+        "hint": "O navegador bloqueia o acesso.",
+        "label": "Bloqueado"
+      },
+      "generic": {
+        "hint": "O dispositivo não inicia.",
+        "label": "Não inicia"
+      },
+      "noDevice": {
+        "hint": "Nenhum dispositivo encontrado — conecte um.",
+        "label": "Ausente"
+      }
+    },
     "deviceSettings": {
       "button": "Dispositivos",
       "dtx": "Não transmitir as pausas na fala",
@@ -2024,22 +2042,19 @@
     "errorRetry": "Tentar novamente",
     "errors": {
       "camera": {
-        "busy": "A câmera está sendo usada por outro aplicativo.",
-        "denied": "Acesso à câmera negado. Ative a permissão nas configurações do navegador (ícone de cadeado na barra de endereço).",
-        "generic": "Não foi possível ligar a câmera.",
-        "noDevice": "Nenhuma câmera encontrada."
+        "unavailable": "Câmera indisponível."
       },
       "mic": {
-        "busy": "O microfone está sendo usado por outro aplicativo.",
-        "denied": "Acesso ao microfone negado. Ative a permissão nas configurações do navegador (ícone de cadeado na barra de endereço).",
-        "generic": "Não foi possível ligar o microfone.",
-        "noDevice": "Nenhum microfone encontrado."
+        "unavailable": "Microfone indisponível."
+      },
+      "reason": {
+        "busy": "Outro aplicativo está usando o dispositivo — feche-o e tente novamente.",
+        "denied": "Permita o acesso no navegador (ícone de cadeado na barra de endereço) e tente novamente.",
+        "generic": "Tente novamente.",
+        "noDevice": "Nenhum dispositivo encontrado — conecte um e tente novamente."
       },
       "screen": {
-        "busy": "O compartilhamento de tela não está disponível agora.",
-        "denied": "O compartilhamento de tela foi recusado.",
-        "generic": "Não foi possível compartilhar a tela.",
-        "noDevice": "Nenhuma tela disponível para compartilhar."
+        "unavailable": "Compartilhamento de tela indisponível."
       }
     },
     "exitFullscreen": "Sair da tela cheia",
@@ -2150,10 +2165,6 @@
       "cameraStarting": "Iniciando a câmera…",
       "cancel": "Cancelar",
       "description": "Você está prestes a entrar na chamada de vídeo deste grupo. Verifique a câmera, o microfone e o alto-falante e depois entre na chamada.",
-      "errorBusy": "O dispositivo está sendo usado por outro aplicativo.",
-      "errorDenied": "Acesso negado. Permita o acesso à câmera e ao microfone nas configurações do navegador.",
-      "errorNoDevice": "Nenhum dispositivo correspondente encontrado.",
-      "errorUnknown": "Não foi possível acessar seus dispositivos.",
       "headerTitle": "{name} – Entrar na chamada de vídeo",
       "hintBoth": "Você está entrando sem câmera nem microfone — só vai ver e ouvir os outros.",
       "hintCamera": "Você está entrando sem câmera — os outros ouvem você, mas não veem você.",

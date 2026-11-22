@@ -24,6 +24,57 @@ const mountWith = (propsData = {}) => ({
 })
 
 describe('DeviceSelectors', () => {
+  describe('a device that did not start', () => {
+    const cameras = [{ deviceId: 'cam-1', label: 'Built-in camera' }]
+
+    it('says why below its field, and in place of the badge', () => {
+      const { wrapper } = mountWith({ cameras, cameraStatus: 'granted', cameraIssue: 'busy' })
+      expect(wrapper.find('[data-test="device-camera-issue"]').text()).toBe(
+        'videoCall.deviceIssue.busy.hint',
+      )
+      expect(wrapper.find('[data-test="device-camera-issue-status"]').text()).toBe(
+        'videoCall.deviceIssue.busy.label',
+      )
+      expect(wrapper.text()).not.toContain('videoCall.prejoin.permission.granted')
+    })
+
+    it('says so for a microphone missing as well', () => {
+      const { wrapper } = mountWith({ micStatus: 'granted', micIssue: 'noDevice' })
+      expect(wrapper.find('[data-test="device-mic-issue"]').text()).toBe(
+        'videoCall.deviceIssue.noDevice.hint',
+      )
+      expect(wrapper.find('[data-test="device-mic-issue-status"]').text()).toBe(
+        'videoCall.deviceIssue.noDevice.label',
+      )
+    })
+
+    it('takes the place kept for a device starting, where there is one', () => {
+      const { wrapper } = mountWith({ cameras, startingSigns: true, cameraIssue: 'busy' })
+      expect(
+        wrapper.find('.device-selectors__slot [data-test="device-camera-issue"]').exists(),
+      ).toBe(true)
+      expect(wrapper.findAll('[data-test="device-camera-issue"]')).toHaveLength(1)
+    })
+
+    it('gives way there to a device starting', () => {
+      const { wrapper } = mountWith({
+        cameras,
+        startingSigns: true,
+        cameraIssue: 'busy',
+        cameraStarting: true,
+      })
+      expect(wrapper.find('[data-test="device-camera-starting"]').exists()).toBe(true)
+      expect(wrapper.find('[data-test="device-camera-issue"]').exists()).toBe(false)
+    })
+
+    it('says nothing of the kind while every device runs', () => {
+      const { wrapper } = mountWith({ cameras, cameraStatus: 'granted' })
+      expect(wrapper.find('[data-test="device-camera-issue"]').exists()).toBe(false)
+      expect(wrapper.find('[data-test="device-mic-issue"]').exists()).toBe(false)
+      expect(wrapper.text()).toContain('videoCall.prejoin.permission.granted')
+    })
+  })
+
   describe('device rows', () => {
     const devices = {
       cameras: [

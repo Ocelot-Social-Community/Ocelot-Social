@@ -23,6 +23,8 @@ const stubs = {
       'selectedSpeaker',
       'cameraStarting',
       'micStarting',
+      'cameraIssue',
+      'micIssue',
     ],
   }),
 }
@@ -58,6 +60,28 @@ const mountWith = async ({ propsData = {}, mediaDevices } = {}) => {
 }
 
 describe('DeviceSettings', () => {
+  describe('a device that did not start', () => {
+    const RETRY = '[data-test="video-call-device-retry"]'
+
+    it('offers no retry while every device runs', async () => {
+      const { wrapper } = await mountWith()
+      expect(wrapper.find(RETRY).exists()).toBe(false)
+      wrapper.destroy()
+    })
+
+    it.each([
+      ['the camera', { cameraIssue: 'busy' }],
+      ['the microphone', { micIssue: 'noDevice' }],
+    ])('is named at its field for %s, with a retry', async (_name, propsData) => {
+      const { wrapper, selectors } = await mountWith({ propsData })
+      expect(selectors.props('cameraIssue')).toBe(propsData.cameraIssue || null)
+      expect(selectors.props('micIssue')).toBe(propsData.micIssue || null)
+      await wrapper.find(RETRY).trigger('click')
+      expect(wrapper.emitted('retry')).toHaveLength(1)
+      wrapper.destroy()
+    })
+  })
+
   it('takes the focus and lists the devices by kind', async () => {
     const { wrapper, selectors } = await mountWith()
     expect(document.activeElement).toBe(wrapper.element)

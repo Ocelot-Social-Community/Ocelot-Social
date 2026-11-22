@@ -4,7 +4,14 @@
       <label class="device-selectors__label" :for="`${idPrefix}-camera`">
         {{ $t('videoCall.prejoin.camera') }}
         <span
-          v-if="cameraStatus"
+          v-if="cameraIssue"
+          class="device-selectors__status device-selectors__status--denied"
+          data-test="device-camera-issue-status"
+        >
+          {{ $t(`videoCall.deviceIssue.${cameraIssue}.label`) }}
+        </span>
+        <span
+          v-else-if="cameraStatus"
           :class="['device-selectors__status', `device-selectors__status--${cameraStatus}`]"
         >
           {{ $t(`videoCall.prejoin.permission.${cameraStatus}`) }}
@@ -29,9 +36,10 @@
         </option>
       </select>
       <div v-if="startingSigns" class="device-selectors__slot">
-        <transition name="device-selectors-fade">
+        <transition name="device-selectors-fade" mode="out-in">
           <div
             v-if="cameraStarting"
+            key="starting"
             class="device-selectors__starting"
             role="status"
             data-test="device-camera-starting"
@@ -39,15 +47,33 @@
             <os-spinner size="sm" />
             {{ $t('videoCall.prejoin.cameraStarting') }}
           </div>
+          <p
+            v-else-if="cameraIssue"
+            key="issue"
+            class="device-selectors__starting device-selectors__issue"
+            data-test="device-camera-issue"
+          >
+            {{ $t(`videoCall.deviceIssue.${cameraIssue}.hint`) }}
+          </p>
         </transition>
       </div>
+      <p v-else-if="cameraIssue" class="device-selectors__issue" data-test="device-camera-issue">
+        {{ $t(`videoCall.deviceIssue.${cameraIssue}.hint`) }}
+      </p>
     </div>
 
     <div class="device-selectors__row">
       <label class="device-selectors__label" :for="`${idPrefix}-mic`">
         {{ $t('videoCall.prejoin.microphone') }}
         <span
-          v-if="micStatus"
+          v-if="micIssue"
+          class="device-selectors__status device-selectors__status--denied"
+          data-test="device-mic-issue-status"
+        >
+          {{ $t(`videoCall.deviceIssue.${micIssue}.label`) }}
+        </span>
+        <span
+          v-else-if="micStatus"
           :class="['device-selectors__status', `device-selectors__status--${micStatus}`]"
         >
           {{ $t(`videoCall.prejoin.permission.${micStatus}`) }}
@@ -83,6 +109,14 @@
             <os-spinner size="sm" />
             {{ $t('videoCall.prejoin.micStarting') }}
           </div>
+          <p
+            v-else-if="micIssue"
+            key="issue"
+            class="device-selectors__starting device-selectors__issue"
+            data-test="device-mic-issue"
+          >
+            {{ $t(`videoCall.deviceIssue.${micIssue}.hint`) }}
+          </p>
           <div
             v-else-if="meterStream"
             key="meter"
@@ -93,6 +127,9 @@
           </div>
         </transition>
       </div>
+      <p v-else-if="micIssue" class="device-selectors__issue" data-test="device-mic-issue">
+        {{ $t(`videoCall.deviceIssue.${micIssue}.hint`) }}
+      </p>
       <div
         v-else-if="meterStream"
         class="device-selectors__meter"
@@ -209,6 +246,16 @@ export default {
       default: null,
     },
     micStatus: {
+      type: String,
+      default: null,
+    },
+    // Why the device did not start (deviceError.js: busy | noDevice | denied | generic), said
+    // below its field and in place of the badge; nothing while it is left out.
+    cameraIssue: {
+      type: String,
+      default: null,
+    },
+    micIssue: {
       type: String,
       default: null,
     },
@@ -470,6 +517,19 @@ export default {
 .device-selectors__status--info {
   background: transparent;
   color: var(--text-color-softer);
+}
+
+/*  As quiet as the sign of a device starting: the badge above and the toast say it loud. */
+.device-selectors__issue {
+  margin: 0;
+  font-size: var(--font-size-small);
+  color: var(--text-color-soft);
+}
+
+/*  In the slot below the field it keeps to one line, as the sign of a device starting does. */
+.device-selectors__slot .device-selectors__issue {
+  display: block;
+  text-overflow: ellipsis;
 }
 
 /*  As high as the level bar, which shares the microphone's. The sign itself */

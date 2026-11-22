@@ -11,6 +11,7 @@
   * [HTML](webapp/html.md)
   * [SCSS](webapp/scss.md)
   * [Vue](webapp/vue.md)
+  * [Video Call](webapp/components/VideoCall/README.md)
 * [Maintenance Page](maintenance/README.md)
 * [Branding](packages/branding/README.md)
 * [Testing Guide](testing.md)
