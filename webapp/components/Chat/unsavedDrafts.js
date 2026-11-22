@@ -32,6 +32,25 @@ export const newDraftRevision = (userId, roomId) => {
 export const isLatestDraftRevision = (userId, roomId, revision) =>
   revisions.get(keyOf(userId, roomId)) === revision
 
+// What changes a draft on the server — its saves, its files, and sending, which ends it — goes
+// one after the other per user and room, whichever chat asked: one replaced by another, like a
+// call's chat, must not have a save still under way arrive after a newer one. `waits: false`
+// starts the work at once, as nothing may wait while the page is left. Gives the work's promise.
+const queues = new Map()
+
+export const queueDraftWork = (userId, roomId, work, { waits = true } = {}) => {
+  const key = keyOf(userId, roomId)
+  const previous = waits ? queues.get(key) : undefined
+  const next = previous ? previous.then(() => work()) : Promise.resolve(work())
+  const settled = next
+    .catch(() => {})
+    .then(() => {
+      if (queues.get(key) === settled) queues.delete(key)
+    })
+  queues.set(key, settled)
+  return next
+}
+
 export const unsavedDraftRoomIds = (userId) => {
   const prefix = `${userId}${SEPARATOR}`
   return [...texts.keys()]
@@ -43,4 +62,5 @@ export const unsavedDraftRoomIds = (userId) => {
 export const forgetUnsavedDrafts = () => {
   texts.clear()
   revisions.clear()
+  queues.clear()
 }

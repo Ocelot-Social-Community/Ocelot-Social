@@ -2467,7 +2467,9 @@ describe('Chat.vue', () => {
         jest.advanceTimersByTime(1000)
         await flush()
         global.URL.createObjectURL = jest.fn(() => 'blob:local')
-        mocks.$apollo.mutate.mockResolvedValue({ data: { CreateMessage: null } })
+        mocks.$apollo.mutate.mockResolvedValue({
+          data: { CreateMessage: { id: 'sent-1', content: 'Sent after all' } },
+        })
         await wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Sent after all' })
         delete global.URL.createObjectURL
         mocks.$apollo.mutate.mockClear()
@@ -2475,6 +2477,35 @@ describe('Chat.vue', () => {
         wrapper.vm.keepAllDrafts()
 
         expect(draftSaves()).toEqual([])
+        // Acknowledged: the message shown is the one the server created.
+        const last = wrapper.vm.messages[wrapper.vm.messages.length - 1]
+        expect(last).toMatchObject({ content: 'Sent after all', isUploading: false })
+        expect(last.failure).toBeFalsy()
+        expect(wrapper.vm._localToServerIds['sent-1']).toBe(last._id)
+      })
+
+      it("waits for a save of a chat replaced meanwhile, like a call's chat", async () => {
+        let saved
+        mocks.$apollo.mutate.mockImplementationOnce(
+          () => new Promise((resolve) => (saved = () => resolve({ data: {} }))),
+        )
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Old' })
+        jest.advanceTimersByTime(1000)
+        wrapper.destroy()
+        mocks.$apollo.mutate.mockClear()
+
+        wrapper = Wrapper()
+        wrapper.vm.rooms = [mockRoom()]
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'New' })
+        jest.advanceTimersByTime(1000)
+        await flush()
+
+        expect(draftSaves()).toEqual([])
+
+        saved()
+        await flush()
+
+        expect(draftSaves()).toEqual([{ roomId: 'room-1', text: 'New' }])
       })
     })
 
@@ -2565,6 +2596,41 @@ describe('Chat.vue', () => {
         expect(order).toEqual(['draft', 'message'])
         expect(draftSaves()).toEqual([{ roomId: 'room-1', text: 'Hello' }])
       })
+
+      it('lets a draft typed meanwhile wait for it, as ending the draft would take it away', async () => {
+        let created
+        const order = []
+        mocks.$apollo.mutate.mockImplementation(({ variables }) => {
+          if ('content' in variables) {
+            return new Promise((resolve) => {
+              created = () => {
+                order.push('message')
+                resolve({ data: { CreateMessage: null } })
+              }
+            })
+          }
+          order.push(`draft ${variables.text}`)
+          return Promise.resolve({ data: {} })
+        })
+        const settle = async () => {
+          for (let i = 0; i < 10; i++) await Promise.resolve()
+        }
+        await settle()
+
+        const sending = wrapper.vm.sendMessage({ roomId: 'room-1', content: 'Sent' })
+        await settle()
+        wrapper.vm.draftTyped({ roomId: 'room-1', message: 'Typed meanwhile' })
+        jest.advanceTimersByTime(1000)
+        await settle()
+
+        expect(order).toEqual([])
+
+        created()
+        await sending
+        await settle()
+
+        expect(order).toEqual(['message', 'draft Typed meanwhile'])
+      })
     })
 
     describe('when sending fails', () => {
@@ -2639,8 +2705,11 @@ describe('Chat.vue', () => {
         mocks.$apollo.query.mockResolvedValue({
           data: { Room: [mockRoom({ id: 'real-1', roomId: 'real-1' })], Message: [] },
         })
+        // Sent one after the other: the second is under way when the first got the room.
+        const sending = wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Sent' })
         const failing = wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Failed later' })
-        await wrapper.vm.sendMessage({ roomId: 'temp-u1', content: 'Sent' })
+        await sending
+        for (let i = 0; i < 10; i++) await Promise.resolve()
 
         fail()
         await failing
@@ -2867,6 +2936,76 @@ describe('Chat.vue', () => {
 
         expect(fileSaves()).toEqual([{ roomId: 'room-1', url: 'https://s3/old.txt' }])
         expect(wrapper.vm.draftFilesOf('room-1')).toEqual([])
+      })
+
+      it('removes a file again whose removal failed, not shown meanwhile', async () => {
+        wrapper.vm.rooms = [mockRoom({ draftFiles: [added('old')] })]
+        mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Offline'))
+        wrapper.vm.draftFilesChanged(field, [])
+        jest.advanceTimersByTime(1000)
+        await settle()
+
+        expect(wrapper.vm.draftFilesOf('room-1')).toEqual([])
+
+        wrapper.vm.keepAllDrafts()
+        await settle()
+        wrapper.vm.keepAllDrafts()
+        await settle()
+
+        expect(fileSaves()).toEqual([
+          { roomId: 'room-1', url: 'https://s3/old.txt' },
+          { roomId: 'room-1', url: 'https://s3/old.txt' },
+        ])
+      })
+
+      it('removes a file again whose removal failed with the next change of the field', async () => {
+        wrapper.vm.rooms = [mockRoom({ draftFiles: [added('old')] })]
+        mocks.$apollo.mutate.mockRejectedValueOnce(new Error('Offline'))
+        wrapper.vm.draftFilesChanged(field, [])
+        jest.advanceTimersByTime(1000)
+        await settle()
+
+        const file = { name: 'new', type: 'text/plain', blob: new Blob(['x']) }
+        wrapper.vm.draftFilesChanged(field, [file])
+        jest.advanceTimersByTime(1000)
+        await settle()
+
+        expect(fileSaves()).toEqual([
+          { roomId: 'room-1', url: 'https://s3/old.txt' },
+          { roomId: 'room-1', url: 'https://s3/old.txt' },
+          expect.objectContaining({ file: expect.objectContaining({ name: 'new' }) }),
+        ])
+      })
+
+      it('sent while uploaded for the draft are not taken out of it by the field emptied after', async () => {
+        global.URL.createObjectURL = jest.fn(() => 'blob:local')
+        let uploaded
+        mocks.$apollo.mutate.mockImplementation(({ variables }) =>
+          'file' in variables
+            ? new Promise((resolve) => {
+                uploaded = () => resolve({ data: { AddRoomDraftFile: added('notes') } })
+              })
+            : Promise.resolve({ data: {} }),
+        )
+        const file = { name: 'notes', type: 'text/plain', blob: new Blob(['x']) }
+        wrapper.vm.draftFilesChanged(field, [file])
+        jest.advanceTimersByTime(1000)
+        await settle()
+
+        const sending = wrapper.vm.sendMessage({ roomId: 'room-1', content: 'See', files: [file] })
+        // The library empties the field after sending.
+        wrapper.vm.draftFilesChanged(field, [])
+        jest.advanceTimersByTime(1000)
+        uploaded()
+        await sending
+        await settle()
+
+        const variables = mocks.$apollo.mutate.mock.calls.map(([options]) => options.variables)
+        const message = variables.find((v) => 'content' in v)
+        expect(message).toMatchObject({ draftFiles: ['https://s3/notes.txt'] })
+        expect(message.files).toBeUndefined()
+        expect(variables.filter((v) => 'url' in v)).toEqual([])
+        delete global.URL.createObjectURL
       })
 
       it('removes a file taken out while it was uploaded', async () => {

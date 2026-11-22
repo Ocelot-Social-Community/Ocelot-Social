@@ -171,6 +171,7 @@ import {
   clearUnsavedDraft,
   isLatestDraftRevision,
   newDraftRevision,
+  queueDraftWork,
   setUnsavedDraft,
   unsavedDraft,
   unsavedDraftRoomIds,
@@ -308,12 +309,14 @@ export default {
     // How often another room has been opened; see fetchMessages.
     this.roomSwitches = 0
     // Typed, and not kept yet, per room id — the text, the people picked to mention in it, the
-    // files attached; its timer; and the saves asked for per room, one after the other.
+    // files attached; and its timer. The saves go one after the other (queueDraftSave).
     this._typed = {}
     this._typedMentions = {}
     this._typedFiles = {}
     this._draftTimers = {}
-    this._draftSaves = {}
+    // The addresses of the draft's files taken out whose removal failed, per room id: no longer
+    // shown, removed again with the next change of the draft (removeDraftFiles).
+    this._goneFiles = {}
     // The files last seen in the field per room, kept with the draft or not.
     this._fieldFiles = {}
     // The latest save of a room's draft asked for, per room id, as { text }: sent again with
@@ -1494,7 +1497,6 @@ export default {
     async sendMessage(messageDetails, { again = false } = {}) {
       const { roomId, content, files } = messageDetails
       const isVirtualRoom = roomId.startsWith('temp-')
-      const draftSaved = this._draftSaves[roomId]
       if (!again) {
         // Sending ends the draft, on the server too (CreateMessage). The emptied field reports
         // itself right after; known as empty already, it is not saved again.
@@ -1504,6 +1506,11 @@ export default {
         newDraftRevision(this.currentUser.id, roomId)
         this.$set(this.drafts, roomId, '')
         this.$set(this.draftFiles, roomId, [])
+        // Its files are the message's now, one still uploaded for the draft too: the field
+        // emptied after sending does not take them out of the draft (keepDraftFiles).
+        files?.forEach((file) => {
+          file.takenOver = true
+        })
       }
 
       // Immediately add new message
@@ -1539,24 +1546,29 @@ export default {
       }
 
       try {
-        // The draft's saves still under way go first: the draft must not outlive what was
-        // sent, and a file being uploaded for it is taken over, not uploaded a second time.
-        await draftSaved
-        if (!again) this.$set(this.draftFiles, roomId, [])
+        // In line with the draft's saves: those asked for before go first — the draft must not
+        // outlive what was sent, and a file being uploaded for it is taken over, not uploaded a
+        // second time — and those asked for while it is sent wait for it, as ending the draft
+        // would take them away.
+        const createdMessage = await this.queueDraftSave(roomId, async (target) => {
+          if (!again) this.$set(this.draftFiles, roomId, [])
 
-        // Build mutation variables — userId for virtual rooms, roomId for existing
-        const mutationVariables = { ...this.draftTarget(roomId), content }
-        const fresh = (files || []).filter((file) => !file.draftUrl)
-        const fromDraft = (files || []).filter((file) => file.draftUrl)
-        if (fresh.length) mutationVariables.files = fresh.map((file) => this.fileInputOf(file))
-        if (fromDraft.length) mutationVariables.draftFiles = fromDraft.map((file) => file.draftUrl)
-        if (again) mutationVariables.endsDraft = false
+          // userId for virtual rooms, roomId for existing
+          const mutationVariables = { ...target, content }
+          const fresh = (files || []).filter((file) => !file.draftUrl)
+          const fromDraft = (files || []).filter((file) => file.draftUrl)
+          if (fresh.length) mutationVariables.files = fresh.map((file) => this.fileInputOf(file))
+          if (fromDraft.length) {
+            mutationVariables.draftFiles = fromDraft.map((file) => file.draftUrl)
+          }
+          if (again) mutationVariables.endsDraft = false
 
-        const { data } = await this.$apollo.mutate({
-          mutation: createMessageMutation(),
-          variables: mutationVariables,
+          const { data } = await this.$apollo.mutate({
+            mutation: createMessageMutation(),
+            variables: mutationVariables,
+          })
+          return data.CreateMessage
         })
-        const createdMessage = data.CreateMessage
 
         if (createdMessage) {
           // Replace local message with server response
@@ -1809,7 +1821,8 @@ export default {
       const userId = this.currentUser.id
       const unsavedText = unsavedDraft(userId, roomId)
       const unsaved = unsavedText !== undefined
-      if (typed === undefined && files === undefined && !unsaved) return
+      const gone = this._goneFiles[roomId]
+      if (typed === undefined && files === undefined && !unsaved && !gone) return
       this.forgetTyped(roomId)
       const text = typed !== undefined ? this.tagged(typed, mentioned) : unsavedText
       if (text !== undefined && (text !== this.draftOf(roomId) || unsaved)) {
@@ -1818,6 +1831,7 @@ export default {
         this.saveDraftText(roomId, text)
       }
       if (files !== undefined) this.keepDraftFiles(roomId, files)
+      else if (gone) this.removeDraftFiles(roomId, gone)
     },
 
     // Saves a room's draft text. Should it fail, the text is saved again later — unless a
@@ -1886,16 +1900,9 @@ export default {
           known.filter((file) => kept.includes(file.url)),
         )
       }
-      const context = this.leavingContext()
-      gone.forEach(({ url }) =>
-        this.queueDraftSave(roomId, (target) =>
-          this.$apollo.mutate({
-            mutation: removeRoomDraftFile(),
-            variables: { ...target, url },
-            context,
-          }),
-        ),
-      )
+      // Those whose removal failed go again.
+      const goneBefore = this._goneFiles[roomId] || []
+      this.removeDraftFiles(roomId, [...gone.map(({ url }) => url), ...goneBefore])
       files
         .filter((file) => !file.draftUrl && !file.draftUpload && file.blob && !file.loading)
         .forEach((file) => {
@@ -1910,14 +1917,17 @@ export default {
               if (!added) return
               file.draftUrl = added.url
               this.$set(this.draftFiles, roomId, [...this.draftFilesOf(roomId), added])
-              // Taken out of the field again while it was uploaded: it goes again too.
+              // Taken out of the field again while it was uploaded: it goes again too. Not when
+              // it was sent meanwhile: the field emptied by sending did not take it out.
               const inField = this._fieldFiles[roomId]
-              if (inField && !inField.includes(file)) this.keepDraftFiles(roomId, inField)
+              if (inField && !inField.includes(file) && !file.takenOver) {
+                this.keepDraftFiles(roomId, inField)
+              }
             } catch (error) {
               // Not uploaded: the files of the field count as changed again, so the next change,
               // leaving the room, closing the chat or leaving the page tries again — with the
               // field as it is then, without what was taken out meanwhile.
-              if (!(roomId in this._typedFiles)) {
+              if (!(roomId in this._typedFiles) && !file.takenOver) {
                 this._typedFiles[roomId] = this._fieldFiles[roomId] || [file]
               }
               throw error
@@ -1928,26 +1938,46 @@ export default {
         })
     },
 
-    // The saves of a room's draft go one after the other: a direct conversation's room is
-    // opened by the first, and a message waits for all of them (sendMessage). Not told when
-    // one fails: the draft is still in the field, and its next change tries again.
+    // Removes files from the draft, which are no longer shown. A removal that fails is asked
+    // for again with the next change of the draft, leaving the room, closing the chat or
+    // leaving the page — else the file would be back once the chat is opened anew.
+    removeDraftFiles(roomId, urls) {
+      delete this._goneFiles[roomId]
+      const context = this.leavingContext()
+      urls.forEach((url) =>
+        this.queueDraftSave(roomId, async (target) => {
+          try {
+            await this.$apollo.mutate({
+              mutation: removeRoomDraftFile(),
+              variables: { ...target, url },
+              context,
+            })
+          } catch (error) {
+            const gone = this._goneFiles[roomId] || []
+            if (!gone.includes(url)) this._goneFiles[roomId] = [...gone, url]
+            throw error
+          }
+        }),
+      )
+    },
+
+    // The saves of a room's draft go one after the other, those of other chats too
+    // (unsavedDrafts.js): a direct conversation's room is opened by the first, and a message
+    // goes in line with them (sendMessage). Not told when a save fails: the draft is still in
+    // the field, and its next change tries again. Gives the save's promise.
     queueDraftSave(roomId, save) {
       const target = this.draftTarget(roomId)
       // Leaving the page, nothing waits: a save behind another may never start.
-      const previous = this._leaving ? null : this._draftSaves[roomId]
-      const next = previous ? previous.then(() => save(target)) : Promise.resolve(save(target))
-      const chained = next
-        .catch(() => {})
-        .then(() => {
-          if (this._draftSaves[roomId] === chained) delete this._draftSaves[roomId]
-        })
-      this._draftSaves[roomId] = chained
+      return queueDraftWork(this.currentUser.id, roomId, () => save(target), {
+        waits: !this._leaving,
+      })
     },
 
     keepAllDrafts() {
       const roomIds = new Set([
         ...Object.keys(this._typed),
         ...Object.keys(this._typedFiles),
+        ...Object.keys(this._goneFiles),
         ...unsavedDraftRoomIds(this.currentUser.id),
       ])
       roomIds.forEach((roomId) => this.keepDraft(roomId))
