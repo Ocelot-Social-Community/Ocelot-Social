@@ -603,6 +603,36 @@ describe('PreJoin', () => {
     })
   })
 
+  it('asks no more for a camera switched off while both were asked for', async () => {
+    let refuse
+    const mediaDevices = {
+      getUserMedia: jest
+        .fn()
+        .mockImplementationOnce(() => new Promise((resolve, reject) => (refuse = reject)))
+        .mockRejectedValue(Object.assign(new Error(), { name: 'NotReadableError' })),
+      enumerateDevices: jest.fn().mockResolvedValue([]),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }
+    const { wrapper } = mountWith(mediaDevices)
+    wrapper.setData({
+      cameraActive: true,
+      micActive: true,
+      cameraStatus: 'granted',
+      micStatus: 'granted',
+    })
+    const acquiring = wrapper.vm.acquireStream()
+    await flushPromises()
+    // The camera switched off meanwhile: its request is overtaken.
+    wrapper.vm.streamRequests.video++
+    refuse(Object.assign(new Error(), { name: 'NotReadableError' }))
+    await acquiring
+
+    const asked = mediaDevices.getUserMedia.mock.calls.map(([constraints]) => constraints)
+    expect(asked).toHaveLength(2)
+    expect(asked[1]).toEqual({ audio: expect.anything() })
+  })
+
   describe('acquireStream overtaken by a newer request', () => {
     const fakeStream = (name) => {
       const track = { stop: jest.fn() }

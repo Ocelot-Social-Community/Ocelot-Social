@@ -484,18 +484,22 @@ export default {
               (s) => ({ s }),
               (e) => ({ e }),
             )
-          const audio = await alone('audio')
+          // A kind switched off or picked anew meanwhile is not asked for again.
+          const audio = overtaken('audio') ? null : await alone('audio')
           if (allOvertaken()) {
             // Not on show, so nothing else would hand the microphone back.
-            if (audio.s) audio.s.getTracks().forEach((t) => t.stop())
+            if (audio?.s) audio.s.getTracks().forEach((t) => t.stop())
             return false
           }
-          const video = audio.s ? null : await alone('video')
-          if (audio.s) failures = { video: err }
-          else if (video.s) failures = { audio: audio.e }
+          const video = audio?.s || overtaken('video') ? null : await alone('video')
+          if (audio?.s) failures = { video: err }
           // Each alone says what is wrong with it; the request for both may answer for either.
-          else failures = { video: video.e, audio: audio.e }
-          stream = audio.s || video.s || null
+          else
+            failures = {
+              ...(video && !video.s && { video: video.e }),
+              ...(audio && { audio: audio.e }),
+            }
+          stream = audio?.s || video?.s || null
         } else {
           failures = { [wantVideo ? 'video' : 'audio']: err }
         }

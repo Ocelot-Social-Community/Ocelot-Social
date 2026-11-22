@@ -8173,6 +8173,46 @@ describe('VideoCall — a join whose device fails', () => {
     expect(wrapper.vm.phase).toBe('in-call')
   })
 
+  it('hands back the capture of a room still being left when the call is hung up', async () => {
+    const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+    const camera = capture()
+    const room = {
+      disconnect: jest.fn(() => new Promise(() => {})),
+      localParticipant: {
+        audioTrackPublications: new Map(),
+        videoTrackPublications: new Map([['cam', { track: camera }]]),
+      },
+    }
+    wrapper.setData({ room })
+    // Joining anew leaves the old room first; its disconnect does not come through.
+    wrapper.vm.leaveRoom()
+    expect(wrapper.vm.room).toBeNull()
+
+    await wrapper.vm.cleanup()
+
+    expect(camera.stop).toHaveBeenCalled()
+    expect(camera.mediaStreamTrack.stop).toHaveBeenCalled()
+  })
+
+  it('hands back the capture of a room whose disconnect fails', async () => {
+    const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+    const microphone = capture()
+    const room = {
+      disconnect: jest.fn().mockRejectedValue(new Error('gone')),
+      localParticipant: {
+        audioTrackPublications: new Map([['mic', { track: microphone }]]),
+        videoTrackPublications: new Map(),
+      },
+    }
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+    await wrapper.vm.leaveRoom(room)
+
+    expect(microphone.stop).toHaveBeenCalled()
+    expect(wrapper.vm.roomsLeaving.size).toBe(0)
+    warn.mockRestore()
+  })
+
   it('keeps the room of the later of two clicks on retry', async () => {
     const { Room } = await import('livekit-client')
     Room.instances = []

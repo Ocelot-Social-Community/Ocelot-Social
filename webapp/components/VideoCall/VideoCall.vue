@@ -792,6 +792,23 @@ function stopCapture(track) {
   }
 }
 
+// Stops every capture a room publishes from here: LiveKit's own disconnect misses some (muted
+// at the time, replaced sources, screen-share remnants), and hands them back only once it is
+// through.
+function stopLocalTracks(room) {
+  try {
+    const lp = room?.localParticipant
+    if (!lp) return
+    const pubs = [
+      ...(lp.audioTrackPublications?.values?.() ?? []),
+      ...(lp.videoTrackPublications?.values?.() ?? []),
+    ]
+    pubs.forEach((pub) => stopCapture(pub && pub.track))
+  } catch (_e) {
+    /* noop */
+  }
+}
+
 // LiveKit rates every participant's connection several times a minute. Videos
 // are paused once ours stays weak this long, and come back only after it has
 // been fine for clearly longer, so a flaky line doesn't make them flicker.
@@ -1701,6 +1718,8 @@ export default {
     // Counts the ways into and out of a call; a connect() whose number is no longer the
     // current one was given up while it waited — for its token, say.
     this.connectAttempt = 0
+    // Rooms whose disconnect is under way (leaveRoom).
+    this.roomsLeaving = new Set()
     this.deviceSwitches = this.newDeviceSwitches()
     // How often the camera has been switched, on or off (toggleCamera; see retryDevices).
     this.cameraToggles = 0
@@ -4074,15 +4093,21 @@ export default {
     // Only one room per window: whoever joins anew leaves the old one first,
     // or LiveKit keeps it as a second participant of our own.
     // Leaves the room on show, or the given one, which may be on show or not.
+    // Until it is through, the room is among those being left: hanging up meanwhile hands
+    // their camera and microphone back too (cleanup), as does a disconnect that fails.
     async leaveRoom(room = this.room) {
       if (!room) return
       if (this.room === room) this.room = null
+      this.roomsLeaving.add(room)
       try {
         await room.disconnect()
       } catch (err) {
+        stopLocalTracks(room)
         // The room is dropped either way; say so instead of failing in silence.
         // eslint-disable-next-line no-console
         console.warn('VideoCall: leaving the room failed', err)
+      } finally {
+        this.roomsLeaving.delete(room)
       }
     },
     async leave() {
@@ -4125,6 +4150,8 @@ export default {
       // A connect() still waiting for its token must not join once this is through.
       this.connectAttempt++
       this.closingRoom = this.room
+      // A room still being left (leaveRoom) is no longer this.room, but may still capture.
+      this.roomsLeaving.forEach(stopLocalTracks)
       if (this.room) {
         // Belt-and-braces: stop every local track ourselves before asking
         // LiveKit to disconnect. LiveKit's room.disconnect(stopTracks=true)
@@ -4132,22 +4159,10 @@ export default {
         // disconnect time, replaced sources, screen-share remnants), which
         // leaves the browser's camera / mic recording indicator stuck on
         // until the user reloads the tab.
-        try {
-          const lp = this.room.localParticipant
-          if (lp) {
-            const pubs = [
-              ...(lp.audioTrackPublications?.values?.() ?? []),
-              ...(lp.videoTrackPublications?.values?.() ?? []),
-            ]
-            const tracks = pubs.map((pub) => pub && pub.track)
-            // A dtx switch holds the microphone unpublished for a moment: in no publication,
-            // and running.
-            if (this.dtxSwitch) tracks.push(this.dtxTrack)
-            tracks.forEach(stopCapture)
-          }
-        } catch (_e) {
-          /* noop */
-        }
+        stopLocalTracks(this.room)
+        // A dtx switch holds the microphone unpublished for a moment: in no publication,
+        // and running.
+        if (this.dtxSwitch) stopCapture(this.dtxTrack)
         try {
           await this.room.disconnect(true)
         } catch (_e) {
