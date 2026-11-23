@@ -329,6 +329,13 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  ignore:
+    # Vue 2 compatibility check: stay on the 2.x line (2.7.16 is final)
+    - dependency-name: "vue"
+      update-types: ["version-update:semver-major"]
+    # @vue/test-utils 2.x only supports Vue 3
+    - dependency-name: "@vue/test-utils"
+      update-types: ["version-update:semver-major"]
 
 - package-ecosystem: npm
   open-pull-requests-limit: 99
@@ -338,3 +345,10 @@ updates:
     day: "saturday"
     timezone: "Europe/Berlin"
     time: "03:00"
+  ignore:
+    # Vue 2 compatibility check: stay on the 2.x line (2.7.16 is final)
+    - dependency-name: "vue"
+      update-types: ["version-update:semver-major"]
+    # @vue/test-utils 2.x only supports Vue 3
+    - dependency-name: "@vue/test-utils"
+      update-types: ["version-update:semver-major"]
