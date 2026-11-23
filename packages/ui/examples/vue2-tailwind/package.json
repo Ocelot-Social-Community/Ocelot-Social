@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ocelot-social/ui": "file:../..",
-    "vue": "^2.7.16"
+    "vue": "^3.5.46"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.5",
