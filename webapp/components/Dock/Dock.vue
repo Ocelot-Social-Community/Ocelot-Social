@@ -256,8 +256,10 @@ export default {
   min-height: 56px;
   padding: var(--space-x-small) 0;
   border: none;
-  background-color: var(--color-primary);
-  color: var(--color-primary-inverse);
+  /*  A filled primary surface, as a filled button: --color-primary-fill is darkened in the dark */
+  /*  theme so the flag matches the buttons, and carries --color-primary-contrast. */
+  background-color: var(--color-primary-fill);
+  color: var(--color-primary-contrast);
   box-shadow: var(--box-shadow-base);
   cursor: pointer;
 }
