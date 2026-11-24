@@ -18,11 +18,13 @@ reviews:
       - master
       - main
 
-  auto_approve:
+  # Approve once the blocking findings are resolved and the checks pass; request changes for
+  # blocking findings. Replaces `request_changes_workflow` (a deprecated alias of this) and
+  # `auto_approve` (never a valid key, ignored).
+  auto_approvals:
     enabled: true
 
   # Review settings
-  request_changes_workflow: true
   high_level_summary: true
   poem: false
   review_status: true
