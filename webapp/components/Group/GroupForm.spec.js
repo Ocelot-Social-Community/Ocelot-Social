@@ -970,6 +970,64 @@ describe('GroupForm', () => {
       expect(wrapper.vm.describedTemplate).toBe('channel')
     })
 
+    it('says on the refused card itself that it is not available, before it is clicked', () => {
+      // Dimmed alone it read as a broken button (#11084); on touch there is no hover to show
+      // the reason underneath first.
+      const wrapper = mountWith(canExceptHidden)
+
+      expect(
+        wrapper
+          .find('[data-test="template-card-hidden"] [data-test="template-card-refused"]')
+          .text(),
+      ).toBe('group.templateRefused')
+      expect(
+        wrapper
+          .find('[data-test="template-card-public"] [data-test="template-card-refused"]')
+          .exists(),
+      ).toBe(false)
+    })
+
+    it('puts the refusal ahead of what the refused template would have meant', async () => {
+      const wrapper = mountWith(canExceptHidden)
+
+      wrapper.find('[data-test="template-card-hidden"]').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+
+      const description = wrapper.find('[data-test="template-description"]').text()
+      expect(description.startsWith('group.validations.typeNotAllowed')).toBe(true)
+      expect(description).toContain('group.templateDescriptions.hidden')
+    })
+
+    it('goes back to explaining the picked template once a card is clicked or tapped', async () => {
+      // The focus a click leaves on the card, and on touch the hover a tap leaves (no mouseleave
+      // follows), used to keep explaining the refused card as if it had been picked (#11084).
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
+    it('keeps explaining a card activated from the keyboard, where the focus is real', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      // Enter or Space on a button fires a click whose `detail` is 0.
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+      expect(wrapper.find('[data-test="template-description-refused"]').exists()).toBe(true)
+    })
+
     it('canCreateAnyGroup is false only when no type is permitted', () => {
       expect(mountWith(() => false).vm.canCreateAnyGroup).toBe(false)
       expect(mountWith((p) => p === 'group.create_closed').vm.canCreateAnyGroup).toBe(true)

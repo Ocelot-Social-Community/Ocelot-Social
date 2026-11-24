@@ -1197,6 +1197,7 @@
       "hidden": "Il gruppo (compreso il nome) è completamente invisibile",
       "public": "Il gruppo e tutte le pubblicazioni sono visibili a tutti gli utenti registrati"
     },
+    "templateRefused": "Non disponibile",
     "type": "Visibilità del gruppo",
     "typeDescriptions": {
       "closed": "Tutte le pubblicazioni visibili solo ai membri del gruppo",

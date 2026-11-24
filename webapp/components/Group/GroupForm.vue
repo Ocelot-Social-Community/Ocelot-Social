@@ -69,11 +69,16 @@
                   choice.name === describedTemplate ? 'template-description' : null
                 "
                 :data-test="`template-card-${choice.name}`"
-                @click="chooseTemplate(choice)"
+                @click="chooseTemplate(choice, $event)"
                 @focus="focusedTemplate = choice.name"
                 @blur="focusedTemplate = null"
               >
                 <template #title>{{ $t(`group.types.${choice.name}`) }}</template>
+                <!-- Refused before it is clicked: the card says so itself, in words — on touch
+                     there is no hover to show the reason underneath first. -->
+                <template v-if="!choice.allowed" #default>
+                  <span data-test="template-card-refused">{{ $t('group.templateRefused') }}</span>
+                </template>
               </group-state-card>
             </li>
           </ul>
@@ -95,7 +100,8 @@
               :aria-hidden="choice.name === describedTemplate ? null : 'true'"
               :data-test="choice.name === describedTemplate ? 'template-description' : null"
             >
-              {{ $t(`group.templateDescriptions.${choice.name}`) }}
+              <!-- The refusal first, as a hint of its own: "not possible, because", before what
+                   the template would have meant. -->
               <span
                 v-if="!choice.allowed"
                 class="template-description__refused"
@@ -103,8 +109,10 @@
                   choice.name === describedTemplate ? 'template-description-refused' : null
                 "
               >
+                <os-icon :icon="icons.exclamationTriangle" aria-hidden="true" />
                 {{ $t('group.validations.typeNotAllowed') }}
               </span>
+              {{ $t(`group.templateDescriptions.${choice.name}`) }}
             </p>
           </div>
           <os-validation-hint
@@ -675,7 +683,16 @@ export default {
      * rights are what the visibility is read from. Both are written: the template is what gets
      * sent, the visibility is what every rule on this form already asks about.
      */
-    chooseTemplate(choice) {
+    chooseTemplate(choice, event) {
+      // A click with the mouse or a tap ends pointing at a card: the line underneath goes back to
+      // the template picked. Otherwise the focus a click leaves on the card — and on touch the
+      // hover a tap leaves, with no mouseleave to follow — kept explaining the card clicked, a
+      // refused one included, as if it had been picked. Activated from the keyboard (`detail` 0)
+      // the focus is real and stays described.
+      if (event && event.detail > 0) {
+        this.hoveredTemplate = null
+        this.focusedTemplate = null
+      }
       // Refused cards stay focusable (aria-disabled, not disabled) so the keyboard reaches the
       // reason under the row; picking one is what is refused, here.
       if (!choice.allowed) return
@@ -840,9 +857,11 @@ export default {
 }
 
 /* Why the template in question cannot be picked — said where its meaning is, not only in a
-   tooltip that keyboard and touch never see. */
+   tooltip that keyboard and touch never see, and ahead of that meaning. */
 .template-description__refused {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xx-small);
   color: var(--color-danger);
 }
 

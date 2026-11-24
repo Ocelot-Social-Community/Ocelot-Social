@@ -1197,6 +1197,7 @@
       "hidden": "Grupi (përfshirë emrin) është plotësisht i padukshëm",
       "public": "Grupi dhe të gjitha postimet janë të dukshme për të gjithë përdoruesit e regjistruar"
     },
+    "templateRefused": "Nuk është në dispozicion",
     "type": "Dukshmëria e grupit",
     "typeDescriptions": {
       "closed": "Të gjitha postimet janë të dukshme vetëm për anëtarët e grupit",

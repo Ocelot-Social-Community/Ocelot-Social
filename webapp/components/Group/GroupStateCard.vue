@@ -102,10 +102,13 @@ export default {
   background: var(--background-color-base);
 }
 
-/* `aria-disabled` as well: a refusal that stays focusable, so it can still say why. */
+/* `aria-disabled` as well: a refusal that stays focusable, so it can still say why. Dimmed alone
+   it read as one more card whose click did nothing; the dashed edge sets it apart from the cards
+   that can be picked, in either theme and without relying on colour. */
 .group-state-card:disabled,
 .group-state-card[aria-disabled='true'] {
   opacity: 0.6;
+  border-style: dashed;
   cursor: not-allowed;
 }
 </style>
