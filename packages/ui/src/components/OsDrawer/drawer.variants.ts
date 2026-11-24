@@ -13,7 +13,8 @@ export const drawerPanelVariants = cva(
     'os-drawer',
     'fixed top-0 bottom-0 z-[9999]',
     'flex flex-col w-[min(320px,85vw)]',
-    'bg-white shadow-xl overflow-y-auto outline-none',
+    // The surface colour from the theme tokens, white where an app ships none (as OsModal, OsCard)
+    'bg-[var(--background-color-base,white)] shadow-xl overflow-y-auto outline-none',
     'motion-reduce:transition-none',
   ],
   {

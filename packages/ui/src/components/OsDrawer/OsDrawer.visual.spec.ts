@@ -71,3 +71,19 @@ test.describe('OsDrawer visual regression', () => {
     await checkA11y(page)
   })
 })
+
+test.describe('OsDrawer theming', () => {
+  test('the panel takes its surface colour from the theme token', async ({ page }) => {
+    // The webapp's dark theme reaches the panel through --background-color-base (#11092). Storybook
+    // sets no such token, so the screenshots above show the white fallback; here the token is set,
+    // as an app's dark theme does, and the rendered panel has to follow it. The dark-theme screenshot
+    // itself comes with the dark visual run (#11124).
+    await page.goto(`${STORY_URL}--right&viewMode=story`)
+    await page.addStyleTag({ content: ':root { --background-color-base: rgb(25, 23, 28); }' })
+
+    await expect(page.locator('[data-testid="os-drawer-panel"]')).toHaveCSS(
+      'background-color',
+      'rgb(25, 23, 28)',
+    )
+  })
+})
