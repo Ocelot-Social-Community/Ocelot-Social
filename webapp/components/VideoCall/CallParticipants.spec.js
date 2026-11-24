@@ -453,13 +453,20 @@ describe('CallParticipants', () => {
     })
 
     it('does not offer removing somebody, even where the ranks allow it (#11081)', async () => {
-      // A removal cannot be taken back yet and keeps out admins as well.
-      wrapper = Wrapper({ moderation: moderatedByMe })
-      const bob = person('bob')
-      await wrapper.vm.openMenu(bob, jest.fn())
+      // A removal cannot be taken back yet and keeps out admins as well. Checked in the menu as it
+      // is shown: Bob's moderation can be revoked there, his removal is not there to pick.
+      wrapper = Wrapper({
+        moderation: { moderators: ['me', 'bob'], everyone: false, speakers: ['bob'] },
+      })
+      await wrapper.find('[data-test="call-participant-menu-bob"]').trigger('click')
+      await flushPromises()
 
       expect(wrapper.vm.rights.bob.remove).toBe(true)
-      expect(names(wrapper.vm.actionsFor(bob))).not.toContain('remove')
+      const shown = (name) =>
+        !!document.querySelector(`[data-test="call-participant-action-${name}"]`) ||
+        wrapper.find(`[data-test="call-participant-action-${name}"]`).exists()
+      expect(shown('revoke')).toBe(true)
+      expect(shown('remove')).toBe(false)
     })
 
     it('removes somebody only once it is confirmed', async () => {
