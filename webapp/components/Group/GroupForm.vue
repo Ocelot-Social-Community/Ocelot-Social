@@ -100,8 +100,12 @@
               :aria-hidden="choice.name === describedTemplate ? null : 'true'"
               :data-test="choice.name === describedTemplate ? 'template-description' : null"
             >
-              <!-- The refusal first, as a hint of its own: "not possible, because", before what
-                   the template would have meant. -->
+              <!-- Named first: the line explains the card pointed at, else the one picked, and
+                   without the name it was not clear which of them it spoke about. Then the refusal,
+                   as a hint of its own — "not possible, because" — before what it would have meant. -->
+              <strong class="template-description__name">
+                {{ $t(`group.types.${choice.name}`) }}:
+              </strong>
               <span
                 v-if="!choice.allowed"
                 class="template-description__refused"
@@ -684,15 +688,12 @@ export default {
      * sent, the visibility is what every rule on this form already asks about.
      */
     chooseTemplate(choice, event) {
-      // A click with the mouse or a tap ends pointing at a card: the line underneath goes back to
-      // the template picked. Otherwise the focus a click leaves on the card — and on touch the
-      // hover a tap leaves, with no mouseleave to follow — kept explaining the card clicked, a
-      // refused one included, as if it had been picked. Activated from the keyboard (`detail` 0)
-      // the focus is real and stays described.
-      if (event && event.detail > 0) {
-        this.hoveredTemplate = null
-        this.focusedTemplate = null
-      }
+      // The focus a mouse click leaves on the card is not the keyboard's: without this it kept
+      // explaining the card clicked — a refused one included — after the pointer had left it, as
+      // if it had been picked. The hover stays: while the pointer is on the card its reason stays
+      // in view, and leaving the card goes back to the template picked. Activated from the
+      // keyboard (`detail` 0) the focus is real and stays described.
+      if (event && event.detail > 0) this.focusedTemplate = null
       // Refused cards stay focusable (aria-disabled, not disabled) so the keyboard reaches the
       // reason under the row; picking one is what is refused, here.
       if (!choice.allowed) return
@@ -858,8 +859,12 @@ export default {
 
 /* Why the template in question cannot be picked — said where its meaning is, not only in a
    tooltip that keyboard and touch never see, and ahead of that meaning. */
+.template-description__name {
+  color: var(--text-color-base);
+}
+
 .template-description__refused {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-xx-small);
   color: var(--color-danger);

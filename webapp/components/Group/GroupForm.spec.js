@@ -994,13 +994,28 @@ describe('GroupForm', () => {
       await wrapper.vm.$nextTick()
 
       const description = wrapper.find('[data-test="template-description"]').text()
-      expect(description.startsWith('group.validations.typeNotAllowed')).toBe(true)
-      expect(description).toContain('group.templateDescriptions.hidden')
+      expect(description.indexOf('group.validations.typeNotAllowed')).toBeLessThan(
+        description.indexOf('group.templateDescriptions.hidden'),
+      )
     })
 
-    it('goes back to explaining the picked template once a card is clicked or tapped', async () => {
-      // The focus a click leaves on the card, and on touch the hover a tap leaves (no mouseleave
-      // follows), used to keep explaining the refused card as if it had been picked (#11084).
+    it('names the template it explains, so it is clear which card the line speaks about', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const description = () => wrapper.find('[data-test="template-description"]').text()
+      await wrapper.find('[data-test="template-card-channel"]').trigger('click')
+
+      expect(description().startsWith('group.types.channel:')).toBe(true)
+
+      wrapper.find('[data-test="template-card-hidden"]').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+
+      expect(description().startsWith('group.types.hidden:')).toBe(true)
+    })
+
+    it('keeps explaining a clicked card while the pointer is on it, and the picked one after', async () => {
+      // The focus a click leaves on the card used to keep explaining the refused card after the
+      // pointer had left it (#11084). Resetting the hover as well made the line jump away from
+      // the card still pointed at — the very card whose reason was asked for.
       const wrapper = mountWith(canExceptHidden, twoTemplates)
       const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
       await card('channel').trigger('click')
@@ -1011,6 +1026,11 @@ describe('GroupForm', () => {
       await wrapper.vm.$nextTick()
 
       expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+
       expect(wrapper.vm.describedTemplate).toBe('channel')
     })
 
