@@ -1225,12 +1225,15 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--space-x-small);
-  /*  On the right as far from the edge as the sidebar's close button above it, and the rows'
-      menus below: the three line up. */
-  padding: var(--space-x-small) var(--space-small) var(--space-x-small) var(--space-x-small);
+  /*  Above and below no more room than its controls need, for everybody, the filter's field open
+      or not: it takes little room, also on a phone, and nothing jumps. On the right as far from
+      the edge as the sidebar's close button above it, and the rows' menus below: the three line
+      up. */
+  padding: var(--space-xxx-small) var(--space-small) var(--space-xxx-small) var(--space-x-small);
   border-bottom: 1px solid var(--border-color-softer);
 }
 .call-participants__toolbar-actions {
+  min-height: var(--call-participants-control-height);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
