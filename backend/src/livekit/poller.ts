@@ -40,6 +40,10 @@ let polling = false
 let consecutiveFailures = 0
 let client: RoomServiceClient | null = null
 const lastSeenCounts = new Map<string, number>()
+// The rooms of this instance's groups the poller has seen listed, whether or not a count went out
+// for them yet — one whose participants could not be asked has none: once gone from the list, its
+// call session is ended all the same (see below). Kept until it is.
+const listedRooms = new Set<string>()
 
 const pollOnce = async () => {
   if (!CONFIG.LIVEKIT_ENABLED) {
@@ -96,6 +100,7 @@ const pollOnce = async () => {
         owed.delete(room.name)
         continue
       }
+      listedRooms.add(room.name)
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const listed = Number(room.numParticipants ?? 0) || 0
       // How many connections: as listed, or as the participants themselves say for a told room.
@@ -163,7 +168,7 @@ const pollOnce = async () => {
     //
     // The entry is kept a while longer in one case only: while the room's call session could
     // not be ended yet (see below).
-    for (const roomName of new Set([...lastSeenCounts.keys(), ...told])) {
+    for (const roomName of new Set([...lastSeenCounts.keys(), ...listedRooms, ...told])) {
       if (seen.has(roomName)) {
         continue
       }
@@ -196,6 +201,7 @@ const pollOnce = async () => {
       }
       if (sessionsSettled) {
         lastSeenCounts.delete(roomName)
+        listedRooms.delete(roomName)
       } else {
         // Remembered at 0, not as "told": the count: 0 above is out, and a told room would
         // have it published again on every poll until the session is settled.
@@ -265,5 +271,6 @@ export const stopLiveKitPoller = () => {
   client = null
   consecutiveFailures = 0
   lastSeenCounts.clear()
+  listedRooms.clear()
   takeToldRooms()
 }

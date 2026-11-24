@@ -642,6 +642,21 @@ describe('poll tick', () => {
       expect(mockSettle).toHaveBeenCalled()
     })
 
+    it('ends the call session of a room gone whose participants could never be asked', async () => {
+      startLiveKitPoller()
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', numParticipants: 1 }])
+      mockListParticipants.mockRejectedValueOnce(new Error('timeout'))
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      expect(mockPublish).not.toHaveBeenCalled()
+
+      // Gone before a count ever went out for it.
+      mockListRooms.mockResolvedValueOnce([])
+      await vi.advanceTimersByTimeAsync(15_000)
+
+      expect(mockEndOfMissingRoom).toHaveBeenCalledWith('driver', 'group-a')
+    })
+
     it('trusts the list for a room whose participants lag behind it', async () => {
       startLiveKitPoller()
       mockListRooms.mockResolvedValueOnce([
