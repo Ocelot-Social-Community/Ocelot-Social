@@ -35,6 +35,25 @@ module.exports = {
       if (cssLoaderUse) {
         cssLoaderUse.options = { ...cssLoaderUse.options, url: passThroughAbsoluteUrls }
       }
+      // The breakpoints (`@media (--vp-mobile)` and co., assets/css/breakpoints.css), resolved as
+      // nuxt.config.js resolves them for the app: global-data puts the @custom-media definitions in
+      // front of every stylesheet, custom-media expands them. Without this every such rule reached
+      // the browser unresolved and was dead here — no story could show a component's phone layout
+      // (#11079). Only these two, not the app's whole postcss-preset-env: nothing else of the
+      // stories' CSS changes.
+      defaultCssRule.use.push({
+        loader: require.resolve('postcss-loader'),
+        options: {
+          postcssOptions: {
+            plugins: [
+              require('@csstools/postcss-global-data')({
+                files: [path.resolve(__dirname, '../assets/css/breakpoints.css')],
+              }),
+              require('postcss-custom-media')(),
+            ],
+          },
+        },
+      })
     }
 
     // load svgs with vue-svg-loader instead of the builder's default asset/resource rule
