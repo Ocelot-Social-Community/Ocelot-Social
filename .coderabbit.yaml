@@ -6,9 +6,6 @@
 language: en-US
 
 reviews:
-  pre_merge_checks:
-    docstrings:
-      mode: "off"
 
   # Review every PR automatically
   auto_review:
