@@ -1050,22 +1050,28 @@ export default {
           ),
         )
       }
-      if (rights.remove) {
-        actions.push(
-          entry(
-            'remove',
-            this.$t('videoCall.participants.removeEllipsis'),
-            this.icons.userTimes,
-            () => {
-              // Each question counts on its own, also when asked again about the same person.
-              this.removalAsked = (this.removalAsked || 0) + 1
-              this.removing = person
-              this.dialog = 'remove'
-            },
-          ),
-        )
-      }
+      // Removing somebody from the call is not offered for now: a removal cannot be taken back,
+      // and it keeps out group admins and elevated admins as well (#11081). The question, the
+      // removal and the server's side stay as they are; to offer it again, bring this back, with
+      // its label `videoCall.participants.removeEllipsis` in the locales (its texts are in #11081).
+      // if (rights.remove) {
+      //   actions.push(
+      //     entry(
+      //       'remove',
+      //       this.$t('videoCall.participants.removeEllipsis'),
+      //       this.icons.userTimes,
+      //       () => this.askRemoval(person),
+      //     ),
+      //   )
+      // }
       return actions
+    },
+    // Asks whether to remove `person` from the call (the dialog), before anything is done.
+    askRemoval(person) {
+      // Each question counts on its own, also when asked again about the same person.
+      this.removalAsked = (this.removalAsked || 0) + 1
+      this.removing = person
+      this.dialog = 'remove'
     },
     run(action, toggleMenu) {
       toggleMenu()

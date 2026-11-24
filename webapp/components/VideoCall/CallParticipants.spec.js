@@ -430,17 +430,12 @@ describe('CallParticipants', () => {
         moderation: { moderators: ['me', 'bob'], everyone: false, speakers: ['bob'] },
       })
       const bob = person('bob', { micOn: false })
-      expect(names(wrapper.vm.actionsFor(bob))).not.toContain('remove')
+      expect(wrapper.vm.rights.bob?.remove).toBeFalsy()
       await wrapper.vm.openMenu(bob, jest.fn())
       const actions = wrapper.vm.actionsFor(bob)
-      expect(names(actions)).toEqual([
-        'spotlight',
-        'profile',
-        'localMute',
-        'floor',
-        'revoke',
-        'remove',
-      ])
+      // Removing is allowed here, but not offered for now (#11081).
+      expect(wrapper.vm.rights.bob.remove).toBe(true)
+      expect(names(actions)).toEqual(['spotlight', 'profile', 'localMute', 'floor', 'revoke'])
       actions.find((action) => action.name === 'floor').callback()
       actions.find((action) => action.name === 'revoke').callback()
       await flushPromises()
@@ -454,16 +449,23 @@ describe('CallParticipants', () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       mocks.$apollo.query.mockRejectedValueOnce(new Error('offline'))
       await wrapper.vm.openMenu(person('bob'), jest.fn())
-      expect(names(wrapper.vm.actionsFor(person('bob')))).not.toContain('remove')
+      expect(wrapper.vm.rights.bob?.remove).toBeFalsy()
+    })
+
+    it('does not offer removing somebody, even where the ranks allow it (#11081)', async () => {
+      // A removal cannot be taken back yet and keeps out admins as well.
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      const bob = person('bob')
+      await wrapper.vm.openMenu(bob, jest.fn())
+
+      expect(wrapper.vm.rights.bob.remove).toBe(true)
+      expect(names(wrapper.vm.actionsFor(bob))).not.toContain('remove')
     })
 
     it('removes somebody only once it is confirmed', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       await wrapper.vm.openMenu(person('bob'), jest.fn())
-      wrapper.vm
-        .actionsFor(person('bob'))
-        .find((action) => action.name === 'remove')
-        .callback()
+      wrapper.vm.askRemoval(person('bob'))
       await wrapper.vm.$nextTick()
       expect(wrapper.find('[data-test="call-participants-dialog"]').exists()).toBe(true)
       expect(mocks.$apollo.mutate).not.toHaveBeenCalled()
@@ -480,10 +482,7 @@ describe('CallParticipants', () => {
     it('takes the keyboard into the question, keeps it there and gives it back', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       await wrapper.vm.openMenu(person('bob'), jest.fn())
-      wrapper.vm
-        .actionsFor(person('bob'))
-        .find((action) => action.name === 'remove')
-        .callback()
+      wrapper.vm.askRemoval(person('bob'))
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
       const dialog = wrapper.find('[data-test="call-participants-dialog"]')
@@ -528,7 +527,7 @@ describe('CallParticipants', () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       const bob = person('bob')
       await wrapper.vm.openMenu(bob, jest.fn())
-      expect(names(wrapper.vm.actionsFor(bob))).toContain('remove')
+      expect(wrapper.vm.rights.bob.remove).toBe(true)
       // Asked again, twice: the first answer arrives last and is out of date.
       let answerFirst
       mocks.$apollo.query
@@ -542,11 +541,11 @@ describe('CallParticipants', () => {
           data: { videoCallModerationRights: { userId: 'bob', remove: false } },
         })
       const first = wrapper.vm.openMenu(bob, jest.fn())
-      expect(names(wrapper.vm.actionsFor(bob))).not.toContain('remove')
+      expect(wrapper.vm.rights.bob?.remove).toBeFalsy()
       await wrapper.vm.openMenu(bob, jest.fn())
       answerFirst({ data: { videoCallModerationRights: { userId: 'bob', remove: true } } })
       await first
-      expect(names(wrapper.vm.actionsFor(bob))).not.toContain('remove')
+      expect(wrapper.vm.rights.bob?.remove).toBeFalsy()
     })
 
     it('closes only its own question once the removal is through', async () => {
@@ -558,11 +557,7 @@ describe('CallParticipants', () => {
             removed = resolve
           }),
       )
-      const ask = (who) =>
-        wrapper.vm
-          .actionsFor(who)
-          .find((action) => action.name === 'remove')
-          .callback()
+      const ask = (who) => wrapper.vm.askRemoval(who)
       wrapper.vm.rights = { bob: { remove: true }, anna: { remove: true } }
       ask(person('bob'))
       const removal = wrapper.vm.remove(person('bob'))
@@ -580,10 +575,7 @@ describe('CallParticipants', () => {
       const removeAndLose = async (people, userId, after = people) => {
         wrapper = Wrapper({ people, moderation: moderatedByMe })
         await wrapper.vm.openMenu(person(userId), jest.fn())
-        wrapper.vm
-          .actionsFor(person(userId))
-          .find((action) => action.name === 'remove')
-          .callback()
+        wrapper.vm.askRemoval(person(userId))
         await wrapper.vm.$nextTick()
         await wrapper.vm.$nextTick()
         let removed
@@ -640,11 +632,7 @@ describe('CallParticipants', () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       const bob = person('bob')
       await wrapper.vm.openMenu(bob, jest.fn())
-      const ask = () =>
-        wrapper.vm
-          .actionsFor(bob)
-          .find((action) => action.name === 'remove')
-          .callback()
+      const ask = () => wrapper.vm.askRemoval(bob)
       ask()
       let removed
       mocks.$apollo.mutate.mockImplementationOnce(

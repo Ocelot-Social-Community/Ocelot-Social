@@ -2144,7 +2144,6 @@
       "open": "Afficher les participants",
       "openProfile": "Ouvrir le profil",
       "remove": "Retirer",
-      "removeEllipsis": "Retirer de l’appel …",
       "removeExplanation": "Impossible de rejoindre cet appel tant qu’il dure. Le prochain reste ouvert.",
       "removeQuestion": "Retirer {name} de l’appel ?",
       "resign": "Quitter la modération",
