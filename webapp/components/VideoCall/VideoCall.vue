@@ -769,6 +769,8 @@ const SPEAKER_HOLD_MS = 1500
 // whether this user may OPEN a call (nobody in it yet) — a token kept for long
 // would carry that decision past the moment it was true. Older ones are
 // fetched anew on join; the preloaded client library still saves its share.
+// How often a join token is asked for again when the tab's id changed while it was asked for.
+const JOIN_TOKEN_ID_ATTEMPTS = 3
 const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
 // Asking for the call's conference chat: how often, and how long between two attempts.
 const CALL_CHAT_JOIN_ATTEMPTS = 3
@@ -3413,21 +3415,31 @@ export default {
         Date.now() - prefetched.requestedAt < PREFETCHED_TOKEN_MAX_AGE_MS
       ) {
         try {
-          return await prefetched.promise
+          const payload = await prefetched.promise
+          // The tab may have got a new id while waiting: then the token is not its own.
+          if (prefetched.clientId === tabClientId()) return payload
         } catch (_e) {
           /* fall through to a fresh request */
         }
       }
       return this.fetchJoinPayload(groupId)
     },
-    async fetchJoinPayload(groupId, clientId = tabClientId()) {
-      const { data } = await this.$apollo.mutate({
-        mutation: joinGroupVideoCallMutation(),
-        variables: { groupId, clientId },
-      })
-      const payload = data && data.joinGroupVideoCall
-      if (!payload) throw new Error('No token returned')
-      return payload
+    // A token for the tab's id as it is when the token arrives, not only when it was asked for:
+    // one that came under an id the tab no longer has (another tab turned out to have it,
+    // tabClientId) would take that tab's connection out of the call. Asked again then, a few
+    // times at most. With an id given — the prefetch, whose taker checks it — asked once.
+    async fetchJoinPayload(groupId, givenClientId = null) {
+      for (let attempt = 0; attempt < JOIN_TOKEN_ID_ATTEMPTS; attempt++) {
+        const clientId = givenClientId || tabClientId()
+        const { data } = await this.$apollo.mutate({
+          mutation: joinGroupVideoCallMutation(),
+          variables: { groupId, clientId },
+        })
+        const payload = data && data.joinGroupVideoCall
+        if (!payload) throw new Error('No token returned')
+        if (givenClientId || clientId === tabClientId()) return payload
+      }
+      throw new Error('The id of this tab kept changing')
     },
     onLocalConnectionQuality(quality) {
       // LiveKit reports every change, so a shaky line flips between poor and

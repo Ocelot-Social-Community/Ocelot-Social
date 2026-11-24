@@ -3317,6 +3317,50 @@ describe('VideoCall', () => {
       expect(tabClientId()).not.toBe(before)
     })
 
+    it('never hands out a prefetched token whose id the tab lost while it was on its way', async () => {
+      let answer
+      const apollo = {
+        mutate: jest
+          .fn()
+          .mockImplementationOnce(
+            () =>
+              new Promise((resolve) => {
+                answer = resolve
+              }),
+          )
+          .mockResolvedValue({ data: { joinGroupVideoCall: payload } }),
+      }
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      await flushPromises()
+      const taking = wrapper.vm.takeJoinPayload('g1')
+      // Another tab turns out to have the id, while the token is still on its way.
+      resetTabClientId()
+      answer({ data: { joinGroupVideoCall: payload } })
+      await taking
+      expect(tokenRequests(apollo)).toBe(2)
+      expect(apollo.mutate.mock.calls[1][0].variables.clientId).toBe(tabClientId())
+    })
+
+    it('asks again for a fresh token whose id the tab lost while it was on its way', async () => {
+      const apollo = {
+        mutate: jest
+          .fn()
+          .mockImplementationOnce(async () => {
+            resetTabClientId()
+            return { data: { joinGroupVideoCall: payload } }
+          })
+          .mockResolvedValue({ data: { joinGroupVideoCall: payload } }),
+      }
+      const { wrapper } = factory({ show: true, groupId: null, apollo })
+      await flushPromises()
+      const before = tabClientId()
+      await wrapper.vm.fetchJoinPayload('g1')
+      expect(tokenRequests(apollo)).toBe(2)
+      expect(apollo.mutate.mock.calls[0][0].variables.clientId).toBe(before)
+      expect(apollo.mutate.mock.calls[1][0].variables.clientId).toBe(tabClientId())
+      expect(tabClientId()).not.toBe(before)
+    })
+
     it('does not ask without a group', async () => {
       const apollo = apolloResolving()
       factory({ show: true, groupId: null, apollo })
