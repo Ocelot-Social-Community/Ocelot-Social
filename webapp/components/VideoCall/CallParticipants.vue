@@ -7,7 +7,8 @@
     <!--
       What concerns the whole call: the moderation's own controls, and the filter. Somebody who
       may step into the moderation is offered that instead. While "mute all" is being chosen, its
-      question and answers take the controls' place; the filter stays.
+      question and answers take the controls' place; the filter stays. While the filter's field is
+      open, the controls step aside for it, and its button keeps its place.
     -->
     <div
       :class="['call-participants__toolbar', { 'call-participants__toolbar--slim': onlyFilter }]"
@@ -36,7 +37,7 @@
             data-test="mute-all-confirm"
             variant="danger"
             size="sm"
-            :loading="busy"
+            :loading="toolbarBusy"
             :disabled="muteCount === 0"
             @click="muteAll"
           >
@@ -44,7 +45,7 @@
           </os-button>
         </template>
         <os-button
-          v-if="isModerator && !muting"
+          v-if="isModerator && !muting && !filterOpen"
           data-test="call-participants-mute-all"
           variant="primary"
           appearance="outline"
@@ -57,12 +58,12 @@
           {{ $t('videoCall.participants.muteAll') }}
         </os-button>
         <os-button
-          v-if="!isModerator && mayTakeOver && !muting"
+          v-if="!isModerator && mayTakeOver && !muting && !filterOpen"
           data-test="call-participants-take-over"
           variant="primary"
           appearance="outline"
           size="sm"
-          :loading="busy"
+          :loading="toolbarBusy"
           @click="takeOver"
         >
           <template #icon>
@@ -71,14 +72,14 @@
           {{ $t('videoCall.participants.takeOver') }}
         </os-button>
         <label
-          v-if="(isModerator || moderation.everyone) && !muting"
+          v-if="(isModerator || moderation.everyone) && !muting && !filterOpen"
           class="call-participants__everyone"
           data-test="call-participants-everyone"
         >
           <input
             type="checkbox"
             :checked="moderation.everyone"
-            :disabled="busy || !mayToggleEveryone"
+            :disabled="toolbarBusy || !mayToggleEveryone"
             @change="setEveryone($event.target.checked, $event.target)"
           />
           {{ $t('videoCall.participants.everyoneModerates') }}
@@ -517,8 +518,11 @@ export default {
   emits: ['spotlight', 'local-mute', 'switch-off', 'switch-on'],
   data() {
     return {
-      // The requests to the server still on their way: while any is, the controls wait.
+      // The requests to the server still on their way: while any is, the controls in the rows
+      // wait. Those of the toolbar wait only for their own: a row worked meanwhile does not make
+      // them flicker.
       pending: 0,
+      toolbarPending: 0,
       // The filter: whether its row is unfolded, the part of a name it looks for, and the chips
       // chosen, by key.
       filterOpen: false,
@@ -554,6 +558,9 @@ export default {
   computed: {
     busy() {
       return this.pending > 0
+    },
+    toolbarBusy() {
+      return this.toolbarPending > 0
     },
     removalOpen() {
       return this.dialog === 'remove' && !!this.removing
@@ -644,16 +651,10 @@ export default {
         ),
       ]
     },
-    // Whether the toolbar holds nothing but the filter's button: then it takes less room. Its
-    // field open, it has its full height again.
+    // Whether the toolbar holds nothing but the filter: then it takes less room. Not for its field
+    // open or closed, so that its button stays where it is.
     onlyFilter() {
-      return (
-        !this.filterOpen &&
-        !this.muting &&
-        !this.isModerator &&
-        !this.mayTakeOver &&
-        !this.moderation.everyone
-      )
+      return !this.muting && !this.isModerator && !this.mayTakeOver && !this.moderation.everyone
     },
     chosenChips() {
       return this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
@@ -1071,8 +1072,9 @@ export default {
       toggleMenu()
       action.callback()
     },
-    async mutate(mutation, variables) {
+    async mutate(mutation, variables, { toolbar = false } = {}) {
       this.pending++
+      if (toolbar) this.toolbarPending++
       try {
         await this.$apollo.mutate({
           mutation,
@@ -1084,6 +1086,7 @@ export default {
         return false
       } finally {
         this.pending--
+        if (toolbar) this.toolbarPending--
       }
     },
     moderate(person, action) {
@@ -1098,12 +1101,16 @@ export default {
     // Failed, the box shows what holds again. Vue would not: the value bound to it has not
     // changed, only the box, by the click.
     async setEveryone(enabled, checkbox) {
-      const done = await this.mutate(setVideoCallEveryoneModeratesMutation(), { enabled })
+      const done = await this.mutate(
+        setVideoCallEveryoneModeratesMutation(),
+        { enabled },
+        { toolbar: true },
+      )
       if (!done && checkbox) checkbox.checked = this.moderation.everyone
       return done
     },
     takeOver() {
-      return this.mutate(takeOverVideoCallModerationMutation(), {})
+      return this.mutate(takeOverVideoCallModerationMutation(), {}, { toolbar: true })
     },
     // Closes its own question only: dismissed meanwhile, and another one asked — about somebody
     // else or the same one again — that one stays.
@@ -1194,9 +1201,11 @@ export default {
       // and the buttons follow (VideoCall: microphoneMuted, self).
       // Those spared only for having the floor are not named either: taken back meanwhile, the
       // server would spare them all the same.
-      const done = await this.mutate(muteAllInVideoCallMutation(), {
-        exceptUserIds: this.spared.filter((userId) => !this.sparedForFloor.includes(userId)),
-      })
+      const done = await this.mutate(
+        muteAllInVideoCallMutation(),
+        { exceptUserIds: this.spared.filter((userId) => !this.sparedForFloor.includes(userId)) },
+        { toolbar: true },
+      )
       if (!done || this.selection !== selection) return
       this.stopMuting()
     },
@@ -1210,6 +1219,8 @@ export default {
 
 <style scoped>
 .call-participants {
+  /*  As high as a small OsButton: the filter's field open is no higher than its button closed. */
+  --call-participants-control-height: 26px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1221,7 +1232,9 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--space-x-small);
-  padding: var(--space-x-small);
+  /*  On the right as far from the edge as the sidebar's close button above it, and the rows'
+      menus below: the three line up. */
+  padding: var(--space-x-small) var(--space-small) var(--space-x-small) var(--space-x-small);
   border-bottom: 1px solid var(--border-color-softer);
 }
 /*  Nothing but the filter's button in it: no more room above and below than the button needs. */
@@ -1244,10 +1257,10 @@ export default {
   min-width: 0;
   margin-left: auto;
 }
-/*  Closed, only the button: it fits behind the moderation's controls. Open, the field wants room
-    and moves to a line of its own when that is too short. */
+/*  Closed, only the button: it fits behind the moderation's controls. Open, the controls step
+    aside and the field takes the line. */
 .call-participants__filter--open {
-  flex: 1 1 12rem;
+  flex: 1 1 auto;
 }
 .call-participants__filter-field {
   flex: 1 1 auto;
@@ -1255,7 +1268,9 @@ export default {
   align-items: center;
   gap: var(--space-xx-small);
   min-width: 0;
-  padding: var(--space-xx-small) var(--space-x-small);
+  box-sizing: border-box;
+  height: var(--call-participants-control-height);
+  padding: 0 var(--space-x-small);
   border: 1px solid var(--border-color-soft);
   border-radius: var(--border-radius-base);
   background: var(--background-color-base);
@@ -1295,6 +1310,12 @@ export default {
   background: none;
   color: var(--text-color-soft);
   cursor: pointer;
+}
+/*  The menu's button stands in the dropdown's trigger, an inline block: inline itself, it would
+    sit on that line's baseline, with room for descenders below, and so above the field's middle.
+    A block of its own has no line to sit on. */
+.call-participants__filter-more-toggle {
+  display: flex;
 }
 /*  Under the pointer, both get a grey ground, the same as the menu's options. */
 .call-participants__filter-clear:hover,
@@ -1391,7 +1412,8 @@ export default {
   display: flex;
   align-items: center;
   gap: var(--space-x-small);
-  padding: var(--space-xx-small) var(--space-x-small);
+  /*  On the right as the toolbar (see there). */
+  padding: var(--space-xx-small) var(--space-small) var(--space-xx-small) var(--space-x-small);
 }
 .call-participants__avatar {
   flex: 0 0 auto;
