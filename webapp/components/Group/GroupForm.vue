@@ -69,6 +69,7 @@
                   choice.name === describedTemplate ? 'template-description' : null
                 "
                 :data-test="`template-card-${choice.name}`"
+                @pointerdown="lastPointerType = $event.pointerType"
                 @click="chooseTemplate(choice, $event)"
                 @focus="focusedTemplate = choice.name"
                 @blur="focusedTemplate = null"
@@ -413,6 +414,8 @@ export default {
       // out under the row. Two fields, not one: focus leaving a card must not forget the cursor
       // still resting on it, nor the cursor leaving forget the focus.
       hoveredTemplate: null,
+      // How the last press on a template card came: 'mouse', 'touch' or 'pen' (chooseTemplate).
+      lastPointerType: null,
       focusedTemplate: null,
       // Exposed for the template (see the category validation hint below) —
       // bare module-scope reads don't resolve there, unlike in the script.
@@ -704,7 +707,19 @@ export default {
       // if it had been picked. The hover stays: while the pointer is on the card its reason stays
       // in view, and leaving the card goes back to the template picked. Activated from the
       // keyboard (`detail` 0) the focus is real and stays described.
-      if (event && event.detail > 0) this.focusedTemplate = null
+      if (event && event.detail > 0) {
+        if (this.lastPointerType === 'touch') {
+          // A tap has no hover to keep the reason in view, and a browser may report the finger
+          // leaving the card before the click: the tapped card stays explained, until the next tap.
+          this.hoveredTemplate = choice.name
+        } else {
+          this.focusedTemplate = null
+        }
+      } else {
+        // Space or Enter: the keyboard is on this card, even where an earlier mouse click had
+        // dropped the focus it left (the focus itself did not move, so no focus event says so).
+        this.focusedTemplate = choice.name
+      }
       // Refused cards stay focusable (aria-disabled, not disabled) so the keyboard reaches the
       // reason under the row; picking one is what is refused, here.
       if (!choice.allowed) return

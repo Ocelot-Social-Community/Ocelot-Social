@@ -1034,6 +1034,42 @@ describe('GroupForm', () => {
       expect(wrapper.vm.describedTemplate).toBe('channel')
     })
 
+    it('explains the card again when the keyboard activates it after a mouse click', async () => {
+      // The click dropped the focus it left; the focus stayed on the card, so no focus event
+      // brings it back when Space is pressed there next.
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+    })
+
+    it('keeps explaining a tapped card, even where the finger is reported leaving it first', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+      const tap = new Event('pointerdown')
+      tap.pointerType = 'touch'
+
+      card('hidden').element.dispatchEvent(tap)
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+    })
+
     it('keeps explaining a card activated from the keyboard, where the focus is real', async () => {
       const wrapper = mountWith(canExceptHidden, twoTemplates)
       const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
