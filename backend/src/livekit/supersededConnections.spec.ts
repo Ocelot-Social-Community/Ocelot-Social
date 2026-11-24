@@ -102,6 +102,12 @@ describe('supersededConnections', () => {
     expect(supersededConnections(connections)).toEqual([])
   })
 
+  it('are none whose join time the media server does not tell', () => {
+    const connections = [connection('ute#tab-aaaa1#01', 0), connection('ute#tab-aaaa1#02', 10_000)]
+
+    expect(supersededConnections(connections)).toEqual([])
+  })
+
   it('are the older ones only, while two newest ones are tied', () => {
     const connections = [
       connection('ute#tab-aaaa1#01', 5_000),

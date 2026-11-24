@@ -6,7 +6,7 @@ import flushPromises from 'flush-promises'
 import VideoCall, { LEAVE_REQUEST_DEADLINE_MS } from './VideoCall.vue'
 import CallNotice from './CallNotice.vue'
 import { createAudioWatchdog } from './audioWatchdog'
-import { tabClientId } from './tabClientId'
+import { tabClientId, resetTabClientId } from './tabClientId'
 import { TextDecoder, TextEncoder } from 'util'
 
 // LiveKit hands data messages over as bytes; jsdom knows no codec for them.
@@ -3302,6 +3302,19 @@ describe('VideoCall', () => {
         groupId: 'g2',
         clientId: tabClientId(),
       })
+    })
+
+    it('never hands out a token fetched under another id of the tab', async () => {
+      // Another tab turned out to have the id meanwhile: this one has a new one now.
+      const apollo = apolloResolving()
+      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
+      await flushPromises()
+      const before = apollo.mutate.mock.calls[0][0].variables.clientId
+      resetTabClientId()
+      await wrapper.vm.takeJoinPayload('g1')
+      expect(tokenRequests(apollo)).toBe(2)
+      expect(apollo.mutate.mock.calls[1][0].variables.clientId).toBe(tabClientId())
+      expect(tabClientId()).not.toBe(before)
     })
 
     it('does not ask without a group', async () => {

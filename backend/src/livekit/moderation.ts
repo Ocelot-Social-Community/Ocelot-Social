@@ -477,10 +477,10 @@ export const supersededConnections = (connections: Connection[]): Connection[] =
   return connections.filter((connection) => {
     const key = clientKeyOf(connection.identity)
     const kept = key !== null ? newest.get(key) : undefined
+    // Without a time of its own, a connection cannot be said to have joined first.
+    const joined = connection.joinedAtMs ?? 0
     return (
-      kept !== undefined &&
-      kept !== connection &&
-      (connection.joinedAtMs ?? 0) < (kept.joinedAtMs ?? 0)
+      kept !== undefined && kept !== connection && joined > 0 && joined < (kept.joinedAtMs ?? 0)
     )
   })
 }

@@ -3389,15 +3389,18 @@ export default {
     prefetchJoin() {
       const groupId = this.groupId
       if (!groupId) return
+      // The tab's id as it is now goes into the token: should it change meanwhile — another tab
+      // turned out to have it (tabClientId) — the token is not used.
+      const clientId = tabClientId()
       const promise = (async () => {
         // Loads the client library chunk as well, the other half of the wait.
         await import('livekit-client')
-        return this.fetchJoinPayload(groupId)
+        return this.fetchJoinPayload(groupId, clientId)
       })()
       // A failure here is not the user's business yet: connect() asks again
       // and reports whatever the real attempt runs into.
       promise.catch(() => {})
-      this.prefetched = { groupId, requestedAt: Date.now(), promise }
+      this.prefetched = { groupId, clientId, requestedAt: Date.now(), promise }
     },
     async takeJoinPayload(groupId) {
       const prefetched = this.prefetched
@@ -3406,6 +3409,7 @@ export default {
       if (
         prefetched &&
         prefetched.groupId === groupId &&
+        prefetched.clientId === tabClientId() &&
         Date.now() - prefetched.requestedAt < PREFETCHED_TOKEN_MAX_AGE_MS
       ) {
         try {
@@ -3416,10 +3420,10 @@ export default {
       }
       return this.fetchJoinPayload(groupId)
     },
-    async fetchJoinPayload(groupId) {
+    async fetchJoinPayload(groupId, clientId = tabClientId()) {
       const { data } = await this.$apollo.mutate({
         mutation: joinGroupVideoCallMutation(),
-        variables: { groupId, clientId: tabClientId() },
+        variables: { groupId, clientId },
       })
       const payload = data && data.joinGroupVideoCall
       if (!payload) throw new Error('No token returned')
