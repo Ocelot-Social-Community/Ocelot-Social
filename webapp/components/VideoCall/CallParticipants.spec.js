@@ -1050,6 +1050,29 @@ describe('CallParticipants', () => {
       expect(toolbar().find('[data-test="call-participants-filter"]').exists()).toBe(true)
     })
 
+    it('waits with muting while a floor given meanwhile is on its way', async () => {
+      // The server spares whoever has the floor when "mute all" arrives: sent before the floor,
+      // it would mute the one just given it.
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      let answer
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      const confirm = () => wrapper.find('[data-test="mute-all-confirm"]')
+      expect(confirm().attributes('disabled')).toBeUndefined()
+      wrapper.vm.toggleFloor('bob')
+      await wrapper.vm.$nextTick()
+      expect(confirm().attributes('disabled')).toBe('disabled')
+      answer({ data: {} })
+      await flushPromises()
+      expect(confirm().attributes('disabled')).toBeUndefined()
+    })
+
     it('goes back to the list as it was when cancelled, by button or by Escape', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       wrapper.vm.openMuteAll()
@@ -1371,6 +1394,46 @@ describe('CallParticipants', () => {
       wrapper.vm.openMuteAll()
       await wrapper.vm.toggleFloor('me')
       expect(wrapper.vm.spared).toContain('me')
+    })
+  })
+
+  describe('the scrollbar of the list', () => {
+    let observed
+    beforeEach(() => {
+      observed = null
+      global.ResizeObserver = class {
+        constructor(callback) {
+          observed = callback
+        }
+
+        observe() {}
+
+        disconnect() {}
+      }
+    })
+    afterEach(() => {
+      delete global.ResizeObserver
+    })
+
+    const widths = (offsetWidth, clientWidth) => {
+      const list = wrapper.find('ul').element
+      Object.defineProperty(list, 'offsetWidth', { value: offsetWidth, configurable: true })
+      Object.defineProperty(list, 'clientWidth', { value: clientWidth, configurable: true })
+    }
+    const room = () => wrapper.element.style.getPropertyValue('--call-participants-scrollbar')
+
+    it('gives the toolbar as much more room on the right as it takes', async () => {
+      wrapper = Wrapper()
+      expect(room()).toBe('0px')
+      widths(300, 285)
+      observed()
+      await wrapper.vm.$nextTick()
+      expect(room()).toBe('15px')
+      // Gone again, or one that only shows while scrolling: none.
+      widths(300, 300)
+      observed()
+      await wrapper.vm.$nextTick()
+      expect(room()).toBe('0px')
     })
   })
 

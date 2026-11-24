@@ -1,6 +1,7 @@
 <template>
   <section
     class="call-participants"
+    :style="{ '--call-participants-scrollbar': scrollbarWidth + 'px' }"
     :aria-label="$t('videoCall.participants.label')"
     @keydown.esc="muting && stopMuting()"
   >
@@ -30,7 +31,7 @@
             variant="danger"
             size="sm"
             :loading="toolbarBusy"
-            :disabled="muteCount === 0"
+            :disabled="muteCount === 0 || busy"
             @click="muteAll"
           >
             {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
@@ -534,6 +535,10 @@ export default {
       // them flicker.
       pending: 0,
       toolbarPending: 0,
+      // How wide the list's scrollbar is where it takes room (not where it only shows while
+      // scrolling): the toolbar keeps that much more room on the right, so that its controls and
+      // the rows' menus keep one edge.
+      scrollbarWidth: 0,
       // The filter: whether its row is unfolded, the part of a name it looks for, and the chips
       // chosen, by key.
       filterOpen: false,
@@ -563,7 +568,15 @@ export default {
     // Not shown either: how often the room has told of somebody's floor changing, by userId.
     this.floorTold = {}
   },
+  mounted() {
+    // Its content box narrows as a scrollbar comes, so it is told then too.
+    if (typeof ResizeObserver === 'undefined' || !this.$refs.list) return
+    this.listObserver = new ResizeObserver(() => this.measureScrollbar())
+    this.listObserver.observe(this.$refs.list)
+    this.measureScrollbar()
+  },
   beforeDestroy() {
+    if (this.listObserver) this.listObserver.disconnect()
     clearTimeout(this.restTimer)
   },
   computed: {
@@ -1164,6 +1177,11 @@ export default {
     // Giving or taking back the floor counts at once, not only with "mute all". Giving it
     // spares; taking it back unticks again whoever was ticked only by giving it, and leaves a
     // tick set before.
+    measureScrollbar() {
+      const list = this.$refs.list
+      if (!list) return
+      this.scrollbarWidth = Math.max(0, list.offsetWidth - list.clientWidth)
+    },
     async toggleFloor(userId) {
       const giving = !this.floor.includes(userId)
       const selection = this.selection
@@ -1240,8 +1258,9 @@ export default {
   /*  Above and below no more room than its controls need, for everybody, the filter's field open
       or not: it takes little room, also on a phone, and nothing jumps. On the right as far from
       the edge as the sidebar's close button above it, and the rows' menus below: the three line
-      up. */
-  padding: var(--space-xxx-small) var(--space-small) var(--space-xxx-small) var(--space-x-small);
+      up — plus the list's scrollbar where it takes room, which only the rows have beside them. */
+  padding: var(--space-xxx-small) calc(var(--space-small) + var(--call-participants-scrollbar, 0px))
+    var(--space-xxx-small) var(--space-x-small);
   border-bottom: 1px solid var(--border-color-softer);
 }
 .call-participants__toolbar-actions {
