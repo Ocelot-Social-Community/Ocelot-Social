@@ -5,9 +5,14 @@ on:
   # branch. Creating it raises a push event too, and the `merge_group` run below already covers it;
   # without the exclusion every queue entry would run this workflow twice. `tags` has to be spelled
   # out because naming `branches-ignore` alone would stop the workflow from running for tags.
+  # Also excluded: release-please's overflow branch for release notes too long for a pull request
+  # body. It never becomes a pull request, so nobody needs its checks. release-please first resets it
+  # to the master commit and then pushes the notes on top a second later — the first push's runs get
+  # cancelled by the second and, sharing master's SHA, put red "cancelled" checks on master's commit.
   push:
     branches-ignore:
       - 'gh-readonly-queue/**'
+      - 'release-please--**--release-notes'
     tags:
       - '**'
   # Pull requests from forks only (see the `if` on the first job): a fork's push happens in the fork
