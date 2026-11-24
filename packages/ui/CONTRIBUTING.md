@@ -90,17 +90,24 @@ Use the complete Tailwind-based scales:
 
 ### Styling
 
-- Use CSS Custom Properties (no hardcoded colors)
 - Use Tailwind utility classes
-- Dark mode via `dark:` prefix
+- Colours come from the theme tokens (CSS custom properties), never as literals: the app's tokens
+  carry the light and the dark value, so a component follows the theme without `dark:` classes
+- A literal is allowed only as the **fallback** of `var()`, for apps that ship no tokens
 
 ```vue
 <template>
-  <button class="bg-[--button-primary-bg] dark:bg-[--button-primary-bg-dark]">
+  <div class="bg-[var(--background-color-base,white)]">
     <slot />
-  </button>
+  </div>
 </template>
 ```
+
+`npm run verify` fails on a literal colour anywhere else (`bg-white`, `text-gray-500`, `#fff`,
+`rgb(…)`, or `white`/`black` in a `<style>` block): it would stay the same in light and dark, as
+OsDrawer's white panel did. A deliberate exception, such as a backdrop that darkens the page in
+both themes, goes into `LITERAL_COLOUR_EXCEPTIONS` in `scripts/check-completeness.ts`, with its
+reason.
 
 ### Vue 2/3 Compatibility
 

@@ -82,12 +82,12 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['src/test/setup.ts'],
-    include: ['src/**/*.{test,spec}.{js,ts}'],
+    include: ['src/**/*.{test,spec}.{js,ts}', 'scripts/literal-colours.spec.ts'],
     exclude: ['src/**/*.visual.spec.ts', 'src/plugins/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'json-summary', 'html'],
-      include: ['src/**/*.{ts,vue}'],
+      include: ['src/**/*.{ts,vue}', 'scripts/literal-colours.ts'],
       exclude: [
         'src/**/*.d.ts',
         'src/**/*.{test,spec}.ts',
