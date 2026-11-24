@@ -2144,7 +2144,6 @@
       "open": "Show the participants",
       "openProfile": "Open profile",
       "remove": "Remove",
-      "removeEllipsis": "Remove from the call …",
       "removeExplanation": "They cannot join this call again while it lasts. The next call is open to them.",
       "removeQuestion": "Remove {name} from the call?",
       "resign": "Give up the moderation",
