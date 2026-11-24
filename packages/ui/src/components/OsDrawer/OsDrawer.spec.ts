@@ -47,6 +47,14 @@ describe('osDrawer', () => {
       expect(closed).toContain('[transition:translate_200ms_ease-out,visibility_0s_linear_200ms]')
     })
 
+    it('takes its surface colour from the theme, white only where an app ships no tokens', () => {
+      // A literal white panel stays white in the dark theme (#11092).
+      const classes = panelOf(mount(OsDrawer, { props: { open: true } })).classes()
+
+      expect(classes).toContain('bg-[var(--background-color-base,white)]')
+      expect(classes).not.toContain('bg-white')
+    })
+
     it.each([
       ['right', 'right-0', 'translate-x-full'],
       ['left', 'left-0', '-translate-x-full'],
