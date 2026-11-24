@@ -20,7 +20,7 @@ describe('VideoCalls graphql documents', () => {
 
   it('builds the joinGroupVideoCall mutation', () => {
     expect(printOp(joinGroupVideoCallMutation())).toBe(
-      'mutation ($groupId: ID!) { joinGroupVideoCall(groupId: $groupId) { token url roomName } }',
+      'mutation ($groupId: ID!, $clientId: String) { joinGroupVideoCall(groupId: $groupId, clientId: $clientId) { token url roomName } }',
     )
   })
 

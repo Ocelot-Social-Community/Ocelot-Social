@@ -26,6 +26,7 @@ import { allGroupPermissionKeys } from '@src/groupPermission'
 import { dominatesInGroup } from '@src/groupRole/authority'
 import { parseStoredPermissions } from '@src/groupRole/storedPermissions'
 import { OWNER_ROLE } from '@src/groupRole/types'
+import { clientKeyOf } from '@src/livekit/rooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -434,8 +435,12 @@ export const listConnections = async (
     LIVEKIT_API_TIMEOUT_MS,
     'listParticipants',
   )
+  // In milliseconds where the media server says so: two joins of one tab can fall into the
+  // same second, and which of them is the newer decides which one stays (supersededConnections).
+  const joinedAtMs = (participant: { joinedAt?: bigint; joinedAtMs?: bigint }) =>
+    Number(participant.joinedAtMs ?? 0) || Number(participant.joinedAt ?? 0) * 1000
   return [...participants]
-    .sort((a, b) => Number(a.joinedAt ?? 0) - Number(b.joinedAt ?? 0))
+    .sort((a, b) => joinedAtMs(a) - joinedAtMs(b))
     .map((participant) => ({
       identity: participant.identity,
       userId: userIdOf(participant),
@@ -445,6 +450,27 @@ export const listConnections = async (
         muted: track.muted,
       })),
     }))
+}
+
+/**
+ * The connections a newer one from the same browser tab has replaced, of connections in the order
+ * they joined. A tab is in a call once: an older connection of it is one it did not end — left by
+ * a failed join, a crashed page, a reload — and would stay as a second self, silent, for as long
+ * as the tab keeps it open. The user's other tabs and devices are never among them, nor are
+ * connections without a tab id (clientKeyOf).
+ */
+export const supersededConnections = (connections: Connection[]): Connection[] => {
+  const newest = new Map<string, Connection>()
+  for (const connection of connections) {
+    const key = clientKeyOf(connection.identity)
+    if (key) {
+      newest.set(key, connection)
+    }
+  }
+  return connections.filter((connection) => {
+    const key = clientKeyOf(connection.identity)
+    return key !== null && newest.get(key) !== connection
+  })
 }
 
 /** The users in the room, in the order they joined, each once. */

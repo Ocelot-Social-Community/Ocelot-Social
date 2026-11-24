@@ -3,7 +3,9 @@
 // Called whenever the moderation may have changed: after every act of moderation, when somebody
 // joins the call's chat (which is when a session opens), and by the poller on every poll of a room
 // with people in it — the one place that notices a moderator who has simply gone, and that puts
-// right what an act of moderation left undone.
+// right what an act of moderation left undone. On the way, a connection that a newer one from the
+// same browser tab has replaced is taken out of the call (supersededConnections); the webhook does
+// that alone as soon as somebody joins (dropSupersededConnections).
 import { TwirpError } from 'livekit-server-sdk'
 
 import {
@@ -16,6 +18,7 @@ import {
   readModeration,
   removeConnections,
   settleModeration,
+  supersededConnections,
 } from '@src/livekit/moderation'
 import { liveKitConfigOf, roomNameForGroup, roomServiceFor, userIdOf } from '@src/livekit/rooms'
 import logger from '@src/logger'
@@ -41,6 +44,44 @@ export const connectionsOf = async (
       return []
     }
     throw err
+  }
+}
+
+/**
+ * Takes the connections out that a newer one from the same tab has replaced, and gives back the
+ * others: the call as it is meant to be.
+ */
+const withoutSuperseded = async (
+  config: LiveKitConfig,
+  groupId: string,
+  connections: Connection[],
+): Promise<Connection[]> => {
+  const superseded = supersededConnections(connections)
+  if (superseded.length === 0) {
+    return connections
+  }
+  await removeConnections(roomServiceFor(config), roomNameForGroup(groupId), superseded)
+  return connections.filter((connection) => !superseded.includes(connection))
+}
+
+/**
+ * Takes the connections out of the group's call that a newer one from the same tab has replaced
+ * (supersededConnections). For the webhook, as soon as somebody joins; settleAndPublishModeration
+ * does the same on its way. Never throws: the next settling tries again.
+ */
+export const dropSupersededConnections = async (
+  rawConfig: Dependencies['config'],
+  groupId: string,
+): Promise<void> => {
+  const config = liveKitConfigOf(rawConfig)
+  if (!config) {
+    return
+  }
+  try {
+    await withoutSuperseded(config, groupId, await connectionsOf(config, groupId))
+    // eslint-disable-next-line no-catch-all/no-catch-all
+  } catch (err: unknown) {
+    logger.warn(`Taking replaced connections out of the call in group ${groupId} failed:`, err)
   }
 }
 
@@ -75,7 +116,11 @@ export const settleAndPublishModeration = async (
     return
   }
   try {
-    const connections = await connectionsOf(config, groupId)
+    const connections = await withoutSuperseded(
+      config,
+      groupId,
+      await connectionsOf(config, groupId),
+    )
     if (connections.length === 0) {
       return
     }

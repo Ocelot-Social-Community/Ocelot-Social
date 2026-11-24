@@ -6,6 +6,7 @@ import flushPromises from 'flush-promises'
 import VideoCall, { LEAVE_REQUEST_DEADLINE_MS } from './VideoCall.vue'
 import CallNotice from './CallNotice.vue'
 import { createAudioWatchdog } from './audioWatchdog'
+import { tabClientId } from './tabClientId'
 import { TextDecoder, TextEncoder } from 'util'
 
 // LiveKit hands data messages over as bytes; jsdom knows no codec for them.
@@ -3198,13 +3199,27 @@ describe('VideoCall', () => {
       const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga', apollo })
       await flushPromises()
       expect(tokenRequests(apollo)).toBe(1)
-      expect(apollo.mutate.mock.calls[0][0].variables).toEqual({ groupId: 'g1' })
+      // With the tab's id: a connection this tab left behind is taken out once it is in again.
+      expect(apollo.mutate.mock.calls[0][0].variables).toEqual({
+        groupId: 'g1',
+        clientId: tabClientId(),
+      })
 
       await wrapper.vm.connect()
       // The click only opens the socket — no second round trip.
       expect(tokenRequests(apollo)).toBe(1)
       expect(wrapper.vm.room.connect).toHaveBeenCalledWith('ws://lk', 'tok', expect.any(Object))
       expect(wrapper.vm.phase).toBe('in-call')
+    })
+
+    it('leaves the room when the page is left, as LiveKit does unless told otherwise', async () => {
+      // A closed tab is then gone for the others at once, not only once the media server
+      // misses it (#10682): LiveKit's Room disconnects on pagehide, beforeunload and freeze.
+      const { wrapper } = factory({ show: true, groupId: 'g1', apollo: apolloResolving() })
+      await flushPromises()
+      await wrapper.vm.connect()
+      expect(wrapper.vm.room.options).toBeDefined()
+      expect(wrapper.vm.room.options.disconnectOnPageLeave).not.toBe(false)
     })
 
     it('waits for a request that is still under way', async () => {
@@ -3268,7 +3283,10 @@ describe('VideoCall', () => {
       await flushPromises()
       await wrapper.vm.takeJoinPayload('g2')
       expect(tokenRequests(apollo)).toBe(2)
-      expect(apollo.mutate.mock.calls[1][0].variables).toEqual({ groupId: 'g2' })
+      expect(apollo.mutate.mock.calls[1][0].variables).toEqual({
+        groupId: 'g2',
+        clientId: tabClientId(),
+      })
     })
 
     it('does not ask without a group', async () => {

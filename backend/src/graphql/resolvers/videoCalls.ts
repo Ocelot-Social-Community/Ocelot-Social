@@ -18,6 +18,7 @@ import { readModeration } from '@src/livekit/moderation'
 import { settleAndPublishModeration } from '@src/livekit/moderationService'
 import {
   groupIdFromRoomName,
+  identityFor,
   liveKitConfigOf,
   roomNameForGroup,
   roomServiceFor,
@@ -506,7 +507,11 @@ export default {
       await settleAndPublishModeration(context, params.groupId)
       return chatRoomId
     },
-    joinGroupVideoCall: async (_root, params: { groupId: string }, context) => {
+    joinGroupVideoCall: async (
+      _root,
+      params: { groupId: string; clientId?: string | null },
+      context,
+    ) => {
       const roomName = roomNameForGroup(params.groupId)
       // Two different acts through one mutation. JOINING an existing call (count > 0) needs
       // `group.videoCall.join`, which the shield has already checked. OPENING one (no live
@@ -531,10 +536,13 @@ export default {
           throw new AppError(Errors.VIDEO_CALL_START_NOT_PERMITTED)
         }
       }
-      // LiveKit treats `identity` as a unique key in a room; two connections
-      // with the same identity kick each other out. Append a random suffix
-      // so the same user can be present from multiple tabs / devices.
-      const identity = `${String(context.user.id)}#${randomBytes(4).toString('hex')}`
+      // With the tab's id, so that a connection the tab left behind is taken out once it joins
+      // anew (see supersededConnections), while the user's other tabs and devices stay.
+      const identity = identityFor(
+        String(context.user.id),
+        params.clientId,
+        randomBytes(4).toString('hex'),
+      )
       const { avatarUrl, slug } = await getUserCallProfile(context.driver, context.user.id)
       const at = new AccessToken(
         context.config.LIVEKIT_API_KEY,

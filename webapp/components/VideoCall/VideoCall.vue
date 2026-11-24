@@ -756,6 +756,7 @@ const withDeadline = (request) => {
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 import { inertAround, takeFocus, trapFocus } from './dialogFocus'
+import { tabClientId } from './tabClientId'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -3415,7 +3416,7 @@ export default {
     async fetchJoinPayload(groupId) {
       const { data } = await this.$apollo.mutate({
         mutation: joinGroupVideoCallMutation(),
-        variables: { groupId },
+        variables: { groupId, clientId: tabClientId() },
       })
       const payload = data && data.joinGroupVideoCall
       if (!payload) throw new Error('No token returned')

@@ -43,8 +43,27 @@ export const roomServiceFor = (config: LiveKitConfig) =>
     config.LIVEKIT_API_SECRET,
   )
 
-// The user behind a connection: the join token puts it into the metadata, and the identity is
-// `<userId>#<suffix>` (see joinGroupVideoCall) for a participant whose metadata is unreadable.
+// A browser tab's id for itself, as the webapp keeps it for the tab's life (sessionStorage).
+const CLIENT_ID = /^[A-Za-z0-9_-]{8,64}$/
+
+/**
+ * A connection's identity: unique in the room, as LiveKit takes two connections of one identity
+ * for one participant and lets only the newer stay. So each join gets a random suffix, and the
+ * same user can be in the call from several devices and tabs. With the tab's id in it
+ * (`<userId>#<clientId>#<suffix>`), the connections of one tab can be told apart from the
+ * user's others (see clientKeyOf); a malformed id is left out, as from an older webapp.
+ */
+export const identityFor = (userId: string, clientId: string | null | undefined, suffix: string) =>
+  clientId && CLIENT_ID.test(clientId) ? `${userId}#${clientId}#${suffix}` : `${userId}#${suffix}`
+
+/** The user and tab a connection was joined from, `<userId>#<clientId>`; null without a tab id. */
+export const clientKeyOf = (identity: string): string | null => {
+  const [userId, clientId, suffix, ...rest] = identity.split('#')
+  return userId && clientId && suffix && rest.length === 0 ? `${userId}#${clientId}` : null
+}
+
+// The user behind a connection: the join token puts it into the metadata, and the identity
+// begins with it (see identityFor) for a participant whose metadata is unreadable.
 export const userIdOf = (participant: { identity?: string; metadata?: string }): string | null => {
   try {
     const { userId } = JSON.parse(participant.metadata ?? '') as { userId?: unknown }

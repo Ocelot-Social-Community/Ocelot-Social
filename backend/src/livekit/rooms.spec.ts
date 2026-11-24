@@ -11,7 +11,8 @@ vi.mock('@config/index', () => ({
   },
 }))
 
-const { groupIdFromRoomName, roomNameForGroup, roomPrefix } = await import('./rooms')
+const { clientKeyOf, groupIdFromRoomName, identityFor, roomNameForGroup, roomPrefix } =
+  await import('./rooms')
 
 describe('the names of the rooms', () => {
   it('are group-<id> without a prefix of the instance', () => {
@@ -41,5 +42,31 @@ describe('the names of the rooms', () => {
     expect(groupIdFromRoomName('group-')).toBeNull()
     expect(groupIdFromRoomName(null)).toBeNull()
     expect(groupIdFromRoomName(undefined)).toBeNull()
+  })
+})
+
+describe('the identity of a connection', () => {
+  it("carries the tab's id between the user and the suffix", () => {
+    expect(identityFor('ute', 'tab-aaaa1', 'ab12')).toBe('ute#tab-aaaa1#ab12')
+    expect(clientKeyOf('ute#tab-aaaa1#ab12')).toBe('ute#tab-aaaa1')
+  })
+
+  it('leaves out a missing or malformed tab id, and then knows no tab', () => {
+    for (const clientId of [
+      undefined,
+      null,
+      '',
+      'short',
+      'with#hash1',
+      'with space',
+      'x'.repeat(65),
+    ]) {
+      expect(identityFor('ute', clientId, 'ab12')).toBe('ute#ab12')
+    }
+
+    expect(clientKeyOf('ute#ab12')).toBeNull()
+    expect(clientKeyOf('ute')).toBeNull()
+    expect(clientKeyOf('ute#tab-aaaa1#ab12#more')).toBeNull()
+    expect(clientKeyOf('#tab-aaaa1#ab12')).toBeNull()
   })
 })

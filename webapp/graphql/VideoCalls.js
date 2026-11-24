@@ -16,9 +16,11 @@ export const videoCallParticipantCountQuery = () => gql`
   }
 `
 
+// `clientId`: the tab's own id (tabClientId.js), so that a connection the tab left behind is
+// taken out of the call once it is in again.
 export const joinGroupVideoCallMutation = () => gql`
-  mutation ($groupId: ID!) {
-    joinGroupVideoCall(groupId: $groupId) {
+  mutation ($groupId: ID!, $clientId: String) {
+    joinGroupVideoCall(groupId: $groupId, clientId: $clientId) {
       token
       url
       roomName
