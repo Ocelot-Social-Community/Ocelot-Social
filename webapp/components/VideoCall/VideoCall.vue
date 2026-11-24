@@ -2680,10 +2680,18 @@ export default {
       // the call comes up over that page and leaves it as it is (see toggleMinimize). Awaited,
       // so the URL has changed before the LiveKit handshake starts.
       if (this.onOwnGroupPage) {
+        // While the navigation is under way the join may be given up — cancelled (cleanup()
+        // counts the attempt on) or replaced by another group's prejoin. Then it must not connect,
+        // least of all to the other group's call, with this prejoin's devices.
+        const attempt = this.connectAttempt
+        const groupId = this.groupId
         await this.navigate({
           name: 'call-id-slug',
           params: { id: this.groupId, slug: this.groupSlug },
         })
+        const givenUp =
+          attempt !== this.connectAttempt || groupId !== this.groupId || this.phase !== 'connecting'
+        if (givenUp) return
       }
       await this.connect()
     },

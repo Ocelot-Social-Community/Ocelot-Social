@@ -1190,6 +1190,71 @@ describe('VideoCall', () => {
       expect(wrapper.vm.connect).toHaveBeenCalled()
     })
 
+    describe('while the navigation to the call URL is under way', () => {
+      // Nuxt's push returns nothing; the join goes on from the router's callbacks.
+      const pending = () => {
+        const { wrapper } = factory({
+          show: true,
+          groupId: 'g1',
+          groupSlug: 'yoga',
+          routeParams: { id: 'g1', slug: 'yoga' },
+        })
+        wrapper.setData({ phase: 'prejoin' })
+        wrapper.vm.connect = jest.fn().mockResolvedValue()
+        const callbacks = {}
+        wrapper.vm.$router.push = jest.fn((location, onComplete, onAbort) => {
+          Object.assign(callbacks, { onComplete, onAbort })
+        })
+        const join = wrapper.vm.onPreJoinReady({ micEnabled: true, cameraEnabled: true })
+        return { wrapper, callbacks, join }
+      }
+
+      it.each(['onComplete', 'onAbort'])(
+        'connects only once the router reports back (%s)',
+        async (callback) => {
+          const { wrapper, callbacks, join } = pending()
+          await flushPromises()
+          expect(wrapper.vm.connect).not.toHaveBeenCalled()
+
+          callbacks[callback]()
+          await join
+
+          expect(wrapper.vm.connect).toHaveBeenCalledTimes(1)
+        },
+      )
+
+      it('does not connect once the join was given up meanwhile', async () => {
+        const { wrapper, callbacks, join } = pending()
+        // Cancelled: cleanup() counts the attempt on.
+        wrapper.vm.connectAttempt++
+
+        callbacks.onComplete()
+        await join
+
+        expect(wrapper.vm.connect).not.toHaveBeenCalled()
+      })
+
+      it("does not connect to another group's call opened meanwhile", async () => {
+        const { wrapper, callbacks, join } = pending()
+        Object.defineProperty(wrapper.vm, 'groupId', { value: 'g2', configurable: true })
+
+        callbacks.onComplete()
+        await join
+
+        expect(wrapper.vm.connect).not.toHaveBeenCalled()
+      })
+
+      it('does not connect once a new prejoin was opened meanwhile', async () => {
+        const { wrapper, callbacks, join } = pending()
+        wrapper.setData({ phase: 'prejoin' })
+
+        callbacks.onComplete()
+        await join
+
+        expect(wrapper.vm.connect).not.toHaveBeenCalled()
+      })
+    })
+
     it('skips router push if already on the call route', async () => {
       const { wrapper } = factory({
         show: true,
