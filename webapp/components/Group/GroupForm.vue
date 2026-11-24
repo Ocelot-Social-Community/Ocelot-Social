@@ -113,10 +113,21 @@
                   choice.name === describedTemplate ? 'template-description-refused' : null
                 "
               >
-                <os-icon :icon="icons.exclamationTriangle" aria-hidden="true" />
+                <os-icon
+                  :icon="icons.exclamationTriangle"
+                  class="template-description__refused-icon"
+                  aria-hidden="true"
+                />
                 {{ $t('group.validations.typeNotAllowed') }}
               </span>
-              {{ $t(`group.templateDescriptions.${choice.name}`) }}
+              <!-- Under a refusal, the meaning starts a line of its own: run on after it, the two
+                   sentences read as one. -->
+              <span
+                class="template-description__text"
+                :class="{ 'template-description__text--own-line': !choice.allowed }"
+              >
+                {{ $t(`group.templateDescriptions.${choice.name}`) }}
+              </span>
             </p>
           </div>
           <os-validation-hint
@@ -863,11 +874,18 @@ export default {
   color: var(--text-color-base);
 }
 
+/* Inline, not an inline-flex box: a box cannot break inside, so on a narrow screen it jumped
+   to a line of its own as a whole instead of wrapping like the text around it. */
 .template-description__refused {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xx-small);
   color: var(--color-danger);
+}
+
+.template-description__refused-icon {
+  vertical-align: -0.125em;
+}
+
+.template-description__text--own-line {
+  display: block;
 }
 
 .appearance--auto {
