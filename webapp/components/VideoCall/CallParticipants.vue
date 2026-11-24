@@ -1,50 +1,62 @@
 <template>
   <section
     class="call-participants"
+    :style="{ '--call-participants-scrollbar': scrollbarWidth + 'px' }"
     :aria-label="$t('videoCall.participants.label')"
     @keydown.esc="muting && stopMuting()"
   >
     <!--
       What concerns the whole call: the moderation's own controls, and the filter. Somebody who
-      may step into the moderation is offered that instead. While "mute all" is being chosen, its
-      question and answers take the controls' place; the filter stays.
+      may step into the moderation is offered that instead. While "mute all" is being chosen, the
+      line holds only its red button at the front and a cross at the end that cancels it: the ticks
+      in the rows tell the rest, and the filter, which shows everybody meanwhile anyway, steps
+      aside. While the filter's field is open, the controls step aside for it, and its button
+      keeps its place.
     -->
-    <div
-      :class="['call-participants__toolbar', { 'call-participants__toolbar--slim': onlyFilter }]"
-      data-test="call-participants-toolbar"
-    >
-      <h3
-        v-if="muting"
-        class="call-participants__muting-title"
-        data-test="call-participants-muting"
-      >
+    <!-- As high for everybody, the filter's field open or not, so that nothing jumps. -->
+    <div class="call-participants__toolbar" data-test="call-participants-toolbar">
+      <!-- The question, for a screen reader: the eye has the ticks in the rows. -->
+      <h3 v-if="muting" class="call-participants__sr-only" data-test="call-participants-muting">
         {{ $t('videoCall.participants.muteWhom') }}
       </h3>
-      <!-- Its answers stand where the moderation's controls stood, the filter behind them. -->
-      <div class="call-participants__toolbar-actions">
+      <div
+        :class="[
+          'call-participants__toolbar-actions',
+          { 'call-participants__toolbar-actions--muting': muting },
+        ]"
+      >
         <template v-if="muting">
-          <os-button
-            data-test="mute-all-cancel"
-            appearance="outline"
-            variant="primary"
-            size="sm"
-            @click="stopMuting"
-          >
-            {{ $t('actions.cancel') }}
-          </os-button>
           <os-button
             data-test="mute-all-confirm"
             variant="danger"
             size="sm"
-            :loading="busy"
-            :disabled="muteCount === 0"
+            :loading="toolbarBusy"
+            :disabled="muteCount === 0 || busy"
             @click="muteAll"
           >
             {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
           </os-button>
+          <!--
+            Where the filter's button stands otherwise. Ghost, unlike the sidebar's cross right
+            above it, which closes the whole sidebar.
+          -->
+          <os-button
+            v-tooltip="$t('videoCall.participants.muteCancel')"
+            data-test="mute-all-cancel"
+            variant="primary"
+            appearance="ghost"
+            circle
+            size="sm"
+            :aria-label="$t('videoCall.participants.muteCancel')"
+            @click="stopMuting"
+          >
+            <template #icon>
+              <os-icon :icon="icons.close" />
+            </template>
+          </os-button>
         </template>
         <os-button
-          v-if="isModerator && !muting"
+          v-if="isModerator && !muting && !filterOpen"
           data-test="call-participants-mute-all"
           variant="primary"
           appearance="outline"
@@ -57,12 +69,12 @@
           {{ $t('videoCall.participants.muteAll') }}
         </os-button>
         <os-button
-          v-if="!isModerator && mayTakeOver && !muting"
+          v-if="!isModerator && mayTakeOver && !muting && !filterOpen"
           data-test="call-participants-take-over"
           variant="primary"
           appearance="outline"
           size="sm"
-          :loading="busy"
+          :loading="toolbarBusy"
           @click="takeOver"
         >
           <template #icon>
@@ -71,14 +83,14 @@
           {{ $t('videoCall.participants.takeOver') }}
         </os-button>
         <label
-          v-if="(isModerator || moderation.everyone) && !muting"
+          v-if="(isModerator || moderation.everyone) && !muting && !filterOpen"
           class="call-participants__everyone"
           data-test="call-participants-everyone"
         >
           <input
             type="checkbox"
             :checked="moderation.everyone"
-            :disabled="busy || !mayToggleEveryone"
+            :disabled="toolbarBusy || !mayToggleEveryone"
             @change="setEveryone($event.target.checked, $event.target)"
           />
           {{ $t('videoCall.participants.everyoneModerates') }}
@@ -89,6 +101,7 @@
           the next time.
         -->
         <span
+          v-if="!muting"
           :class="['call-participants__filter', { 'call-participants__filter--open': filterOpen }]"
           data-test="call-participants-filter"
         >
@@ -517,8 +530,15 @@ export default {
   emits: ['spotlight', 'local-mute', 'switch-off', 'switch-on'],
   data() {
     return {
-      // The requests to the server still on their way: while any is, the controls wait.
+      // The requests to the server still on their way: while any is, the controls in the rows
+      // wait. Those of the toolbar wait only for their own: a row worked meanwhile does not make
+      // them flicker.
       pending: 0,
+      toolbarPending: 0,
+      // How wide the list's scrollbar is where it takes room (not where it only shows while
+      // scrolling): the toolbar keeps that much more room on the right, so that its controls and
+      // the rows' menus keep one edge.
+      scrollbarWidth: 0,
       // The filter: whether its row is unfolded, the part of a name it looks for, and the chips
       // chosen, by key.
       filterOpen: false,
@@ -548,12 +568,23 @@ export default {
     // Not shown either: how often the room has told of somebody's floor changing, by userId.
     this.floorTold = {}
   },
+  mounted() {
+    // Its content box narrows as a scrollbar comes, so it is told then too.
+    if (typeof ResizeObserver === 'undefined' || !this.$refs.list) return
+    this.listObserver = new ResizeObserver(() => this.measureScrollbar())
+    this.listObserver.observe(this.$refs.list)
+    this.measureScrollbar()
+  },
   beforeDestroy() {
+    if (this.listObserver) this.listObserver.disconnect()
     clearTimeout(this.restTimer)
   },
   computed: {
     busy() {
       return this.pending > 0
+    },
+    toolbarBusy() {
+      return this.toolbarPending > 0
     },
     removalOpen() {
       return this.dialog === 'remove' && !!this.removing
@@ -643,17 +674,6 @@ export default {
           (person) => !!this.locallyMuted[person.userId],
         ),
       ]
-    },
-    // Whether the toolbar holds nothing but the filter's button: then it takes less room. Its
-    // field open, it has its full height again.
-    onlyFilter() {
-      return (
-        !this.filterOpen &&
-        !this.muting &&
-        !this.isModerator &&
-        !this.mayTakeOver &&
-        !this.moderation.everyone
-      )
     },
     chosenChips() {
       return this.filterChips.filter((chip) => this.filterKeys.includes(chip.key))
@@ -763,18 +783,17 @@ export default {
       return this.moderation.speakers.includes(userId)
     },
     // What sets somebody apart, in order; the roles in the call stand out in colour. Each knows
-    // what goes before it: ": " after "you", " – " between the others. While everybody
-    // moderates, everybody is marked as moderating, and those named as such, who alone can end
-    // it, as leading the moderation.
+    // what goes before it: ": " after "you", " – " between the others. Those named as moderators
+    // stay "moderator" whatever happens; while everybody moderates, everybody else is marked as
+    // "co-moderator".
     badges(person) {
       const marks = [
         person.isMe && { key: 'you', text: this.$t('videoCall.you') },
         (this.moderation.everyone || this.isNamedModerator(person.userId)) && {
           key: 'moderator',
-          text:
-            this.moderation.everyone && this.isNamedModerator(person.userId)
-              ? this.$t('videoCall.participants.leadModerator')
-              : this.$t('videoCall.participants.moderator'),
+          text: this.isNamedModerator(person.userId)
+            ? this.$t('videoCall.participants.moderator')
+            : this.$t('videoCall.participants.coModerator'),
           role: true,
         },
         this.hasFloor(person.userId) && {
@@ -1077,8 +1096,9 @@ export default {
       toggleMenu()
       action.callback()
     },
-    async mutate(mutation, variables) {
+    async mutate(mutation, variables, { toolbar = false } = {}) {
       this.pending++
+      if (toolbar) this.toolbarPending++
       try {
         await this.$apollo.mutate({
           mutation,
@@ -1090,6 +1110,7 @@ export default {
         return false
       } finally {
         this.pending--
+        if (toolbar) this.toolbarPending--
       }
     },
     moderate(person, action) {
@@ -1104,12 +1125,16 @@ export default {
     // Failed, the box shows what holds again. Vue would not: the value bound to it has not
     // changed, only the box, by the click.
     async setEveryone(enabled, checkbox) {
-      const done = await this.mutate(setVideoCallEveryoneModeratesMutation(), { enabled })
+      const done = await this.mutate(
+        setVideoCallEveryoneModeratesMutation(),
+        { enabled },
+        { toolbar: true },
+      )
       if (!done && checkbox) checkbox.checked = this.moderation.everyone
       return done
     },
     takeOver() {
-      return this.mutate(takeOverVideoCallModerationMutation(), {})
+      return this.mutate(takeOverVideoCallModerationMutation(), {}, { toolbar: true })
     },
     // Closes its own question only: dismissed meanwhile, and another one asked — about somebody
     // else or the same one again — that one stays.
@@ -1158,6 +1183,11 @@ export default {
     // Giving or taking back the floor counts at once, not only with "mute all". Giving it
     // spares; taking it back unticks again whoever was ticked only by giving it, and leaves a
     // tick set before.
+    measureScrollbar() {
+      const list = this.$refs.list
+      if (!list) return
+      this.scrollbarWidth = Math.max(0, list.offsetWidth - list.clientWidth)
+    },
     async toggleFloor(userId) {
       const giving = !this.floor.includes(userId)
       const selection = this.selection
@@ -1200,9 +1230,11 @@ export default {
       // and the buttons follow (VideoCall: microphoneMuted, self).
       // Those spared only for having the floor are not named either: taken back meanwhile, the
       // server would spare them all the same.
-      const done = await this.mutate(muteAllInVideoCallMutation(), {
-        exceptUserIds: this.spared.filter((userId) => !this.sparedForFloor.includes(userId)),
-      })
+      const done = await this.mutate(
+        muteAllInVideoCallMutation(),
+        { exceptUserIds: this.spared.filter((userId) => !this.sparedForFloor.includes(userId)) },
+        { toolbar: true },
+      )
       if (!done || this.selection !== selection) return
       this.stopMuting()
     },
@@ -1216,6 +1248,8 @@ export default {
 
 <style scoped>
 .call-participants {
+  /*  As high as a small OsButton: the filter's field open is no higher than its button closed. */
+  --call-participants-control-height: 26px;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1227,15 +1261,16 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--space-x-small);
-  padding: var(--space-x-small);
+  /*  Above and below no more room than its controls need, for everybody, the filter's field open
+      or not: it takes little room, also on a phone, and nothing jumps. On the right as far from
+      the edge as the sidebar's close button above it, and the rows' menus below: the three line
+      up — plus the list's scrollbar where it takes room, which only the rows have beside them. */
+  padding: var(--space-xxx-small) calc(var(--space-small) + var(--call-participants-scrollbar, 0px))
+    var(--space-xxx-small) var(--space-x-small);
   border-bottom: 1px solid var(--border-color-softer);
 }
-/*  Nothing but the filter's button in it: no more room above and below than the button needs. */
-.call-participants__toolbar--slim {
-  padding-top: var(--space-xxx-small);
-  padding-bottom: var(--space-xxx-small);
-}
 .call-participants__toolbar-actions {
+  min-height: var(--call-participants-control-height);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1250,10 +1285,10 @@ export default {
   min-width: 0;
   margin-left: auto;
 }
-/*  Closed, only the button: it fits behind the moderation's controls. Open, the field wants room
-    and moves to a line of its own when that is too short. */
+/*  Closed, only the button: it fits behind the moderation's controls. Open, the controls step
+    aside and the field takes the line. */
 .call-participants__filter--open {
-  flex: 1 1 12rem;
+  flex: 1 1 auto;
 }
 .call-participants__filter-field {
   flex: 1 1 auto;
@@ -1261,7 +1296,9 @@ export default {
   align-items: center;
   gap: var(--space-xx-small);
   min-width: 0;
-  padding: var(--space-xx-small) var(--space-x-small);
+  box-sizing: border-box;
+  height: var(--call-participants-control-height);
+  padding: 0 var(--space-x-small);
   border: 1px solid var(--border-color-soft);
   border-radius: var(--border-radius-base);
   background: var(--background-color-base);
@@ -1301,6 +1338,12 @@ export default {
   background: none;
   color: var(--text-color-soft);
   cursor: pointer;
+}
+/*  The menu's button stands in the dropdown's trigger, an inline block: inline itself, it would
+    sit on that line's baseline, with room for descenders below, and so above the field's middle.
+    A block of its own has no line to sit on. */
+.call-participants__filter-more-toggle {
+  display: flex;
 }
 /*  Under the pointer, both get a grey ground, the same as the menu's options. */
 .call-participants__filter-clear:hover,
@@ -1397,7 +1440,8 @@ export default {
   display: flex;
   align-items: center;
   gap: var(--space-x-small);
-  padding: var(--space-xx-small) var(--space-x-small);
+  /*  On the right as the toolbar (see there). */
+  padding: var(--space-xx-small) var(--space-small) var(--space-xx-small) var(--space-x-small);
 }
 .call-participants__avatar {
   flex: 0 0 auto;
@@ -1523,10 +1567,10 @@ export default {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
-.call-participants__muting-title {
-  margin: 0;
-  font-size: var(--font-size-base);
-  font-weight: bold;
+/*  The red button at the front, the cross at the end, where the filter's button stands
+    otherwise. Set on the line, not on the cross: a scoped rule does not reach an OsButton's root. */
+.call-participants__toolbar-actions--muting {
+  justify-content: space-between;
 }
 .call-participants__pick {
   flex: 0 0 auto;

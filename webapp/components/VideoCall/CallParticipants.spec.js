@@ -111,16 +111,16 @@ describe('CallParticipants', () => {
       expect(wrapper.find('[data-test="call-participant-badges-anna"]').exists()).toBe(false)
     })
 
-    it('marks everybody as moderating while everybody moderates, those named as leading', () => {
+    it('keeps those named as moderators while everybody moderates, and marks the others as co-moderators', () => {
       wrapper = Wrapper({
         people: [person('me', { isMe: true }), person('bob'), person('anna')],
         moderation: { moderators: ['bob'], everyone: true, speakers: [] },
       })
       expect(wrapper.vm.badgeLine(person('me', { isMe: true }))).toBe(
-        'videoCall.you: videoCall.participants.moderator',
+        'videoCall.you: videoCall.participants.coModerator',
       )
-      expect(wrapper.vm.badgeLine(person('bob'))).toBe('videoCall.participants.leadModerator')
-      expect(wrapper.vm.badgeLine(person('anna'))).toBe('videoCall.participants.moderator')
+      expect(wrapper.vm.badgeLine(person('bob'))).toBe('videoCall.participants.moderator')
+      expect(wrapper.vm.badgeLine(person('anna'))).toBe('videoCall.participants.coModerator')
     })
 
     it('says "you" alone when nothing else sets one apart', () => {
@@ -160,18 +160,26 @@ describe('CallParticipants', () => {
       expect(document.activeElement).toBe(find('filter-name').element)
     })
 
-    it('takes less room where its button is all the toolbar holds', async () => {
-      const slim = () => find('toolbar').classes('call-participants__toolbar--slim')
-      wrapper = Wrapper()
-      expect(slim()).toBe(true)
-      await find('filter-toggle').trigger('click')
-      expect(slim()).toBe(false)
-      wrapper.destroy()
-      wrapper = Wrapper({ mayTakeOver: true })
-      expect(slim()).toBe(false)
-      wrapper.destroy()
+    it("has the moderation's controls step aside while its field is open, and keeps its button last", async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
-      expect(slim()).toBe(false)
+      expect(find('mute-all').exists()).toBe(true)
+      expect(find('everyone').exists()).toBe(true)
+      await find('filter-toggle').trigger('click')
+      expect(find('mute-all').exists()).toBe(false)
+      expect(find('everyone').exists()).toBe(false)
+      expect(find('filter-toggle').element.parentElement.lastElementChild).toBe(
+        find('filter-toggle').element,
+      )
+      await find('filter-toggle').trigger('click')
+      expect(find('mute-all').exists()).toBe(true)
+      expect(find('everyone').exists()).toBe(true)
+    })
+
+    it('has the offer to step in step aside too while its field is open', async () => {
+      wrapper = Wrapper({ mayTakeOver: true })
+      expect(find('take-over').exists()).toBe(true)
+      await find('filter-toggle').trigger('click')
+      expect(find('take-over').exists()).toBe(false)
     })
 
     it('finds a part of a name whatever its case and accents, and tells how many of all', async () => {
@@ -224,11 +232,8 @@ describe('CallParticipants', () => {
       await find('filter-clear').trigger('click')
       expect(wrapper.vm.filterName).toBe('')
       await find('filter-name').setValue('bo')
-      // Esc in the field leaves "mute all" alone.
-      await find('mute-all').trigger('click')
       await find('filter-name').trigger('keydown', { key: 'Escape' })
       expect(wrapper.vm.filterName).toBe('')
-      expect(wrapper.vm.muting).toBe(true)
       await find('filter-name').trigger('keydown', { key: 'Escape' })
       expect(find('filter-name').exists()).toBe(false)
     })
@@ -1020,6 +1025,49 @@ describe('CallParticipants', () => {
       expect(wrapper.emitted('switch-off')).toBeUndefined()
     })
 
+    it('has only its red button and a cross to cancel in the toolbar, the filter stepping aside', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      const toolbar = () => wrapper.find('[data-test="call-participants-toolbar"]')
+      expect(toolbar().find('[data-test="call-participants-filter"]').exists()).toBe(true)
+      await wrapper.find('[data-test="call-participants-mute-all"]').trigger('click')
+      const actions = toolbar()
+        .findAll('button')
+        .wrappers.map((button) => button.attributes('data-test'))
+      expect(actions).toEqual(['mute-all-confirm', 'mute-all-cancel'])
+      expect(wrapper.find('[data-test="mute-all-cancel"]').attributes('aria-label')).toBe(
+        'videoCall.participants.muteCancel',
+      )
+      // The question stays, for a screen reader.
+      expect(wrapper.find('[data-test="call-participants-muting"]').classes()).toContain(
+        'call-participants__sr-only',
+      )
+      await wrapper.find('[data-test="mute-all-cancel"]').trigger('click')
+      expect(toolbar().find('[data-test="call-participants-filter"]').exists()).toBe(true)
+    })
+
+    it('waits with muting while a floor given meanwhile is on its way', async () => {
+      // The server spares whoever has the floor when "mute all" arrives: sent before the floor,
+      // it would mute the one just given it.
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      wrapper.vm.openMuteAll()
+      await wrapper.vm.$nextTick()
+      let answer
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      const confirm = () => wrapper.find('[data-test="mute-all-confirm"]')
+      expect(confirm().attributes('disabled')).toBeUndefined()
+      wrapper.vm.toggleFloor('bob')
+      await wrapper.vm.$nextTick()
+      expect(confirm().attributes('disabled')).toBe('disabled')
+      answer({ data: {} })
+      await flushPromises()
+      expect(confirm().attributes('disabled')).toBeUndefined()
+    })
+
     it('goes back to the list as it was when cancelled, by button or by Escape', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       wrapper.vm.openMuteAll()
@@ -1344,6 +1392,46 @@ describe('CallParticipants', () => {
     })
   })
 
+  describe('the scrollbar of the list', () => {
+    let observed
+    beforeEach(() => {
+      observed = null
+      global.ResizeObserver = class {
+        constructor(callback) {
+          observed = callback
+        }
+
+        observe() {}
+
+        disconnect() {}
+      }
+    })
+    afterEach(() => {
+      delete global.ResizeObserver
+    })
+
+    const widths = (offsetWidth, clientWidth) => {
+      const list = wrapper.find('ul').element
+      Object.defineProperty(list, 'offsetWidth', { value: offsetWidth, configurable: true })
+      Object.defineProperty(list, 'clientWidth', { value: clientWidth, configurable: true })
+    }
+    const room = () => wrapper.element.style.getPropertyValue('--call-participants-scrollbar')
+
+    it('gives the toolbar as much more room on the right as it takes', async () => {
+      wrapper = Wrapper()
+      expect(room()).toBe('0px')
+      widths(300, 285)
+      observed()
+      await wrapper.vm.$nextTick()
+      expect(room()).toBe('15px')
+      // Gone again, or one that only shows while scrolling: none.
+      widths(300, 300)
+      observed()
+      await wrapper.vm.$nextTick()
+      expect(room()).toBe('0px')
+    })
+  })
+
   describe('the moderation as a whole', () => {
     it('lets somebody who may step in take it over', async () => {
       wrapper = Wrapper({ mayTakeOver: true })
@@ -1390,6 +1478,43 @@ describe('CallParticipants', () => {
         mayTakeOver: true,
       })
       expect(wrapper.vm.mayToggleEveryone).toBe(true)
+    })
+
+    it('keeps its switch as it is while a row is being worked, so the toolbar does not flicker', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      let answer
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      const box = () => wrapper.find('[data-test="call-participants-everyone"] input')
+      wrapper.vm.setFloor(wrapper.vm.people[1], true)
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.busy).toBe(true)
+      expect(box().attributes('disabled')).toBeUndefined()
+      answer({ data: {} })
+      await flushPromises()
+      expect(wrapper.vm.busy).toBe(false)
+    })
+
+    it('waits with its switch while its own change is on its way', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      let answer
+      mocks.$apollo.mutate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            answer = resolve
+          }),
+      )
+      const box = () => wrapper.find('[data-test="call-participants-everyone"] input')
+      box().element.checked = true
+      await box().trigger('change')
+      expect(box().attributes('disabled')).toBe('disabled')
+      answer({ data: {} })
+      await flushPromises()
+      expect(box().attributes('disabled')).toBeUndefined()
     })
 
     it('offers nobody else the switch', () => {
