@@ -11,9 +11,17 @@ class FakeChannel {
   }
 
   postMessage(data) {
-    FakeChannel.open
-      .filter((other) => other !== this && other.name === this.name && !other.asleep)
-      .forEach((other) => other.onmessage && other.onmessage({ data }))
+    const deliver = () =>
+      FakeChannel.open
+        .filter((other) => other !== this && other.name === this.name && !other.asleep)
+        .forEach((other) => other.onmessage && other.onmessage({ data }))
+    // Queued, as a browser does: delivered once the sender has gone on.
+    if (FakeChannel.queued) FakeChannel.pending.push(deliver)
+    else deliver()
+  }
+
+  static flush() {
+    while (FakeChannel.pending.length) FakeChannel.pending.shift()()
   }
 
   close() {
@@ -21,6 +29,8 @@ class FakeChannel {
   }
 }
 FakeChannel.open = []
+FakeChannel.queued = false
+FakeChannel.pending = []
 
 // One page: the module as it loads, with the channel it opened.
 const load = () => {
@@ -42,6 +52,8 @@ describe('tabClientId', () => {
   beforeEach(() => {
     window.sessionStorage.clear()
     FakeChannel.open = []
+    FakeChannel.queued = false
+    FakeChannel.pending = []
     global.BroadcastChannel = FakeChannel
   })
 
@@ -120,6 +132,25 @@ describe('tabClientId', () => {
       expect(reloaded.tabClientId()).not.toBe(copy.tabClientId())
       expect(copy.tabClientId()).toBe(id)
     })
+  })
+
+  it('stays when an answer to another tab’s question about it is heard', () => {
+    // A is in a call with X; B and C both come with a copy of X and ask at once. Each answer
+    // reaches every tab, A included.
+    FakeChannel.queued = true
+    const a = load()
+    FakeChannel.flush()
+    const x = a.tabClientId()
+    window.sessionStorage.setItem(KEY, x)
+    const b = load()
+    window.sessionStorage.setItem(KEY, x)
+    const c = load()
+    FakeChannel.flush()
+
+    expect(a.tabClientId()).toBe(x)
+    expect(b.tabClientId()).not.toBe(x)
+    expect(c.tabClientId()).not.toBe(x)
+    expect(b.tabClientId()).not.toBe(c.tabClientId())
   })
 
   it('is a new one after a page ended without pagehide, a known limit', () => {

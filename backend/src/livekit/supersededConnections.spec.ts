@@ -108,6 +108,14 @@ describe('supersededConnections', () => {
     expect(supersededConnections(connections)).toEqual([])
   })
 
+  it('are those whose token was issued before, whatever order they joined in', () => {
+    // A join the tab gave up reached the media server after the one it went on with.
+    const kept = connection('ute#tab-aaaa1#100-aaaaaaaa', 9_000)
+    const givenUp = connection('ute#tab-aaaa1#0zz-bbbbbbbb', 10_000)
+
+    expect(supersededConnections([kept, givenUp])).toEqual([givenUp])
+  })
+
   it('are the older ones only, while two newest ones are tied', () => {
     const connections = [
       connection('ute#tab-aaaa1#01', 5_000),

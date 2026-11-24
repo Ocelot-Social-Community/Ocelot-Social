@@ -24,6 +24,9 @@ const VALID = /^[A-Za-z0-9_-]{8,64}$/
 
 let id = null
 let channel = null
+// What this tab's latest question carried: an answer counts only for it, not for another tab's
+// question about the same id, which this one may hear as well.
+let asked = null
 
 const newId = () => {
   const random =
@@ -71,9 +74,12 @@ const openChannel = () => {
     opened.onmessage = ({ data }) => {
       if (!data || !id) return
       // Another tab asks for the id this one has: it is taken.
-      if (data.ask === id) opened.postMessage({ taken: id })
+      if (data.ask === id) opened.postMessage({ taken: id, question: data.question })
       // This tab asked, and another one has it already: a new one for this tab.
-      else if (data.taken === id) id = newId()
+      else if (data.taken === id && asked && data.question === asked) {
+        id = newId()
+        asked = null
+      }
     }
     return opened
   } catch (_e) {
@@ -84,7 +90,8 @@ const openChannel = () => {
 const askOthers = () => {
   if (!channel || !id) return
   try {
-    channel.postMessage({ ask: id })
+    asked = newId()
+    channel.postMessage({ ask: id, question: asked })
   } catch (_e) {
     /* closed: no other tab to ask */
   }

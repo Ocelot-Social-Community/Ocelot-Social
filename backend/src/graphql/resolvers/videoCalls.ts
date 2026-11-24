@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-import { randomBytes } from 'node:crypto'
 
 import { withFilter } from 'graphql-subscriptions'
 import { AccessToken, TwirpError } from 'livekit-server-sdk'
@@ -19,6 +18,7 @@ import { settleAndPublishModeration } from '@src/livekit/moderationService'
 import {
   groupIdFromRoomName,
   identityFor,
+  joinSuffix,
   liveKitConfigOf,
   roomNameForGroup,
   roomServiceFor,
@@ -538,11 +538,7 @@ export default {
       }
       // With the tab's id, so that a connection the tab left behind is taken out once it joins
       // anew (see supersededConnections), while the user's other tabs and devices stay.
-      const identity = identityFor(
-        String(context.user.id),
-        params.clientId,
-        randomBytes(4).toString('hex'),
-      )
+      const identity = identityFor(String(context.user.id), params.clientId, joinSuffix())
       const { avatarUrl, slug } = await getUserCallProfile(context.driver, context.user.id)
       const at = new AccessToken(
         context.config.LIVEKIT_API_KEY,

@@ -26,7 +26,7 @@ import { allGroupPermissionKeys } from '@src/groupPermission'
 import { dominatesInGroup } from '@src/groupRole/authority'
 import { parseStoredPermissions } from '@src/groupRole/storedPermissions'
 import { OWNER_ROLE } from '@src/groupRole/types'
-import { clientKeyOf } from '@src/livekit/rooms'
+import { clientKeyOf, issuedAtOf } from '@src/livekit/rooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -462,26 +462,37 @@ export const listConnections = async (
  * as the tab keeps it open. The user's other tabs and devices are never among them, nor are
  * connections without a tab id (clientKeyOf).
  *
- * Only one that joined before the newest is superseded: of two whose join times are the same —
- * a media server that tells whole seconds only — which is the newer cannot be said, so both stay
- * until a later look tells them apart, or the older one leaves on its own.
+ * The newer is the one whose join token was issued later (see joinSuffix): the attempt the tab
+ * went on with, even when one it gave up reached the media server after it. Only for identities
+ * that do not say when, by when they joined. Where it cannot be said which is the newer — the
+ * same time, or a join time the media server does not tell — both stay, until a later look tells
+ * them apart, or the older one leaves on its own.
  */
 export const supersededConnections = (connections: Connection[]): Connection[] => {
-  const newest = new Map<string, Connection>()
+  // Whether `later` is known to be the newer of the two: by when their tokens were issued where
+  // both say, as an attempt the tab gave up may reach the media server after the one it went on
+  // with; else by when they joined, which an unknown time cannot tell.
+  const isNewer = (later: Connection, earlier: Connection) => {
+    const issuedLater = issuedAtOf(later.identity)
+    const issuedEarlier = issuedAtOf(earlier.identity)
+    if (issuedLater !== null && issuedEarlier !== null) {
+      return issuedEarlier < issuedLater
+    }
+    const joined = earlier.joinedAtMs ?? 0
+    return joined > 0 && joined < (later.joinedAtMs ?? 0)
+  }
+  const kept = new Map<string, Connection>()
   for (const connection of connections) {
     const key = clientKeyOf(connection.identity)
-    if (key) {
-      newest.set(key, connection)
+    const current = key !== null ? kept.get(key) : undefined
+    if (key !== null && (!current || isNewer(connection, current))) {
+      kept.set(key, connection)
     }
   }
   return connections.filter((connection) => {
     const key = clientKeyOf(connection.identity)
-    const kept = key !== null ? newest.get(key) : undefined
-    // Without a time of its own, a connection cannot be said to have joined first.
-    const joined = connection.joinedAtMs ?? 0
-    return (
-      kept !== undefined && kept !== connection && joined > 0 && joined < (kept.joinedAtMs ?? 0)
-    )
+    const newest = key !== null ? kept.get(key) : undefined
+    return newest !== undefined && newest !== connection && isNewer(newest, connection)
   })
 }
 

@@ -1,5 +1,7 @@
 // The media server's rooms as the backend names and reaches them. Shared by the call resolvers,
 // the moderation of a call, the poller and the webhook.
+import { randomBytes } from 'node:crypto'
+
 import { RoomServiceClient } from 'livekit-server-sdk'
 
 import CONFIG from '@config/index'
@@ -55,6 +57,22 @@ const CLIENT_ID = /^[A-Za-z0-9_-]{8,64}$/
  */
 export const identityFor = (userId: string, clientId: string | null | undefined, suffix: string) =>
   clientId && CLIENT_ID.test(clientId) ? `${userId}#${clientId}#${suffix}` : `${userId}#${suffix}`
+
+/**
+ * The last part of a new identity: when its join token was issued, in milliseconds (base 36),
+ * and something random. Every attempt to join takes a token of its own as it begins, so of two
+ * connections of one tab the one with the later token is the attempt the tab went on with —
+ * whatever order the media server saw them come in (see supersededConnections).
+ */
+export const joinSuffix = (issuedAtMs: number = Date.now()) =>
+  `${issuedAtMs.toString(36)}-${randomBytes(4).toString('hex')}`
+
+/** When the token of a tab's connection was issued (see joinSuffix); null if it does not say. */
+export const issuedAtOf = (identity: string): number | null => {
+  const parts = identity.split('#')
+  const match = parts.length === 3 ? /^([0-9a-z]+)-[0-9a-f]+$/.exec(parts[2]) : null
+  return match ? parseInt(match[1], 36) : null
+}
 
 /** The user and tab a connection was joined from, `<userId>#<clientId>`; null without a tab id. */
 export const clientKeyOf = (identity: string): string | null => {

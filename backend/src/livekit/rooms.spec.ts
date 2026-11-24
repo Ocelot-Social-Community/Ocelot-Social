@@ -11,8 +11,15 @@ vi.mock('@config/index', () => ({
   },
 }))
 
-const { clientKeyOf, groupIdFromRoomName, identityFor, roomNameForGroup, roomPrefix } =
-  await import('./rooms')
+const {
+  clientKeyOf,
+  groupIdFromRoomName,
+  identityFor,
+  issuedAtOf,
+  joinSuffix,
+  roomNameForGroup,
+  roomPrefix,
+} = await import('./rooms')
 
 describe('the names of the rooms', () => {
   it('are group-<id> without a prefix of the instance', () => {
@@ -68,5 +75,24 @@ describe('the identity of a connection', () => {
     expect(clientKeyOf('ute')).toBeNull()
     expect(clientKeyOf('ute#tab-aaaa1#ab12#more')).toBeNull()
     expect(clientKeyOf('#tab-aaaa1#ab12')).toBeNull()
+  })
+})
+
+describe('joinSuffix', () => {
+  it('says when its token was issued, readable again from the identity', () => {
+    const suffix = joinSuffix(1_700_000_000_123)
+
+    expect(suffix).toMatch(/^[0-9a-z]+-[0-9a-f]{8}$/)
+    expect(issuedAtOf(identityFor('ute', 'tab-aaaa1', suffix))).toBe(1_700_000_000_123)
+  })
+
+  it('differs for two tokens issued in the same millisecond', () => {
+    expect(joinSuffix(1)).not.toBe(joinSuffix(1))
+  })
+
+  it('tells nothing for an identity that does not say when', () => {
+    expect(issuedAtOf('ute#tab-aaaa1#ab12')).toBeNull()
+    expect(issuedAtOf('ute#ab12')).toBeNull()
+    expect(issuedAtOf('ute#lkx1-ab12')).toBeNull()
   })
 })
