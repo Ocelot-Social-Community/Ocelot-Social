@@ -1,5 +1,6 @@
 import { storiesOf } from '@storybook/vue'
 import PreJoin from '~/components/VideoCall/PreJoin.vue'
+import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import helpers from '~/storybook/helpers'
 
 helpers.init()
@@ -29,10 +30,12 @@ const fakePermissions = {
 storiesOf('PreJoin', module)
   .addDecorator(helpers.layout)
   // The pre-join dialog as a phone shows it: VideoCall makes it fill the screen below 810px
-  // (video-call--modal), and the dialog scrolls inside. The join button has to be in view without
-  // scrolling, at every phone size (#11079) — see PreJoin.visual.spec.js.
+  // (video-call--modal), its header above the device setup, and the dialog scrolls inside. The
+  // join button has to be in view without scrolling, at every phone size (#11079) — see
+  // PreJoin.visual.spec.js. The header is the call's own (compact RoomHeader), so the setup gets
+  // no more height here than in the call.
   .add('full screen', () => ({
-    components: { PreJoin },
+    components: { PreJoin, RoomHeader },
     store: helpers.store,
     beforeCreate() {
       // Before PreJoin mounts and asks for the devices.
@@ -47,6 +50,12 @@ storiesOf('PreJoin', module)
     },
     template: `
       <div style="position: fixed; inset: 0; display: flex; flex-direction: column">
+        <room-header
+          compact
+          show-group-icon
+          :profile="{ id: 'g1', name: 'Yoga Practice' }"
+          title="Yoga Practice"
+        />
         <pre-join />
       </div>`,
   }))
