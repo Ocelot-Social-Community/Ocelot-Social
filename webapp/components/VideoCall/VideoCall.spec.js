@@ -1594,6 +1594,21 @@ describe('VideoCall', () => {
       expect(leave).toHaveBeenCalled()
     })
 
+    it('takes a room left behind being taken out for nothing of the call on show', async () => {
+      // The server takes out what this tab left behind once it is in again (#10682): that old
+      // room is told it was removed, which must not end the call the user is in now.
+      const { wrapper } = factory({ show: false, groupId: 'g1', groupSlug: 'yoga' })
+      withApollo(wrapper)
+      await wrapper.vm.connect()
+      const leftBehind = wrapper.vm.room
+      wrapper.vm.room = { ...leftBehind }
+      const leave = jest.spyOn(wrapper.vm, 'leave').mockResolvedValue()
+      const tellRemoved = jest.spyOn(wrapper.vm, 'tellRemoved')
+      leftBehind.handlers.Disconnected('PARTICIPANT_REMOVED')
+      expect(leave).not.toHaveBeenCalled()
+      expect(tellRemoved).not.toHaveBeenCalled()
+    })
+
     describe('hung up while the devices come up', () => {
       let Room
       beforeEach(async () => {

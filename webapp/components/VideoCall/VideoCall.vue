@@ -2864,6 +2864,9 @@ export default {
         // the caller already drives the next step and a re-entrant leave()
         // would clobber the retry/leave flow.
         room.on(RoomEvent.Disconnected, (reason) => {
+          // Only the call on show. A room this tab left behind is taken out by the server once the
+          // tab is in again (#10682) — removed, but not from the call the user is in now.
+          if (this.room !== room) return
           if (reason === DisconnectReason.CLIENT_INITIATED) return
           // Removed by a moderator: said, unless the notice before it already did.
           if (reason === DisconnectReason.PARTICIPANT_REMOVED) this.tellRemoved()
