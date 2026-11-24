@@ -6,31 +6,25 @@
   >
     <!--
       What concerns the whole call: the moderation's own controls, and the filter. Somebody who
-      may step into the moderation is offered that instead. While "mute all" is being chosen, its
-      question and answers take the controls' place; the filter stays. While the filter's field is
-      open, the controls step aside for it, and its button keeps its place.
+      may step into the moderation is offered that instead. While "mute all" is being chosen, the
+      line holds only its red button at the front and a cross at the end that cancels it: the ticks
+      in the rows tell the rest, and the filter, which shows everybody meanwhile anyway, steps
+      aside. While the filter's field is open, the controls step aside for it, and its button
+      keeps its place.
     -->
     <!-- As high for everybody, the filter's field open or not, so that nothing jumps. -->
     <div class="call-participants__toolbar" data-test="call-participants-toolbar">
-      <h3
-        v-if="muting"
-        class="call-participants__muting-title"
-        data-test="call-participants-muting"
-      >
+      <!-- The question, for a screen reader: the eye has the ticks in the rows. -->
+      <h3 v-if="muting" class="call-participants__sr-only" data-test="call-participants-muting">
         {{ $t('videoCall.participants.muteWhom') }}
       </h3>
-      <!-- Its answers stand where the moderation's controls stood, the filter behind them. -->
-      <div class="call-participants__toolbar-actions">
+      <div
+        :class="[
+          'call-participants__toolbar-actions',
+          { 'call-participants__toolbar-actions--muting': muting },
+        ]"
+      >
         <template v-if="muting">
-          <os-button
-            data-test="mute-all-cancel"
-            appearance="outline"
-            variant="primary"
-            size="sm"
-            @click="stopMuting"
-          >
-            {{ $t('actions.cancel') }}
-          </os-button>
           <os-button
             data-test="mute-all-confirm"
             variant="danger"
@@ -40,6 +34,24 @@
             @click="muteAll"
           >
             {{ $t('videoCall.participants.muteCount', { count: muteCount }) }}
+          </os-button>
+          <!--
+            Where the filter's button stands otherwise. Ghost, unlike the sidebar's cross right
+            above it, which closes the whole sidebar.
+          -->
+          <os-button
+            v-tooltip="$t('videoCall.participants.muteCancel')"
+            data-test="mute-all-cancel"
+            variant="primary"
+            appearance="ghost"
+            circle
+            size="sm"
+            :aria-label="$t('videoCall.participants.muteCancel')"
+            @click="stopMuting"
+          >
+            <template #icon>
+              <os-icon :icon="icons.close" />
+            </template>
           </os-button>
         </template>
         <os-button
@@ -88,6 +100,7 @@
           the next time.
         -->
         <span
+          v-if="!muting"
           :class="['call-participants__filter', { 'call-participants__filter--open': filterOpen }]"
           data-test="call-participants-filter"
         >
@@ -1530,10 +1543,10 @@ export default {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
-.call-participants__muting-title {
-  margin: 0;
-  font-size: var(--font-size-base);
-  font-weight: bold;
+/*  The red button at the front, the cross at the end, where the filter's button stands
+    otherwise. Set on the line, not on the cross: a scoped rule does not reach an OsButton's root. */
+.call-participants__toolbar-actions--muting {
+  justify-content: space-between;
 }
 .call-participants__pick {
   flex: 0 0 auto;

@@ -227,17 +227,13 @@ describe('CallParticipants', () => {
 
     it('empties the name with the cross or Esc, and folds away on a second Esc', async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
-      // "Mute all" chosen first: its button steps aside while the field is open.
-      await find('mute-all').trigger('click')
       await find('filter-toggle').trigger('click')
       await find('filter-name').setValue('bo')
       await find('filter-clear').trigger('click')
       expect(wrapper.vm.filterName).toBe('')
       await find('filter-name').setValue('bo')
-      // Esc in the field leaves "mute all" alone.
       await find('filter-name').trigger('keydown', { key: 'Escape' })
       expect(wrapper.vm.filterName).toBe('')
-      expect(wrapper.vm.muting).toBe(true)
       await find('filter-name').trigger('keydown', { key: 'Escape' })
       expect(find('filter-name').exists()).toBe(false)
     })
@@ -1032,6 +1028,26 @@ describe('CallParticipants', () => {
       expect(wrapper.find('[data-test="mute-all-pick-bob"]').exists()).toBe(false)
       expect(wrapper.find('[data-test="call-participant-menu-bob"]').exists()).toBe(true)
       expect(wrapper.emitted('switch-off')).toBeUndefined()
+    })
+
+    it('has only its red button and a cross to cancel in the toolbar, the filter stepping aside', async () => {
+      wrapper = Wrapper({ moderation: moderatedByMe })
+      const toolbar = () => wrapper.find('[data-test="call-participants-toolbar"]')
+      expect(toolbar().find('[data-test="call-participants-filter"]').exists()).toBe(true)
+      await wrapper.find('[data-test="call-participants-mute-all"]').trigger('click')
+      const actions = toolbar()
+        .findAll('button')
+        .wrappers.map((button) => button.attributes('data-test'))
+      expect(actions).toEqual(['mute-all-confirm', 'mute-all-cancel'])
+      expect(wrapper.find('[data-test="mute-all-cancel"]').attributes('aria-label')).toBe(
+        'videoCall.participants.muteCancel',
+      )
+      // The question stays, for a screen reader.
+      expect(wrapper.find('[data-test="call-participants-muting"]').classes()).toContain(
+        'call-participants__sr-only',
+      )
+      await wrapper.find('[data-test="mute-all-cancel"]').trigger('click')
+      expect(toolbar().find('[data-test="call-participants-filter"]').exists()).toBe(true)
     })
 
     it('goes back to the list as it was when cancelled, by button or by Escape', async () => {
