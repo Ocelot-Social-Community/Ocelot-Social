@@ -416,6 +416,9 @@ export default {
       hoveredTemplate: null,
       // How the last press on a template card came: 'mouse', 'touch' or 'pen' (chooseTemplate).
       lastPointerType: null,
+      // The card last tapped: a tap has no hover to keep its reason in view, so it stays
+      // explained until another pick. Its own field, so clearing it never drops a live hover.
+      touchPinnedTemplate: null,
       focusedTemplate: null,
       // Exposed for the template (see the category validation hint below) —
       // bare module-scope reads don't resolve there, unlike in the script.
@@ -587,10 +590,16 @@ export default {
     },
     /**
      * Which template the line under the cards explains: the one pointed at, else the one
-     * focused, else the one picked.
+     * tapped, else the one focused, else the one picked.
      */
     describedTemplate() {
-      return this.hoveredTemplate || this.focusedTemplate || this.formData.template || null
+      return (
+        this.hoveredTemplate ||
+        this.touchPinnedTemplate ||
+        this.focusedTemplate ||
+        this.formData.template ||
+        null
+      )
     },
     /**
      * The cards on the create form: every template, with the glyph and the right it costs.
@@ -711,20 +720,18 @@ export default {
         if (this.lastPointerType === 'touch') {
           // A tap has no hover to keep the reason in view, and a browser may report the finger
           // leaving the card before the click: the tapped card stays explained, until the next tap.
-          this.hoveredTemplate = choice.name
+          this.touchPinnedTemplate = choice.name
         } else {
+          this.touchPinnedTemplate = null
           this.focusedTemplate = null
         }
       } else {
         // Space or Enter: the keyboard is on this card, even where an earlier mouse click had
         // dropped the focus it left (the focus itself did not move, so no focus event says so).
         this.focusedTemplate = choice.name
-        // A card pinned by an earlier tap would outrank it; a real mouse hover stays, the pointer
-        // is still on that card and leaving it goes back to this one.
-        if (this.lastPointerType === 'touch') {
-          this.hoveredTemplate = null
-          this.lastPointerType = null
-        }
+        // A card pinned by an earlier tap would outrank it; a live mouse hover stays, leaving
+        // that card goes back to this one.
+        this.touchPinnedTemplate = null
       }
       // Refused cards stay focusable (aria-disabled, not disabled) so the keyboard reaches the
       // reason under the row; picking one is what is refused, here.
