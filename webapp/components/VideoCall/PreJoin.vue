@@ -796,7 +796,9 @@ export default {
   position: sticky;
   bottom: 0;
   display: flex;
-  justify-content: flex-end;
+  /*  Centred, as the device toggles above: right-aligned in a panel only a little wider than  */
+  /*  the two buttons, they looked centred by mistake, a few pixels off.                      */
+  justify-content: center;
   gap: var(--space-x-small);
   margin: auto calc(-1 * var(--space-base)) calc(-1 * var(--space-base));
   padding: var(--space-small) var(--space-base) var(--space-base);
