@@ -660,7 +660,13 @@ jobs:
           git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" readme-screenshots
 
   e2e_status:
-    name: E2E | Status
+    # The required check is `E2E | Status`. In the pull_request run of a branch of this repository
+    # the job is skipped (below) and carries a different name on purpose: a skipped job still leaves
+    # a check of its name on the commit, and GitHub counts a skipped required check as passed. While
+    # the push run's status job still waited for the matrix — and so had no check yet — that skipped
+    # twin alone satisfied the rule, and a pull request could enter the merge queue with its E2E
+    # tests still running.
+    name: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) && 'E2E | Status (covered by the push run)' || 'E2E | Status' }}
     # always(), so a failed matrix still reports — but not in the pull_request run of a branch of
     # this repository, where every job above is skipped on purpose and this one would report a
     # failure for tests that run in the push run instead.
