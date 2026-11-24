@@ -719,6 +719,12 @@ export default {
         // Space or Enter: the keyboard is on this card, even where an earlier mouse click had
         // dropped the focus it left (the focus itself did not move, so no focus event says so).
         this.focusedTemplate = choice.name
+        // A card pinned by an earlier tap would outrank it; a real mouse hover stays, the pointer
+        // is still on that card and leaving it goes back to this one.
+        if (this.lastPointerType === 'touch') {
+          this.hoveredTemplate = null
+          this.lastPointerType = null
+        }
       }
       // Refused cards stay focusable (aria-disabled, not disabled) so the keyboard reaches the
       // reason under the row; picking one is what is refused, here.

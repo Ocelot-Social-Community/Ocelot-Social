@@ -1070,6 +1070,42 @@ describe('GroupForm', () => {
       expect(wrapper.vm.describedTemplate).toBe('hidden')
     })
 
+    it('explains a card activated from the keyboard after a tap pinned another one', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      const tap = new Event('pointerdown')
+      tap.pointerType = 'touch'
+      card('hidden').element.dispatchEvent(tap)
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+
+      card('channel').element.dispatchEvent(new Event('focus'))
+      card('channel').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
+    it('keeps a real mouse hover described over a card activated from the keyboard', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      const point = new Event('pointerdown')
+      point.pointerType = 'mouse'
+      card('hidden').element.dispatchEvent(point)
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+
+      card('channel').element.dispatchEvent(new Event('focus'))
+      card('channel').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
     it('keeps explaining a card activated from the keyboard, where the focus is real', async () => {
       const wrapper = mountWith(canExceptHidden, twoTemplates)
       const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
