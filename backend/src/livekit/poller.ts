@@ -19,7 +19,7 @@ import { getDriver } from '@src/db/neo4j'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import { endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
 import { settleAndPublishModeration } from '@src/livekit/moderationService'
-import { roomPrefix } from '@src/livekit/rooms'
+import { peopleIn, roomPrefix } from '@src/livekit/rooms'
 import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -98,29 +98,41 @@ const pollOnce = async () => {
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const listed = Number(room.numParticipants ?? 0) || 0
-      // Who is there: as listed, or as the participants themselves say for a told room.
+      // How many connections: as listed, or as the participants themselves say when they are
+      // asked below.
       let count = listed
       if (lastSeenCounts.get(room.name) !== listed || told.has(room.name)) {
-        if (told.has(room.name)) {
-          // The correction for a told room asks the participants themselves, as the count query
-          // does: the room list can lag behind them, and its count, published as "the truth",
-          // would put a call everybody just left back to 1 (#10508). If they cannot be asked,
-          // the room stays owed for the next poll rather than corrected with the list.
-          try {
-            const participants = await withTimeout(
-              client.listParticipants(room.name),
-              POLL_TIMEOUT_MS,
-              'listParticipants',
-            )
+        // What is published is how many PEOPLE are in the call, which only the participants tell:
+        // the list counts connections, a user on two devices twice. For a told room it is also
+        // the correction the count query gets: the room list can lag behind the participants,
+        // and its count, published as "the truth", would put a call everybody just left back to
+        // 1 (#10508). If they cannot be asked, the room stays owed for the next poll.
+        let people: number
+        try {
+          const participants = await withTimeout(
+            client.listParticipants(room.name),
+            POLL_TIMEOUT_MS,
+            'listParticipants',
+          )
+          if (told.has(room.name)) {
             count = participants.length
-            // eslint-disable-next-line no-catch-all/no-catch-all
-          } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err)
-            logger.warn('LiveKit poll: listParticipants failed for', room.name, message)
-            continue
+            people = peopleIn(participants)
+          } else {
+            // Nobody among the participants yet while the list has somebody: they lag behind it,
+            // as when a call has just begun. Not published as an empty call; the list's count
+            // until the next change.
+            people = participants.length > 0 ? peopleIn(participants) : listed
           }
+          // eslint-disable-next-line no-catch-all/no-catch-all
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : String(err)
+          logger.warn('LiveKit poll: listParticipants failed for', room.name, message)
+          continue
         }
-        await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
+        await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, {
+          groupId,
+          count: people,
+        })
         // Only once it is out: a count noted before a publish that failed would look published
         // to the next poll, which would then keep quiet about it. What is noted is the LIST's
         // count, which the next poll compares with — a list still lagging behind the

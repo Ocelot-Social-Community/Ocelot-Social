@@ -2223,11 +2223,14 @@ export default {
         /* without the answer the list does not offer it */
       }
     },
-    // Hanging up as the last moderator while others stay asks who moderates on.
+    // Hanging up as the last moderator while others stay asks who moderates on — not while one
+    // stays in the call on another device: then one does not leave it, and moderates on.
     isLastModerator() {
       const me = this.currentUser && this.currentUser.id
+      const self = this.people.find((person) => person.isMe)
       return (
         this.phase === 'in-call' &&
+        !(self && self.devices > 1) &&
         !this.moderation.everyone &&
         this.moderation.moderators.includes(me) &&
         !this.people.some(

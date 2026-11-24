@@ -58,3 +58,19 @@ export const userIdOf = (participant: { identity?: string; metadata?: string }):
   const [userId] = (participant.identity ?? '').split('#')
   return userId || null
 }
+
+// How many people are in a call: a user on several tabs or devices once. A connection nobody can
+// be told behind counts on its own, so that a call with somebody in it never counts as empty.
+export const peopleIn = (participants: { identity?: string; metadata?: string }[]): number => {
+  const users = new Set<string>()
+  let unknown = 0
+  for (const participant of participants) {
+    const userId = userIdOf(participant)
+    if (userId) {
+      users.add(userId)
+    } else {
+      unknown += 1
+    }
+  }
+  return users.size + unknown
+}

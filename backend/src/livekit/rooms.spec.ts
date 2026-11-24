@@ -11,7 +11,7 @@ vi.mock('@config/index', () => ({
   },
 }))
 
-const { groupIdFromRoomName, roomNameForGroup, roomPrefix } = await import('./rooms')
+const { groupIdFromRoomName, peopleIn, roomNameForGroup, roomPrefix } = await import('./rooms')
 
 describe('the names of the rooms', () => {
   it('are group-<id> without a prefix of the instance', () => {
@@ -41,5 +41,22 @@ describe('the names of the rooms', () => {
     expect(groupIdFromRoomName('group-')).toBeNull()
     expect(groupIdFromRoomName(null)).toBeNull()
     expect(groupIdFromRoomName(undefined)).toBeNull()
+  })
+})
+
+describe('peopleIn', () => {
+  it('counts a user on several tabs or devices once', () => {
+    expect(
+      peopleIn([
+        { identity: 'peter#1', metadata: '{"userId":"peter"}' },
+        { identity: 'peter#2', metadata: '{"userId":"peter"}' },
+        { identity: 'udo#3' },
+      ]),
+    ).toBe(2)
+  })
+
+  it('counts a connection nobody can be told behind on its own, so a call is never empty', () => {
+    expect(peopleIn([{ identity: '' }, { identity: '' }])).toBe(2)
+    expect(peopleIn([])).toBe(0)
   })
 })

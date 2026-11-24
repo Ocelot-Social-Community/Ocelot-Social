@@ -872,18 +872,21 @@ describe('handOverVideoCallModeration', () => {
     expect((await state())?.moderatorIds).toEqual(['udo'])
   })
 
-  it('lets everybody moderate, said once', async () => {
+  it('lets everybody moderate, said once, with one of the others named moderator', async () => {
     inCall('ute', 'udo')
     const sessionId = await open('ute')
     as('ute')
     await handOver({ everyone: true })
 
-    expect(await state()).toMatchObject({ everyoneModerates: true, moderatorIds: [] })
+    // Somebody has to be able to end it: not the one leaving.
+    expect(await state()).toMatchObject({ everyoneModerates: true, moderatorIds: ['udo'] })
 
     await setModerator(database.driver, sessionId, 'ute', { moderator: true })
     await handOver({ everyone: true })
 
-    expect(told()).toEqual([{ type: 'everyoneModerates', by: 'Ute', to: 'all' }])
+    expect(told().filter(({ type }) => type === 'everyoneModerates')).toEqual([
+      { type: 'everyoneModerates', by: 'Ute', to: 'all' },
+    ])
   })
 
   it('changes nothing for one who is no moderator named as such', async () => {

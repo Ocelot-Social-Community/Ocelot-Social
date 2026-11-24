@@ -564,14 +564,32 @@ describe('poll tick', () => {
       })
     })
 
-    it('asks only for told rooms, and trusts the list for the others', async () => {
+    it('counts the people of a changed room, a user on two devices once', async () => {
+      startLiveKitPoller()
+      mockListRooms.mockResolvedValueOnce([{ name: 'group-a', sid: 'RM_a', numParticipants: 3 }])
+      mockListParticipants.mockResolvedValueOnce([
+        { identity: 'peter#tab-aaaa1#1' },
+        { identity: 'peter#tab-bbbb1#2' },
+        { identity: 'udo#tab-cccc1#3' },
+      ])
+      await vi.advanceTimersByTimeAsync(5_000)
+
+      expect(mockListParticipants).toHaveBeenCalledWith('group-a')
+      expect(mockPublish).toHaveBeenCalledWith('VIDEO_CALL_PARTICIPANT_COUNT_CHANGED', {
+        groupId: 'a',
+        count: 2,
+      })
+    })
+
+    it('trusts the list for a room whose participants lag behind it', async () => {
       startLiveKitPoller()
       mockListRooms.mockResolvedValueOnce([
         { name: 'group-a', sid: 'RM_a', numParticipants: 2, metadata: '{"moderation":null}' },
       ])
+      // The participants do not show anybody yet.
+      mockListParticipants.mockResolvedValueOnce([])
       await vi.advanceTimersByTimeAsync(5_000)
 
-      expect(mockListParticipants).not.toHaveBeenCalled()
       // Somebody came: the moderation is checked for the room.
       expect(mockSettle).toHaveBeenCalledWith(expect.objectContaining({ driver: 'driver' }), 'a', {
         published: '{"moderation":null}',
