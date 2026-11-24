@@ -4500,7 +4500,11 @@ export default {
 
 /*  The question who moderates on, over the whole call. */
 .video-call__handover {
-  position: absolute;
+  /*  In the middle of the browser window, over the whole page: the minimized call is far too
+      small for it. Fixed, not absolute — no ancestor of it has a transform or a filter that
+      would hold it in the call's box instead, and the call's overflow does not clip it. In the
+      browser's full screen, the call is all there is, and the dialog stays in it. */
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
