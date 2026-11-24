@@ -770,18 +770,17 @@ export default {
       return this.moderation.speakers.includes(userId)
     },
     // What sets somebody apart, in order; the roles in the call stand out in colour. Each knows
-    // what goes before it: ": " after "you", " – " between the others. While everybody
-    // moderates, everybody is marked as moderating, and those named as such, who alone can end
-    // it, as leading the moderation.
+    // what goes before it: ": " after "you", " – " between the others. Those named as moderators
+    // stay "moderator" whatever happens; while everybody moderates, everybody else is marked as
+    // "co-moderator".
     badges(person) {
       const marks = [
         person.isMe && { key: 'you', text: this.$t('videoCall.you') },
         (this.moderation.everyone || this.isNamedModerator(person.userId)) && {
           key: 'moderator',
-          text:
-            this.moderation.everyone && this.isNamedModerator(person.userId)
-              ? this.$t('videoCall.participants.leadModerator')
-              : this.$t('videoCall.participants.moderator'),
+          text: this.isNamedModerator(person.userId)
+            ? this.$t('videoCall.participants.moderator')
+            : this.$t('videoCall.participants.coModerator'),
           role: true,
         },
         this.hasFloor(person.userId) && {
