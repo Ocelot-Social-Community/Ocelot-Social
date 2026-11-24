@@ -420,6 +420,8 @@ export const settleModeration = async (
 export interface Connection {
   identity: string
   userId: string | null
+  /** When it joined, in milliseconds; 0 where the media server does not say. */
+  joinedAtMs?: number
   /** `source` as the protocol numbers it (see SOURCE). */
   tracks: { sid: string; source: number; muted: boolean }[]
 }
@@ -444,6 +446,7 @@ export const listConnections = async (
     .map((participant) => ({
       identity: participant.identity,
       userId: userIdOf(participant),
+      joinedAtMs: joinedAtMs(participant),
       tracks: participant.tracks.map((track) => ({
         sid: track.sid,
         source: track.source,
@@ -458,6 +461,10 @@ export const listConnections = async (
  * a failed join, a crashed page, a reload — and would stay as a second self, silent, for as long
  * as the tab keeps it open. The user's other tabs and devices are never among them, nor are
  * connections without a tab id (clientKeyOf).
+ *
+ * Only one that joined before the newest is superseded: of two whose join times are the same —
+ * a media server that tells whole seconds only — which is the newer cannot be said, so both stay
+ * until a later look tells them apart, or the older one leaves on its own.
  */
 export const supersededConnections = (connections: Connection[]): Connection[] => {
   const newest = new Map<string, Connection>()
@@ -469,7 +476,12 @@ export const supersededConnections = (connections: Connection[]): Connection[] =
   }
   return connections.filter((connection) => {
     const key = clientKeyOf(connection.identity)
-    return key !== null && newest.get(key) !== connection
+    const kept = key !== null ? newest.get(key) : undefined
+    return (
+      kept !== undefined &&
+      kept !== connection &&
+      (connection.joinedAtMs ?? 0) < (kept.joinedAtMs ?? 0)
+    )
   })
 }
 

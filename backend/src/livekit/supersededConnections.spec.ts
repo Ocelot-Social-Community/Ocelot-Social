@@ -39,7 +39,12 @@ const config = {
   LIVEKIT_API_SECRET: 'secret',
 }
 
-const connection = (identity: string) => ({ identity, userId: identity.split('#')[0], tracks: [] })
+const connection = (identity: string, joinedAtMs: number) => ({
+  identity,
+  userId: identity.split('#')[0],
+  joinedAtMs,
+  tracks: [],
+})
 
 const participant = (identity: string, joinedAt: bigint, joinedAtMs?: bigint) => ({
   identity,
@@ -60,9 +65,9 @@ beforeEach(() => {
 describe('supersededConnections', () => {
   it('are the older connections of a tab that has joined anew', () => {
     const connections = [
-      connection('ute#tab-aaaa1#01'),
-      connection('ute#tab-aaaa1#02'),
-      connection('ute#tab-aaaa1#03'),
+      connection('ute#tab-aaaa1#01', 1000),
+      connection('ute#tab-aaaa1#02', 2000),
+      connection('ute#tab-aaaa1#03', 3000),
     ]
 
     expect(supersededConnections(connections)).toEqual([connections[0], connections[1]])
@@ -70,21 +75,41 @@ describe('supersededConnections', () => {
 
   it("are none of the user's other tabs and devices", () => {
     // Two devices of the same user, each in the call once: both stay.
-    const connections = [connection('ute#laptop-01#01'), connection('ute#phone-001#02')]
+    const connections = [connection('ute#laptop-01#01', 1000), connection('ute#phone-001#02', 2000)]
 
     expect(supersededConnections(connections)).toEqual([])
   })
 
   it("are none of somebody else's, even with the same tab id", () => {
-    const connections = [connection('ute#tab-aaaa1#01'), connection('udo#tab-aaaa1#02')]
+    const connections = [connection('ute#tab-aaaa1#01', 1000), connection('udo#tab-aaaa1#02', 2000)]
 
     expect(supersededConnections(connections)).toEqual([])
   })
 
   it('are none of the connections without a tab id, as of an older webapp', () => {
-    const connections = [connection('ute#01'), connection('ute#02')]
+    const connections = [connection('ute#01', 1000), connection('ute#02', 2000)]
 
     expect(supersededConnections(connections)).toEqual([])
+  })
+
+  it('are none of two whose join times cannot tell which is the newer', () => {
+    // A media server that tells whole seconds only: both joined in the same one.
+    const connections = [
+      connection('ute#tab-aaaa1#01', 10_000),
+      connection('ute#tab-aaaa1#02', 10_000),
+    ]
+
+    expect(supersededConnections(connections)).toEqual([])
+  })
+
+  it('are the older ones only, while two newest ones are tied', () => {
+    const connections = [
+      connection('ute#tab-aaaa1#01', 5_000),
+      connection('ute#tab-aaaa1#02', 10_000),
+      connection('ute#tab-aaaa1#03', 10_000),
+    ]
+
+    expect(supersededConnections(connections)).toEqual([connections[0]])
   })
 })
 
@@ -143,6 +168,17 @@ describe('dropSupersededConnections', () => {
 
     await expect(dropSupersededConnections(config, 'g1')).resolves.toBeUndefined()
     expect(mockLogger.warn).toHaveBeenCalled()
+  })
+
+  it('keeps both of two joins in the same second where the media server tells no milliseconds', async () => {
+    service.listParticipants.mockResolvedValue([
+      participant('ute#tab-aaaa1#a', 10n),
+      participant('ute#tab-aaaa1#b', 10n),
+    ])
+
+    await dropSupersededConnections(config, 'g1')
+
+    expect(service.removeParticipant).not.toHaveBeenCalled()
   })
 
   it('takes out the others when one of them is already gone', async () => {
