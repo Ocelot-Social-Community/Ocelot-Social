@@ -445,6 +445,11 @@ export default {
         // Nothing to hand on; for one who moderates because everybody does, it stays that way.
         return true
       }
+      // Still in the call on another device — come meanwhile, maybe, while the question was
+      // open: then one does not leave the call, and moderates on there.
+      if (connections.filter((connection) => connection.userId === me.id).length > 1) {
+        return true
+      }
       if (everyone && !state.everyoneModerates) {
         await setEveryoneModerates(context.driver, state.sessionId, true)
         await notify(client, roomName, { type: 'everyoneModerates', by: me.name })

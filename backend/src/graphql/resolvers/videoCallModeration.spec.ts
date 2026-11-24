@@ -889,6 +889,18 @@ describe('handOverVideoCallModeration', () => {
     ])
   })
 
+  it('changes nothing for one still in the call on another device', async () => {
+    // Ute on two devices: hanging up on one, she stays in the call, and moderates on.
+    inCall('ute', 'ute', 'udo')
+    await open('ute')
+    as('ute')
+
+    expect((await handOver({ everyone: true })).data?.handOverVideoCallModeration).toBe(true)
+    expect(await state()).toMatchObject({ everyoneModerates: false, moderatorIds: ['ute'] })
+    expect((await handOver({ toUserId: 'udo' })).data?.handOverVideoCallModeration).toBe(true)
+    expect((await state())?.moderatorIds).toEqual(['ute'])
+  })
+
   it('changes nothing for one who is no moderator named as such', async () => {
     inCall('ute', 'udo')
     await open('ute')

@@ -98,16 +98,18 @@ const pollOnce = async () => {
       }
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const listed = Number(room.numParticipants ?? 0) || 0
-      // How many connections: as listed, or as the participants themselves say when they are
-      // asked below.
+      // How many connections: as listed, or as the participants themselves say for a told room.
       let count = listed
-      if (lastSeenCounts.get(room.name) !== listed || told.has(room.name)) {
-        // What is published is how many PEOPLE are in the call, which only the participants tell:
-        // the list counts connections, a user on two devices twice. For a told room it is also
-        // the correction the count query gets: the room list can lag behind the participants,
-        // and its count, published as "the truth", would put a call everybody just left back to
-        // 1 (#10508). If they cannot be asked, the room stays owed for the next poll.
-        let people: number
+      // What is published is how many PEOPLE are in the call, which only the participants tell:
+      // the list counts connections, a user on two devices twice, and the same number of
+      // connections can be other people. So they are asked on every poll of a room with somebody
+      // in it, and a change of the people is what is published. For a told room it is also the
+      // correction the count query gets: the room list can lag behind the participants, and its
+      // count, published as "the truth", would put a call everybody just left back to 1
+      // (#10508). If they cannot be asked, a told room stays owed for the next poll; any other
+      // keeps what was published.
+      let people: number | null = 0
+      if (listed > 0 || told.has(room.name)) {
         try {
           const participants = await withTimeout(
             client.listParticipants(room.name),
@@ -116,28 +118,28 @@ const pollOnce = async () => {
           )
           if (told.has(room.name)) {
             count = participants.length
-            people = peopleIn(participants)
-          } else {
-            // Nobody among the participants yet while the list has somebody: they lag behind it,
-            // as when a call has just begun. Not published as an empty call; the list's count
-            // until the next change.
-            people = participants.length > 0 ? peopleIn(participants) : listed
           }
+          // Nobody among the participants while the list has somebody: one of the two lags behind.
+          // As a call has just begun, the participants: not published as an empty call, but as
+          // the list has it, until a later poll finds them. As a call has just ended, the list
+          // (#10508): what was published stands, not the list's stale count.
+          const lagging = lastSeenCounts.get(room.name) ?? listed
+          people = told.has(room.name) || participants.length > 0 ? peopleIn(participants) : lagging
           // eslint-disable-next-line no-catch-all/no-catch-all
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : String(err)
           logger.warn('LiveKit poll: listParticipants failed for', room.name, message)
-          continue
+          if (told.has(room.name)) {
+            continue
+          }
+          people = null
         }
-        await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, {
-          groupId,
-          count: people,
-        })
+      }
+      if (people !== null && (lastSeenCounts.get(room.name) !== people || told.has(room.name))) {
+        await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: people })
         // Only once it is out: a count noted before a publish that failed would look published
-        // to the next poll, which would then keep quiet about it. What is noted is the LIST's
-        // count, which the next poll compares with — a list still lagging behind the
-        // participants then shows no change, instead of republishing its stale count.
-        lastSeenCounts.set(room.name, listed)
+        // to the next poll, which would then keep quiet about it.
+        lastSeenCounts.set(room.name, people)
       }
       // The moderation is kept in step on every poll, not only when the count changes: one coming
       // as a moderator goes leaves it the same. If it was the last moderator, the call needs

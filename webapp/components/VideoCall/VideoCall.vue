@@ -2282,6 +2282,13 @@ export default {
       if (!this.handover || this.handover.busy) return
       const room = this.room
       const dialog = this.handover
+      // No longer the last moderator — another one came, or one is in the call on another device
+      // by now: nothing to hand on, one just leaves (the server checks the same).
+      if (!this.isLastModerator()) {
+        this.handover = null
+        await this.leave()
+        return
+      }
       dialog.busy = true
       try {
         await withDeadline(

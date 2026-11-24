@@ -7601,6 +7601,25 @@ describe('VideoCall — the people in the call and their moderation', () => {
       ).toEqual([])
     })
 
+    it('just leaves when, by the time the choice is made, one is in the call on another device', async () => {
+      const { wrapper, leave, $apollo } = inCall(
+        { moderators: ['u1'], everyone: false, speakers: [] },
+        { query: jest.fn().mockResolvedValue({ data: { videoCallModerationSuccessor: 'bob' } }) },
+      )
+      await wrapper.vm.requestLeave()
+      expect(wrapper.vm.handover).not.toBeNull()
+      // While the question is open, one joins from a second device.
+      wrapper.setData({
+        tiles: [tile('u1#1', 'u1', { isLocal: true }), tile('u1#2', 'u1'), tile('bob#1', 'bob')],
+      })
+      await wrapper.vm.leaveAfterHandover('everyone')
+      expect(wrapper.vm.handover).toBeNull()
+      expect(leave).toHaveBeenCalled()
+      expect(
+        $apollo.mutate.mock.calls.filter(([{ variables }]) => 'toUserId' in variables),
+      ).toEqual([])
+    })
+
     it('asks who moderates on, with the suggestion of the server picked', async () => {
       const { wrapper, leave, $apollo } = inCall(
         { moderators: ['u1'], everyone: false, speakers: [] },
