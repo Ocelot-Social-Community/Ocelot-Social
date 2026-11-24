@@ -2,9 +2,7 @@
 type ActiveVideoCall {
   group: Group!
 
-  """
-  Connections to the call — tabs and devices, so two people sharing an account count twice.
-  """
+  """People in the call: a user on several tabs or devices counts once."""
   participantCount: Int!
 
   """
@@ -2256,7 +2254,7 @@ type Query {
   videoCallModerationSuccessor(groupId: ID!): ID
 
   """
-  Current number of participants in a group's video call. Requires authentication.
+  Current number of people in a group's video call, a user on several devices once. Requires authentication.
   """
   videoCallParticipantCount(groupId: ID!): Int!
 
