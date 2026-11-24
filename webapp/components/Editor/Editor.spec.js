@@ -1092,6 +1092,29 @@ describe('Editor.vue', () => {
         expect(reference.getBoundingClientRect().top).toBe(210)
       })
 
+      it('holds still while the selection measures only a fraction of a pixel apart', () => {
+        // Measured 861.98 and 861.97 by turns, every frame: the arrow, at the middle, flipped
+        // between two pixels without end (#11086).
+        const { view } = wrapper.vm.editor
+        const { reference } = wrapper.vm.$refs.contextMenu.menu
+        const at = (left) => () => ({ left, right: left + 119, top: 603.85, bottom: 623.85 })
+        view.coordsAtPos = at(861.98)
+        const first = reference.getBoundingClientRect()
+        view.coordsAtPos = at(861.97)
+        expect(reference.getBoundingClientRect()).toEqual(first)
+        view.coordsAtPos = at(862.4)
+        expect(reference.getBoundingClientRect()).toEqual(first)
+      })
+
+      it('moves with the selection once it moves by more than half a pixel', () => {
+        const { view } = wrapper.vm.editor
+        const { reference } = wrapper.vm.$refs.contextMenu.menu
+        view.coordsAtPos = () => ({ left: 100, right: 100, top: 10, bottom: 30 })
+        reference.getBoundingClientRect()
+        view.coordsAtPos = () => ({ left: 100.6, right: 100.6, top: 10, bottom: 30 })
+        expect(reference.getBoundingClientRect().left).toBe(100.6)
+      })
+
       it('links the selected text with the URL entered', async () => {
         expect(linkInputShown()).toBe(true)
         linkInput().value = 'https://example.org'

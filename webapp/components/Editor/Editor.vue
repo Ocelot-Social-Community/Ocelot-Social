@@ -317,13 +317,22 @@ export default {
             const end = view.coordsAtPos(to, from < to ? -1 : 1)
             const oneLine = start.top === end.top
             const left = oneLine ? start.left : end.left
-            rect = {
-              left,
-              right: end.right,
-              top: end.top,
-              bottom: end.bottom,
-              width: end.right - left,
-              height: end.bottom - end.top,
+            const measured = { left, right: end.right, top: end.top, bottom: end.bottom }
+            // The same selection measures a hundredth of a pixel differently from frame to frame
+            // in some browsers (861.98, 861.97, …). The input re-reads this every frame (tippy's
+            // `sticky`) and is placed anew on any change: its arrow, which points at the middle,
+            // flipped between two pixels without end where that middle lay on a rounding edge
+            // (#11086). So the anchor only moves for more than half a pixel — what text that
+            // really moved does.
+            const moved = ['left', 'right', 'top', 'bottom'].some(
+              (edge) => Math.abs(measured[edge] - rect[edge]) > 0.5,
+            )
+            if (moved) {
+              rect = {
+                ...measured,
+                width: measured.right - measured.left,
+                height: measured.bottom - measured.top,
+              }
             }
           } catch (e) {
             // The position is not in the view (anymore): stay where we were.
