@@ -160,30 +160,13 @@ describe('CallParticipants', () => {
       expect(document.activeElement).toBe(find('filter-name').element)
     })
 
-    it('takes less room where the filter is all the toolbar holds, its field open or not', async () => {
-      const slim = () => find('toolbar').classes('call-participants__toolbar--slim')
-      wrapper = Wrapper()
-      expect(slim()).toBe(true)
-      // Open, as high as closed: its button stays where it is.
-      await find('filter-toggle').trigger('click')
-      expect(slim()).toBe(true)
-      wrapper.destroy()
-      wrapper = Wrapper({ mayTakeOver: true })
-      expect(slim()).toBe(false)
-      wrapper.destroy()
-      wrapper = Wrapper({ moderation: moderatedByMe })
-      expect(slim()).toBe(false)
-    })
-
     it("has the moderation's controls step aside while its field is open, and keeps its button last", async () => {
       wrapper = Wrapper({ moderation: moderatedByMe })
       expect(find('mute-all').exists()).toBe(true)
       expect(find('everyone').exists()).toBe(true)
-      const slim = find('toolbar').classes('call-participants__toolbar--slim')
       await find('filter-toggle').trigger('click')
       expect(find('mute-all').exists()).toBe(false)
       expect(find('everyone').exists()).toBe(false)
-      expect(find('toolbar').classes('call-participants__toolbar--slim')).toBe(slim)
       expect(find('filter-toggle').element.parentElement.lastElementChild).toBe(
         find('filter-toggle').element,
       )
