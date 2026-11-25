@@ -9,6 +9,7 @@
  * 4. Every component has keyboard accessibility tests (quality)
  * 5. All variant values are demonstrated in stories (coverage)
  * 6. All stories have visual regression tests (coverage)
+ * 7. No literal colours in component source — they have no dark-theme counterpart (theming)
  *
  * Note: JSDoc comments on props are checked via ESLint (jsdoc/require-jsdoc)
  */
@@ -17,6 +18,8 @@ import { readFile } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 
 import { glob } from 'glob'
+
+import { findLiteralColours } from './literal-colours'
 
 /**
  * Convert PascalCase to kebab-case (e.g., "AllVariants" -> "all-variants")
@@ -216,6 +219,69 @@ for (const storyPath of ocelotStories) {
   if (result.errors.length > 0 || result.warnings.length > 0) {
     results.push(result)
   }
+}
+
+// --- Check 7: Literal colours ---
+// A colour outside a theme token stays the same in light and dark (OsDrawer's white panel, #11092).
+// Each exception names the file, the literal and why it is not a token. Keep it short: an entry
+// that no longer matches fails the check too, so the list cannot outlive its reason.
+const LITERAL_COLOUR_EXCEPTIONS: { file: string; literal: string; reason: string }[] = [
+  {
+    file: 'src/components/OsDrawer/OsDrawer.vue',
+    literal: 'bg-black/50',
+    reason: 'Backdrop: darkens the page in both themes; a theme colour would lighten it in dark',
+  },
+  {
+    file: 'src/components/OsModal/OsModal.vue',
+    literal: 'bg-black/70',
+    reason: 'Backdrop: darkens the page in both themes; a theme colour would lighten it in dark',
+  },
+  {
+    file: 'src/ocelot/components/OsLocationMap/OsLocationMap.vue',
+    literal: '#fff',
+    reason:
+      'Picker cursor (an SVG data URL, no CSS variables): drawn over map tiles, not a surface',
+  },
+  {
+    file: 'src/ocelot/components/OsLocationMap/OsLocationMap.vue',
+    literal: '#3FB1CE',
+    reason: "pinColor default: mapbox-gl's own marker colour, on map tiles; the app passes its own",
+  },
+]
+
+const colourFiles = await glob('src/**/*.{vue,ts,css}', {
+  ignore: ['src/**/*.spec.ts', 'src/**/*.stories.ts', 'src/**/*.d.ts', 'src/test/**'],
+})
+const usedExceptions = new Set<(typeof LITERAL_COLOUR_EXCEPTIONS)[number]>()
+
+for (const file of colourFiles.sort()) {
+  const content = await tryReadFile(file)
+  const errors = findLiteralColours(content ?? '', file)
+    .filter(({ literal }) => {
+      const exception = LITERAL_COLOUR_EXCEPTIONS.find(
+        (entry) => entry.file === file && entry.literal === literal,
+      )
+      if (exception) {
+        usedExceptions.add(exception)
+      }
+      return !exception
+    })
+    .map(
+      ({ literal, line }) =>
+        `Literal colour "${literal}" at ${file}:${String(line)} — use a theme token, the literal only as var() fallback`,
+    )
+
+  if (errors.length > 0) {
+    results.push({ component: file, errors, warnings: [] })
+  }
+}
+
+const staleExceptions = LITERAL_COLOUR_EXCEPTIONS.filter((entry) => !usedExceptions.has(entry)).map(
+  ({ file, literal }) =>
+    `Literal colour exception "${literal}" in ${file} no longer matches — remove it`,
+)
+if (staleExceptions.length > 0) {
+  results.push({ component: 'Literal colour exceptions', errors: staleExceptions, warnings: [] })
 }
 
 // Output results
