@@ -688,6 +688,11 @@ export default {
 
 .prejoin__avatar {
   pointer-events: auto;
+  /*  Shrinks with a short preview (a phone turned sideways) and stays round: the height gives way */
+  /*  in the column, the width follows it. Its own fixed width made it an oval there. */
+  min-height: 0;
+  width: auto;
+  aspect-ratio: 1;
 }
 
 .prejoin__placeholder-text {
@@ -782,11 +787,23 @@ export default {
   flex: 1;
 }
 
+/*  The way in stays in view (#11079): stuck to the bottom of .prejoin, which is what scrolls, so */
+/*  the preview and the device settings move beneath it rather than taking it below the fold —  */
+/*  on a phone, upright or turned, and wherever the dialog has to scroll at all. Its own ground  */
+/*  and the line above it, so what scrolls under it does not show through. The negative margins */
+/*  carry that ground to the panel's edges; the padding puts the buttons back where they were.  */
 .prejoin__actions {
+  position: sticky;
+  bottom: 0;
   display: flex;
-  justify-content: flex-end;
+  /*  Centred, as the device toggles above: right-aligned in a panel only a little wider than  */
+  /*  the two buttons, they looked centred by mistake, a few pixels off.                      */
+  justify-content: center;
   gap: var(--space-x-small);
-  margin-top: auto;
+  margin: auto calc(-1 * var(--space-base)) calc(-1 * var(--space-base));
+  padding: var(--space-small) var(--space-base) var(--space-base);
+  background: var(--background-color-soft);
+  border-top: 1px solid var(--border-color-softest);
 }
 
 @media (--vp-mobile) {
@@ -794,9 +811,13 @@ export default {
     flex-direction: column;
   }
 
+  /*  Smaller on a short screen, so what is above the buttons is not mostly preview — turned */
+  /*  sideways a phone has some 360px, and 200 of them went to the picture. `svh` is the height  */
+  /*  with the browser's own bars shown; `vh` (without them) is the fallback where it is unknown. */
   .prejoin__preview {
-    min-height: 200px;
-    flex: 0 0 35vh;
+    min-height: 120px;
+    flex: 0 0 30vh;
+    flex: 0 0 30svh;
   }
 
   .prejoin__panel {

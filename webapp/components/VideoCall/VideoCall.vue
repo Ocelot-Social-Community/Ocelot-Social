@@ -4283,8 +4283,11 @@ export default {
   /*  Grows with its content — a hint or an error below the devices adds a line — */
   /*  as long as the screen has room; only beyond that the content scrolls. */
   height: auto;
+  /*  `dvh` follows the browser's own bars as they come and go; `vh` is the fallback. */
   min-height: min(560px, calc(100vh - var(--space-large) * 2));
+  min-height: min(560px, calc(100dvh - var(--space-large) * 2));
   max-height: calc(100vh - var(--space-large) * 2);
+  max-height: calc(100dvh - var(--space-large) * 2);
   border-radius: var(--border-radius-base);
   overflow: hidden;
   /*  calc(), not Sass '+': the tokens are var() now and Sass cannot add those. */
