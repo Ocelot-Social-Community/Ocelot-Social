@@ -27,7 +27,10 @@ A form field's placeholder shows an example of a valid value: "e.g. London" for 
 
 Free text gets an "e.g." in front (place, goal, venue), so the example is not mistaken for a value already entered. A value with a format of its own (a name, a slug) is shown as it is, to show that format. A field no example fits leaves the placeholder empty.
 
-Search fields and filters are the exception: there the placeholder is the conventional label of the box.
+Two exceptions, where the placeholder stands in for the label:
+
+- search fields and filters: there the placeholder is the conventional label of the box
+- the compact login, password reset and registration forms (`LoginForm`, `PasswordReset/Request`, `RegistrationSlideEmail`, `Signup`): a visible label above each field made them read worse (#10625). A screen reader still gets a name: with no label, the browser takes the placeholder as the field's accessible name (HTML-AAM), so no `aria-label` is needed on top. The cost for sighted users is accepted: the hint vanishes while typing and its contrast is low.
 
 Why?
 - a placeholder repeating the label tells the user nothing new
