@@ -231,9 +231,9 @@ export default {
     var(--box-shadow-sticky);
 }
 
-/* The bar's lower edge in the dark theme, where the shadow hardly shows: one faint light
-   line, between the field's side lines and not over them. A line of its own, not a part of the
-   shadow, which would lie over it and fade out towards the ends. */
+/* The bar's lower edge: one faint line (light in the dark theme, where the shadow hardly shows,
+   dark in the light one), between the field's side lines and not over them. A line of its own, not
+   a part of the shadow, which would lie over it and fade out towards the ends. */
 .editor-menubar.is-stuck::after {
   content: '';
   position: absolute;
@@ -241,7 +241,7 @@ export default {
   right: var(--input-border-size);
   bottom: calc(-1 * var(--input-border-size));
   height: var(--input-border-size);
-  background-color: light-dark(transparent, rgba(255, 255, 255, 0.1));
+  background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
   pointer-events: none;
 }
 
