@@ -231,6 +231,20 @@ export default {
     var(--box-shadow-sticky);
 }
 
+/* The bar's lower edge in the dark theme, where the shadow hardly shows: one faint light
+   line, between the field's side lines and not over them. A line of its own, not a part of the
+   shadow, which would lie over it and fade out towards the ends. */
+.editor-menubar.is-stuck::after {
+  content: '';
+  position: absolute;
+  left: var(--input-border-size);
+  right: var(--input-border-size);
+  bottom: calc(-1 * var(--input-border-size));
+  height: var(--input-border-size);
+  background-color: light-dark(transparent, rgba(255, 255, 255, 0.1));
+  pointer-events: none;
+}
+
 /* The field's outline turns to the primary colour while it has the focus (.editor-content); the
    bar's lines follow. */
 .editor:has(.editor-content:focus-within) > .editor-menubar.is-stuck {
