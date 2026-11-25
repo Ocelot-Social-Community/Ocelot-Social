@@ -47,6 +47,11 @@ vi.mock('@src/livekit/callSession', () => ({
   __esModule: true,
   endCallSession: async (...args: unknown[]) => mockEndCallSession(...args),
 }))
+const mockDropSuperseded = vi.fn<(...args: unknown[]) => Promise<void>>()
+vi.mock('@src/livekit/moderationService', () => ({
+  __esModule: true,
+  dropSupersededConnections: async (...args: unknown[]) => mockDropSuperseded(...args),
+}))
 vi.mock('@src/db/neo4j', () => ({
   __esModule: true,
   getDriver: () => 'driver',
@@ -135,6 +140,7 @@ beforeEach(() => {
   mockPublish.mockReset().mockResolvedValue(undefined)
   mockGetCount.mockReset().mockResolvedValue(0)
   mockEndCallSession.mockReset().mockResolvedValue(undefined)
+  mockDropSuperseded.mockReset().mockResolvedValue(undefined)
   // Settled at once, unless a test says otherwise.
   takeToldRooms()
   mockLogger.info.mockReset()
@@ -261,6 +267,45 @@ describe('registerLiveKitWebhook', () => {
       })
       expect(res.status).toHaveBeenCalledWith(204)
     })
+
+    it('takes out a connection the joining tab left behind, before the count goes out', async () => {
+      mockReceive.mockResolvedValueOnce({
+        event: 'participant_joined',
+        room: { name: 'group-abc' },
+      })
+      mockDropSuperseded.mockImplementationOnce(async () => {
+        expect(mockGetCount).not.toHaveBeenCalled()
+
+        return Promise.resolve()
+      })
+      const res = makeRes()
+      handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), res)
+      // One wait more than the other events: the taking out comes first.
+      await flushPromises()
+      await flushPromises()
+
+      expect(mockDropSuperseded).toHaveBeenCalledWith(
+        {
+          LIVEKIT_URL: 'wss://lk.example.test',
+          LIVEKIT_API_KEY: 'key',
+          LIVEKIT_API_SECRET: 'secret',
+        },
+        'abc',
+      )
+      expect(mockGetCount).toHaveBeenCalled()
+      expect(res.status).toHaveBeenCalledWith(204)
+    })
+
+    it.each([['participant_left'], ['room_started'], ['room_finished']])(
+      'takes nobody out for %s',
+      async (eventName) => {
+        mockReceive.mockResolvedValueOnce({ event: eventName, room: { name: 'group-abc' } })
+        handler(makeReq({ authHeader: 'sig', body: Buffer.from('p') }), makeRes())
+        await flushPromises()
+
+        expect(mockDropSuperseded).not.toHaveBeenCalled()
+      },
+    )
 
     it.each([['participant_left'], ['room_started']])(
       'publishes live count for %s',

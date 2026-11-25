@@ -675,9 +675,36 @@ describe('joinGroupVideoCall', () => {
       await mutate({ mutation: JoinGroupVideoCall, variables: { groupId: 'meta-3' } })
       const second = lastAccessTokenOptions().identity
 
-      expect(first).toMatch(/^member-1#[0-9a-f]{8}$/)
-      expect(second).toMatch(/^member-1#[0-9a-f]{8}$/)
+      expect(first).toMatch(/^member-1#[0-9a-z]+-[0-9a-f]{8}$/)
+      expect(second).toMatch(/^member-1#[0-9a-z]+-[0-9a-f]{8}$/)
       expect(second).not.toBe(first)
+    })
+
+    it("carries the tab's id, so that a connection the tab left behind can be told", async () => {
+      livekitConfig = ENABLED_LIVEKIT
+      authenticatedUser = memberJson
+      await Factory.build(
+        'group',
+        { id: 'meta-tab', template: 'public', ...DESCRIPTION_OVERRIDE },
+        { ownerId: 'member-1' },
+      )
+
+      await mutate({
+        mutation: JoinGroupVideoCall,
+        variables: { groupId: 'meta-tab', clientId: 'tab-aaaa1' },
+      })
+
+      expect(lastAccessTokenOptions().identity).toMatch(
+        /^member-1#tab-aaaa1#[0-9a-z]+-[0-9a-f]{8}$/,
+      )
+
+      // A malformed one is left out, rather than failing the join.
+      await mutate({
+        mutation: JoinGroupVideoCall,
+        variables: { groupId: 'meta-tab', clientId: 'not#a#tab' },
+      })
+
+      expect(lastAccessTokenOptions().identity).toMatch(/^member-1#[0-9a-z]+-[0-9a-f]{8}$/)
     })
 
     it('issues a short-lived ticket, not one that outlives the decisions behind it', async () => {

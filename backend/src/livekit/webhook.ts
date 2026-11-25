@@ -10,6 +10,7 @@ import { serverPubsub } from '@src/context'
 import { getDriver } from '@src/db/neo4j'
 import { getLiveParticipantCount, groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import { endCallSession } from '@src/livekit/callSession'
+import { dropSupersededConnections } from '@src/livekit/moderationService'
 import { markRoomTold } from '@src/livekit/toldRooms'
 import logger from '@src/logger'
 
@@ -110,6 +111,14 @@ export const registerLiveKitWebhook = (app: Express) => {
         // and its sessions are ended only if the media server lists no room of that name.
         markRoomTold(roomName)
       }
+    }
+    if (event.event === 'participant_joined') {
+      // A tab that joins anew replaces its own connection from before, should that one still be
+      // there: taken out now, and before the count goes out, which it would otherwise be part of.
+      await dropSupersededConnections(
+        { LIVEKIT_URL: livekitUrl, LIVEKIT_API_KEY: apiKey, LIVEKIT_API_SECRET: apiSecret },
+        groupId,
+      )
     }
     if (relevantEvents.has(event.event)) {
       try {

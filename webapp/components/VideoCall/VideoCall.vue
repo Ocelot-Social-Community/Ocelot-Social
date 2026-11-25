@@ -756,6 +756,7 @@ const withDeadline = (request) => {
 import { saveDevicePreference } from './devicePreferences'
 import { createAudioWatchdog } from './audioWatchdog'
 import { inertAround, takeFocus, trapFocus } from './dialogFocus'
+import { tabClientId } from './tabClientId'
 
 // How long a participant keeps the speaking treatment after LiveKit drops them
 // from the active-speaker list. LiveKit reports raw audio activity, so it lets
@@ -768,6 +769,8 @@ const SPEAKER_HOLD_MS = 1500
 // whether this user may OPEN a call (nobody in it yet) — a token kept for long
 // would carry that decision past the moment it was true. Older ones are
 // fetched anew on join; the preloaded client library still saves its share.
+// How often a join token is asked for again when the tab's id changed while it was asked for.
+const JOIN_TOKEN_ID_ATTEMPTS = 3
 const PREFETCHED_TOKEN_MAX_AGE_MS = 60000
 // Asking for the call's conference chat: how often, and how long between two attempts.
 const CALL_CHAT_JOIN_ATTEMPTS = 3
@@ -2883,6 +2886,9 @@ export default {
         // the caller already drives the next step and a re-entrant leave()
         // would clobber the retry/leave flow.
         room.on(RoomEvent.Disconnected, (reason) => {
+          // Only the call on show. A room this tab left behind is taken out by the server once the
+          // tab is in again (#10682) — removed, but not from the call the user is in now.
+          if (this.room !== room) return
           if (reason === DisconnectReason.CLIENT_INITIATED) return
           // Removed by a moderator: said, unless the notice before it already did.
           if (reason === DisconnectReason.PARTICIPANT_REMOVED) this.tellRemoved()
@@ -3405,15 +3411,18 @@ export default {
     prefetchJoin() {
       const groupId = this.groupId
       if (!groupId) return
+      // The tab's id as it is now goes into the token: should it change meanwhile — another tab
+      // turned out to have it (tabClientId) — the token is not used.
+      const clientId = tabClientId()
       const promise = (async () => {
         // Loads the client library chunk as well, the other half of the wait.
         await import('livekit-client')
-        return this.fetchJoinPayload(groupId)
+        return this.fetchJoinPayload(groupId, clientId)
       })()
       // A failure here is not the user's business yet: connect() asks again
       // and reports whatever the real attempt runs into.
       promise.catch(() => {})
-      this.prefetched = { groupId, requestedAt: Date.now(), promise }
+      this.prefetched = { groupId, clientId, requestedAt: Date.now(), promise }
     },
     async takeJoinPayload(groupId) {
       const prefetched = this.prefetched
@@ -3422,24 +3431,35 @@ export default {
       if (
         prefetched &&
         prefetched.groupId === groupId &&
+        prefetched.clientId === tabClientId() &&
         Date.now() - prefetched.requestedAt < PREFETCHED_TOKEN_MAX_AGE_MS
       ) {
         try {
-          return await prefetched.promise
+          const payload = await prefetched.promise
+          // The tab may have got a new id while waiting: then the token is not its own.
+          if (prefetched.clientId === tabClientId()) return payload
         } catch (_e) {
           /* fall through to a fresh request */
         }
       }
       return this.fetchJoinPayload(groupId)
     },
-    async fetchJoinPayload(groupId) {
-      const { data } = await this.$apollo.mutate({
-        mutation: joinGroupVideoCallMutation(),
-        variables: { groupId },
-      })
-      const payload = data && data.joinGroupVideoCall
-      if (!payload) throw new Error('No token returned')
-      return payload
+    // A token for the tab's id as it is when the token arrives, not only when it was asked for:
+    // one that came under an id the tab no longer has (another tab turned out to have it,
+    // tabClientId) would take that tab's connection out of the call. Asked again then, a few
+    // times at most. With an id given — the prefetch, whose taker checks it — asked once.
+    async fetchJoinPayload(groupId, givenClientId = null) {
+      for (let attempt = 0; attempt < JOIN_TOKEN_ID_ATTEMPTS; attempt++) {
+        const clientId = givenClientId || tabClientId()
+        const { data } = await this.$apollo.mutate({
+          mutation: joinGroupVideoCallMutation(),
+          variables: { groupId, clientId },
+        })
+        const payload = data && data.joinGroupVideoCall
+        if (!payload) throw new Error('No token returned')
+        if (givenClientId || clientId === tabClientId()) return payload
+      }
+      throw new Error('The id of this tab kept changing')
     },
     onLocalConnectionQuality(quality) {
       // LiveKit reports every change, so a shaky line flips between poor and

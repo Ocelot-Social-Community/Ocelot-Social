@@ -1,5 +1,5 @@
-mutation JoinGroupVideoCall($groupId: ID!) {
-  joinGroupVideoCall(groupId: $groupId) {
+mutation JoinGroupVideoCall($groupId: ID!, $clientId: String) {
+  joinGroupVideoCall(groupId: $groupId, clientId: $clientId) {
     token
     url
     roomName

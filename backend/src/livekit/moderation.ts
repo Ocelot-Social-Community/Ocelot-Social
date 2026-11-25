@@ -26,6 +26,7 @@ import { allGroupPermissionKeys } from '@src/groupPermission'
 import { dominatesInGroup } from '@src/groupRole/authority'
 import { parseStoredPermissions } from '@src/groupRole/storedPermissions'
 import { OWNER_ROLE } from '@src/groupRole/types'
+import { clientKeyOf, issuedAtOf } from '@src/livekit/rooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
 
@@ -419,6 +420,8 @@ export const settleModeration = async (
 export interface Connection {
   identity: string
   userId: string | null
+  /** When it joined, in milliseconds; 0 where the media server does not say. */
+  joinedAtMs?: number
   /** `source` as the protocol numbers it (see SOURCE). */
   tracks: { sid: string; source: number; muted: boolean }[]
 }
@@ -434,17 +437,63 @@ export const listConnections = async (
     LIVEKIT_API_TIMEOUT_MS,
     'listParticipants',
   )
+  // In milliseconds where the media server says so: two joins of one tab can fall into the
+  // same second, and which of them is the newer decides which one stays (supersededConnections).
+  const joinedAtMs = (participant: { joinedAt?: bigint; joinedAtMs?: bigint }) =>
+    Number(participant.joinedAtMs ?? 0) || Number(participant.joinedAt ?? 0) * 1000
   return [...participants]
-    .sort((a, b) => Number(a.joinedAt ?? 0) - Number(b.joinedAt ?? 0))
+    .sort((a, b) => joinedAtMs(a) - joinedAtMs(b))
     .map((participant) => ({
       identity: participant.identity,
       userId: userIdOf(participant),
+      joinedAtMs: joinedAtMs(participant),
       tracks: participant.tracks.map((track) => ({
         sid: track.sid,
         source: track.source,
         muted: track.muted,
       })),
     }))
+}
+
+/**
+ * The connections a newer one from the same browser tab has replaced, of connections in the order
+ * they joined. A tab is in a call once: an older connection of it is one it did not end — left by
+ * a failed join, a crashed page, a reload — and would stay as a second self, silent, for as long
+ * as the tab keeps it open. The user's other tabs and devices are never among them, nor are
+ * connections without a tab id (clientKeyOf).
+ *
+ * The newer is the one whose join token was issued later (see joinSuffix): the attempt the tab
+ * went on with, even when one it gave up reached the media server after it. Only for identities
+ * that do not say when, by when they joined. Where it cannot be said which is the newer — the
+ * same time, or a join time the media server does not tell — both stay, until a later look tells
+ * them apart, or the older one leaves on its own.
+ */
+export const supersededConnections = (connections: Connection[]): Connection[] => {
+  // Whether `later` is known to be the newer of the two: by when their tokens were issued where
+  // both say, as an attempt the tab gave up may reach the media server after the one it went on
+  // with; else by when they joined, which an unknown time cannot tell.
+  const isNewer = (later: Connection, earlier: Connection) => {
+    const issuedLater = issuedAtOf(later.identity)
+    const issuedEarlier = issuedAtOf(earlier.identity)
+    if (issuedLater !== null && issuedEarlier !== null) {
+      return issuedEarlier < issuedLater
+    }
+    const joined = earlier.joinedAtMs ?? 0
+    return joined > 0 && joined < (later.joinedAtMs ?? 0)
+  }
+  const kept = new Map<string, Connection>()
+  for (const connection of connections) {
+    const key = clientKeyOf(connection.identity)
+    const current = key !== null ? kept.get(key) : undefined
+    if (key !== null && (!current || isNewer(connection, current))) {
+      kept.set(key, connection)
+    }
+  }
+  return connections.filter((connection) => {
+    const key = clientKeyOf(connection.identity)
+    const newest = key !== null ? kept.get(key) : undefined
+    return newest !== undefined && newest !== connection && isNewer(newest, connection)
+  })
 }
 
 /** The users in the room, in the order they joined, each once. */

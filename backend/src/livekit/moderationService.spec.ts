@@ -184,6 +184,22 @@ describe('settleAndPublishModeration', () => {
     expect(service.removeParticipant).not.toHaveBeenCalled()
   })
 
+  it('takes out a connection its tab left behind, and keeps the user on their other device', async () => {
+    const connected = (identity: string, joinedAt: bigint) => ({
+      ...participant('ute', joinedAt),
+      identity,
+    })
+    service.listParticipants.mockResolvedValue([
+      connected('ute#tab-aaaa1#old', 1n),
+      connected('ute#phone-001#own', 2n),
+      connected('ute#tab-aaaa1#new', 3n),
+    ])
+    await settleAndPublishModeration({ driver, config }, 'g1')
+
+    expect(service.removeParticipant).toHaveBeenCalledTimes(1)
+    expect(service.removeParticipant).toHaveBeenCalledWith('group-g1', 'ute#tab-aaaa1#old')
+  })
+
   it('never throws', async () => {
     service.listParticipants.mockRejectedValue(new Error('down'))
 
