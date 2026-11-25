@@ -393,14 +393,7 @@
               tabs say. What its header offered besides sits at the end of this row.
             -->
             <div class="video-call__chat-tabs">
-              <call-chat-tabs
-                with-participants
-                :participant-count="uniqueParticipantCount"
-                exportable
-                :exporting="chatExporting"
-                :exportEmpty="callChatEmpty"
-                @export="exportCallChat"
-              />
+              <call-chat-tabs with-participants :participant-count="uniqueParticipantCount" />
               <div class="video-call__chat-actions">
                 <os-button
                   data-test="video-call-close-chat"
@@ -418,6 +411,12 @@
                 </os-button>
               </div>
             </div>
+            <!-- What can be done with the conference chat, below the tabs. -->
+            <call-chat-toolbar
+              v-if="!participantsOpen && activeChatTab === 'call'"
+              :exporting="chatExporting"
+              @export="exportCallChat"
+            />
             <call-participants
               v-if="participantsOpen"
               :people="people"
@@ -439,7 +438,6 @@
                 :groupId="activeChatTab === 'group' ? groupId : null"
                 :roomId="activeChatTab === 'call' ? chatRoomId : null"
                 :hint="chatHint"
-                @empty-change="onChatEmptyChange"
                 :hintKey="activeChatTab ? 'call-chat-' + activeChatTab : null"
                 :autoFocus="!isMobile"
                 @close-single-room="closeInCallChat"
@@ -732,6 +730,7 @@ import {
 import { roomUnreadQuery, roomUpdated } from '~/graphql/Rooms'
 import Chat from '~/components/Chat/Chat.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import CallChatToolbar from '~/components/VideoCall/CallChatToolbar.vue'
 import CallParticipants from '~/components/VideoCall/CallParticipants.vue'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
@@ -884,6 +883,7 @@ export default {
     OsCounterIcon,
     OsIcon,
     CallChatTabs,
+    CallChatToolbar,
     CallParticipants,
     Chat,
     RoomHeader,
@@ -970,7 +970,6 @@ export default {
       micMeterStream: null,
       chatExporting: false,
       // Whether the conference chat on screen is known to hold no message (see Chat.vue).
-      callChatEmpty: false,
       // The remote participant heard last. Whoever spoke stays on screen next to
       // the chat on a phone until somebody else speaks (see speakerTile).
       lastRemoteSpeakerId: null,
@@ -1642,9 +1641,6 @@ export default {
     // a choice — without a conference chat the group's is all there is, which says nothing
     // about what the user would pick.
     activeChatTab(tab, previous) {
-      // Another chat on screen: what was known of the conference chat's messages is the
-      // instance's that is gone; the new one reports again.
-      if (tab !== previous) this.callChatEmpty = false
       if (tab && this.chatRoomId) this.setLastChatTab(tab)
     },
     chatRoomId(next, previous) {
@@ -2439,7 +2435,7 @@ export default {
       this.saveSidebarSize()
     },
     // The export is the chat's own doing (it knows the room and fetches every message);
-    // only its button sits here, in the tab row.
+    // only its button sits here, in the toolbar below the tabs.
     async exportCallChat() {
       const chat = this.$refs.inCallChat
       if (!chat || this.chatExporting) return
@@ -2449,10 +2445,6 @@ export default {
       } finally {
         this.chatExporting = false
       }
-    },
-    onChatEmptyChange(empty) {
-      // Only the conference chat's emptiness bears on its download.
-      if (this.activeChatTab === 'call') this.callChatEmpty = empty
     },
     selectChatTab(tab) {
       this.setShowChat(callChatTarget(tab, this))
@@ -4597,6 +4589,12 @@ export default {
 .video-call__sidebar > * {
   flex: 1;
   min-height: 0;
+}
+
+/*  The conference chat's toolbar keeps its own slim height (CallChatToolbar): it does not grow
+    with the chat below it. */
+.video-call__sidebar > .call-chat-toolbar {
+  flex: 0 0 auto;
 }
 
 /*  On a phone the chat goes below the videos instead of beside them, and the stage */

@@ -118,53 +118,20 @@ describe('CallChatTabs', () => {
     expect(count(wrapper, 'call').text()).toBe('99+')
   })
 
-  describe('menu of the conference chat', () => {
-    const menuButton = (wrapper) => wrapper.find('[data-test="call-chat-tab-menu"]')
-    const entries = (wrapper) => wrapper.findAll('.os-menu-item')
+  it('keeps each label as wide as in bold, so switching tabs moves no tab', () => {
+    wrapper = Wrapper()
+    const label = tab(wrapper, 'call').find('.call-chat-tabs__label')
+    // The bold copy is drawn from the attribute: the text is there once.
+    expect(label.attributes('data-label')).toBe('videoCall.chatTabs.call')
+    expect(label.text()).toBe('videoCall.chatTabs.call')
+  })
 
-    it('sits in the tab of the conference chat while that chat is open', () => {
-      wrapper = Wrapper({}, { exportable: true })
-      expect(menuButton(wrapper).exists()).toBe(true)
-      expect(menuButton(wrapper).attributes('aria-label')).toBe('actions.menu')
-      const cell = tab(wrapper, 'call').element.parentElement
-      expect(cell.contains(menuButton(wrapper).element)).toBe(true)
-    })
-
-    it('is not offered while the chat of the group is open', () => {
-      wrapper = Wrapper({ chat: groupChat }, { exportable: true })
-      expect(menuButton(wrapper).exists()).toBe(false)
-    })
-
-    it('says when there is nothing to download, and offers it all the same', async () => {
-      wrapper = Wrapper({}, { exportable: true, exportEmpty: true })
-      await menuButton(wrapper).trigger('click')
-      const download = entries(wrapper).filter(
-        (entry) => entry.text() === 'chat.exportChat (chat.messagesEmpty)',
-      )
-      expect(download).toHaveLength(1)
-
-      await download.at(0).trigger('click')
-
-      expect(wrapper.emitted('export')).toHaveLength(1)
-    })
-
-    it('is not offered where the host does not do downloads', () => {
-      wrapper = Wrapper()
-      expect(menuButton(wrapper).exists()).toBe(false)
-    })
-
-    it('offers the download, and leaves it to the host, which holds the chat', async () => {
-      wrapper = Wrapper({}, { exportable: true })
-      await menuButton(wrapper).trigger('click')
-      const download = entries(wrapper).filter((entry) => entry.text() === 'chat.exportChat')
-      expect(download).toHaveLength(1)
-
-      await download.at(0).trigger('click')
-
-      expect(wrapper.emitted('export')).toHaveLength(1)
-      // Not a tab: nothing in the menu opens a chat.
-      expect(opened()).toEqual([])
-    })
+  it('holds only tabs: what can be done with a chat is in its toolbar below', () => {
+    wrapper = Wrapper()
+    expect(wrapper.find('[data-test="call-chat-tab-menu"]').exists()).toBe(false)
+    expect(wrapper.findAll('button').wrappers.every((b) => b.attributes('role') === 'tab')).toBe(
+      true,
+    )
   })
 
   it('opens the chat of the group when its tab is clicked', async () => {

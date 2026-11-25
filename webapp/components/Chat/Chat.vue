@@ -369,11 +369,6 @@ export default {
     showHint() {
       this.renderHint()
     },
-    // For a host that offers something depending on it — the download in a call's menu says
-    // when there is nothing to download.
-    knownEmpty(empty) {
-      this.$emit('empty-change', empty)
-    },
     hint() {
       this.renderHint()
     },
@@ -575,16 +570,6 @@ export default {
       return this.selectedRoom.isCallRoom
         ? this.$t('chat.callRoomName', { name: this.selectedRoom.roomName })
         : this.selectedRoom.roomName
-    },
-    // Known to hold no message at all: every message is loaded, and there is none. Not just
-    // "none loaded yet", which a chat whose older messages are still to come would also be.
-    knownEmpty() {
-      return (
-        !!this.selectedRoom?.id &&
-        !this.selectedRoom.id.startsWith('temp-') &&
-        this.messagesLoaded &&
-        this.messages.length === 0
-      )
     },
     selectedRoomWritable() {
       // Only the conference chat of a video call that is over is read-only.
