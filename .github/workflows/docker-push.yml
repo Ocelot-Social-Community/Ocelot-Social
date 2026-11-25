@@ -5,9 +5,14 @@ on:
   # branch. Creating it raises a push event too, and the `merge_group` run below already covers it;
   # without the exclusion every queue entry would run this workflow twice. `tags` has to be spelled
   # out because naming `branches-ignore` alone would stop the workflow from running for tags.
+  # Also excluded: release-please's overflow branch for release notes too long for a pull request
+  # body. It never becomes a pull request, so nobody needs its checks. release-please first resets it
+  # to the master commit and then pushes the notes on top a second later — the first push's runs get
+  # cancelled by the second and, sharing master's SHA, put red "cancelled" checks on master's commit.
   push:
     branches-ignore:
       - 'gh-readonly-queue/**'
+      - 'release-please--**--release-notes'
     tags:
       - '**'
   # Pull requests from forks only (see the `if` on the first job): a fork's push happens in the fork
@@ -288,7 +293,7 @@ jobs:
       # starting its workflows: no contents, no packages.
       - name: Generate it4c-release-bot token
         id: app-token
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
