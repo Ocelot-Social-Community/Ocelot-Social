@@ -108,6 +108,7 @@ export const chatMessageAdded = () => {
         date
         room {
           id
+          unreadCount
         }
         saved
         distributed

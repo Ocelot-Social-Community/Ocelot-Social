@@ -1451,9 +1451,14 @@ export default {
       changedRoom.index = new Date().toISOString()
       const isCurrentRoom = msg.room.id === this.selectedRoom?.id
       const isOwnMessage = msg.senderId === this.currentUser.id
-      // Don't increment unreadCount for freshly fetched rooms — server count already includes this message
+      // The server's count is resolved for this viewer: it leaves out what a sender they block or
+      // mute writes, which a group room delivers live all the same, so counting up alone would
+      // rise above it. Right after markAsSeen, though, it may still hold what was just read, as
+      // the mutation is not committed yet. One more than the local count bounds it: no more than
+      // this one message has come in. A room fetched just now has the newest count already, and
+      // the open room keeps its own: what arrives there is shown and marked as seen in place.
       if (!freshlyFetched && !isCurrentRoom && !isOwnMessage) {
-        changedRoom.unreadCount++
+        changedRoom.unreadCount = Math.min(changedRoom.unreadCount + 1, msg.room.unreadCount)
       }
       this.moveRoomToTop(changedRoom, msg.room.id)
       // Only add incoming messages to the chat — own messages are handled via mutation response
