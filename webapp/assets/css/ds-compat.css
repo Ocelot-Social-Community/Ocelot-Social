@@ -434,6 +434,18 @@
   display: block;
 }
 
+/*  The label of a field that is not an OcelotInput (editor, select, date picker, …), drawn as
+    .ds-input-label. Global, not in a form's own <style>: there it reached the other form only
+    once that form had been loaded, so the label changed colour with the way the user came.
+    After .ds-text in this file, so its margin-bottom: 0 wins over .ds-text's on the
+    `ds-text select-label` elements. */
+.select-label {
+  margin-bottom: 0;
+  padding-bottom: var(--space-xx-small);
+  color: var(--text-color-soft);
+  font-size: var(--font-size-base);
+}
+
 .ds-input-error {
   color: var(--color-danger);
   font-size: var(--font-size-x-small);

@@ -928,13 +928,6 @@ export default {
   appearance: auto;
 }
 
-.select-label {
-  margin-bottom: 0;
-  padding-bottom: 4px;
-  color: var(--text-color-soft);
-  font-size: 1rem;
-}
-
 .textarea-label {
   padding-bottom: 14px;
 }
