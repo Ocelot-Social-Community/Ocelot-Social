@@ -69,11 +69,17 @@
                   choice.name === describedTemplate ? 'template-description' : null
                 "
                 :data-test="`template-card-${choice.name}`"
-                @click="chooseTemplate(choice)"
+                @pointerdown="lastPointerType = $event.pointerType"
+                @click="chooseTemplate(choice, $event)"
                 @focus="focusedTemplate = choice.name"
                 @blur="focusedTemplate = null"
               >
                 <template #title>{{ $t(`group.types.${choice.name}`) }}</template>
+                <!-- Refused before it is clicked: the card says so itself, in words — on touch
+                     there is no hover to show the reason underneath first. -->
+                <template v-if="!choice.allowed" #default>
+                  <span data-test="template-card-refused">{{ $t('group.templateRefused') }}</span>
+                </template>
               </group-state-card>
             </li>
           </ul>
@@ -95,7 +101,12 @@
               :aria-hidden="choice.name === describedTemplate ? null : 'true'"
               :data-test="choice.name === describedTemplate ? 'template-description' : null"
             >
-              {{ $t(`group.templateDescriptions.${choice.name}`) }}
+              <!-- Named first: the line explains the card pointed at, else the one picked, and
+                   without the name it was not clear which of them it spoke about. Then the refusal,
+                   as a hint of its own — "not possible, because" — before what it would have meant. -->
+              <strong class="template-description__name">
+                {{ $t(`group.types.${choice.name}`) }}:
+              </strong>
               <span
                 v-if="!choice.allowed"
                 class="template-description__refused"
@@ -103,7 +114,20 @@
                   choice.name === describedTemplate ? 'template-description-refused' : null
                 "
               >
+                <os-icon
+                  :icon="icons.exclamationTriangle"
+                  class="template-description__refused-icon"
+                  aria-hidden="true"
+                />
                 {{ $t('group.validations.typeNotAllowed') }}
+              </span>
+              <!-- Under a refusal, the meaning starts a line of its own: run on after it, the two
+                   sentences read as one. -->
+              <span
+                class="template-description__text"
+                :class="{ 'template-description__text--own-line': !choice.allowed }"
+              >
+                {{ $t(`group.templateDescriptions.${choice.name}`) }}
               </span>
             </p>
           </div>
@@ -390,6 +414,11 @@ export default {
       // out under the row. Two fields, not one: focus leaving a card must not forget the cursor
       // still resting on it, nor the cursor leaving forget the focus.
       hoveredTemplate: null,
+      // How the last press on a template card came: 'mouse', 'touch' or 'pen' (chooseTemplate).
+      lastPointerType: null,
+      // The card last tapped: a tap has no hover to keep its reason in view, so it stays
+      // explained until another pick. Its own field, so clearing it never drops a live hover.
+      touchPinnedTemplate: null,
       focusedTemplate: null,
       // Exposed for the template (see the category validation hint below) —
       // bare module-scope reads don't resolve there, unlike in the script.
@@ -561,10 +590,16 @@ export default {
     },
     /**
      * Which template the line under the cards explains: the one pointed at, else the one
-     * focused, else the one picked.
+     * tapped, else the one focused, else the one picked.
      */
     describedTemplate() {
-      return this.hoveredTemplate || this.focusedTemplate || this.formData.template || null
+      return (
+        this.hoveredTemplate ||
+        this.touchPinnedTemplate ||
+        this.focusedTemplate ||
+        this.formData.template ||
+        null
+      )
     },
     /**
      * The cards on the create form: every template, with the glyph and the right it costs.
@@ -675,7 +710,29 @@ export default {
      * rights are what the visibility is read from. Both are written: the template is what gets
      * sent, the visibility is what every rule on this form already asks about.
      */
-    chooseTemplate(choice) {
+    chooseTemplate(choice, event) {
+      // The focus a mouse click leaves on the card is not the keyboard's: without this it kept
+      // explaining the card clicked — a refused one included — after the pointer had left it, as
+      // if it had been picked. The hover stays: while the pointer is on the card its reason stays
+      // in view, and leaving the card goes back to the template picked. Activated from the
+      // keyboard (`detail` 0) the focus is real and stays described.
+      if (event && event.detail > 0) {
+        if (this.lastPointerType === 'touch') {
+          // A tap has no hover to keep the reason in view, and a browser may report the finger
+          // leaving the card before the click: the tapped card stays explained, until the next tap.
+          this.touchPinnedTemplate = choice.name
+        } else {
+          this.touchPinnedTemplate = null
+          this.focusedTemplate = null
+        }
+      } else {
+        // Space or Enter: the keyboard is on this card, even where an earlier mouse click had
+        // dropped the focus it left (the focus itself did not move, so no focus event says so).
+        this.focusedTemplate = choice.name
+        // A card pinned by an earlier tap would outrank it; a live mouse hover stays, leaving
+        // that card goes back to this one.
+        this.touchPinnedTemplate = null
+      }
       // Refused cards stay focusable (aria-disabled, not disabled) so the keyboard reaches the
       // reason under the row; picking one is what is refused, here.
       if (!choice.allowed) return
@@ -840,10 +897,23 @@ export default {
 }
 
 /* Why the template in question cannot be picked — said where its meaning is, not only in a
-   tooltip that keyboard and touch never see. */
+   tooltip that keyboard and touch never see, and ahead of that meaning. */
+.template-description__name {
+  color: var(--text-color-base);
+}
+
+/* Inline, not an inline-flex box: a box cannot break inside, so on a narrow screen it jumped
+   to a line of its own as a whole instead of wrapping like the text around it. */
 .template-description__refused {
-  display: block;
   color: var(--color-danger);
+}
+
+.template-description__refused-icon {
+  vertical-align: -0.125em;
+}
+
+.template-description__text--own-line {
+  display: block;
 }
 
 .appearance--auto {

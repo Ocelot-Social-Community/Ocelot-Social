@@ -1197,6 +1197,7 @@
       "hidden": "Groep (inclusief de naam) is volledig onzichtbaar",
       "public": "Groep en alle berichten zijn zichtbaar voor alle geregistreerde gebruikers"
     },
+    "templateRefused": "Niet beschikbaar",
     "type": "Zichtbaarheid van de groep",
     "typeDescriptions": {
       "closed": "Alle berichten alleen zichtbaar voor groepsleden",

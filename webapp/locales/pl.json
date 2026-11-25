@@ -1197,6 +1197,7 @@
       "hidden": "Grupa (łącznie z nazwą) jest całkowicie niewidoczna",
       "public": "Grupa i wszystkie wpisy są widoczne dla wszystkich zarejestrowanych użytkowników"
     },
+    "templateRefused": "Niedostępne",
     "type": "Widoczność grupy",
     "typeDescriptions": {
       "closed": "Wszystkie wpisy widoczne tylko dla członków grupy",

@@ -1197,6 +1197,7 @@
       "hidden": "Group (including the name) is completely invisible",
       "public": "Group and all posts are visible for all registered users"
     },
+    "templateRefused": "Not available",
     "type": "Visibility of the group",
     "typeDescriptions": {
       "closed": "All posts only visible to the group's members",

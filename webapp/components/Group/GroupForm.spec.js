@@ -970,6 +970,194 @@ describe('GroupForm', () => {
       expect(wrapper.vm.describedTemplate).toBe('channel')
     })
 
+    it('says on the refused card itself that it is not available, before it is clicked', () => {
+      // Dimmed alone it read as a broken button (#11084); on touch there is no hover to show
+      // the reason underneath first.
+      const wrapper = mountWith(canExceptHidden)
+
+      expect(
+        wrapper
+          .find('[data-test="template-card-hidden"] [data-test="template-card-refused"]')
+          .text(),
+      ).toBe('group.templateRefused')
+      expect(
+        wrapper
+          .find('[data-test="template-card-public"] [data-test="template-card-refused"]')
+          .exists(),
+      ).toBe(false)
+    })
+
+    it('puts the refusal ahead of what the refused template would have meant', async () => {
+      const wrapper = mountWith(canExceptHidden)
+
+      wrapper.find('[data-test="template-card-hidden"]').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+
+      const description = wrapper.find('[data-test="template-description"]').text()
+      expect(description.indexOf('group.validations.typeNotAllowed')).toBeLessThan(
+        description.indexOf('group.templateDescriptions.hidden'),
+      )
+    })
+
+    it('names the template it explains, so it is clear which card the line speaks about', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const description = () => wrapper.find('[data-test="template-description"]').text()
+      await wrapper.find('[data-test="template-card-channel"]').trigger('click')
+
+      expect(description().startsWith('group.types.channel:')).toBe(true)
+
+      wrapper.find('[data-test="template-card-hidden"]').element.dispatchEvent(new Event('focus'))
+      await wrapper.vm.$nextTick()
+
+      expect(description().startsWith('group.types.hidden:')).toBe(true)
+    })
+
+    it('keeps explaining a clicked card while the pointer is on it, and the picked one after', async () => {
+      // The focus a click leaves on the card used to keep explaining the refused card after the
+      // pointer had left it (#11084). Resetting the hover as well made the line jump away from
+      // the card still pointed at — the very card whose reason was asked for.
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
+    it('explains the card again when the keyboard activates it after a mouse click', async () => {
+      // The click dropped the focus it left; the focus stayed on the card, so no focus event
+      // brings it back when Space is pressed there next.
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+    })
+
+    it('keeps explaining a tapped card, even where the finger is reported leaving it first', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+      const tap = new Event('pointerdown')
+      tap.pointerType = 'touch'
+
+      card('hidden').element.dispatchEvent(tap)
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+    })
+
+    it('explains a card activated from the keyboard after a tap pinned another one', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      const tap = new Event('pointerdown')
+      tap.pointerType = 'touch'
+      card('hidden').element.dispatchEvent(tap)
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+
+      card('channel').element.dispatchEvent(new Event('focus'))
+      card('channel').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.formData.template).toBe('channel')
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
+    it('keeps a real mouse hover described over a card activated from the keyboard', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      const point = new Event('pointerdown')
+      point.pointerType = 'mouse'
+      card('hidden').element.dispatchEvent(point)
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseenter'))
+
+      card('channel').element.dispatchEvent(new Event('focus'))
+      card('channel').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+
+      card('hidden').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
+    it('keeps a mouse hover that came after a tap, when the keyboard activates a card', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      const tap = new Event('pointerdown')
+      tap.pointerType = 'touch'
+      card('channel').element.dispatchEvent(tap)
+      card('channel').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+
+      card('channel').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+
+      card('channel').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+    })
+
+    it('drops the pin of a tapped card once the mouse picks another', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      const tap = new Event('pointerdown')
+      tap.pointerType = 'touch'
+      card('hidden').element.dispatchEvent(tap)
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+
+      const point = new Event('pointerdown')
+      point.pointerType = 'mouse'
+      card('channel').element.parentElement.dispatchEvent(new Event('mouseenter'))
+      card('channel').element.dispatchEvent(point)
+      card('channel').element.dispatchEvent(new MouseEvent('click', { detail: 1 }))
+      card('channel').element.parentElement.dispatchEvent(new Event('mouseleave'))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.describedTemplate).toBe('channel')
+    })
+
+    it('keeps explaining a card activated from the keyboard, where the focus is real', async () => {
+      const wrapper = mountWith(canExceptHidden, twoTemplates)
+      const card = (name) => wrapper.find(`[data-test="template-card-${name}"]`)
+      await card('channel').trigger('click')
+
+      card('hidden').element.dispatchEvent(new Event('focus'))
+      // Enter or Space on a button fires a click whose `detail` is 0.
+      card('hidden').element.dispatchEvent(new MouseEvent('click', { detail: 0 }))
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.vm.describedTemplate).toBe('hidden')
+      expect(wrapper.find('[data-test="template-description-refused"]').exists()).toBe(true)
+    })
+
     it('canCreateAnyGroup is false only when no type is permitted', () => {
       expect(mountWith(() => false).vm.canCreateAnyGroup).toBe(false)
       expect(mountWith((p) => p === 'group.create_closed').vm.canCreateAnyGroup).toBe(true)

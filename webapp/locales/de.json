@@ -1197,6 +1197,7 @@
       "hidden": "Gruppe (auch der Name) komplett unsichtbar",
       "public": "Gruppe und alle Beiträge für registrierte Nutzer sichtbar"
     },
+    "templateRefused": "Nicht verfügbar",
     "type": "Öffentlichkeit der Gruppe",
     "typeDescriptions": {
       "closed": "Alle Beiträge nur für Gruppenmitglieder sichtbar",
