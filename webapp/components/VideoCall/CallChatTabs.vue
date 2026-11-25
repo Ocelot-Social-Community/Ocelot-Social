@@ -6,13 +6,35 @@
     What can be done with the conference chat is in a toolbar below (CallChatToolbar): the row
     only holds tabs.
   -->
-  <div class="call-chat-tabs" role="tablist" :aria-label="$t('videoCall.chatTabs.label')">
+  <div
+    class="call-chat-tabs"
+    role="tablist"
+    :aria-label="$t('videoCall.chatTabs.label')"
+    :style="{ '--call-chat-tabs-others': othersLeastWidth }"
+  >
     <div
       v-for="tab in tabs"
       :key="tab.value"
       role="presentation"
-      :class="['call-chat-tabs__cell', { 'call-chat-tabs__cell--active': tab.value === active }]"
+      :class="[
+        'call-chat-tabs__cell',
+        {
+          'call-chat-tabs__cell--active': tab.value === active,
+          'call-chat-tabs__cell--counted': tab.count > 0,
+          'call-chat-tabs__cell--compact': compact.includes(tab.value),
+        },
+      ]"
     >
+      <!--
+        What the tab holds, unseen, with the title in bold as when open: it gives the cell the
+        width the tab asks for. The tab itself lies over it and fills the cell, whatever is left
+        of its title then.
+      -->
+      <span ref="sizers" class="call-chat-tabs__sizer" aria-hidden="true" :data-tab="tab.value">
+        <os-icon :icon="tab.icon" class="call-chat-tabs__icon" />
+        <span class="call-chat-tabs__label">{{ tab.label }}</span>
+        <os-badge v-if="tab.count > 0" :count="tab.count" />
+      </span>
       <button
         ref="tabs"
         v-tooltip="{ content: tab.tooltip, placement: 'bottom', classes: 'tooltip--narrow' }"
@@ -30,10 +52,11 @@
       >
         <!-- What kind of tab it is, at a glance: one of the two chats, or the people. -->
         <os-icon :icon="tab.icon" class="call-chat-tabs__icon" />
-        <!-- As wide as the label in bold, active or not: switching tabs moves no tab. -->
-        <span class="call-chat-tabs__label" :data-label="tab.label">
-          <span class="call-chat-tabs__label-text">{{ tab.label }}</span>
-        </span>
+        <!--
+          The title, cut with "…" as the tab gets narrow; below a least width, gone, the symbol
+          (and count) alone, in the middle.
+        -->
+        <span class="call-chat-tabs__label">{{ tab.label }}</span>
         <!--
           Unread messages, as the red count the app shows on its icons; how many are in the
           call, in the calm colour.
@@ -55,6 +78,15 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import { mapGetters, mapMutations } from 'vuex'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 
+// How much of a title a tab shows at the least, in em of its font; a shorter one whole.
+const TITLE_LEAST_EM = 3
+
+// Whether a tab of `room` px shows its title: `whole` is what it holds with all of the title,
+// `title` the title's own width. Without the title it needs whole - title; with it, at least
+// the least of the title, or all of a shorter one.
+export const titleFits = ({ room, whole, title, least }) =>
+  room >= whole - title + Math.min(title, least)
+
 // The choice between the two chats of a running video call: the conference chat only its
 // participants share, and the group's own, which reaches every member. Shown wherever one of
 // the two is on screen — in the call's sidebar and in the floating chat window beside the
@@ -69,8 +101,27 @@ export default {
     // How many people are in the call, for that tab.
     participantCount: { type: Number, default: 0 },
   },
+  data() {
+    return {
+      // The tabs too narrow for what is the least of their title: their symbol (and count) alone.
+      compact: [],
+    }
+  },
   created() {
     this.icons = iconRegistry
+  },
+  mounted() {
+    // Each cell's width against what its unseen copy holds. Hiding a title changes no cell's
+    // width (the copy keeps it), so this settles at once.
+    if (typeof ResizeObserver === 'undefined') return
+    this.cellObserver = new ResizeObserver(() => this.fitTitles())
+    this.observeCells()
+  },
+  updated() {
+    this.observeCells()
+  },
+  beforeDestroy() {
+    if (this.cellObserver) this.cellObserver.disconnect()
   },
   computed: {
     ...mapGetters({
@@ -84,6 +135,14 @@ export default {
     active() {
       if (this.withParticipants && this.participantsOpen) return 'participants'
       return activeCallChatTab(this.chat, this)
+    },
+    // How much room the tabs beside the open one take at the least, each down to its symbol (and
+    // count): the open one may take all the rest before its title is cut.
+    othersLeastWidth() {
+      const others = this.tabs.filter((tab) => tab.value !== this.active)
+      const counted = others.filter((tab) => tab.count > 0).length
+      const plain = others.length - counted
+      return `calc(var(--call-chat-tab-least) * ${plain} + var(--call-chat-tab-least-counted) * ${counted})`
     },
     // The one tab in the tab order, as the tab pattern asks: the active one, else the first.
     focusable() {
@@ -123,7 +182,8 @@ export default {
                 value: 'call',
                 label: this.$t('videoCall.chatTabs.call'),
                 title: this.$t('videoCall.chatTabs.callTitle'),
-                icon: this.icons.chatBubble,
+                // The chat of the call: the call's camera, a speech bubble before it.
+                icon: this.icons.videoChat,
                 // Held to a narrow tooltip, the hint wraps by itself. The same text is the note
                 // above the chat's messages, where it wraps to the chat's width.
                 hint: this.$t('videoCall.chatTabs.callHint'),
@@ -142,6 +202,34 @@ export default {
     },
   },
   methods: {
+    observeCells() {
+      if (!this.cellObserver) return
+      this.cellObserver.disconnect()
+      ;(this.$refs.sizers || []).forEach((sizer) => this.cellObserver.observe(sizer.parentElement))
+    },
+    // A title is shown while its tab has room for at least the least of it — all of a short one,
+    // some 3em of a longer one, cut with "…" — and otherwise not at all: the symbol alone.
+    fitTitles() {
+      const compact = []
+      // By the tab each copy stands for: Vue 2 keeps no order in a list of refs once it re-renders.
+      ;(this.$refs.sizers || []).forEach((sizer) => {
+        const label = sizer.querySelector('.call-chat-tabs__label')
+        const tab = this.tabs.find(({ value }) => value === sizer.dataset.tab)
+        if (!label || !tab || !sizer.isConnected) return
+        const fontSize = parseFloat(getComputedStyle(label).fontSize) || 16
+        if (
+          !titleFits({
+            room: sizer.parentElement.clientWidth,
+            whole: sizer.offsetWidth,
+            title: label.offsetWidth,
+            least: TITLE_LEAST_EM * fontSize,
+          })
+        ) {
+          compact.push(tab.value)
+        }
+      })
+      if (compact.join() !== this.compact.join()) this.compact = compact
+    },
     ...mapMutations({
       openChat: 'chat/SET_OPEN_CHAT',
       setParticipantsOpen: 'videoCall/SET_PARTICIPANTS_OPEN',
@@ -172,22 +260,22 @@ export default {
   flex: 1 1 auto;
   align-self: stretch;
   min-width: 0;
-  /*  Each tab as wide as its title asks, the short ones first: the grid gives every column its */
-  /*  least width (symbol and count), then shares out the rest evenly, but none more than its */
-  /*  title needs — so the short titles stay whole and only the longest is cut, until even the */
-  /*  short ones do not fit. Room beyond what all need is shared out evenly: the tabs still fill */
-  /*  the row. */
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(var(--call-chat-tab-min-width), auto);
-  /*  Its symbol, a two-digit count, and the space around them. */
-  --call-chat-tab-min-width: 4rem;
+  /*  Each tab as wide as its title asks; room beyond what all need is shared out evenly, so */
+  /*  the tabs fill the row. Short of room, the open tab comes first: the others give way, down */
+  /*  to their symbol (and count), before it is cut (see the cells). */
+  display: flex;
+  /*  A tab at its least: its symbol and the space beside it; with a count, that as well. */
+  --call-chat-tab-least: calc(1.2em + 2 * var(--space-x-small));
+  --call-chat-tab-least-counted: calc(var(--call-chat-tab-least) + var(--space-xx-small) + 1.75em);
 }
 
 .call-chat-tabs__cell {
-  min-width: 0;
+  /*  Giving way in proportion to their titles, down to their symbol. */
+  flex: 1 1 auto;
+  min-width: var(--call-chat-tab-least);
+  position: relative;
   display: flex;
-  align-items: center;
+  overflow: hidden;
   /*  The same three states as the app's tab navigation. */
   border-bottom: 2px solid transparent;
 }
@@ -201,16 +289,38 @@ export default {
   border-bottom-color: var(--color-primary);
 }
 
+.call-chat-tabs__cell--counted {
+  min-width: var(--call-chat-tab-least-counted);
+}
+
+/*  The open tab does not give way; it takes at most what the others leave at their least, and */
+/*  only beyond that is its title cut. */
+.call-chat-tabs__cell--active {
+  flex-shrink: 0;
+  max-width: calc(100% - var(--call-chat-tabs-others));
+}
+
+/*  The sizer and the tab hold the same, laid out alike. */
+.call-chat-tabs__sizer,
 .call-chat-tabs__tab {
-  flex: 1 1 0;
-  min-width: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-xx-small);
-  align-self: stretch;
-  /*  Hardly any space above and below: the row the tabs are put in sets their height. */
-  padding: var(--space-xxx-small) var(--space-xx-small);
+  /*  Hardly any space above and below: the row the tabs are put in sets their height. Beside, */
+  /*  enough that two tabs never run into each other. */
+  padding: var(--space-xxx-small) var(--space-x-small);
+}
+
+.call-chat-tabs__sizer {
+  flex: 0 0 auto;
+  visibility: hidden;
+  font-weight: var(--text-weight-bold);
+}
+
+.call-chat-tabs__tab {
+  position: absolute;
+  inset: 0;
+  justify-content: center;
   border: 0;
   background: none;
   color: var(--text-color-base);
@@ -222,28 +332,21 @@ export default {
   font-weight: var(--text-weight-bold);
 }
 
-/*  The label gives way when the row gets narrow; the count beside it does not (OsBadge's */
-/*  `count` never shrinks). */
+/*  The title gives way when the row gets narrow; the symbol and the count beside it do not */
+/*  (OsBadge's `count` never shrinks). */
 .call-chat-tabs__icon {
   flex: 0 0 auto;
 }
 .call-chat-tabs__label {
   min-width: 0;
-  /*  The label and its bold copy in one cell: the wider of the two sets its width. */
-  display: grid;
-}
-.call-chat-tabs__label-text,
-.call-chat-tabs__label::after {
-  grid-area: 1 / 1;
-  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.call-chat-tabs__label::after {
-  content: attr(data-label);
-  font-weight: var(--text-weight-bold);
-  visibility: hidden;
+
+/*  Too narrow for the least of its title: no "…" with a letter or two, the symbol alone. */
+.call-chat-tabs__cell--compact .call-chat-tabs__tab .call-chat-tabs__label {
+  display: none;
 }
 
 .call-chat-tabs__tab:focus-visible {
