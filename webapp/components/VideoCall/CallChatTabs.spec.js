@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import Vuex from 'vuex'
-import CallChatTabs from './CallChatTabs.vue'
+import CallChatTabs, { titleFits } from './CallChatTabs.vue'
 
 const localVue = global.localVue
 
@@ -118,12 +118,77 @@ describe('CallChatTabs', () => {
     expect(count(wrapper, 'call').text()).toBe('99+')
   })
 
-  it('keeps each label as wide as in bold, so switching tabs moves no tab', () => {
+  it('marks the tabs with a count, which keep room for it when they give way', () => {
+    wrapper = Wrapper({ unread: 3 })
+    const cell = (name) => tab(wrapper, name).element.parentElement.classList
+    expect(cell('call')).toContain('call-chat-tabs__cell--counted')
+    expect(cell('group')).not.toContain('call-chat-tabs__cell--counted')
+  })
+
+  it('leaves the open tab all the room the others do not need at their least', () => {
+    wrapper = Wrapper({ unread: 3, groupUnread: 2, chat: groupChat })
+    // Open: the group chat. Beside it the conference chat, with a count.
+    expect(wrapper.attributes('style')).toContain(
+      '--call-chat-tabs-others: calc(var(--call-chat-tab-least) * 0 + var(--call-chat-tab-least-counted) * 1)',
+    )
+  })
+
+  it('gives each cell its width by an unseen copy of what the tab holds, not read out', () => {
     wrapper = Wrapper()
-    const label = tab(wrapper, 'call').find('.call-chat-tabs__label')
-    // The bold copy is drawn from the attribute: the text is there once.
-    expect(label.attributes('data-label')).toBe('videoCall.chatTabs.call')
-    expect(label.text()).toBe('videoCall.chatTabs.call')
+    const cell = tab(wrapper, 'call').element.parentElement
+    const sizer = cell.querySelector('.call-chat-tabs__sizer')
+    expect(sizer.getAttribute('aria-hidden')).toBe('true')
+    expect(sizer.textContent.trim()).toBe('videoCall.chatTabs.call')
+    // Not within the tab: the tab's own text is its title once.
+    expect(tab(wrapper, 'call').text()).toBe('videoCall.chatTabs.call')
+  })
+
+  describe('whether a tab shows its title', () => {
+    // A tab of 30px without its title; a long title of 100px, a short one of 40px; at the least
+    // 64px of a title (4em).
+    const fits = (room, title) => titleFits({ room, whole: 30 + title, title, least: 64 })
+
+    it('shows a long one cut while at least its least is left', () => {
+      expect(fits(130, 100)).toBe(true)
+      expect(fits(94, 100)).toBe(true)
+      expect(fits(93, 100)).toBe(false)
+    })
+
+    it('shows a short one only whole', () => {
+      expect(fits(70, 40)).toBe(true)
+      expect(fits(69, 40)).toBe(false)
+    })
+  })
+
+  it('measures each tab by its own copy, whatever the order of the copies', () => {
+    wrapper = Wrapper({}, { withParticipants: true })
+    const sizers = [...wrapper.vm.$refs.sizers].reverse()
+    // Room for the group chat's title only; each copy says which tab it is.
+    sizers.forEach((sizer) => {
+      const room = sizer.dataset.tab === 'group' ? 200 : 10
+      Object.defineProperty(sizer.parentElement, 'clientWidth', { value: room, configurable: true })
+      Object.defineProperty(sizer, 'offsetWidth', { value: 100, configurable: true })
+      const label = sizer.querySelector('.call-chat-tabs__label')
+      Object.defineProperty(label, 'offsetWidth', { value: 70, configurable: true })
+    })
+    wrapper.vm.$refs.sizers = sizers
+    wrapper.vm.fitTitles()
+    expect(wrapper.vm.compact.sort()).toEqual(['call', 'participants'])
+  })
+
+  it('shows the symbol alone in a tab marked too narrow for its title', async () => {
+    wrapper = Wrapper()
+    wrapper.setData({ compact: ['group'] })
+    await wrapper.vm.$nextTick()
+    const cell = (name) => tab(wrapper, name).element.parentElement.classList
+    expect(cell('group')).toContain('call-chat-tabs__cell--compact')
+    expect(cell('call')).not.toContain('call-chat-tabs__cell--compact')
+  })
+
+  it('gives the conference chat a symbol of its own, not the one of the group chat', () => {
+    wrapper = Wrapper()
+    const symbols = wrapper.findAll('[role="tab"] .os-icon').wrappers.map((icon) => icon.html())
+    expect(symbols[0]).not.toBe(symbols[1])
   })
 
   it('holds only tabs: what can be done with a chat is in its toolbar below', () => {
