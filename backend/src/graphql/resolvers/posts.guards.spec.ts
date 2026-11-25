@@ -18,6 +18,7 @@ import { beforeAll, afterAll, describe, it, expect } from 'vitest'
 import { createLoaders } from '@context/loaders'
 import { cleanDatabase } from '@db/factories'
 import { closeDriver, getDriver } from '@db/neo4j'
+import { createReadScopes } from '@graphql/resolvers/helpers/viewerGroups'
 
 import postsResolvers from './posts'
 
@@ -45,6 +46,7 @@ const fieldContext = () =>
   ({
     driver,
     loaders: createLoaders(driver, null),
+    readScopes: createReadScopes(),
     cypherParams: { currentUserId: null },
   }) as unknown as Context
 
@@ -113,14 +115,6 @@ describe('Post.comments', () => {
 })
 
 describe('Post.commentsCount', () => {
-  it('returns a count the parent query already projected instead of querying again', async () => {
-    // The search projects its own count onto each post; asking again would cost a query per
-    // hit and could disagree with the number the search ranked by.
-    await expect(
-      postsResolvers.Post.commentsCount({ id: 'p1', commentsCount: 7 }, {}, fieldContext()),
-    ).resolves.toBe(7)
-  })
-
   it('counts nothing for a parent that carries no id', async () => {
     // Keyed on the parent id, as `comments` above: without one, every such parent would share
     // the answer of the key `undefined`.

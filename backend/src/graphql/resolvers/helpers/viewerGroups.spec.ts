@@ -1,12 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { elevatedReadScope, groupReadScope, viewerScope } from './viewerGroups'
+import { createReadScopes, elevatedReadScope, groupReadScope, viewerScope } from './viewerGroups'
 
 import type { Context } from '@src/context'
 import type { PermissionKey } from '@src/permission'
 
 const contextHolding = (...permissions: string[]) =>
-  ({ effectivePermissions: new Set(permissions as PermissionKey[]) }) as unknown as Context
+  ({
+    effectivePermissions: new Set(permissions as PermissionKey[]),
+    readScopes: createReadScopes(),
+  }) as unknown as Context
 
 // One row per membership, the shape the scope query returns.
 const membershipRow = (groupId: string, roleName: string, permissions: string | null) => ({
@@ -21,6 +24,7 @@ const contextWithMemberships = (
     user: { id: 'viewer' },
     effectivePermissions: new Set(permissions as PermissionKey[]),
     database: { query: vi.fn().mockResolvedValue({ records: rows }) },
+    readScopes: createReadScopes(),
   }) as unknown as Context
 
 // What the elevation query sees: an `ELEVATED_IN` lookup answers with these group ids, the
@@ -38,6 +42,7 @@ const contextElevatedIn = (groupIds: string[], ...permissions: string[]) => {
       user: { id: 'viewer' },
       effectivePermissions: new Set(permissions as PermissionKey[]),
       database: { query },
+      readScopes: createReadScopes(),
     } as unknown as Context,
     query,
   }
@@ -86,7 +91,7 @@ describe(elevatedReadScope, () => {
 
 describe(groupReadScope, () => {
   it('asks nothing for an anonymous visitor, who holds no membership', async () => {
-    const context = { user: null } as unknown as Context
+    const context = { user: null, readScopes: createReadScopes() } as unknown as Context
 
     expect(await groupReadScope(context)).toEqual({
       readableGroupIds: [],
@@ -165,6 +170,7 @@ describe(viewerScope, () => {
       user: { id: 'viewer' },
       effectivePermissions: new Set(['group.content.read.any_closed'] as PermissionKey[]),
       database: { query },
+      readScopes: createReadScopes(),
     } as unknown as Context
 
     expect(await viewerScope(context)).toEqual({
@@ -175,12 +181,68 @@ describe(viewerScope, () => {
   })
 
   it('is a constraining scope for an anonymous visitor, not an absent one', async () => {
-    const context = { user: null, effectivePermissions: new Set() } as unknown as Context
+    const context = {
+      user: null,
+      effectivePermissions: new Set(),
+      readScopes: createReadScopes(),
+    } as unknown as Context
 
     expect(await viewerScope(context)).toEqual({
       viewerId: null,
       contentGroupIds: [],
       elevatedGroupIds: [],
     })
+  })
+})
+
+describe('within one request', () => {
+  const contextWith = (query: ReturnType<typeof vi.fn>) =>
+    ({
+      user: { id: 'viewer' },
+      effectivePermissions: new Set(['group.content.read.any_closed'] as PermissionKey[]),
+      database: { query },
+      readScopes: createReadScopes(),
+    }) as unknown as Context
+  const answering = () =>
+    vi.fn(async ({ query: statement }: { query: string }) =>
+      Promise.resolve({
+        records: statement.includes('ELEVATED_IN')
+          ? [{ get: () => 'elevated' }]
+          : [membershipRow('mine', 'usual', '["group.read","group.content.read"]')],
+      }),
+    )
+
+  it('asks the database once, however often and however concurrently it is asked', async () => {
+    // The post query and every batched field below it ask the same scope; each used to be a
+    // round trip of its own, before the batch statement could start.
+    const query = answering()
+    const context = contextWith(query)
+
+    const answers = await Promise.all([viewerScope(context), viewerScope(context)])
+    await viewerScope(context)
+    await groupReadScope(context)
+
+    expect(answers[0]).toEqual(answers[1])
+    expect(query).toHaveBeenCalledTimes(2) // one membership lookup, one elevation lookup
+  })
+
+  it('asks again for another request', async () => {
+    // The memo lives in the context, which is built per request: nothing carries over.
+    const query = answering()
+    await viewerScope(contextWith(query))
+    await viewerScope(contextWith(query))
+
+    expect(query).toHaveBeenCalledTimes(4)
+  })
+
+  it('forgets a lookup that failed, so the next asker tries again', async () => {
+    const query = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('connection reset'))
+      .mockResolvedValue({ records: [membershipRow('mine', 'usual', '["group.content.read"]')] })
+    const context = contextWith(query)
+
+    await expect(groupReadScope(context)).rejects.toThrow('connection reset')
+    expect((await groupReadScope(context)).contentGroupIds).toEqual(['mine'])
   })
 })
