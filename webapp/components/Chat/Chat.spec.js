@@ -636,17 +636,50 @@ describe('Chat.vue', () => {
       expect(wrapper.vm.messages).toHaveLength(0)
     })
 
-    it('increments unreadCount for non-current rooms', async () => {
+    it('takes the unread count of a room that is not open from the server', async () => {
       wrapper.vm.selectedRoom = mockRoom({ id: 'other-room' })
       await wrapper.vm.chatMessageAdded({
         data: {
           chatMessageAdded: mockMessage({
             senderId: 'other-user',
-            room: { id: 'room-1' },
+            room: { id: 'room-1', unreadCount: 4 },
           }),
         },
       })
-      expect(wrapper.vm.rooms[0].unreadCount).toBe(1)
+      expect(wrapper.vm.rooms[0].unreadCount).toBe(4)
+    })
+
+    it('does not count a message the server leaves out, as from a sender the viewer mutes', async () => {
+      // A group room delivers a muted or blocked member's message live; the server's count,
+      // resolved for this viewer, does not include it.
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 2 })]
+      wrapper.vm.selectedRoom = mockRoom({ id: 'other-room' })
+      await wrapper.vm.chatMessageAdded({
+        data: {
+          chatMessageAdded: mockMessage({
+            senderId: 'muted-user',
+            content: 'From a muted member',
+            room: { id: 'room-1', unreadCount: 2 },
+          }),
+        },
+      })
+      expect(wrapper.vm.rooms[0].unreadCount).toBe(2)
+      // The room is updated all the same: the message is there, only not counted.
+      expect(wrapper.vm.rooms[0].lastMessage.content).toBe('From a muted member')
+    })
+
+    it('leaves the unread count of a room alone for a message the viewer wrote', async () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 2 })]
+      wrapper.vm.selectedRoom = mockRoom({ id: 'other-room' })
+      await wrapper.vm.chatMessageAdded({
+        data: {
+          chatMessageAdded: mockMessage({
+            senderId: 'current-user',
+            room: { id: 'room-1', unreadCount: 7 },
+          }),
+        },
+      })
+      expect(wrapper.vm.rooms[0].unreadCount).toBe(2)
     })
   })
 
