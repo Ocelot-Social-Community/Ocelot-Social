@@ -216,6 +216,12 @@ export default {
 /* Lifts off the text running past underneath only while it sticks; in its place it would only
    add noise above the text field. */
 .editor-menubar.is-stuck {
+  /* A narrow margin above and below the tools, which a detached bar needs and the bar in its place
+     does not. The bottom one is taken back from the margin below, so that nothing under the bar
+     moves when it sticks (the text field keeps its gap of --space-small, which is wider). */
+  padding-top: var(--space-xx-small);
+  padding-bottom: var(--space-xx-small);
+  margin-bottom: calc(-2 * var(--space-xx-small));
   /* The bar sits above the text field and ends level with it, so the field's side lines run up to
      it and stop. Two inner lines in the field's border colour (inset, so the bar keeps its width)
      carry them on along the bar: bar and field read as one piece. */
