@@ -216,7 +216,22 @@ export default {
 /* Lifts off the text running past underneath only while it sticks; in its place it would only
    add noise above the text field. */
 .editor-menubar.is-stuck {
-  box-shadow: var(--box-shadow-sticky);
+  /* The bar sits above the text field and ends level with it, so the field's side lines run up to
+     it and stop. Two inner lines in the field's border colour (inset, so the bar keeps its width)
+     carry them on along the bar: bar and field read as one piece. */
+  box-shadow:
+    inset var(--input-border-size) 0 0 var(--border-color-softer),
+    inset calc(-1 * var(--input-border-size)) 0 0 var(--border-color-softer),
+    var(--box-shadow-sticky);
+}
+
+/* The field's outline turns to the primary colour while it has the focus (.editor-content); the
+   bar's lines follow. */
+.editor:has(.editor-content:focus-within) > .editor-menubar.is-stuck {
+  box-shadow:
+    inset var(--input-border-size) 0 0 var(--color-primary),
+    inset calc(-1 * var(--input-border-size)) 0 0 var(--color-primary),
+    var(--box-shadow-sticky);
 }
 
 @media (prefers-reduced-motion: reduce) {
