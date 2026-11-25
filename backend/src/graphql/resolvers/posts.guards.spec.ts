@@ -115,14 +115,6 @@ describe('Post.comments', () => {
 })
 
 describe('Post.commentsCount', () => {
-  it('returns a count the parent query already projected instead of querying again', async () => {
-    // The search projects its own count onto each post; asking again would cost a query per
-    // hit and could disagree with the number the search ranked by.
-    await expect(
-      postsResolvers.Post.commentsCount({ id: 'p1', commentsCount: 7 }, {}, fieldContext()),
-    ).resolves.toBe(7)
-  })
-
   it('counts nothing for a parent that carries no id', async () => {
     // Keyed on the parent id, as `comments` above: without one, every such parent would share
     // the answer of the key `undefined`.

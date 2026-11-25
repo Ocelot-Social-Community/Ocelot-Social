@@ -982,11 +982,9 @@ export default {
           .load(parent.id as string)
       )
     },
-    // Counted like the list above: in a group the viewer does not read, nothing.
+    // Counted like the list above: in a group the viewer does not read, nothing. Always counted
+    // here, never taken from the parent: a count projected elsewhere would bypass this filter.
     commentsCount: async (parent, _params, context: Context) => {
-      if (typeof parent?.commentsCount !== 'undefined') {
-        return parent.commentsCount
-      }
       if (!parent?.id) {
         return 0
       }
