@@ -13,7 +13,9 @@ WORKDIR /app
 FROM base AS development
 ENV NODE_ENV="development"
 EXPOSE 6006
-CMD ["/bin/sh", "-c", "npm install && npm run dev"]
+# Storybook 10.6+ listens on 127.0.0.1 by default: inside a container that is the container's own
+# loopback, which the published port 6006 does not reach. Listen on all interfaces instead.
+CMD ["/bin/sh", "-c", "npm install && npm run dev -- --host 0.0.0.0"]
 
 FROM base AS build
 COPY package*.json ./
