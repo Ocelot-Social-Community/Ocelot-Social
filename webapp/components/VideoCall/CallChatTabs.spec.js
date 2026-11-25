@@ -118,6 +118,14 @@ describe('CallChatTabs', () => {
     expect(count(wrapper, 'call').text()).toBe('99+')
   })
 
+  it('keeps each label as wide as in bold, so switching tabs moves no tab', () => {
+    wrapper = Wrapper()
+    const label = tab(wrapper, 'call').find('.call-chat-tabs__label')
+    // The bold copy is drawn from the attribute: the text is there once.
+    expect(label.attributes('data-label')).toBe('videoCall.chatTabs.call')
+    expect(label.text()).toBe('videoCall.chatTabs.call')
+  })
+
   it('holds only tabs: what can be done with a chat is in its toolbar below', () => {
     wrapper = Wrapper()
     expect(wrapper.find('[data-test="call-chat-tab-menu"]').exists()).toBe(false)
