@@ -228,8 +228,14 @@ const buildStore = (state = {}) => {
 
 const factory = (state = {}) => {
   const built = buildStore(state)
-  const $route = { name: state.routeName || 'groups-id-slug' }
-  const $router = { push: jest.fn(), replace: jest.fn() }
+  const $route = { name: state.routeName || 'groups-id-slug', params: state.routeParams || {} }
+  // As Nuxt's push: it hands callbacks to the router and returns nothing — no promise to chain on.
+  const $router = {
+    push: jest.fn((location, onComplete) => {
+      if (onComplete) onComplete()
+    }),
+    replace: jest.fn(),
+  }
   const wrapper = mount(VideoCall, {
     localVue,
     store: built.store,
@@ -1014,48 +1020,74 @@ describe('VideoCall', () => {
   })
 
   describe('toggleMinimize', () => {
-    it('flips minimized via the store and pushes the matching route', () => {
-      const { wrapper, setMinimized } = factory({
-        show: true,
-        groupId: 'g1',
-        groupSlug: 'yoga',
-        routeName: 'call-id-slug',
-      })
-      wrapper.vm.$router.push = jest.fn().mockResolvedValue()
-      wrapper.vm.toggleMinimize()
-      expect(setMinimized).toHaveBeenCalled()
-      // Target route after toggle is groups-id-slug; differs from current.
-      expect(wrapper.vm.$router.push).toHaveBeenCalled()
-    })
+    const inCall = (routeName, routeParams, minimized = false) =>
+      factory({ show: true, groupId: 'g1', groupSlug: 'yoga', routeName, routeParams, minimized })
 
-    it('does not push when no groupId/groupSlug', () => {
-      const { wrapper } = factory({ show: true })
-      wrapper.vm.$router.push = jest.fn()
+    it('brings the call up over any other page and leaves that page as it is', () => {
+      // An editor with unsaved text under the call: navigating took it down without its warning.
+      const { wrapper, setMinimized } = inCall('post-edit-id', { id: 'p1' }, true)
+
       wrapper.vm.toggleMinimize()
+
+      expect(setMinimized).toHaveBeenCalledWith(expect.anything(), false)
       expect(wrapper.vm.$router.push).not.toHaveBeenCalled()
     })
 
-    it('swallows navigation rejection without breaking the store update', async () => {
-      const { wrapper, setMinimized } = factory({
-        show: true,
-        groupId: 'g1',
-        groupSlug: 'yoga',
-        routeName: 'call-id-slug',
-      })
-      const push = jest.fn().mockRejectedValue(new Error('aborted'))
-      wrapper.vm.$router.push = push
-      // Trigger the toggle and let the rejected push promise settle.
-      const result = wrapper.vm.toggleMinimize()
-      await wrapper.vm.$nextTick()
-      await wrapper.vm.$nextTick()
-      // 1. Store mutation ran — minimize state is updated despite the
-      //    failed route push (so the UI doesn't lock up).
-      expect(setMinimized).toHaveBeenCalled()
-      // 2. The router.push was actually attempted.
-      expect(push).toHaveBeenCalled()
-      // 3. toggleMinimize is sync but kicks off an async .catch; the
-      //    method itself returns undefined and must not reject.
-      expect(result).toBeUndefined()
+    it('parks the call over any other page without leaving it', () => {
+      const { wrapper, setMinimized } = inCall('post-edit-id', { id: 'p1' })
+
+      wrapper.vm.toggleMinimize()
+
+      expect(setMinimized).toHaveBeenCalledWith(expect.anything(), true)
+      expect(wrapper.vm.$router.push).not.toHaveBeenCalled()
+    })
+
+    it("parks the call from its own page on its group's page, as that page shows only the call", () => {
+      const { wrapper } = inCall('call-id-slug', { id: 'g1', slug: 'yoga' })
+
+      wrapper.vm.toggleMinimize()
+
+      expect(wrapper.vm.$router.push).toHaveBeenCalledWith(
+        { name: 'groups-id-slug', params: { id: 'g1', slug: 'yoga' } },
+        expect.any(Function),
+        expect.any(Function),
+      )
+    })
+
+    it("brings the call up from its group's page on the call's own URL", () => {
+      const { wrapper } = inCall('groups-id-slug', { id: 'g1', slug: 'yoga' }, true)
+
+      wrapper.vm.toggleMinimize()
+
+      expect(wrapper.vm.$router.push).toHaveBeenCalledWith(
+        { name: 'call-id-slug', params: { id: 'g1', slug: 'yoga' } },
+        expect.any(Function),
+        expect.any(Function),
+      )
+    })
+
+    it("stays on another group's page when bringing the call up", () => {
+      const { wrapper } = inCall('groups-id-slug', { id: 'g2', slug: 'other' }, true)
+
+      wrapper.vm.toggleMinimize()
+
+      expect(wrapper.vm.$router.push).not.toHaveBeenCalled()
+    })
+
+    it("does not throw on Nuxt's push, which returns no promise", () => {
+      // A `.catch()` on its result threw, and Nuxt showed its error page in place of the page.
+      const { wrapper } = inCall('call-id-slug', { id: 'g1', slug: 'yoga' })
+      wrapper.vm.$router.push = jest.fn(() => undefined)
+
+      expect(() => wrapper.vm.toggleMinimize()).not.toThrow()
+    })
+
+    it('does not navigate without the group to go to', () => {
+      const { wrapper } = factory({ show: true, routeName: 'call-id-slug' })
+
+      wrapper.vm.toggleMinimize()
+
+      expect(wrapper.vm.$router.push).not.toHaveBeenCalled()
     })
   })
 
@@ -1067,11 +1099,14 @@ describe('VideoCall', () => {
 
   describe('onPreJoinReady', () => {
     it('captures the device payload and triggers connect', async () => {
-      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        groupSlug: 'yoga',
+        routeParams: { id: 'g1', slug: 'yoga' },
+      })
       wrapper.setData({ phase: 'prejoin' })
       wrapper.vm.connect = jest.fn().mockResolvedValue()
-      wrapper.vm.$router.push = jest.fn().mockResolvedValue()
-      wrapper.vm.$route.name = 'groups-id-slug'
       await wrapper.vm.onPreJoinReady({
         cameraDeviceId: 'cam-1',
         micDeviceId: 'mic-1',
@@ -1084,7 +1119,30 @@ describe('VideoCall', () => {
       expect(wrapper.vm.speakerDeviceId).toBe('spk-1')
       expect(wrapper.vm.phase).toBe('connecting')
       expect(wrapper.vm.connect).toHaveBeenCalled()
-      expect(wrapper.vm.$router.push).toHaveBeenCalled()
+      // Joined from the group's page: on to the call's own URL.
+      expect(wrapper.vm.$router.push).toHaveBeenCalledWith(
+        { name: 'call-id-slug', params: { id: 'g1', slug: 'yoga' } },
+        expect.any(Function),
+        expect.any(Function),
+      )
+    })
+
+    it('stays on any other page when joined from there, so that page is not taken down', async () => {
+      // A post being edited under the call: leaving it took its unsaved text with it.
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        groupSlug: 'yoga',
+        routeName: 'post-edit-id',
+        routeParams: { id: 'p1' },
+      })
+      wrapper.setData({ phase: 'prejoin' })
+      wrapper.vm.connect = jest.fn().mockResolvedValue()
+
+      await wrapper.vm.onPreJoinReady({ micEnabled: true, cameraEnabled: true })
+
+      expect(wrapper.vm.$router.push).not.toHaveBeenCalled()
+      expect(wrapper.vm.connect).toHaveBeenCalled()
     })
 
     it('keeps what did not start in the prejoin for the device settings, through the join', async () => {
@@ -1095,8 +1153,6 @@ describe('VideoCall', () => {
           .fn()
           .mockResolvedValue({ data: { joinGroupVideoCall: { url: 'ws://lk', token: 'tok' } } }),
       }
-      wrapper.vm.$router.push = jest.fn().mockResolvedValue()
-      wrapper.vm.$route.name = 'groups-id-slug'
       await wrapper.vm.onPreJoinReady({
         cameraDeviceId: 'cam-1',
         micDeviceId: 'mic-1',
@@ -1111,12 +1167,17 @@ describe('VideoCall', () => {
       expect(wrapper.vm.deviceIssues).toEqual({ camera: 'busy', mic: null })
     })
 
-    it('swallows router push errors', async () => {
-      const { wrapper } = factory({ show: true, groupId: 'g1', groupSlug: 'yoga' })
+    it('still joins when the navigation to the call URL is refused', async () => {
+      const { wrapper } = factory({
+        show: true,
+        groupId: 'g1',
+        groupSlug: 'yoga',
+        routeParams: { id: 'g1', slug: 'yoga' },
+      })
       wrapper.setData({ phase: 'prejoin' })
       wrapper.vm.connect = jest.fn().mockResolvedValue()
-      wrapper.vm.$router.push = jest.fn().mockRejectedValue(new Error('aborted'))
-      wrapper.vm.$route.name = 'groups-id-slug'
+      // Refused, as by a guard: Nuxt's push calls onAbort and returns nothing.
+      wrapper.vm.$router.push = jest.fn((location, onComplete, onAbort) => onAbort())
       await expect(
         wrapper.vm.onPreJoinReady({
           cameraDeviceId: null,
@@ -1126,6 +1187,72 @@ describe('VideoCall', () => {
           cameraEnabled: false,
         }),
       ).resolves.toBeUndefined()
+      expect(wrapper.vm.connect).toHaveBeenCalled()
+    })
+
+    describe('while the navigation to the call URL is under way', () => {
+      // Nuxt's push returns nothing; the join goes on from the router's callbacks.
+      const pending = () => {
+        const { wrapper } = factory({
+          show: true,
+          groupId: 'g1',
+          groupSlug: 'yoga',
+          routeParams: { id: 'g1', slug: 'yoga' },
+        })
+        wrapper.setData({ phase: 'prejoin' })
+        wrapper.vm.connect = jest.fn().mockResolvedValue()
+        const callbacks = {}
+        wrapper.vm.$router.push = jest.fn((location, onComplete, onAbort) => {
+          Object.assign(callbacks, { onComplete, onAbort })
+        })
+        const join = wrapper.vm.onPreJoinReady({ micEnabled: true, cameraEnabled: true })
+        return { wrapper, callbacks, join }
+      }
+
+      it.each(['onComplete', 'onAbort'])(
+        'connects only once the router reports back (%s)',
+        async (callback) => {
+          const { wrapper, callbacks, join } = pending()
+          await flushPromises()
+          expect(wrapper.vm.connect).not.toHaveBeenCalled()
+
+          callbacks[callback]()
+          await join
+
+          expect(wrapper.vm.connect).toHaveBeenCalledTimes(1)
+        },
+      )
+
+      it('does not connect once the join was given up meanwhile', async () => {
+        const { wrapper, callbacks, join } = pending()
+        // Cancelled: cleanup() counts the attempt on.
+        wrapper.vm.connectAttempt++
+
+        callbacks.onComplete()
+        await join
+
+        expect(wrapper.vm.connect).not.toHaveBeenCalled()
+      })
+
+      it("does not connect to another group's call opened meanwhile", async () => {
+        const { wrapper, callbacks, join } = pending()
+        Object.defineProperty(wrapper.vm, 'groupId', { value: 'g2', configurable: true })
+
+        callbacks.onComplete()
+        await join
+
+        expect(wrapper.vm.connect).not.toHaveBeenCalled()
+      })
+
+      it('does not connect once a new prejoin was opened meanwhile', async () => {
+        const { wrapper, callbacks, join } = pending()
+        wrapper.setData({ phase: 'prejoin' })
+
+        callbacks.onComplete()
+        await join
+
+        expect(wrapper.vm.connect).not.toHaveBeenCalled()
+      })
     })
 
     it('skips router push if already on the call route', async () => {
@@ -1137,7 +1264,6 @@ describe('VideoCall', () => {
       })
       wrapper.setData({ phase: 'prejoin' })
       wrapper.vm.connect = jest.fn().mockResolvedValue()
-      wrapper.vm.$router.push = jest.fn().mockResolvedValue()
       await wrapper.vm.onPreJoinReady({
         cameraDeviceId: null,
         micDeviceId: null,

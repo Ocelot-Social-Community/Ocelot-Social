@@ -1306,6 +1306,16 @@ export default {
       }
       return name
     },
+    // On the page of the group the call is in — where the call's own URL takes over (see
+    // toggleMinimize, onPreJoinReady).
+    onOwnGroupPage() {
+      return (
+        !!this.groupSlug &&
+        this.$route.name === 'groups-id-slug' &&
+        !!this.$route.params &&
+        this.$route.params.id === this.groupId
+      )
+    },
     groupRoute() {
       if (!this.groupId || !this.groupSlug) return null
       return { name: 'groups-id-slug', params: { id: this.groupId, slug: this.groupSlug } }
@@ -2628,18 +2638,22 @@ export default {
     toggleMinimize() {
       const next = !this.minimized
       this.setMinimized(next)
-      // URL follows the visual state: maximized → /call/..., minimized → /groups/...
-      const targetRoute = next ? 'groups-id-slug' : 'call-id-slug'
-      if (this.groupId && this.groupSlug && this.$route.name !== targetRoute) {
-        this.$router
-          .push({
-            name: targetRoute,
-            params: { id: this.groupId, slug: this.groupSlug },
-          })
-          .catch(() => {
-            /* ignore navigation duplicates / aborts */
-          })
+      // Bringing the call up or parking it is a view, not a page: the page under the call stays as
+      // it is — an editor keeps its text, a form its input. Navigating to /call/... used to take
+      // that page down, and with it its unsaved changes, without the warning it gives on leaving.
+      // Between the call's own page and its group's page alone the URL follows, as it did: the
+      // call page shows nothing but the call, and the group page holds nothing to lose.
+      if (next && this.onCallRoute && this.groupRoute) {
+        this.navigate(this.groupRoute)
+      } else if (!next && this.onOwnGroupPage) {
+        this.navigate({ name: 'call-id-slug', params: { id: this.groupId, slug: this.groupSlug } })
       }
+    },
+    // Vue Router's push, resolved once the navigation is over — done, refused by a guard, or
+    // replaced by another. Nuxt's push returns no promise (it hands its own callbacks to the
+    // router), so a `.catch()` on it threw — and left Nuxt's error page in place of the page.
+    navigate(location) {
+      return new Promise((resolve) => this.$router.push(location, resolve, resolve))
     },
     onGroupLinkClick() {
       // The nuxt-link navigates; the route watcher above will minimize the
@@ -2660,18 +2674,24 @@ export default {
       this.phase = 'connecting'
       this.error = null
       this.tiles = []
-      // Take the user to the call's own URL — the page exists so the in-call
-      // view is bookmarkable / shareable / browser-back aware. Await the push
-      // so the URL change finishes before we start the LiveKit handshake.
-      if (this.groupId && this.groupSlug && this.$route.name !== 'call-id-slug') {
-        try {
-          await this.$router.push({
-            name: 'call-id-slug',
-            params: { id: this.groupId, slug: this.groupSlug },
-          })
-        } catch (_e) {
-          /* navigation duplicates / aborts — fine */
-        }
+      // Joined from the group's page, the user is taken to the call's own URL — the page exists
+      // so the in-call view is bookmarkable / shareable / browser-back aware. Joined from any
+      // other page (a running call offered on another page, say, while a post is being edited),
+      // the call comes up over that page and leaves it as it is (see toggleMinimize). Awaited,
+      // so the URL has changed before the LiveKit handshake starts.
+      if (this.onOwnGroupPage) {
+        // While the navigation is under way the join may be given up — cancelled (cleanup()
+        // counts the attempt on) or replaced by another group's prejoin. Then it must not connect,
+        // least of all to the other group's call, with this prejoin's devices.
+        const attempt = this.connectAttempt
+        const groupId = this.groupId
+        await this.navigate({
+          name: 'call-id-slug',
+          params: { id: this.groupId, slug: this.groupSlug },
+        })
+        const givenUp =
+          attempt !== this.connectAttempt || groupId !== this.groupId || this.phase !== 'connecting'
+        if (givenUp) return
       }
       await this.connect()
     },
