@@ -668,14 +668,16 @@ const handleCreateMessage: IMiddlewareResolver = async (
           MATCH (senderUser:User { id: $currentUserId })-[:CHATS_IN]->(room:Room { id: $roomId })
           MATCH (room)<-[:CHATS_IN]-(recipientUser:User)
             WHERE NOT recipientUser.id = $currentUserId
-            AND NOT (recipientUser)-[:BLOCKED]-(senderUser)
-            AND NOT (recipientUser)-[:MUTED]->(senderUser)
           // Optional: a member without an e-mail address gets no mail, but still the live update.
           OPTIONAL MATCH (recipientUser)-[:PRIMARY_EMAIL]->(emailAddress:EmailAddress)
           OPTIONAL MATCH (room)-[:ROOM_FOR]->(group:Group)<-[mutedGroup:MUTED]-(recipientUser)
           RETURN senderUser {.*}, recipientUser {.*}, emailAddress {.email},
             mutedGroup IS NOT NULL AS isGroupMuted,
-            EXISTS((room)-[:ROOM_FOR]->(:VideoCallSession)) AS isCallRoom
+            EXISTS((room)-[:ROOM_FOR]->(:VideoCallSession)) AS isCallRoom,
+            EXISTS((room)-[:ROOM_FOR]->(:Group)) AS isGroupRoom,
+            (EXISTS((recipientUser)-[:BLOCKED]-(senderUser))
+              OR EXISTS((recipientUser)-[:MUTED]->(senderUser)))
+              AS ignoresSender
         `
       const txResponse = await transaction.run(messageRecipientsCypher, {
         currentUserId,
@@ -689,6 +691,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
           email: record.get('emailAddress')?.email,
           isGroupMuted: record.get('isGroupMuted'),
           isCallRoom: record.get('isCallRoom'),
+          isGroupRoom: record.get('isGroupRoom'),
+          ignoresSender: record.get('ignoresSender'),
         })),
       }
     })
@@ -699,6 +703,14 @@ const handleCreateMessage: IMiddlewareResolver = async (
     for (const recipient of recipients) {
       const recipientUser = recipient.user
       const { email } = recipient
+
+      // A block or mute between the two keeps a direct chat (or a call's conference chat) quiet.
+      // A group room is the group's: its history shows every member's messages to everyone, so
+      // the live update does too — otherwise a new message only appeared once the room was
+      // opened again. The mail stays away either way.
+      if (recipient.ignoresSender && !recipient.isGroupRoom) {
+        continue
+      }
 
       // send subscriptions.
       // The falsy side cannot happen from here: `recipients` comes from a query that MATCHes the
@@ -724,7 +736,8 @@ const handleCreateMessage: IMiddlewareResolver = async (
         !recipient.isCallRoom &&
         recipientUser.emailNotificationsChatMessage !== false &&
         !isUserOnline(recipientUser) &&
-        !recipient.isGroupMuted
+        !recipient.isGroupMuted &&
+        !recipient.ignoresSender
       ) {
         void sendChatMessageMail({ email, senderUser, recipientUser })
       }

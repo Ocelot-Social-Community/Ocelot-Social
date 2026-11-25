@@ -1358,6 +1358,43 @@ describe('notifications', () => {
         })
       })
 
+      // A group room is the group's: its history shows every member's messages to everyone, a
+      // block or mute between two members included. The live update follows the history — it
+      // used to be dropped, so a new message only appeared once the room was opened again. The
+      // mail stays away, as in a direct chat.
+      describe.each([
+        { name: 'the chatReceiver has blocked chatSender', from: 'receiver', relation: 'blocked' },
+        { name: 'chatSender has blocked the chatReceiver', from: 'sender', relation: 'blocked' },
+        { name: 'the chatReceiver has muted chatSender', from: 'receiver', relation: 'muted' },
+      ])('if $name', ({ from, relation }) => {
+        it('still publishes the message live, but sends no email', async () => {
+          isUserOnlineMock = vi.fn().mockReturnValue(false)
+          if (from === 'receiver') {
+            await chatReceiver.relateTo(chatSender, relation)
+          } else {
+            await chatSender.relateTo(chatReceiver, relation)
+          }
+
+          await mutate({
+            mutation: CreateMessage,
+            variables: { roomId: groupRoomId, content: 'Some message to the whole group' },
+          })
+
+          expect(pubsubSpy).toHaveBeenCalledWith('CHAT_MESSAGE_ADDED', {
+            chatMessageAdded: expect.objectContaining({
+              content: 'Some message to the whole group',
+              senderId: 'chatSender',
+            }),
+            userId: 'chatReceiver',
+          })
+          expect(pubsubSpy).toHaveBeenCalledWith(
+            'ROOM_UPDATED',
+            expect.objectContaining({ userId: 'chatReceiver' }),
+          )
+          expect(sendChatMessageMailMock).not.toHaveBeenCalled()
+        })
+      })
+
       describe('if the chatReceiver has not muted the group', () => {
         it('publishes subscriptions and sends an email', async () => {
           isUserOnlineMock = vi.fn().mockReturnValue(false)
