@@ -206,6 +206,12 @@ export default {
   top: var(--header-height);
   z-index: var(--z-index-sticky);
   background-color: var(--background-color-base);
+  /* A narrow margin around the tools: where the stuck bar is detached from the editor's top and
+     draws the field's outline along its sides, they must not touch it. The bottom one is taken
+     back from the margin below, so that the text field keeps its place (its gap of
+     --space-small is wider). */
+  padding: var(--space-xx-small);
+  margin-bottom: calc(-2 * var(--space-xx-small));
   /* The page header slides away and back in 0.3s (HeaderMenu) and --header-height follows it; the
      bar follows at the same pace, or it would jump. */
   transition:
@@ -216,12 +222,6 @@ export default {
 /* Lifts off the text running past underneath only while it sticks; in its place it would only
    add noise above the text field. */
 .editor-menubar.is-stuck {
-  /* A narrow margin above and below the tools, which a detached bar needs and the bar in its place
-     does not. The bottom one is taken back from the margin below, so that nothing under the bar
-     moves when it sticks (the text field keeps its gap of --space-small, which is wider). */
-  padding-top: var(--space-xx-small);
-  padding-bottom: var(--space-xx-small);
-  margin-bottom: calc(-2 * var(--space-xx-small));
   /* The bar sits above the text field and ends level with it, so the field's side lines run up to
      it and stop. Two inner lines in the field's border colour (inset, so the bar keeps its width)
      carry them on along the bar: bar and field read as one piece. */
