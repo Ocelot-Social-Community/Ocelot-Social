@@ -206,6 +206,12 @@ export default {
   top: var(--header-height);
   z-index: var(--z-index-sticky);
   background-color: var(--background-color-base);
+  /* A narrow margin around the tools: where the stuck bar is detached from the editor's top and
+     draws the field's outline along its sides, they must not touch it. The bottom one is taken
+     back from the margin below, so that the text field keeps its place (its gap of
+     --space-small is wider). */
+  padding: var(--space-xx-small);
+  margin-bottom: calc(-2 * var(--space-xx-small));
   /* The page header slides away and back in 0.3s (HeaderMenu) and --header-height follows it; the
      bar follows at the same pace, or it would jump. */
   transition:
@@ -216,7 +222,36 @@ export default {
 /* Lifts off the text running past underneath only while it sticks; in its place it would only
    add noise above the text field. */
 .editor-menubar.is-stuck {
-  box-shadow: var(--box-shadow-sticky);
+  /* The bar sits above the text field and ends level with it, so the field's side lines run up to
+     it and stop. Two inner lines in the field's border colour (inset, so the bar keeps its width)
+     carry them on along the bar: bar and field read as one piece. */
+  box-shadow:
+    inset var(--input-border-size) 0 0 var(--border-color-softer),
+    inset calc(-1 * var(--input-border-size)) 0 0 var(--border-color-softer),
+    var(--box-shadow-sticky);
+}
+
+/* The bar's lower edge: one faint line (light in the dark theme, where the shadow hardly shows,
+   dark in the light one), between the field's side lines and not over them. A line of its own, not
+   a part of the shadow, which would lie over it and fade out towards the ends. */
+.editor-menubar.is-stuck::after {
+  content: '';
+  position: absolute;
+  left: var(--input-border-size);
+  right: var(--input-border-size);
+  bottom: calc(-1 * var(--input-border-size));
+  height: var(--input-border-size);
+  background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
+  pointer-events: none;
+}
+
+/* The field's outline turns to the primary colour while it has the focus (.editor-content); the
+   bar's lines follow. */
+.editor:has(.editor-content:focus-within) > .editor-menubar.is-stuck {
+  box-shadow:
+    inset var(--input-border-size) 0 0 var(--color-primary),
+    inset calc(-1 * var(--input-border-size)) 0 0 var(--color-primary),
+    var(--box-shadow-sticky);
 }
 
 @media (prefers-reduced-motion: reduce) {
