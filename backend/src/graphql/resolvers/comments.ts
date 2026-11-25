@@ -14,40 +14,10 @@ import Resolver from './helpers/Resolver'
 
 import type { NodeQueryParams } from './helpers/nodeQuery'
 import type { Context } from '@src/context'
-import type { Transaction } from 'neo4j-driver'
 
 /** A block either way between the user bound as `user` and the author of the post bound as `post`. */
 const BLOCKED_WITH_POST_AUTHOR = (user: string, post: string): string =>
   `EXISTS { MATCH (${user})-[:BLOCKED]-(:User)-[:WROTE]->(${post}) }`
-
-// The write matched nothing. A block is the reason worth naming; anything else (a post or
-// comment that is gone) keeps its old answer, an empty result.
-const refuseIfBlocked = async (untypedTransaction: unknown, userId: string, postId: string) => {
-  // `unknown`: the callers' transactions come from an untyped driver session.
-  const transaction = untypedTransaction as Transaction
-  const result = await transaction.run(
-    `MATCH (user:User { id: $userId }), (post:Post { id: $postId })
-     WHERE ${BLOCKED_WITH_POST_AUTHOR('user', 'post')}
-     RETURN post.id`,
-    { userId, postId },
-  )
-  if (result.records.length > 0) {
-    throw new AppError(Errors.COMMENT_SAVE_BLOCKED)
-  }
-}
-
-const refuseIfBlockedUnder = async (untypedTransaction: unknown, commentId: string) => {
-  const transaction = untypedTransaction as Transaction
-  const result = await transaction.run(
-    `MATCH (commenter:User)-[:WROTE]->(:Comment { id: $commentId })-[:COMMENTS]->(post:Post)
-     WHERE ${BLOCKED_WITH_POST_AUTHOR('commenter', 'post')}
-     RETURN post.id`,
-    { commentId },
-  )
-  if (result.records.length > 0) {
-    throw new AppError(Errors.COMMENT_SAVE_BLOCKED)
-  }
-}
 
 // The Comment root query, hand-written since the neo4j-graphql-js migration.
 // softDeleteMiddleware injects `deleted`/`disabled` as top-level arguments, so those must
@@ -109,8 +79,10 @@ export default {
         const created = createCommentTransactionResponse.records.map(
           (record) => record.get('comment').properties,
         )
+        // Nothing written means the block stopped it: the validation middleware has made sure
+        // the post is there, and posts are only ever soft-deleted.
         if (created.length === 0) {
-          await refuseIfBlocked(transaction, user.id as string, postId as string)
+          throw new AppError(Errors.COMMENT_SAVE_BLOCKED)
         }
         return created
       })
@@ -142,8 +114,10 @@ export default {
         const updated = updateCommentTransactionResponse.records.map(
           (record) => record.get('comment').properties,
         )
+        // Nothing written means the block stopped it: `isAuthor` has made sure the comment is
+        // the actor's own, and comments are only ever soft-deleted.
         if (updated.length === 0) {
-          await refuseIfBlockedUnder(transaction, params.id as string)
+          throw new AppError(Errors.COMMENT_SAVE_BLOCKED)
         }
         return updated
       })
