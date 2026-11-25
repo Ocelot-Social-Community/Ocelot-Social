@@ -637,6 +637,7 @@ describe('Chat.vue', () => {
     })
 
     it('takes the unread count of a room that is not open from the server', async () => {
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 3 })]
       wrapper.vm.selectedRoom = mockRoom({ id: 'other-room' })
       await wrapper.vm.chatMessageAdded({
         data: {
@@ -647,6 +648,22 @@ describe('Chat.vue', () => {
         },
       })
       expect(wrapper.vm.rooms[0].unreadCount).toBe(4)
+    })
+
+    it('counts no more than the one message that came in, while a seen mutation is pending', async () => {
+      // markAsSeen lowered the count to 0 already; the server, not committed yet, still holds
+      // the two messages just read besides the new one.
+      wrapper.vm.rooms = [mockRoom({ unreadCount: 0 })]
+      wrapper.vm.selectedRoom = mockRoom({ id: 'other-room' })
+      await wrapper.vm.chatMessageAdded({
+        data: {
+          chatMessageAdded: mockMessage({
+            senderId: 'other-user',
+            room: { id: 'room-1', unreadCount: 3 },
+          }),
+        },
+      })
+      expect(wrapper.vm.rooms[0].unreadCount).toBe(1)
     })
 
     it('does not count a message the server leaves out, as from a sender the viewer mutes', async () => {
@@ -1600,6 +1617,26 @@ describe('Chat.vue', () => {
       })
       expect(wrapper.vm.rooms[0].id).toBe('new-room')
       expect(wrapper.vm._externalRoomIds.has('new-room')).toBe(true)
+    })
+
+    it('keeps the count of a room fetched just now over the older one the message carries', async () => {
+      // Read on another device between the push and the fetch: the fetched room is newer.
+      wrapper = Wrapper()
+      wrapper.vm.rooms = [mockRoom()]
+      wrapper.vm.selectedRoom = mockRoom()
+      mocks.$apollo.query.mockResolvedValue({
+        data: { Room: [mockRoom({ id: 'new-room', roomId: 'new-room', unreadCount: 0 })] },
+      })
+      await subscriptionHandlers.chatMessageAdded.next({
+        data: {
+          chatMessageAdded: mockMessage({
+            room: { id: 'new-room', unreadCount: 1 },
+            senderId: 'sender',
+          }),
+        },
+      })
+      expect(wrapper.vm.rooms[0].id).toBe('new-room')
+      expect(wrapper.vm.rooms[0].unreadCount).toBe(0)
     })
   })
 

@@ -1411,6 +1411,7 @@ export default {
     async chatMessageAdded({ data }) {
       const msg = data.chatMessageAdded
       let roomIndex = this.rooms.findIndex((r) => r.id === msg.room.id)
+      let freshlyFetched = false
       if (roomIndex === -1) {
         // A room stays a conference chat, so it is asked for once, not on every message.
         if (this.callRoomIds.has(msg.room.id)) return
@@ -1436,6 +1437,7 @@ export default {
             this._externalRoomIds.add(newRoom.roomId)
             this.rooms = [newRoom, ...this.rooms]
             roomIndex = 0
+            freshlyFetched = true
           } else {
             return
           }
@@ -1449,12 +1451,14 @@ export default {
       changedRoom.index = new Date().toISOString()
       const isCurrentRoom = msg.room.id === this.selectedRoom?.id
       const isOwnMessage = msg.senderId === this.currentUser.id
-      // The count is the server's, resolved for this viewer: it leaves out what a sender they
-      // block or mute writes, which a group room delivers live all the same. Counting up here
-      // would rise above it. The open room keeps its count — what arrives there is shown and
-      // marked as seen in place.
-      if (!isCurrentRoom && !isOwnMessage) {
-        changedRoom.unreadCount = msg.room.unreadCount
+      // The server's count is resolved for this viewer: it leaves out what a sender they block or
+      // mute writes, which a group room delivers live all the same, so counting up alone would
+      // rise above it. Right after markAsSeen, though, it may still hold what was just read, as
+      // the mutation is not committed yet. One more than the local count bounds it: no more than
+      // this one message has come in. A room fetched just now has the newest count already, and
+      // the open room keeps its own: what arrives there is shown and marked as seen in place.
+      if (!freshlyFetched && !isCurrentRoom && !isOwnMessage) {
+        changedRoom.unreadCount = Math.min(changedRoom.unreadCount + 1, msg.room.unreadCount)
       }
       this.moveRoomToTop(changedRoom, msg.room.id)
       // Only add incoming messages to the chat — own messages are handled via mutation response
