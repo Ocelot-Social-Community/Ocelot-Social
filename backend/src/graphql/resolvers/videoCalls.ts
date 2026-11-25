@@ -19,6 +19,7 @@ import { settleAndPublishModeration } from '@src/livekit/moderationService'
 import {
   groupIdFromRoomName,
   liveKitConfigOf,
+  peopleIn,
   roomNameForGroup,
   roomServiceFor,
   userIdOf,
@@ -136,8 +137,10 @@ const LIVEKIT_API_TIMEOUT_MS = 4000
 const JOIN_TOKEN_TTL = '10m'
 
 export interface RoomParticipants {
-  /** LiveKit connections, i.e. tabs and devices — two people sharing an account count twice. */
+  /** LiveKit connections, i.e. tabs and devices. */
   count: number
+  /** The people among them: a user on several tabs or devices once (see peopleIn). */
+  people: number
   /**
    * The user behind each connection, in the order they joined — a user twice for two
    * connections, like the count: it may be two people sharing an account.
@@ -160,14 +163,14 @@ export const getRoomParticipants = async (
       (a, b) => Number(a.joinedAt ?? 0) - Number(b.joinedAt ?? 0),
     )
     const userIds = ordered.map(userIdOf).filter((id): id is string => !!id)
-    return { count: participants.length, userIds }
+    return { count: participants.length, people: peopleIn(participants), userIds }
   } catch (err) {
     // Only "room not found" is a legitimate zero — the room hasn't been
     // created yet because no participant has joined. Every other error
     // (network, credentials, throttling, timeout) is a real failure that
     // would silently masquerade as "empty room" if swallowed.
     if (err instanceof TwirpError && (err.status === 404 || err.code === 'not_found')) {
-      return { count: 0, userIds: [] }
+      return { count: 0, people: 0, userIds: [] }
     }
     logger.warn(`listParticipants failed for ${roomName}:`, err)
     throw err
@@ -215,7 +218,7 @@ export const getLiveCall = async (
 export const getLiveParticipantCount = async (
   config: LiveKitConfig,
   roomName: string,
-): Promise<number> => (await getRoomParticipants(config, roomName)).count
+): Promise<number> => (await getRoomParticipants(config, roomName)).people
 
 // A call change is published to every subscriber at once, and every dock asks LiveKit the same
 // question in that moment. Requests still in flight are shared, so N viewers cost one call.
@@ -452,7 +455,7 @@ export default {
           }
           // Same as the count query: what is told here must be corrected if it ends unseen.
           noteCountTold(roomName, participants.count)
-          return { groupId, participantCount: participants.count, userIds: participants.userIds }
+          return { groupId, participantCount: participants.people, userIds: participants.userIds }
         }),
       )
       const calls = running.filter((call) => !!call)

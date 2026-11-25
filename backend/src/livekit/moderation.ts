@@ -360,9 +360,10 @@ export const successorOf = async (
 }
 
 /**
- * Makes sure the call has a moderator while somebody is in it.
+ * Makes sure the call has a moderator while somebody is in it — also while everybody moderates:
+ * the others do so only as co-moderators, and only a moderator named as such, or somebody who
+ * may step in, can end that.
  *
- * - Everybody moderates: nothing to do.
  * - Whoever started the call is back and never handed it on: they moderate again.
  * - A moderator is in the call: nothing to do.
  * - Otherwise the moderation goes to the successor (see successorOf), leaving out whoever had it
@@ -376,7 +377,7 @@ export const settleModeration = async (
   presentUserIds: string[],
 ): Promise<string | null> => {
   const state = await readModeration(driver, groupId)
-  if (!state || state.everyoneModerates) {
+  if (!state) {
     return null
   }
   const present = presentUserIds.filter((userId) => !state.removedIds.includes(userId))

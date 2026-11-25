@@ -24,7 +24,7 @@ type VideoCallParticipantCount {
 "A video call running in a group right now."
 type ActiveVideoCall {
   group: Group!
-  "Connections to the call — tabs and devices, so two people sharing an account count twice."
+  "People in the call: a user on several tabs or devices counts once."
   participantCount: Int!
   "The user behind each connection, in the order they joined — a user twice for two connections, as two people may share an account."
   participants: [User!]!
@@ -42,7 +42,7 @@ type ActiveVideoCallChange {
 type Query {
   "Whether video calls are enabled on this instance. Public."
   videoCallConfig: VideoCallConfig!
-  "Current number of participants in a group's video call. Requires authentication."
+  "Current number of people in a group's video call, a user on several devices once. Requires authentication."
   videoCallParticipantCount(groupId: ID!): Int!
   "Whether the current user was removed from the group's call running now. Until it is over, they cannot join it. Requires authentication."
   videoCallRemoved(groupId: ID!): Boolean!

@@ -2233,11 +2233,14 @@ export default {
         /* without the answer the list does not offer it */
       }
     },
-    // Hanging up as the last moderator while others stay asks who moderates on.
+    // Hanging up as the last moderator while others stay asks who moderates on — not while one
+    // stays in the call on another device: then one does not leave it, and moderates on.
     isLastModerator() {
       const me = this.currentUser && this.currentUser.id
+      const self = this.people.find((person) => person.isMe)
       return (
         this.phase === 'in-call' &&
+        !(self && self.devices > 1) &&
         !this.moderation.everyone &&
         this.moderation.moderators.includes(me) &&
         !this.people.some(
@@ -2289,6 +2292,13 @@ export default {
       if (!this.handover || this.handover.busy) return
       const room = this.room
       const dialog = this.handover
+      // No longer the last moderator — another one came, or one is in the call on another device
+      // by now: nothing to hand on, one just leaves (the server checks the same).
+      if (!this.isLastModerator()) {
+        this.handover = null
+        await this.leave()
+        return
+      }
       dialog.busy = true
       try {
         await withDeadline(
@@ -4520,7 +4530,11 @@ export default {
 
 /*  The question who moderates on, over the whole call. */
 .video-call__handover {
-  position: absolute;
+  /*  In the middle of the browser window, over the whole page: the minimized call is far too
+      small for it. Fixed, not absolute — no ancestor of it has a transform or a filter that
+      would hold it in the call's box instead, and the call's overflow does not clip it. In the
+      browser's full screen, the call is all there is, and the dialog stays in it. */
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;

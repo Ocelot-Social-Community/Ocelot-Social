@@ -445,14 +445,23 @@ export default {
         // Nothing to hand on; for one who moderates because everybody does, it stays that way.
         return true
       }
-      if (everyone) {
-        if (!state.everyoneModerates) {
-          await setEveryoneModerates(context.driver, state.sessionId, true)
-          await notify(client, roomName, { type: 'everyoneModerates', by: me.name })
-        }
-      } else {
-        await handOn(context, groupId, { client, roomName, connections, present, state }, toUserId)
+      // Still in the call on another device — come meanwhile, maybe, while the question was
+      // open: then one does not leave the call, and moderates on there.
+      if (connections.filter((connection) => connection.userId === me.id).length > 1) {
+        return true
       }
+      if (everyone && !state.everyoneModerates) {
+        await setEveryoneModerates(context.driver, state.sessionId, true)
+        await notify(client, roomName, { type: 'everyoneModerates', by: me.name })
+      }
+      // Everybody moderating, too, takes a moderator named as such: only one can end it. Picked
+      // among the others, as one named by hand: whoever hands on is leaving.
+      await handOn(
+        context,
+        groupId,
+        { client, roomName, connections, present, state },
+        everyone ? null : toUserId,
+      )
       await setModerator(context.driver, state.sessionId, me.id, { moderator: false })
       await settleAndPublishModeration(context, groupId)
       return true

@@ -324,13 +324,24 @@ describe(successorOf, () => {
 })
 
 describe(settleModeration, () => {
-  it('does nothing without a session, or while everybody moderates', async () => {
+  it('does nothing without a session', async () => {
     expect(await settleModeration(driver, 'g1', ['ute'])).toBeNull()
+  })
 
+  it('names a moderator also while everybody moderates, once the one named has left', async () => {
     await open('ute')
     await setEveryoneModerates(driver, (await state()).sessionId, true)
 
-    expect(await settleModeration(driver, 'g1', ['udo'])).toBeNull()
+    expect(await settleModeration(driver, 'g1', ['udo'])).toBe('udo')
+    expect((await state()).moderatorIds).toContain('udo')
+    expect((await state()).everyoneModerates).toBe(true)
+  })
+
+  it('leaves it alone while everybody moderates and the one named is there', async () => {
+    await open('ute')
+    await setEveryoneModerates(driver, (await state()).sessionId, true)
+
+    expect(await settleModeration(driver, 'g1', ['ute', 'udo'])).toBeNull()
   })
 
   it('leaves it alone while a moderator is there', async () => {

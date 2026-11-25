@@ -19,7 +19,7 @@ import { getDriver } from '@src/db/neo4j'
 import { groupIdFromRoomName } from '@src/graphql/resolvers/videoCalls'
 import { endCallSessionsOfMissingRoom } from '@src/livekit/callSession'
 import { settleAndPublishModeration } from '@src/livekit/moderationService'
-import { roomPrefix } from '@src/livekit/rooms'
+import { peopleIn, roomPrefix } from '@src/livekit/rooms'
 import { markRoomTold, takeToldRooms } from '@src/livekit/toldRooms'
 import { withTimeout } from '@src/livekit/utils'
 import logger from '@src/logger'
@@ -40,6 +40,10 @@ let polling = false
 let consecutiveFailures = 0
 let client: RoomServiceClient | null = null
 const lastSeenCounts = new Map<string, number>()
+// The rooms of this instance's groups the poller has seen listed, whether or not a count went out
+// for them yet — one whose participants could not be asked has none: once gone from the list, its
+// call session is ended all the same (see below). Kept until it is.
+const listedRooms = new Set<string>()
 
 const pollOnce = async () => {
   if (!CONFIG.LIVEKIT_ENABLED) {
@@ -96,36 +100,51 @@ const pollOnce = async () => {
         owed.delete(room.name)
         continue
       }
+      listedRooms.add(room.name)
       // room.numParticipants is a number; gracefully coerce in case of bigint
       const listed = Number(room.numParticipants ?? 0) || 0
-      // Who is there: as listed, or as the participants themselves say for a told room.
+      // How many connections: as listed, or as the participants themselves say for a told room.
       let count = listed
-      if (lastSeenCounts.get(room.name) !== listed || told.has(room.name)) {
-        if (told.has(room.name)) {
-          // The correction for a told room asks the participants themselves, as the count query
-          // does: the room list can lag behind them, and its count, published as "the truth",
-          // would put a call everybody just left back to 1 (#10508). If they cannot be asked,
-          // the room stays owed for the next poll rather than corrected with the list.
-          try {
-            const participants = await withTimeout(
-              client.listParticipants(room.name),
-              POLL_TIMEOUT_MS,
-              'listParticipants',
-            )
+      // What is published is how many PEOPLE are in the call, which only the participants tell:
+      // the list counts connections, a user on two devices twice, and the same number of
+      // connections can be other people. So they are asked on every poll of a room with somebody
+      // in it, and a change of the people is what is published. For a told room it is also the
+      // correction the count query gets: the room list can lag behind the participants, and its
+      // count, published as "the truth", would put a call everybody just left back to 1
+      // (#10508). If they cannot be asked, a told room stays owed for the next poll; any other
+      // keeps what was published.
+      let people: number | null = 0
+      if (listed > 0 || told.has(room.name)) {
+        try {
+          const participants = await withTimeout(
+            client.listParticipants(room.name),
+            POLL_TIMEOUT_MS,
+            'listParticipants',
+          )
+          if (told.has(room.name)) {
             count = participants.length
-            // eslint-disable-next-line no-catch-all/no-catch-all
-          } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err)
-            logger.warn('LiveKit poll: listParticipants failed for', room.name, message)
+          }
+          // Nobody among the participants while the list has somebody: one of the two lags behind.
+          // As a call has just begun, the participants: not published as an empty call, but as
+          // the list has it, until a later poll finds them. As a call has just ended, the list
+          // (#10508): what was published stands, not the list's stale count.
+          const lagging = lastSeenCounts.get(room.name) ?? listed
+          people = told.has(room.name) || participants.length > 0 ? peopleIn(participants) : lagging
+          // eslint-disable-next-line no-catch-all/no-catch-all
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : String(err)
+          logger.warn('LiveKit poll: listParticipants failed for', room.name, message)
+          if (told.has(room.name)) {
             continue
           }
+          people = null
         }
-        await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count })
+      }
+      if (people !== null && (lastSeenCounts.get(room.name) !== people || told.has(room.name))) {
+        await serverPubsub.publish(VIDEO_CALL_PARTICIPANT_COUNT_CHANGED, { groupId, count: people })
         // Only once it is out: a count noted before a publish that failed would look published
-        // to the next poll, which would then keep quiet about it. What is noted is the LIST's
-        // count, which the next poll compares with — a list still lagging behind the
-        // participants then shows no change, instead of republishing its stale count.
-        lastSeenCounts.set(room.name, listed)
+        // to the next poll, which would then keep quiet about it.
+        lastSeenCounts.set(room.name, people)
       }
       // The moderation is kept in step on every poll, not only when the count changes: one coming
       // as a moderator goes leaves it the same. If it was the last moderator, the call needs
@@ -149,7 +168,7 @@ const pollOnce = async () => {
     //
     // The entry is kept a while longer in one case only: while the room's call session could
     // not be ended yet (see below).
-    for (const roomName of new Set([...lastSeenCounts.keys(), ...told])) {
+    for (const roomName of new Set([...lastSeenCounts.keys(), ...listedRooms, ...told])) {
       if (seen.has(roomName)) {
         continue
       }
@@ -182,6 +201,7 @@ const pollOnce = async () => {
       }
       if (sessionsSettled) {
         lastSeenCounts.delete(roomName)
+        listedRooms.delete(roomName)
       } else {
         // Remembered at 0, not as "told": the count: 0 above is out, and a told room would
         // have it published again on every poll until the session is settled.
@@ -251,5 +271,6 @@ export const stopLiveKitPoller = () => {
   client = null
   consecutiveFailures = 0
   lastSeenCounts.clear()
+  listedRooms.clear()
   takeToldRooms()
 }
