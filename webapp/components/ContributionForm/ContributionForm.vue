@@ -939,15 +939,10 @@ export default {
 </script>
 
 <style>
-/* .ds-text (ds-compat.css) sets its own margin-bottom: var(--font-space-x-large)
-   (~16px) as a longhand AFTER its own margin:0 shorthand, so it wins over
-   .select-label's margin-bottom: 0 on specificity ties purely by source
-   order (ds-compat.css loads after component styles) — the visible gap
-   under every .select-label in this form. Scoping with .contribution-form
-   bumps specificity so this actually wins, regardless of load order.
-   Not all the way to 0 — .select-label's own 4px padding-bottom alone read
-   as too tight; this adds another 4px on top of it (~8px total, matching
-   --space-x-small). */
+/* .select-label (ds-compat.css) has margin-bottom: 0 and a 4px padding-bottom.
+   Not all the way to 0 here — that 4px alone read as too tight; this adds
+   another 4px on top of it (~8px total, matching --space-x-small). Scoped
+   with .contribution-form so it wins over the global rule. */
 .contribution-form .select-label {
   margin-bottom: var(--space-xx-small);
 }
