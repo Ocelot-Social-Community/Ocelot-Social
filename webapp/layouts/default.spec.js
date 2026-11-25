@@ -404,4 +404,24 @@ describe('default.vue', () => {
       })
     })
   })
+
+  describe('the toolbar of the conference chat', () => {
+    const toolbar = (overrides) =>
+      Default.computed.callChatToolbar.call({
+        showCallChatTabs: true,
+        participantsInWindow: false,
+        callChatTab: 'call',
+        ...overrides,
+      })
+
+    it('stands below the tabs while the conference chat is open', () => {
+      expect(toolbar()).toBe(true)
+    })
+
+    it('is not there for the chat of the group, the participants, or without the tabs', () => {
+      expect(toolbar({ callChatTab: 'group' })).toBe(false)
+      expect(toolbar({ participantsInWindow: true })).toBe(false)
+      expect(toolbar({ showCallChatTabs: false })).toBe(false)
+    })
+  })
 })

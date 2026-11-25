@@ -1988,38 +1988,6 @@ describe('Chat.vue', () => {
       })
     })
 
-    describe('telling whether it holds no message', () => {
-      const emitted = () => (wrapper.emitted('empty-change') || []).map(([value]) => value)
-
-      it('says so once every message is loaded and there is none', async () => {
-        wrapper = Wrapper()
-        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
-        wrapper.vm.messages = []
-        wrapper.vm.messagesLoaded = true
-        await wrapper.vm.$nextTick()
-        expect(emitted()).toEqual([true])
-      })
-
-      it('does not take "nothing loaded yet" for empty', async () => {
-        wrapper = Wrapper()
-        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
-        wrapper.vm.messages = []
-        wrapper.vm.messagesLoaded = false
-        await wrapper.vm.$nextTick()
-        expect(emitted()).toEqual([])
-      })
-
-      it('takes it back when the first message arrives', async () => {
-        wrapper = Wrapper()
-        wrapper.vm.selectedRoom = mockRoom({ id: 'room-1' })
-        wrapper.vm.messagesLoaded = true
-        await wrapper.vm.$nextTick()
-        wrapper.vm.messages = [mockMessage()]
-        await wrapper.vm.$nextTick()
-        expect(emitted()).toEqual([true, false])
-      })
-    })
-
     const injectedStyles = (propsData) => {
       wrapper = Wrapper(propsData)
       const appended = []

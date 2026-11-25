@@ -70,14 +70,12 @@
         </room-header>
         <div class="chat-modul__tabs">
           <call-chat-tabs
-            exportable
             with-participants
             :participant-count="participantsView ? participantsView.people.length : 0"
-            :exporting="chatExporting"
-            :exportEmpty="chatEmpty"
-            @export="exportChat"
           />
         </div>
+        <!-- What can be done with the conference chat, below the tabs. -->
+        <call-chat-toolbar v-if="callChatToolbar" :exporting="chatExporting" @export="exportChat" />
       </template>
       <!--
         The list of the call's participants, as in the call's own sidebar; what is done there for
@@ -108,8 +106,13 @@
           :hideHeader="showCallChatTabs"
           :hint="callChatHint"
           :hintKey="showCallChatTabs ? 'call-chat-' + callChatTab : null"
-          @empty-change="chatEmpty = $event"
-          :reservedHeight="showCallChatTabs ? CALL_CHAT_TABS_HEIGHT + CALL_CHAT_HEADER_HEIGHT : 0"
+          :reservedHeight="
+            showCallChatTabs
+              ? CALL_CHAT_TABS_HEIGHT +
+                CALL_CHAT_HEADER_HEIGHT +
+                (callChatToolbar ? CALL_CHAT_TOOLBAR_HEIGHT : 0)
+              : 0
+          "
           :userId="getShowChat.chatUserId"
           :groupId="getShowChat.groupId"
           :roomId="getShowChat.roomId"
@@ -136,6 +139,9 @@ import { iconRegistry } from '~/utils/iconRegistry'
 import Chat from '~/components/Chat/Chat.vue'
 import RoomHeader from '~/components/_new/generic/RoomHeader/RoomHeader.vue'
 import CallChatTabs from '~/components/VideoCall/CallChatTabs.vue'
+import CallChatToolbar, {
+  CALL_CHAT_TOOLBAR_HEIGHT,
+} from '~/components/VideoCall/CallChatToolbar.vue'
 import CallParticipants from '~/components/VideoCall/CallParticipants.vue'
 import { activeCallChatTab } from '~/components/VideoCall/callChat'
 import Dock from '~/components/Dock/Dock.vue'
@@ -156,6 +162,7 @@ export default {
     PageFooter,
     Chat,
     CallChatTabs,
+    CallChatToolbar,
     CallParticipants,
     RoomHeader,
     OsButton,
@@ -167,10 +174,8 @@ export default {
     return {
       CALL_CHAT_TABS_HEIGHT,
       CALL_CHAT_HEADER_HEIGHT,
+      CALL_CHAT_TOOLBAR_HEIGHT,
       chatExporting: false,
-      // Whether the chat in the window is known to hold no message (see Chat.vue). Reset with
-      // every chat put there, which then reports anew.
-      chatEmpty: false,
     }
   },
   created() {
@@ -240,6 +245,10 @@ export default {
         chatRoomId: this.videoCallChatRoomId,
       })
     },
+    // The conference chat's toolbar: while that chat is open below the tabs.
+    callChatToolbar() {
+      return this.showCallChatTabs && !this.participantsInWindow && this.callChatTab === 'call'
+    },
     showCallChatTabs() {
       // Only where there is a choice: in a call whose conference chat the server has
       // confirmed, and for a chat that is one of the call's two.
@@ -281,18 +290,12 @@ export default {
     },
   },
   watch: {
-    'getShowChat.roomId'() {
-      this.chatEmpty = false
-    },
     // A chat opened from anywhere (a profile, a group) is shown, not hidden behind the call's
     // participants. The call's own chat following it to a new room is no such opening.
     openChatTarget(target) {
       if (!target || !this.participantsOpen) return
       if (this.getShowChat.roomId && this.getShowChat.roomId === this.videoCallChatRoomId) return
       this.setParticipantsOpen(false)
-    },
-    'getShowChat.groupId'() {
-      this.chatEmpty = false
     },
     'getShowChat.showChat'(open) {
       // On a phone a chat opens on the chat page — except the chats of the call one is

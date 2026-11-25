@@ -3,9 +3,8 @@
     Tabs in the look of the app's tab navigation — the active one underlined — but one line
     high: the place is the top of a narrow chat, shared with the chat's buttons.
 
-    The underline sits on a cell around each tab, as the cell of the conference chat also
-    holds its download button while it is open: the button belongs to that chat, and a
-    button cannot sit inside the tab's own.
+    What can be done with the conference chat is in a toolbar below (CallChatToolbar): the row
+    only holds tabs.
   -->
   <div class="call-chat-tabs" role="tablist" :aria-label="$t('videoCall.chatTabs.label')">
     <div
@@ -43,55 +42,13 @@
           :data-test="'call-chat-tab-count-' + tab.value"
         />
       </button>
-      <!--
-        What can be done with the conference chat, behind the app's three dots: calmer
-        than a row of icons in the tab, and room for what is still to come.
-      -->
-      <dropdown
-        v-if="exportable && tab.value === 'call' && active === 'call'"
-        class="call-chat-tabs__menu"
-        placement="bottom-end"
-        offset="5"
-      >
-        <template #default="{ toggleMenu }">
-          <os-button
-            data-test="call-chat-tab-menu"
-            variant="primary"
-            appearance="ghost"
-            circle
-            size="sm"
-            :loading="exporting"
-            :aria-label="$t('actions.menu')"
-            @click.prevent="toggleMenu()"
-          >
-            <template #icon>
-              <os-icon :icon="icons.ellipsisV" />
-            </template>
-          </os-button>
-        </template>
-        <template #popover="{ toggleMenu }">
-          <os-menu dropdown :routes="callChatActions">
-            <template #menuitem="item">
-              <os-menu-item
-                :route="item.route"
-                :parents="item.parents"
-                @click.stop.prevent="runAction(item.route, toggleMenu)"
-              >
-                <os-icon :icon="item.route.icon" />
-                {{ item.route.label }}
-              </os-menu-item>
-            </template>
-          </os-menu>
-        </template>
-      </dropdown>
     </div>
   </div>
 </template>
 
 <script>
-import { OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem } from '@ocelot-social/ui'
+import { OsBadge, OsIcon } from '@ocelot-social/ui'
 import { iconRegistry } from '~/utils/iconRegistry'
-import Dropdown from '~/components/Dropdown'
 import { mapGetters, mapMutations } from 'vuex'
 import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callChat'
 
@@ -101,24 +58,14 @@ import { activeCallChatTab, callChatTarget } from '~/components/VideoCall/callCh
 // parked call — so it reads and writes the stores rather than taking props from either.
 export default {
   name: 'CallChatTabs',
-  components: { Dropdown, OsBadge, OsButton, OsIcon, OsMenu, OsMenuItem },
+  components: { OsBadge, OsIcon },
   props: {
-    // Whether the conference chat's tab offers its menu, with the chat's download. The
-    // download is the chat's own doing, so the host, which holds the chat, does it on
-    // `export`.
-    exportable: { type: Boolean, default: false },
-    // Whether a download asked for is still under way.
-    exporting: { type: Boolean, default: false },
     // Whether the participants of the call are a third tab: in the call's own sidebar, not in
     // the floating chat window beside the parked call, which only ever holds a chat.
     withParticipants: { type: Boolean, default: false },
     // How many people are in the call, for that tab.
     participantCount: { type: Number, default: 0 },
-    // Whether the conference chat is known to hold no message: its download says so, and can
-    // still be had.
-    exportEmpty: { type: Boolean, default: false },
   },
-  emits: ['export'],
   created() {
     this.icons = iconRegistry
   },
@@ -134,20 +81,6 @@ export default {
     active() {
       if (this.withParticipants && this.participantsOpen) return 'participants'
       return activeCallChatTab(this.chat, this)
-    },
-    // The entries of the conference chat's menu. One so far; others, such as who may write,
-    // are meant to join it.
-    callChatActions() {
-      return [
-        {
-          name: 'export',
-          label: this.exportEmpty
-            ? `${this.$t('chat.exportChat')} (${this.$t('chat.messagesEmpty')})`
-            : this.$t('chat.exportChat'),
-          icon: this.icons.download,
-          callback: () => this.$emit('export'),
-        },
-      ]
     },
     // The one tab in the tab order, as the tab pattern asks: the active one, else the first.
     focusable() {
@@ -218,10 +151,6 @@ export default {
       this.setParticipantsOpen(false)
       this.openChat(callChatTarget(tab, this))
     },
-    runAction(action, toggleMenu) {
-      action.callback()
-      toggleMenu()
-    },
     // Arrow keys move to the neighbouring tab and open it, wrapping at the ends.
     step(direction) {
       const index = this.tabs.findIndex((tab) => tab.value === this.focusable)
@@ -280,10 +209,6 @@ export default {
 
 .call-chat-tabs__cell--active .call-chat-tabs__tab {
   font-weight: var(--text-weight-bold);
-}
-
-.call-chat-tabs__menu {
-  flex-shrink: 0;
 }
 
 /*  The label gives way when the row gets narrow; the count beside it does not (OsBadge's */
