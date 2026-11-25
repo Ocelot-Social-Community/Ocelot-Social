@@ -731,16 +731,9 @@ describe('role management', () => {
     // conflict check must gate on `err instanceof Error` first — otherwise the original failure is
     // replaced by a TypeError from the error handler itself.
     //
-    // Driven against the resolver DIRECTLY, not through a mutation, because what a non-Error
-    // rejection looks like from the outside depends on the environment. graphql-shield runs with
-    // `allowExternalErrors` and, whenever `debug` is off, RETURNS the thrown value as the field
-    // value instead of rethrowing it (graphql-shield/cjs/generator.js:42-48). graphql-js turns a
-    // returned Error back into an error, but a returned STRING it tries to complete as a `Role!`,
-    // which fails on the non-null `name`. `debug` is `!!CONFIG.DEBUG`, so the very same assertion
-    // reads "Unexpected error value: database is down" against a local .env with DEBUG=true and
-    // "Cannot return null for non-nullable field Role.name." in the CI container, where
-    // docker-compose.test.yml sets DEBUG= — measured both ways. The resolver's own contract is
-    // the part that is stable, and the part this test is about.
+    // Driven against the resolver DIRECTLY, not through a mutation: what a non-Error rejection
+    // looks like from the outside is graphql-js's business ("Unexpected error value: …"). The
+    // resolver's own contract is the part this test is about.
     it('does not crash when the failure is not an Error object', async () => {
       const failure = 'database is down'
       const context = {

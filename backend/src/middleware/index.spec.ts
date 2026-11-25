@@ -40,7 +40,10 @@ const middlewareModules = [
   './xssMiddleware',
 ]
 
-const setupMocks = ({ extraMocks, disabledMiddlewares = [] }: MockOptions = {}) => {
+const setupMocks = (
+  { extraMocks, disabledMiddlewares = [] }: MockOptions = {},
+  record: (middlewares: unknown[]) => void = () => {},
+) => {
   vi.doMock('./branding/brandingMiddlewares', () => ({ default: vi.fn() }))
   // ESM mock factories must expose `default` themselves — there is no CommonJS interop layer
   // to synthesise one from the object.
@@ -51,33 +54,46 @@ const setupMocks = ({ extraMocks, disabledMiddlewares = [] }: MockOptions = {}) 
   // Mock all middlewares and allow to override its mock
   for (const mod of middlewareModules) {
     // eslint-disable-next-line security/detect-object-injection
-    vi.doMock(mod, () => ({ default: extraMocks?.[mod] ?? {} }))
+    const marker = extraMocks?.[mod] ?? {}
+    // The permissions are a schema transform, not a graphql-middleware middleware: they are
+    // called with the schema, and record their marker at their place in the order.
+    const mock =
+      mod === './permissionsMiddleware'
+        ? (schema: unknown) => {
+            record([marker])
+            return schema
+          }
+        : marker
+    vi.doMock(mod, () => ({ default: mock }))
   }
 }
 
 const loadModule = async (
   options?: MockOptions,
 ): Promise<{ mod: MiddlewareModule; getCapturedMiddlewares: () => unknown[] }> => {
-  // The registry must be dropped BEFORE registering: an already-instantiated ./applyMiddleware
-  // keeps the previous factory's closure, and this run's capturedArgs would never be written.
+  // The registry must be dropped BEFORE registering: an already-instantiated graphql-middleware
+  // mock keeps the previous factory's closure, and this run's calls would never be recorded.
   vi.resetModules()
-  let capturedArgs: unknown[] = []
-  // ./applyMiddleware, not the package: graphql-middleware is reached through createRequire
-  // there (see that file), which bypasses the runner's registry entirely.
-  vi.doMock('./applyMiddleware', () => ({
-    applyMiddleware: (_schema: unknown, ...middlewares: unknown[]) => {
-      capturedArgs = middlewares
-      return _schema
+  // Each applyMiddleware call and each schema transform, in the order they were applied. The
+  // middlewares are applied from the innermost outwards, so the reversed log is the order they
+  // run in.
+  let applied: unknown[][] = []
+  const record = (middlewares: unknown[]) => applied.push(middlewares)
+  vi.doMock('graphql-middleware', () => ({
+    applyMiddleware: (schema: unknown, ...middlewares: unknown[]) => {
+      record(middlewares)
+      return schema
     },
   }))
-  setupMocks(options)
+  setupMocks(options, record)
 
   const mod = (await import('./index')) as unknown as MiddlewareModule
   return {
     mod,
     getCapturedMiddlewares: () => {
+      applied = []
       mod.default({})
-      return capturedArgs
+      return applied.reverse().flat()
     },
   }
 }
@@ -95,6 +111,27 @@ describe('default', () => {
       const { getCapturedMiddlewares } = await loadModule()
 
       expect(getCapturedMiddlewares()).toHaveLength(15)
+    })
+  })
+
+  it('runs the permissions after sentry and before xss', async () => {
+    await isolateModules(async () => {
+      const sentryMarker = { __test: 'sentry' }
+      const permissionsMarker = { __test: 'permissions' }
+      const xssMarker = { __test: 'xss' }
+      const { getCapturedMiddlewares } = await loadModule({
+        extraMocks: {
+          './sentryMiddleware': sentryMarker,
+          './permissionsMiddleware': permissionsMarker,
+          './xssMiddleware': xssMarker,
+        },
+      })
+
+      expect(getCapturedMiddlewares().slice(0, 3)).toEqual([
+        sentryMarker,
+        permissionsMarker,
+        xssMarker,
+      ])
     })
   })
 

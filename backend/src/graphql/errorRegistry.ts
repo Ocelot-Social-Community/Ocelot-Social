@@ -20,7 +20,7 @@ interface ErrorDefinition {
 
 const definitions = {
   // authentication & account
-  // graphql-shield's answer to every denied permission rule.
+  // graphql-guard's answer to every denied permission rule.
   PERMISSION_RULE_ACCESS_DENIED: {
     type: 'UNAUTHENTICATED',
     text: 'Not Authorized!',
