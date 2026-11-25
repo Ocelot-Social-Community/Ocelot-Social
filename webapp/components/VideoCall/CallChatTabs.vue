@@ -30,7 +30,10 @@
       >
         <!-- What kind of tab it is, at a glance: one of the two chats, or the people. -->
         <os-icon :icon="tab.icon" class="call-chat-tabs__icon" />
-        <span class="call-chat-tabs__label">{{ tab.label }}</span>
+        <!-- As wide as the label in bold, active or not: switching tabs moves no tab. -->
+        <span class="call-chat-tabs__label" :data-label="tab.label">
+          <span class="call-chat-tabs__label-text">{{ tab.label }}</span>
+        </span>
         <!--
           Unread messages, as the red count the app shows on its icons; how many are in the
           call, in the calm colour.
@@ -168,12 +171,20 @@ export default {
   /*  sits on the row's lower edge, whatever padding the row has around its buttons. */
   flex: 1 1 auto;
   align-self: stretch;
-  display: flex;
   min-width: 0;
+  /*  Each tab as wide as its title asks, the short ones first: the grid gives every column its */
+  /*  least width (symbol and count), then shares out the rest evenly, but none more than its */
+  /*  title needs — so the short titles stay whole and only the longest is cut, until even the */
+  /*  short ones do not fit. Room beyond what all need is shared out evenly: the tabs still fill */
+  /*  the row. */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(var(--call-chat-tab-min-width), auto);
+  /*  Its symbol, a two-digit count, and the space around them. */
+  --call-chat-tab-min-width: 4rem;
 }
 
 .call-chat-tabs__cell {
-  flex: 1 1 0;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -218,9 +229,21 @@ export default {
 }
 .call-chat-tabs__label {
   min-width: 0;
+  /*  The label and its bold copy in one cell: the wider of the two sets its width. */
+  display: grid;
+}
+.call-chat-tabs__label-text,
+.call-chat-tabs__label::after {
+  grid-area: 1 / 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.call-chat-tabs__label::after {
+  content: attr(data-label);
+  font-weight: var(--text-weight-bold);
+  visibility: hidden;
 }
 
 .call-chat-tabs__tab:focus-visible {
