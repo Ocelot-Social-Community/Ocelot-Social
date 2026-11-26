@@ -60,6 +60,7 @@ updates:
     time: "03:00"
   allow:
     - dependency-name: "maildev/maildev"
+    - dependency-name: "node"
     - dependency-name: "redis"
 
 # backend

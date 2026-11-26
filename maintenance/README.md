@@ -32,12 +32,13 @@ TMPDIR=/tmp npm run dev -- --port 3001
 
 ### With Docker
 
-From the repository root (the build context must contain `packages/ui/`). Build the UI package on the host first: `docker-compose.override.yml` mounts `packages/ui` from the host, which hides the copy built inside the image, so a fresh checkout without `packages/ui/dist` cannot resolve its UI imports.
+From the repository root (the build context must contain `packages/ui/`):
 
 ```bash
-(cd packages/ui && npm install && npm run build)
 docker compose up maintenance              # http://localhost:3001
 ```
+
+`docker-compose.override.yml` mounts `packages/ui` from the host, which hides the copy built inside the image. The `packages` service therefore builds `packages/ui/dist` on the host first if it is missing.
 
 The override maps the container's port 3000 to 3001 and mounts `maintenance/app`, `maintenance/public`, `nuxt.config.ts` and `packages/ui`, so changes to those reload without a rebuild. Everything else (for example `maintenance/locales` or `package.json`) is baked into the image: an existing image is not rebuilt by `up`, so after such a change start with a forced build:
 
@@ -45,7 +46,7 @@ The override maps the container's port 3000 to 3001 and mounts `maintenance/app`
 docker compose up --build maintenance
 ```
 
-`packages/ui` is the exception to the reload: the page imports its built `dist`, not its sources. After a change in `packages/ui/src` run `(cd packages/ui && npm run build)` on the host; no image build is needed.
+`packages/ui` is the exception to the reload: the page imports its built `dist`, not its sources. After a change in `packages/ui/src` run `(cd packages/ui && npm install && npm run build)` on the host; no image build is needed.
 
 The first build takes a while; later builds come from the cache.
 
