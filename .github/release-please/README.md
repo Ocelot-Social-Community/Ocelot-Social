@@ -44,7 +44,7 @@ its own:
 | Every file a config bumps carries the version its manifest records | The lockstep bump silently stopping — see below. Covers the `extra-files` *and* what the `node` release-type bumps on its own: `package.json` plus both version fields of `package-lock.json`. The latter are easy to miss precisely because no config mentions them. This check also fires on the release pull request itself, since that pull request edits `<name>-manifest.json`: a file the bump missed still shows the old version while the manifest already shows the new one. |
 | No `extra-files` entry is a bare string ending in `.json`/`.yaml`/`.toml`/`.xml` | The trap below. |
 | No config's release pull request `label`s are a subset of another config's | The shared-label abort described under "Why they are split". Mirrors release-please's own matching rule: a pull request belongs to a config when it carries **all** of that config's labels. |
-| Every release-please step is preceded, in its job, by `heal-release-notes.mjs` with the same config, and the overflow text the heal matches still appears in release-please | The heal described under "Overflowing release notes" doing nothing: after the release-please step the run has already failed, with another config it searches the wrong pull requests by label, and with a stale overflow text it recognises no overflowed body at all. |
+| Every release-please step is preceded, in its job, by a `continue-on-error` `heal-release-notes.mjs` step with the same config, and the overflow text the heal matches still appears in release-please | The heal described under "Overflowing release notes" doing nothing or doing harm. After the release-please step the run has already failed. With another config it searches the wrong pull requests by label. Without `continue-on-error` a transient API failure blocks a release that needed no healing. With a stale overflow text it recognises no overflowed body at all. |
 
 ### The `extra-files` trap
 
@@ -185,8 +185,14 @@ release workflow, with the same config file. It finds the config's release pull 
 and for each overflowed one whose side branch lacks the file, points the branch back at the newest
 commit in the ref's activity history that still has it. The content may be one run old;
 release-please regenerates it in the same run. On every other run it changes nothing. A restore
-leaves a `release notes restored` warning on the run; if no commit with the file is left, the step
-fails with what to do by hand.
+leaves a `release notes restored` warning on the run. If no commit with the file is left, the step
+fails with a `release notes missing` annotation that says what to do by hand. Any other failure
+(timeout, 5xx, rate limit) is annotated `release notes heal failed`. The step is
+`continue-on-error`, so it never stops a release on its own: release-please runs after it either
+way, and fails only if the notes really are gone.
+
+Only branches named `release-please--…--release-notes` are ever reset. The link is found anywhere
+in the body, and a changelog entry can carry the same sentence with a link to some other branch.
 
 ## Adding a package
 
@@ -219,4 +225,6 @@ fails with what to do by hand.
    npm publish, and the mirror line is written only when that job actually succeeded.
 7. Put the checkout, Node setup and `heal-release-notes.mjs` steps from `ui-release.yml` in front of
    the release-please step, pointing at the new config — see "Overflowing release notes". The lint
-   rejects a release-please step without them.
+   checks the heal step only: that it comes before release-please in the same job, names the same
+   config and is `continue-on-error`. It does not check the checkout and Node setup. Without them
+   the heal fails, release-please still runs, and the protection is gone without any error.

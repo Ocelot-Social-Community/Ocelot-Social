@@ -100,7 +100,11 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
+      # `continue-on-error`, because the heal is an aid, not a gate: a timeout, a 5xx or a rate limit
+      # here must not hold back a release that needed no healing. When healing WAS needed and failed,
+      # release-please fails right after, and this step's annotation says why.
       - name: Restore lost overflow release notes
+        continue-on-error: true
         run: node .github/release-please/heal-release-notes.mjs .github/release-please/root-config.json
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}

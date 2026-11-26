@@ -5,7 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
 
-import { DEFAULT_LABEL, OVERFLOW_MESSAGE, createGitHub, healReleaseNotes, labelsOf, main, notesBranchOf } from './heal-release-notes.mjs'
+import { DEFAULT_LABEL, NotesLostError, OVERFLOW_MESSAGE, createGitHub, healReleaseNotes, labelsOf, main, notesBranchOf } from './heal-release-notes.mjs'
 
 const RELEASE = 'release-please--branches--master--components--ocelot-social'
 const NOTES = `${RELEASE}--release-notes`
@@ -139,7 +139,25 @@ test('deletions and repeated SHAs in the history are skipped', async () => {
 
 test('no commit with the file in the history is an error that says what to do', async () => {
   const github = fakeRepo({ heads: { [NOTES]: 'bare' }, activity: { [NOTES]: [{ after: 'bare' }] }, pulls: [openPr()] })
-  await assert.rejects(healReleaseNotes({ github, labels: [DEFAULT_LABEL] }), /has no release-notes\.md, and none of the 1 commits.*placeholder/s)
+  await assert.rejects(healReleaseNotes({ github, labels: [DEFAULT_LABEL] }), (error) => {
+    assert.ok(error instanceof NotesLostError)
+    assert.match(error.message, /has no release-notes\.md, and none of the 1 commits.*placeholder/s)
+    return true
+  })
+})
+
+test('a linked branch that is not a release-please notes branch is never touched', async () => {
+  // A changelog entry is free text from a commit subject and can carry the overflow sentence too.
+  const lines = []
+  const github = fakeRepo({
+    heads: { master: 'bare' },
+    withNotes: ['good'],
+    activity: { master: [{ after: 'good' }] },
+    pulls: [openPr(overflowBody('master')), openPr(overflowBody('release-please--x')), openPr(overflowBody('feature--release-notes'))],
+  })
+  assert.deepEqual(await healReleaseNotes({ github, labels: [DEFAULT_LABEL], log: (l) => lines.push(l) }), [])
+  assert.equal(github.calls.some(([name]) => name === 'pointBranchAt'), false)
+  assert.equal(lines.filter((l) => l.endsWith('left alone.')).length, 3)
 })
 
 // The REST client, against a fetch that answers from a routing table and records every request.
@@ -218,6 +236,17 @@ test('pointBranchAt surfaces a refused write with its message', async () => {
   await assert.rejects(github.pointBranchAt('n', 'good'), /resetting n failed with HTTP 403: Resource not accessible/)
 })
 
+test('every request carries a timeout, and an expired one rejects', async () => {
+  const signals = []
+  const fetch = (url, init) =>
+    new Promise((resolve, reject) => {
+      signals.push(init.signal)
+      init.signal.addEventListener('abort', () => reject(init.signal.reason))
+    })
+  await assert.rejects(createGitHub({ token: 't', repository: 'o/r', fetch, timeoutMs: 5 }).hasNotes('n'), { name: 'TimeoutError' })
+  assert.ok(signals[0] instanceof AbortSignal)
+})
+
 test('a GitHub Enterprise API URL is honoured, trailing slash or not', async () => {
   const seen = []
   const fetch = async (url) => (seen.push(url), { status: 200, json: async () => [] })
@@ -260,11 +289,22 @@ test('main fails with an error annotation when it cannot heal', () =>
     assert.match(lines.at(-1), /^::error title=release notes missing::/)
   }))
 
-test('main fails on a config it cannot read', async () => {
+test('main fails on a config it cannot read, under the neutral title', async () => {
   const lines = []
   assert.equal(await main({ argv: ['/nonexistent/x-config.json'], env, out: (l) => lines.push(l), connect: () => fakeRepo() }), 1)
-  assert.match(lines.at(-1), /ENOENT/)
+  assert.match(lines.at(-1), /^::error title=release notes heal failed::.*ENOENT/)
 })
+
+test('an API failure is not reported as missing notes', () =>
+  withConfig({}, async (file) => {
+    const lines = []
+    const repo = fakeRepo()
+    repo.releasePullRequests = async () => {
+      throw new Error('listing pull requests failed with HTTP 502: no message')
+    }
+    assert.equal(await main({ argv: [file], env, out: (l) => lines.push(l), connect: () => repo }), 1)
+    assert.equal(lines.at(-1), '::error title=release notes heal failed::listing pull requests failed with HTTP 502: no message')
+  }))
 
 test('main prints its usage without a config, token or repository', async () => {
   for (const [argv, partial] of [[[], env], [['x'], { ...env, GH_TOKEN: '' }], [['x'], { GH_TOKEN: 't' }]]) {

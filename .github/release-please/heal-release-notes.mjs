@@ -38,6 +38,16 @@ const FILE_PATH_REGEX = new RegExp(`blob/(?<branchName>.*)/${RELEASE_NOTES_FILEN
 
 const NULL_SHA = /^0+$/
 
+// The only shape release-please gives the side branch: `<head branch>--release-notes`, with a head
+// branch that is always `release-please--…`. The link is found anywhere in the body, and a
+// changelog entry is free text taken from a commit subject, so a link to some other branch can
+// appear there. That branch is not one this script owns, and resetting it with force would be
+// destructive.
+const NOTES_BRANCH = /^release-please--.+--release-notes$/
+
+/** The one failure the heal itself diagnoses; everything else is the API or the network. */
+export class NotesLostError extends Error {}
+
 /**
  * The branch an overflowed pull request body links its notes to.
  *
@@ -76,15 +86,20 @@ export function labelsOf(config) {
  * @param {(line: string) => void} [options.log]
  * @returns {Promise<Array<{branch: string, status: 'intact' | 'restored', sha?: string}>>}
  *   one entry per linked notes branch; empty when no consulted pull request overflowed
- * @throws when a notes branch lacks the file and no earlier commit of it has one — the run after
- *   this would fail anyway, and this message says why
+ * @throws {NotesLostError} when a notes branch lacks the file and no earlier commit of it has
+ *   one — the run after this would fail anyway, and this message says why; any other error is the
+ *   API or the network
  */
 export async function healReleaseNotes({ github, labels, log = () => {} }) {
   // The pull requests release-please resolves the overflow link of: open ones it refreshes, and
   // merged ones still labelled pending, which it tags and cuts a release from. A closed, unmerged
   // one is only read back when it carries the snooze label, which nothing here uses.
   const pulls = (await github.releasePullRequests(labels)).filter((pr) => pr.state === 'open' || pr.merged)
-  const branches = [...new Set(pulls.map((pr) => notesBranchOf(pr.body)).filter(Boolean))]
+  const linked = [...new Set(pulls.map((pr) => notesBranchOf(pr.body)).filter(Boolean))]
+  const branches = linked.filter((branch) => NOTES_BRANCH.test(branch))
+  for (const branch of linked.filter((branch) => !branches.includes(branch))) {
+    log(`${branch}: not a release-please notes branch (\`release-please--…--release-notes\`) — left alone.`)
+  }
   if (branches.length === 0) log(`No release pull request labelled ${JSON.stringify(labels)} links overflowed notes.`)
 
   const results = []
@@ -111,7 +126,7 @@ export async function healReleaseNotes({ github, labels, log = () => {} }) {
       }
     }
     if (!sha) {
-      throw new Error(
+      throw new NotesLostError(
         `${branch} has no ${RELEASE_NOTES_FILENAME}, and none of the ${tried.size} commits in its recent history has one either. ` +
           'release-please cannot parse the release pull request without it. Restore the file on that branch by hand, ' +
           'or replace the pull request body with a short placeholder so release-please regenerates it.',
@@ -133,8 +148,11 @@ export async function healReleaseNotes({ github, labels, log = () => {} }) {
  * @param {string} options.repository `owner/name`
  * @param {string} [options.apiUrl]
  * @param {typeof fetch} [options.fetch]
+ * @param {number} [options.timeoutMs] per request. The step runs before EVERY release run, and
+ *   publish.yml queues its runs (`queue: max`), so one request that never answers would otherwise
+ *   hold every later release until the job timeout.
  */
-export function createGitHub({ token, repository, apiUrl = 'https://api.github.com', fetch = globalThis.fetch }) {
+export function createGitHub({ token, repository, apiUrl = 'https://api.github.com', fetch = globalThis.fetch, timeoutMs = 30_000 }) {
   const base = `${apiUrl.replace(/\/$/, '')}/repos/${repository}`
   const q = encodeURIComponent
 
@@ -148,6 +166,7 @@ export function createGitHub({ token, repository, apiUrl = 'https://api.github.c
         ...(body ? { 'content-type': 'application/json' } : {}),
       },
       body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(timeoutMs),
     })
     const data = await response.json().catch(() => null)
     return { status: response.status, data }
@@ -226,7 +245,11 @@ export async function main({ argv, env, out, connect = createGitHub }) {
     }
     return 0
   } catch (error) {
-    out(`::error title=release notes missing::${error.message}`)
+    // Only a NotesLostError means the release-please run after this will fail. Anything else — a
+    // timeout, a 5xx, a rate limit — says nothing about the notes; the workflow step is
+    // `continue-on-error`, so release-please still runs and is the one that decides.
+    const title = error instanceof NotesLostError ? 'release notes missing' : 'release notes heal failed'
+    out(`::error title=${title}::${error.message}`)
     return 1
   }
 }

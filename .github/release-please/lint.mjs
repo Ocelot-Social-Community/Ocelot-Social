@@ -389,7 +389,8 @@ for (const a of labelSets) {
 
 // 8. The overflow heal. heal-release-notes.mjs is only a repair if it runs BEFORE release-please,
 //    in the same job, for the same config — after it, the run has already failed reading the file;
-//    for another config, it searches the wrong pull requests by label. And it recognises the
+//    for another config, it searches the wrong pull requests by label. And it must be
+//    `continue-on-error`, so that it can only ever help. And it recognises the
 //    overflow link by text copied from release-please; if that text moves, the heal silently finds
 //    nothing to heal. Neither mistake turns anything red until the next failed notes write, which
 //    is exactly the situation the heal exists for.
@@ -400,11 +401,15 @@ for (const { name, doc } of workflows) {
     steps.forEach((step, index) => {
       if (typeof step?.uses !== 'string' || !step.uses.startsWith('googleapis/release-please-action@')) return
       const configFile = step.with?.['config-file']
-      const healed = steps
+      const heal = steps
         .slice(0, index)
-        .some((s) => typeof s?.run === 'string' && s.run.includes(HEAL_SCRIPT) && configFile && s.run.includes(configFile))
-      if (!healed) {
+        .find((s) => typeof s?.run === 'string' && s.run.includes(HEAL_SCRIPT) && configFile && s.run.includes(configFile))
+      if (!heal) {
         fail(name, `job \`${jobId}\` runs release-please with ${configFile ?? 'no config-file'} but no earlier step runs ${HEAL_SCRIPT} with that config — one failed write of overflowing release notes would then block every later run`)
+      } else if (heal['continue-on-error'] !== true) {
+        // The heal must never be what stops a release: a transient API failure in it would then
+        // block runs that needed no healing at all, which is the failure it exists to remove.
+        fail(name, `job \`${jobId}\` runs ${HEAL_SCRIPT} without \`continue-on-error: true\` — a transient API failure in the heal would then block a release that needed no healing`)
       }
     })
   }
