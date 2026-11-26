@@ -113,11 +113,13 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
-      # Before the lint, and without any dependency. Two units are tested here, both of them the
-      # kind whose bugs are silent: `path-filter.mjs` reimplements GitHub's filter patterns, which
-      # differ from any classic glob, and `workflow-gate.mjs` resolves the chain from a job's `if:`
-      # to the filter rule that gates it. An approximately-right matcher or a half-resolved chain
-      # would report the trigger list as complete while nothing actually starts a run. Node's
+      # Before the lint, and without any dependency. The units tested here are the kind whose bugs
+      # are silent: `path-filter.mjs` reimplements GitHub's filter patterns, which differ from any
+      # classic glob, and `workflow-gate.mjs` resolves the chain from a job's `if:` to the filter
+      # rule that gates it. An approximately-right matcher or a half-resolved chain would report the
+      # trigger list as complete while nothing actually starts a run. `heal-release-notes.mjs` runs
+      # in the release workflows, not here, but only ever matters on the one run after a failed
+      # notes write — its tests are the only time it is exercised before it is needed. Node's
       # built-in runner picks up `*.test.mjs` only, so `lint.mjs` beside them is not executed here.
       - name: Test the lint's helper modules
         run: node --test .github/release-please/

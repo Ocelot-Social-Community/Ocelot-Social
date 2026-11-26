@@ -387,6 +387,38 @@ for (const a of labelSets) {
   }
 }
 
+// 8. The overflow heal. heal-release-notes.mjs is only a repair if it runs BEFORE release-please,
+//    in the same job, for the same config — after it, the run has already failed reading the file;
+//    for another config, it searches the wrong pull requests by label. And it recognises the
+//    overflow link by text copied from release-please; if that text moves, the heal silently finds
+//    nothing to heal. Neither mistake turns anything red until the next failed notes write, which
+//    is exactly the situation the heal exists for.
+const HEAL_SCRIPT = 'release-please/heal-release-notes.mjs'
+for (const { name, doc } of workflows) {
+  for (const [jobId, job] of Object.entries(doc?.jobs ?? {})) {
+    const steps = job?.steps ?? []
+    steps.forEach((step, index) => {
+      if (typeof step?.uses !== 'string' || !step.uses.startsWith('googleapis/release-please-action@')) return
+      const configFile = step.with?.['config-file']
+      const healed = steps
+        .slice(0, index)
+        .some((s) => typeof s?.run === 'string' && s.run.includes(HEAL_SCRIPT) && configFile && s.run.includes(configFile))
+      if (!healed) {
+        fail(name, `job \`${jobId}\` runs release-please with ${configFile ?? 'no config-file'} but no earlier step runs ${HEAL_SCRIPT} with that config — one failed write of overflowing release notes would then block every later run`)
+      }
+    })
+  }
+}
+{
+  const { OVERFLOW_MESSAGE, RELEASE_NOTES_FILENAME } = await import('./heal-release-notes.mjs')
+  const handler = fs.readFileSync(require.resolve('release-please/build/src/util/pull-request-overflow-handler.js'), 'utf8')
+  for (const [what, text] of [['OVERFLOW_MESSAGE', OVERFLOW_MESSAGE], ['RELEASE_NOTES_FILENAME', RELEASE_NOTES_FILENAME]]) {
+    if (!handler.includes(`'${text}'`)) {
+      fail(rel('heal-release-notes.mjs'), `its ${what} (${JSON.stringify(text)}) no longer appears in release-please's pull-request-overflow-handler.js — the heal would no longer recognise an overflowed body`)
+    }
+  }
+}
+
 const distinct = new Set(sectionLists.values())
 if (distinct.size > 1) {
   const grouped = [...sectionLists.entries()].map(([f, s]) => `${f}: ${JSON.parse(s).map((x) => x.type).join(',')}`)
