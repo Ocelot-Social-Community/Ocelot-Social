@@ -1,9 +1,23 @@
 services:
 
+  # Builds packages/branding and packages/ui into the host folders if their dist/ is missing, then
+  # exits. The services that mount those folders wait for it. It does not rebuild an existing dist/:
+  # after changing the sources of a package, build it on the host (or delete its dist/).
+  packages:
+    # the Node image of the Dockerfiles
+    image: node:26.13.1-alpine
+    volumes:
+      - ./packages:/packages
+      - packages_npm_cache:/root/.npm
+    command: /bin/sh /packages/build-if-missing.sh
+
   webapp:
     image: ghcr.io/ocelot-social-community/ocelot-social/webapp:local-development
     build:
       target: development
+    depends_on:
+      packages:
+        condition: service_completed_successfully
     environment:
       - NODE_ENV=development
       # - DEBUG=true
@@ -28,9 +42,14 @@ services:
     # the host-run backend test suite. Publishing it here too collides
     # ("Bind for 0.0.0.0:9000 failed: port is already allocated").
     depends_on:
-      - minio
-      - minio-mc
-      - imagor
+      minio:
+        condition: service_started
+      minio-mc:
+        condition: service_started
+      imagor:
+        condition: service_started
+      packages:
+        condition: service_completed_successfully
     build:
       target: development
     environment:
@@ -155,6 +174,9 @@ services:
     image: ghcr.io/ocelot-social-community/ocelot-social/maintenance:local-development
     build:
       target: development
+    depends_on:
+      packages:
+        condition: service_completed_successfully
     ports:
       - "3001:3000"
     environment:
@@ -187,6 +209,9 @@ services:
       dockerfile: ./webapp/Dockerfile
       target: development
     command: /bin/sh -c "npm install && node scripts/fix-storybook-webpack.js && npm run storybook"
+    depends_on:
+      packages:
+        condition: service_completed_successfully
     ports:
       - 3002:3002
     environment:
@@ -222,4 +247,5 @@ services:
 
 volumes:
   minio_data:
+  packages_npm_cache:
   webapp_storybook_node_modules:

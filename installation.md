@@ -68,7 +68,10 @@ For Production:
 $ docker compose -f docker-compose.yml up
 ```
 
-This will start all required Docker containers.  
+This will start all required Docker containers.
+
+In development the containers use `packages/branding` and `packages/ui` from your checkout. The `packages` service builds their `dist/` folders if they are missing, which makes the first start take longer. It leaves an existing `dist/` alone: after the sources of one of these packages changed (for example after `git pull`), delete its `dist/` or build it on the host.
+
 In development, make sure your database is running on `http://localhost:7474/browser/` — production publishes only the Bolt port `7687`, not the Neo4j Browser.
 
 Prepare database once before you start by running the following command in a second terminal:
