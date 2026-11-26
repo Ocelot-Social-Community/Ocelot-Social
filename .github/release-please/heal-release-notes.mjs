@@ -41,9 +41,12 @@ const NULL_SHA = /^0+$/
 // The only shape release-please gives the side branch: `<head branch>--release-notes`, with a head
 // branch that is always `release-please--…`. The link is found anywhere in the body, and a
 // changelog entry is free text taken from a commit subject, so a link to some other branch can
-// appear there. That branch is not one this script owns, and resetting it with force would be
-// destructive.
+// appear there — including another config's notes branch, which that config's own workflow may be
+// writing at this very moment. So the shape is only a cheap pre-filter; a branch is healed only
+// when it is exactly the linking pull request's head branch plus `--release-notes`, the name
+// release-please itself derives (`${headRefName}--release-notes`).
 const NOTES_BRANCH = /^release-please--.+--release-notes$/
+const NOTES_SUFFIX = '--release-notes'
 
 /** The one failure the heal itself diagnoses; everything else is the API or the network. */
 export class NotesLostError extends Error {}
@@ -95,10 +98,22 @@ export async function healReleaseNotes({ github, labels, log = () => {} }) {
   // merged ones still labelled pending, which it tags and cuts a release from. A closed, unmerged
   // one is only read back when it carries the snooze label, which nothing here uses.
   const pulls = (await github.releasePullRequests(labels)).filter((pr) => pr.state === 'open' || pr.merged)
-  const linked = [...new Set(pulls.map((pr) => notesBranchOf(pr.body)).filter(Boolean))]
-  const branches = linked.filter((branch) => NOTES_BRANCH.test(branch))
-  for (const branch of linked.filter((branch) => !branches.includes(branch))) {
-    log(`${branch}: not a release-please notes branch (\`release-please--…--release-notes\`) — left alone.`)
+  const branches = []
+  for (const pr of pulls) {
+    const branch = notesBranchOf(pr.body)
+    if (!branch || branches.includes(branch)) continue
+    if (!NOTES_BRANCH.test(branch)) {
+      log(`${branch}: not a release-please notes branch (\`release-please--…--release-notes\`) — left alone.`)
+      continue
+    }
+    // One extra request, and only for a pull request that overflowed: the issues listing carries
+    // no head branch.
+    const head = await github.headBranchOf(pr.number)
+    if (branch !== `${head}${NOTES_SUFFIX}`) {
+      log(`${branch}: linked from #${pr.number}, whose notes branch is ${head}${NOTES_SUFFIX} — left alone.`)
+      continue
+    }
+    branches.push(branch)
   }
   if (branches.length === 0) log(`No release pull request labelled ${JSON.stringify(labels)} links overflowed notes.`)
 
@@ -177,7 +192,7 @@ export function createGitHub({ token, repository, apiUrl = 'https://api.github.c
   }
 
   return {
-    /** Pull requests carrying ALL of `labels`, any state, as `{state, merged, body}`. */
+    /** Pull requests carrying ALL of `labels`, any state, as `{number, state, merged, body}`. */
     async releasePullRequests(labels) {
       const found = []
       for (let page = 1; ; page++) {
@@ -189,10 +204,13 @@ export function createGitHub({ token, repository, apiUrl = 'https://api.github.c
         )
         for (const issue of data) {
           if (!issue.pull_request) continue
-          found.push({ state: issue.state, merged: issue.pull_request.merged_at != null, body: issue.body })
+          found.push({ number: issue.number, state: issue.state, merged: issue.pull_request.merged_at != null, body: issue.body })
         }
         if (data.length < 100) return found
       }
+    },
+    async headBranchOf(number) {
+      return expectOk(`reading pull request #${number}`, await call('GET', `/pulls/${number}`)).head.ref
     },
     async hasNotes(ref) {
       const response = await call('GET', `/contents/${RELEASE_NOTES_FILENAME}?ref=${q(ref)}`)

@@ -31,7 +31,7 @@ test('labelsOf reads `label` the way release-please does, with its default', () 
 
 // An in-memory repository holding just what the heal looks at: branch heads, which commits carry
 // release-notes.md, the activity log of each ref, and the release pull requests.
-function fakeRepo({ heads = {}, withNotes = [], activity = {}, pulls = [] } = {}) {
+function fakeRepo({ heads = {}, withNotes = [], activity = {}, pulls = [], headOf = {} } = {}) {
   const calls = []
   return {
     heads,
@@ -40,10 +40,15 @@ function fakeRepo({ heads = {}, withNotes = [], activity = {}, pulls = [] } = {}
       calls.push(['releasePullRequests', labels])
       return pulls
     },
+    async headBranchOf(number) {
+      calls.push(['headBranchOf', number])
+      return headOf[number] ?? RELEASE
+    },
     async hasNotes(ref) {
       return withNotes.includes(heads[ref] ?? ref)
     },
     async refActivity(branch) {
+      calls.push(['refActivity', branch])
       return activity[branch] ?? []
     },
     async pointBranchAt(branch, sha) {
@@ -53,7 +58,8 @@ function fakeRepo({ heads = {}, withNotes = [], activity = {}, pulls = [] } = {}
   }
 }
 
-const openPr = (body = overflowBody()) => ({ state: 'open', merged: false, body })
+let nextNumber = 1
+const openPr = (body = overflowBody()) => ({ number: nextNumber++, state: 'open', merged: false, body })
 
 test('the incident: a force-reset without the follow-up commit is restored to the last notes commit', async () => {
   // Ref activity of the notes branch on 2026-11-25, newest first.
@@ -99,7 +105,7 @@ test('a merged, untagged release pull request is healed too — its notes become
     heads: { [NOTES]: 'bare' },
     withNotes: ['good'],
     activity: { [NOTES]: [{ after: 'bare' }, { after: 'good' }] },
-    pulls: [{ state: 'closed', merged: true, body: overflowBody() }],
+    pulls: [{ number: 7, state: 'closed', merged: true, body: overflowBody() }],
   })
   assert.equal((await healReleaseNotes({ github, labels: [DEFAULT_LABEL] }))[0].status, 'restored')
 })
@@ -114,7 +120,7 @@ test('two pull requests linking the same branch heal it once', async () => {
     heads: { [NOTES]: 'bare' },
     withNotes: ['good'],
     activity: { [NOTES]: [{ after: 'bare' }, { after: 'good' }] },
-    pulls: [openPr(), { state: 'closed', merged: true, body: overflowBody() }],
+    pulls: [openPr(), { number: 8, state: 'closed', merged: true, body: overflowBody() }],
   })
   await healReleaseNotes({ github, labels: [DEFAULT_LABEL] })
   assert.equal(github.calls.filter(([name]) => name === 'pointBranchAt').length, 1)
@@ -160,6 +166,30 @@ test('a linked branch that is not a release-please notes branch is never touched
   assert.equal(lines.filter((l) => l.endsWith('left alone.')).length, 3)
 })
 
+test("a link to ANOTHER release pull request's notes branch is left alone", async () => {
+  // The root release pull request's changelog quoting the ui one's overflow link: right shape,
+  // wrong owner — and ui-release.yml may be rewriting that very branch right now.
+  const UI_NOTES = 'release-please--branches--master--components--ui--release-notes'
+  const lines = []
+  const pr = openPr(overflowBody(UI_NOTES))
+  const github = fakeRepo({
+    heads: { [UI_NOTES]: 'bare' },
+    withNotes: ['good'],
+    activity: { [UI_NOTES]: [{ after: 'good' }] },
+    pulls: [pr],
+    headOf: { [pr.number]: RELEASE },
+  })
+  assert.deepEqual(await healReleaseNotes({ github, labels: [DEFAULT_LABEL], log: (l) => lines.push(l) }), [])
+  assert.deepEqual(github.calls.map(([name]) => name), ['releasePullRequests', 'headBranchOf'])
+  assert.ok(lines.includes(`${UI_NOTES}: linked from #${pr.number}, whose notes branch is ${NOTES} — left alone.`))
+})
+
+test('the head branch is looked up only for a pull request whose link has the right shape', async () => {
+  const github = fakeRepo({ pulls: [openPr('## 3.22.0'), openPr(overflowBody('master'))] })
+  await healReleaseNotes({ github, labels: [DEFAULT_LABEL] })
+  assert.equal(github.calls.some(([name]) => name === 'headBranchOf'), false)
+})
+
 // The REST client, against a fetch that answers from a routing table and records every request.
 function fakeFetch(routes) {
   const requests = []
@@ -189,9 +219,14 @@ test('releasePullRequests filters by all labels, keeps pull requests only, and p
   })
   const pulls = await github.releasePullRequests(['a', 'b'])
   assert.equal(pulls.length, 101)
-  assert.deepEqual(pulls.at(-1), { state: 'closed', merged: true, body: '#101' })
+  assert.deepEqual(pulls.at(-1), { number: 101, state: 'closed', merged: true, body: '#101' })
   assert.equal(pulls[0].merged, false)
   assert.equal(requests[0].init.headers.authorization, 'Bearer t0k')
+})
+
+test('headBranchOf reads the head ref of one pull request', async () => {
+  const { github } = client({ 'GET /pulls/10685': [200, { head: { ref: RELEASE } }] })
+  assert.equal(await github.headBranchOf(10685), RELEASE)
 })
 
 test('hasNotes is true on 200, false on 404, and throws on anything else', async () => {

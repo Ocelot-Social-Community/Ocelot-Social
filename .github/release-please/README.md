@@ -191,8 +191,10 @@ fails with a `release notes missing` annotation that says what to do by hand. An
 `continue-on-error`, so it never stops a release on its own: release-please runs after it either
 way, and fails only if the notes really are gone.
 
-Only branches named `release-please--…--release-notes` are ever reset. The link is found anywhere
-in the body, and a changelog entry can carry the same sentence with a link to some other branch.
+A branch is only ever reset when it is exactly the linking pull request's own head branch plus
+`--release-notes`, the name release-please derives itself. The link is found anywhere in the body.
+A changelog entry can carry the same sentence with a link to some other branch, even to another
+config's notes branch that its own workflow may be writing at that moment.
 
 ## Adding a package
 
