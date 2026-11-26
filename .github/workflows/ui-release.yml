@@ -45,8 +45,9 @@ jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
-    # Deliberately no `permissions:` block. Neither step here uses GITHUB_TOKEN: there is no
-    # checkout, `create-github-app-token` authenticates with the app id and private key, and
+    # Deliberately no `permissions:` block. The only GITHUB_TOKEN use here is the read-only sparse
+    # checkout of the release-notes heal, which the workflow's `contents: read` covers;
+    # `create-github-app-token` authenticates with the app id and private key, and
     # release-please-action takes its credentials solely from its `token` input (src/index.ts reads
     # `core.getInput('token')` and hands that to the GitHub client — `process.env` is only consulted
     # for GITHUB_REPOSITORY, never as an auth fallback). Granting write here would have widened
@@ -79,6 +80,39 @@ jobs:
           permission-contents: write
           permission-pull-requests: write
           permission-issues: write
+
+      # release-please cannot recover on its own from one failed write of an overflowing release pull
+      # request's notes: it force-resets the `…--release-notes` side branch, the commit with
+      # `release-notes.md` that should follow never lands, and every later run fails reading that file
+      # before it gets to write it again (v3.22.0, 2026-11-25). This step points the branch back at
+      # the last commit that still has the file, and is a no-op otherwise. Same config file as the
+      # step below — lint.mjs checks the pairing. Details in heal-release-notes.mjs.
+      #
+      # A sparse checkout of the script and .nvmrc only, with GITHUB_TOKEN's read access; the script
+      # itself works through the app token, which already carries the scopes it uses (contents for
+      # the ref, issues to find the release pull requests by label).
+      - name: Checkout the release-please helpers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/release-please
+            .nvmrc
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: '.nvmrc'
+
+      # `continue-on-error`, because the heal is an aid, not a gate: a timeout, a 5xx or a rate limit
+      # here must not hold back a release that needed no healing. When healing WAS needed and failed,
+      # release-please fails right after, and this step's annotation says why.
+      - name: Restore lost overflow release notes
+        continue-on-error: true
+        run: node .github/release-please/heal-release-notes.mjs .github/release-please/ui-config.json
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Release Please
         id: release

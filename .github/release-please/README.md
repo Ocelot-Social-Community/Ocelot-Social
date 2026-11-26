@@ -44,6 +44,7 @@ its own:
 | Every file a config bumps carries the version its manifest records | The lockstep bump silently stopping — see below. Covers the `extra-files` *and* what the `node` release-type bumps on its own: `package.json` plus both version fields of `package-lock.json`. The latter are easy to miss precisely because no config mentions them. This check also fires on the release pull request itself, since that pull request edits `<name>-manifest.json`: a file the bump missed still shows the old version while the manifest already shows the new one. |
 | No `extra-files` entry is a bare string ending in `.json`/`.yaml`/`.toml`/`.xml` | The trap below. |
 | No config's release pull request `label`s are a subset of another config's | The shared-label abort described under "Why they are split". Mirrors release-please's own matching rule: a pull request belongs to a config when it carries **all** of that config's labels. |
+| Every release-please step is preceded, in its job, by a `continue-on-error` `heal-release-notes.mjs` step with the same config, and the overflow text the heal matches still appears in release-please | The heal described under "Overflowing release notes" doing nothing or doing harm. After the release-please step the run has already failed. With another config it searches the wrong pull requests by label. Without `continue-on-error` a transient API failure blocks a release that needed no healing. With a stale overflow text it recognises no overflowed body at all. |
 
 ### The `extra-files` trap
 
@@ -166,6 +167,35 @@ The packages therefore carry their own `label` and `release-label` (`autorelease
 `autorelease: tagged (ui)`, and the same for branding). The application keeps release-please's
 defaults, so the label on its open release pull request still matches.
 
+## Overflowing release notes
+
+A release pull request body is capped at 65 536 characters. Past that, release-please stores the
+full notes as `release-notes.md` on a side branch `<head branch>--release-notes` and puts only a
+link into the body. It rewrites that file on every run in two API calls — force-reset the side
+branch to master, then commit the file — and it reads the file back at the start of every run,
+for the open release pull request and for a merged one it is about to tag.
+
+When the second call fails, the side branch is left without the file, and every later run fails at
+`Failed to find file: release-notes.md` before reaching the write that would repair it. That is what
+held v3.22.0 on 2026-11-25: the first attempt reset the branch and died with an empty error, and the
+re-run could not get past the read.
+
+[`heal-release-notes.mjs`](./heal-release-notes.mjs) runs as the step before release-please in each
+release workflow, with the same config file. It finds the config's release pull requests by label,
+and for each overflowed one whose side branch lacks the file, points the branch back at the newest
+commit in the ref's activity history that still has it. The content may be one run old;
+release-please regenerates it in the same run. On every other run it changes nothing. A restore
+leaves a `release notes restored` warning on the run. If no commit with the file is left, the step
+fails with a `release notes missing` annotation that says what to do by hand. Any other failure
+(timeout, 5xx, rate limit) is annotated `release notes heal failed`. The step is
+`continue-on-error`, so it never stops a release on its own: release-please runs after it either
+way, and fails only if the notes really are gone.
+
+A branch is only ever reset when it is exactly the linking pull request's own head branch plus
+`--release-notes`, the name release-please derives itself. The link is found anywhere in the body.
+A changelog entry can carry the same sentence with a link to some other branch, even to another
+config's notes branch that its own workflow may be writing at that moment.
+
 ## Adding a package
 
 1. Add `<name>-config.json` and `<name>-manifest.json` here, modelled on the existing pair. Package
@@ -195,3 +225,8 @@ defaults, so the label on its open release pull request still matches.
    changelog but not where the artefact was published. Keep its `always() && needs.publish.result ==
    'success'` gate — a failed GitHub Packages mirror must not withhold the notes for a successful
    npm publish, and the mirror line is written only when that job actually succeeded.
+7. Put the checkout, Node setup and `heal-release-notes.mjs` steps from `ui-release.yml` in front of
+   the release-please step, pointing at the new config — see "Overflowing release notes". The lint
+   checks the heal step only: that it comes before release-please in the same job, names the same
+   config and is `continue-on-error`. It does not check the checkout and Node setup. Without them
+   the heal fails, release-please still runs, and the protection is gone without any error.
