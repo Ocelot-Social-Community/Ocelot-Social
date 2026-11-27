@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { createRequire } from 'node:module'
+import { allow, and, deny, guard, or, rule } from 'graphql-guard'
 
 import CONFIG from '@config/index'
 import { Errors } from '@graphql/errorRegistry'
@@ -39,33 +39,10 @@ import type { GroupPermissionKey } from '@src/groupPermission'
 import type { GroupPrivacyLevel } from '@src/groupRole'
 import type { GroupAuthorization } from '@src/groupRole/requestScope'
 import type { PermissionKey } from '@src/permission'
-import type {
-  allow as Allow,
-  and as And,
-  deny as Deny,
-  or as Or,
-  rule as Rule,
-  shield as Shield,
-} from 'graphql-shield'
-
-// Loaded through createRequire because graphql-shield 7.6.5's ESM build is broken: `esm/rules.js`
-// does `import { isUndefined } from 'util'`, and Node's `util` ESM namespace has no such export
-// (it is a deprecated CommonJS-only property), so importing the package the normal way throws at
-// load. Its `exports` map offers no subpath, so the working CJS build cannot be addressed
-// directly either. The type import below still comes from the package's own declarations, so
-// this costs no type safety — only the illusion that the package supports ESM.
-// Revisit when graphql-shield ships a fixed ESM build.
-const { rule, shield, deny, allow, or, and } = createRequire(import.meta.url)('graphql-shield') as {
-  rule: typeof Rule
-  shield: typeof Shield
-  deny: typeof Deny
-  allow: typeof Allow
-  or: typeof Or
-  and: typeof And
-}
+import type { GraphQLSchema } from 'graphql'
+import type { Options, Rules } from 'graphql-guard'
 
 const debug = !!CONFIG.DEBUG
-const allowExternalErrors = true
 
 const isAuthenticated = rule({
   cache: 'contextual',
@@ -493,8 +470,7 @@ const byRoom =
  * whether a hidden group is there. A member who merely lacks the right still gets the default,
  * and so does a guest: the reason is only worth giving to somebody who could get a membership.
  * (Decided here rather than by ordering the rules: `and` answers with the first custom error
- * among ALL refusals, and graphql-shield's `chain` cannot run on this Node — it calls the
- * removed `util.isUndefined`, see the import above.)
+ * among ALL refusals.)
  */
 const hasGroupPermission = (
   permission: GroupPermissionKey,
@@ -543,7 +519,7 @@ const parentHasGroupPermission = (permission: GroupPermissionKey) =>
 /**
  * Creating a group-defined role is switched off for now (#10356).
  *
- * Returns the reason rather than `false`: graphql-shield passes an Error through as the
+ * Returns the reason rather than `false`: graphql-guard passes an Error through as the
  * message, and "Not Authorized!" would send an owner looking for a right they are missing
  * instead of telling them the capability is not there yet.
  */
@@ -741,7 +717,14 @@ export const groupAuthorizationRules = {
 }
 
 // Permissions
-export default shield(
+// guard() returns a new schema rather than a middleware, so the permissions are a function of the
+// schema that middleware/index.ts calls at their place in the middleware order.
+const guardSchema =
+  (rules: Rules, options: Options) =>
+  (schema: GraphQLSchema): GraphQLSchema =>
+    guard(schema, rules, options)
+
+export default guardSchema(
   {
     Query: {
       '*': deny,
@@ -1134,7 +1117,6 @@ export default shield(
   },
   {
     debug,
-    allowExternalErrors,
     fallbackRule: allow,
     fallbackError: new AppError(Errors.PERMISSION_RULE_ACCESS_DENIED),
   },

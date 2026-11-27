@@ -119,9 +119,9 @@ export default defineConfig({
       // index.mjs`) with no `exports` map to arbitrate, so Vite-processed code would take the ESM
       // one while externalised code takes CJS — two live instances, and graphql's `instanceOf`
       // then rejects a type built by "the other" ("Cannot use GraphQLObjectType … from another
-      // module or realm"). CJS is the side that must win: permissionsMiddleware reaches
-      // graphql-shield through createRequire (its ESM build is broken), which is CommonJS and
-      // cannot be talked out of it.
+      // module or realm"). CJS is the side that must win: externalised packages (graphql-guard,
+      // graphql-middleware, @graphql-tools) are loaded by Node, which ignores `module` and so
+      // always gets the CommonJS build.
       graphql: fileURLToPath(new URL('./node_modules/graphql/index.js', import.meta.url)),
     },
   },

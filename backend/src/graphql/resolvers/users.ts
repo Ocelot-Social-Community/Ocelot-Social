@@ -831,7 +831,7 @@ export default {
     },
     ...underscoreIdResolver,
     // Verbatim from User.gql. Who may READ this field is enforced separately by the
-    // graphql-shield rule on User.email; this resolver only fetches it.
+    // graphql-guard rule on User.email; this resolver only fetches it.
     ...cypherFields('User', {
       // A user without a primary email is a supported state — see the
       // `userWithoutEmailAddress` factory. The field is non-null, so the fallback keeps such

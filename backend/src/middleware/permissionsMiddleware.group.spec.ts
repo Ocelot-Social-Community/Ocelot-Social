@@ -73,9 +73,6 @@ const contextFor = (
       getEffective: (key: string) => key !== 'groupsEnabled' || options.groupsEnabled !== false,
       get: () => true,
     },
-    // graphql-shield keeps its per-request rule cache on the context, and a rule declared with
-    // `cache: 'contextual'` reads it directly — the middleware would normally have put it there.
-    _shield: { cache: {} },
     database: {
       query: vi.fn(async () => Promise.resolve({ records: options.queryRecords ?? [] })),
     },
@@ -101,7 +98,7 @@ const contextFor = (
     },
   }) as unknown as Context
 
-// graphql-shield rules answer through resolve(parent, args, context, info).
+// graphql-guard rules answer through resolve(parent, args, context, info).
 const resolve = async (rule: unknown, parent: unknown, args: unknown, context: Context) =>
   (
     rule as {

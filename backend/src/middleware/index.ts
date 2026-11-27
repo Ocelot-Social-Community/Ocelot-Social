@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { applyMiddleware } from 'graphql-middleware'
 
 import CONFIG from '@config/index'
 
-import { applyMiddleware } from './applyMiddleware'
 import brandingMiddlewares from './branding/brandingMiddlewares'
 import categories from './categories'
 import chatMiddleware from './chatMiddleware'
@@ -20,14 +19,20 @@ import userInteractions from './userInteractions'
 import validation from './validation/validationMiddleware'
 import xss from './xssMiddleware'
 
+import type { GraphQLSchema } from 'graphql'
 import type { IMiddleware, IMiddlewareGenerator } from 'graphql-middleware'
 
-export interface MiddlewareOrder {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type GraphQLMiddleware = IMiddleware | IMiddlewareGenerator<any, any, any>
+
+// A middleware is either a graphql-middleware one or, like the permissions, a function that takes
+// the schema and returns a new one.
+export type MiddlewareOrder = {
   position: 'prepend' | 'append' | { before: string } | { after: string }
   name: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  middleware: IMiddleware | IMiddlewareGenerator<any, any, any>
-}
+} & (
+  { middleware: GraphQLMiddleware } | { transformSchema: (schema: GraphQLSchema) => GraphQLSchema }
+)
 
 const ocelotMiddlewares: MiddlewareOrder[] = []
 
@@ -58,7 +63,11 @@ export const addMiddleware = (middleware: MiddlewareOrder) => {
 }
 
 addMiddleware({ name: 'sentry', middleware: sentry, position: 'append' })
-addMiddleware({ name: 'permissions', middleware: permissions, position: { after: 'sentry' } })
+addMiddleware({
+  name: 'permissions',
+  transformSchema: permissions,
+  position: { after: 'sentry' },
+})
 addMiddleware({ name: 'xss', middleware: xss, position: { after: 'permissions' } })
 addMiddleware({ name: 'validation', middleware: validation, position: { after: 'xss' } })
 addMiddleware({
@@ -85,7 +94,7 @@ addMiddleware({
 })
 addMiddleware({ name: 'categories', middleware: categories, position: { after: 'chatMiddleware' } })
 
-export default (schema) => {
+export default (schema: GraphQLSchema): GraphQLSchema => {
   // execute branding middleware function
   brandingMiddlewares()
 
@@ -99,5 +108,25 @@ export default (schema) => {
     console.log(`Warning: Disabled "${CONFIG.DISABLED_MIDDLEWARES.join(', ')}" middleware.`)
   }
 
-  return applyMiddleware(schema, ...filteredMiddlewares.map((middleware) => middleware.middleware))
+  // graphql-middleware wraps the schema from the last middleware inwards, so the first one in the
+  // list runs first. A schema transform keeps its place in that order: the middlewares after it
+  // are applied before it, and the ones before it are applied to what it returns.
+  let appliedSchema = schema
+  let pending: GraphQLMiddleware[] = []
+  const applyPending = () => {
+    if (pending.length) {
+      appliedSchema = applyMiddleware(appliedSchema, ...pending)
+      pending = []
+    }
+  }
+  for (const middleware of [...filteredMiddlewares].reverse()) {
+    if ('transformSchema' in middleware) {
+      applyPending()
+      appliedSchema = middleware.transformSchema(appliedSchema)
+    } else {
+      pending.unshift(middleware.middleware)
+    }
+  }
+  applyPending()
+  return appliedSchema
 }

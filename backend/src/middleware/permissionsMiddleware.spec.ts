@@ -323,7 +323,7 @@ describe('creating a group-defined role', () => {
   it('is refused with the reason, not with "Not Authorized!"', async () => {
     // Parked (#10356). The message matters: an owner reading "Not Authorized!" goes looking for
     // a right they are missing, and there is none to find — the capability is simply not there
-    // yet. graphql-shield passes an Error through as the message, which is why the rule returns
+    // yet. graphql-guard passes an Error through as the message, which is why the rule returns
     // one instead of `false`.
     const roleMaker = await Factory.build(
       'user',
