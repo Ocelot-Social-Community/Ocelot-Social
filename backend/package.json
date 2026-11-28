@@ -97,7 +97,7 @@
     "mime-types": "^3.0.2",
     "minimatch": "^11.0.9",
     "mustache": "^4.2.0",
-    "neo4j-driver": "^4.4.11",
+    "neo4j-driver": "^6.3.2",
     "node-fetch": "^2.7.0",
     "nodemailer": "^10.6.1",
     "nodemailer-html-to-text": "^3.2.0",
