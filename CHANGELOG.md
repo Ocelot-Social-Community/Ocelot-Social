@@ -9,6 +9,25 @@ verbatim; only its version headings were lifted to `##`, because release-please 
 in front of the first `##`/`###` version heading it finds and would otherwise have written it into
 the middle of the file.
 
+## [3.22.1](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.22.0...3.22.1) (2026-11-28)
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.6 to 26.6.7 in /backend ([#11175](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11175)) ([ddac8c8](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ddac8c8af10690cec5c92f43e26226a0c923c735))
+* **deps-dev:** bump @types/node from 26.6.6 to 26.6.7 in /packages/branding ([#11168](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11168)) ([a19d0ac](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a19d0ac2f4a1bb1c13d8d6e869e900aed7fc00d9))
+* **deps-dev:** bump @types/node from 26.6.6 to 26.6.7 in /packages/ui ([#11172](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11172)) ([1c1c598](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/1c1c5989f4d89171f0a78612523f4bffc7dc1ef3))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/branding ([#11176](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11176)) ([25e270e](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/25e270e4f745192f84289607a4bb29b522e64f79))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui ([#11178](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11178)) ([7ad696f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7ad696f50a974c0f503a41e20d14a722d14cf95c))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui/examples/vue2-css ([#11165](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11165)) ([4617e62](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4617e627123cb9c3e1a3c6ec9842a47a0dfcca37))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui/examples/vue3-css ([#11171](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11171)) ([005bf30](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/005bf30000f9f2cfe1e2a24a0258a0fdb570eab8))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui/examples/vue3-tailwind ([#11166](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11166)) ([fb32af9](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/fb32af918d28b7f87f2395587cf6d793f78cb759))
+* **deps-dev:** bump multiple-cucumber-html-reporter from 4.6.0 to 4.7.0 in the cypress group ([#11161](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11161)) ([5498a32](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/5498a32eebc075845301feccd07539ea250a2ab9))
+* **deps-dev:** bump typescript-eslint from 8.73.0 to 8.74.0 in /packages/branding ([#11174](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11174)) ([24853cf](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/24853cf28f9a323756260161afabd52351cb7d22))
+* **deps:** bump @sentry/node from 11.16.0 to 11.17.0 in /backend ([#11169](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11169)) ([68a6611](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/68a661126e57e46c9d7cd655b9bf51db665c5db3))
+* **deps:** bump nuxt from 4.6.4 to 4.7.0 in /maintenance in the nuxt group ([#11167](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11167)) ([01e6db5](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/01e6db5a7ee410a2f5e9236761db5c1f1a8ca8d2))
+* **deps:** bump peter-evans/repository-dispatch from e94e792f234fab3190a5da59fe5d61d7026af9c6 to 174d3b76bcf95744d327d8b1c0cd0b270db5548e ([#11162](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11162)) ([ce3fb71](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/ce3fb71e4a7ea452a4b0222257aba2900c32e7f2))
+
 ## [3.22.0](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/3.21.2...3.22.0) (2026-11-26)
 
 
