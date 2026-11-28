@@ -18,7 +18,7 @@
     "@vitejs/plugin-vue": "^6.0.11",
     "@vue/test-utils": "^2.6.0",
     "eslint": "^10.15.0",
-    "eslint-config-it4c": "^0.14.1",
+    "eslint-config-it4c": "^0.15.0",
     "jsdom": "^31.0.1",
     "vite": "^8.3.8",
     "vitest": "^5.1.1"
