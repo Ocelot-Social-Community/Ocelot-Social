@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.0.10](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.9...ui-v0.0.10) (2026-11-28)
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.6 to 26.6.7 in /packages/ui ([#11172](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11172)) ([1c1c598](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/1c1c5989f4d89171f0a78612523f4bffc7dc1ef3))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui ([#11178](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11178)) ([7ad696f](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/7ad696f50a974c0f503a41e20d14a722d14cf95c))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui/examples/vue2-css ([#11165](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11165)) ([4617e62](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/4617e627123cb9c3e1a3c6ec9842a47a0dfcca37))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui/examples/vue3-css ([#11171](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11171)) ([005bf30](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/005bf30000f9f2cfe1e2a24a0258a0fdb570eab8))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/ui/examples/vue3-tailwind ([#11166](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11166)) ([fb32af9](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/fb32af918d28b7f87f2395587cf6d793f78cb759))
+
 ## [0.0.9](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/ui-v0.0.8...ui-v0.0.9) (2026-11-25)
 
 
