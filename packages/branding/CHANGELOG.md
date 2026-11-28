@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.6](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.5...branding-v0.2.6) (2026-11-28)
+
+
+### Build System & Dependencies
+
+* **deps-dev:** bump @types/node from 26.6.6 to 26.6.7 in /packages/branding ([#11168](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11168)) ([a19d0ac](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/a19d0ac2f4a1bb1c13d8d6e869e900aed7fc00d9))
+* **deps-dev:** bump eslint-config-it4c from 0.14.1 to 0.15.0 in /packages/branding ([#11176](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11176)) ([25e270e](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/25e270e4f745192f84289607a4bb29b522e64f79))
+* **deps-dev:** bump typescript-eslint from 8.73.0 to 8.74.0 in /packages/branding ([#11174](https://github.com/Ocelot-Social-Community/Ocelot-Social/issues/11174)) ([24853cf](https://github.com/Ocelot-Social-Community/Ocelot-Social/commit/24853cf28f9a323756260161afabd52351cb7d22))
+
 ## [0.2.5](https://github.com/Ocelot-Social-Community/Ocelot-Social/compare/branding-v0.2.4...branding-v0.2.5) (2026-11-25)
 
 
