@@ -111,7 +111,7 @@ services:
 
   # Only ever a message bus here, so nothing is written to disk.
   redis:
-    image: redis:8.10-alpine
+    image: redis:8.12-alpine
     command: redis-server --requirepass redis-test-password --save "" --appendonly no
 
   # A stand-in for Mapbox's geocoding API, answering from a fixed list of places
